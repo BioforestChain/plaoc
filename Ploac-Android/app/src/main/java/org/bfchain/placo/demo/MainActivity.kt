@@ -2,24 +2,44 @@ package org.bfchain.placo.demo
 
 //import com.google.accompanist.web.Webview
 import android.annotation.SuppressLint
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
-import android.webkit.JavascriptInterface
+import android.util.Size
+import android.widget.StackView
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.camera.core.Camera
+import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageAnalysis
+import androidx.camera.core.ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST
+import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.view.PreviewView
 import androidx.compose.animation.*
+import androidx.compose.animation.core.FiniteAnimationSpec
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.ContextCompat
 import androidx.navigation.*
 //import androidx.navigation.compose.NavHost
 //import androidx.navigation.compose.composable
@@ -34,9 +54,10 @@ import com.google.accompanist.navigation.material.ModalBottomSheetLayout
 import com.google.accompanist.web.*
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
+import org.bfchain.placo.demo.plugin.scanner.QrCodeAnalyzer
 import org.bfchain.placo.demo.ui.theme.PlacoDemoTheme
+import java.lang.Exception
 import java.net.URLDecoder
-import java.net.URLEncoder
 
 
 private val TAG = "MainActivity"
@@ -57,6 +78,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colors.background
                 ) {
                     NavFun(activity = activity)
+
                 }
             }
         }
@@ -88,13 +110,49 @@ private fun NavFun(activity: ComponentActivity) {
     val bottomSheetNavigator = rememberBottomSheetNavigator()
     val navController = rememberAnimatedNavController(bottomSheetNavigator)
 
+    val durationMillis = 400 * 3;
 
-    ModalBottomSheetLayout(bottomSheetNavigator) {
+    ModalBottomSheetLayout(
+        bottomSheetNavigator,
+//                modifier = Modifier.padding(innerPadding)
+    ) {
+        AnimatedNavHost(
+            navController = navController,
+            startDestination = "profile",
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentScope.SlideDirection.Left,
+                    animationSpec = tween(durationMillis)
+                )//.plus(fadeIn(animationSpec = tween(durationMillis)))
+//                expandIn(animationSpec = tween(durationMillis))
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentScope.SlideDirection.Left,
+                    animationSpec = tween(durationMillis),
+                    targetOffset = { it -> (it * 0.25).toInt() },
+                )
+//                shrinkOut(animationSpec = tween(durationMillis))
+            },
+            popEnterTransition = {
+                slideIntoContainer(
+                    AnimatedContentScope.SlideDirection.Right,
+                    animationSpec = tween(durationMillis)
+                )
+            },
+            popExitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentScope.SlideDirection.Right,
+                    animationSpec = tween(durationMillis),
+                    targetOffset = { it -> (it * 0.25).toInt() },
+                )//.plus(fadeOut(animationSpec = tween(durationMillis)))
+            },
 
-        AnimatedNavHost(navController = navController, startDestination = "profile") {
+            ) {
             composable("home") { Greeting("Home!!") }
             composable("profile") { Profile(navController, activity) }
-            composable("friendslist") { FriendsList() }
+            composable("friendslist") { FriendsList(navController) }
+            composable("qrcode") { QrCodeScanner(navController) }
             composable("web") {
                 DwebIntel(navController = navController)
 
@@ -127,7 +185,6 @@ private fun NavFun(activity: ComponentActivity) {
 
         }
     }
-
 }
 
 
@@ -197,64 +254,97 @@ private fun DWebViewList(
 }
 
 @Composable
+private fun MyScaffold(
+    navController: NavController,
+    title: String,
+    bodyContentBuilder: @Composable (Modifier) -> Unit
+) {
+    val canGoBack by remember {
+        mutableStateOf(navController.backQueue.size > 2)
+    }
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(text = title)
+                },
+                navigationIcon = if (canGoBack) {
+                    {
+                        IconButton(onClick = {
+                            navController.popBackStack()
+                        }) {
+                            Icon(Icons.Filled.ArrowBack, "backIcon")
+                        }
+                    }
+                } else {
+                    null
+                },
+                backgroundColor = MaterialTheme.colors.primary,
+                contentColor = Color.White,
+                elevation = 10.dp
+            )
+        },
+        content = { innerPadding ->
+            bodyContentBuilder(Modifier.padding(innerPadding))
+        }
+    )
+}
+
+@Composable
 private fun Profile(navController: NavController, activity: ComponentActivity) {
     var value by rememberSaveable { mutableStateOf("Hello\nWorld\nInvisible") }
 
     val context = LocalContext.current
-    Column() {
-
-        Button(onClick = {
-            navController.navigate("friendslist") {
-                popUpTo("home")
+    MyScaffold(navController, "QrCodeScanner") { modifier ->
+        Column(modifier = modifier) {
+            Button(onClick = { navController.navigate("qrcode") }) {
+                Text(text = "qrcode scanner")
             }
-        }) {
-            Text(text = "Navigate next")
+            Button(onClick = {
+                navController.navigate("friendslist") {
+                    popUpTo("home")
+                }
+            }) {
+                Text(text = "Navigate next")
+            }
+            Button(onClick = {
+
+                openDWebWindow(activity = activity, url = "file:///android_asset/example.html")
+
+                Log.i(TAG, "startActivity!!!")
+            }) {
+                Text(text = "Go Web")
+            }
+            Button(onClick = {
+                navController.navigate("sheet" + "?arg=From Home Screen")
+            }) {
+                Text(text = "Show Sheet")
+            }
+
+            TextField(
+                value = value,
+                onValueChange = { value = it },
+                label = { Text("Enter text") },
+                maxLines = 2,
+                textStyle = TextStyle(color = Color.Blue, fontWeight = FontWeight.Bold),
+                modifier = Modifier.padding(20.dp)
+            )
         }
-        Button(onClick = {
 
-//            navController.navigate(
-//                "demo-web/${
-//                    URLEncoder.encode(
-//                        "file:///android_asset/example.html",
-//                        "UTF-8"
-//                    )
-//                }"
-//            ) {
-//                popUpTo("friendslist")
-//            }
-//                            openDWebWindow(activity, url);
-
-
-            openDWebWindow(activity = activity, url = "file:///android_asset/example.html")
-
-            Log.i(TAG, "startActivity!!!")
-        }) {
-            Text(text = "Go Web")
-        }
-        Button(onClick = {
-            navController.navigate("sheet" + "?arg=From Home Screen")
-        }) {
-            Text(text = "Show Sheet")
-        }
-
-        TextField(
-            value = value,
-            onValueChange = { value = it },
-            label = { Text("Enter text") },
-            maxLines = 2,
-            textStyle = TextStyle(color = Color.Blue, fontWeight = FontWeight.Bold),
-            modifier = Modifier.padding(20.dp)
-        )
     }
+
+
 }
 
 
 @Composable
-private fun FriendsList() {
-    Column() {
-        Text(text = "Friend KangKang!")
-        Text(text = "FriendsList Dixie!")
-        Text(text = "FriendsList Jane!")
+private fun FriendsList(navController: NavController) {
+    MyScaffold(navController, title = "FriendsList") { modifier ->
+        Column(modifier) {
+            Text(text = "Friend KangKang!")
+            Text(text = "FriendsList Dixie!")
+            Text(text = "FriendsList Jane!")
+        }
     }
 }
 
@@ -271,3 +361,123 @@ fun DefaultPreview() {
         Greeting("Android")
     }
 }
+
+@Composable
+fun QrCodeScanner(navController: NavController) {
+    var code by remember {
+        mutableStateOf("")
+    }
+    val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val cameraProviderFuture = remember {
+        ProcessCameraProvider.getInstance(context)
+    }
+    var hasCamPermission by remember {
+        mutableStateOf(
+            ContextCompat.checkSelfPermission(
+                context,
+                android.Manifest.permission.CAMERA
+            ) == PackageManager.PERMISSION_GRANTED
+        )
+    }
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { granted ->
+            hasCamPermission = granted
+        }
+    )
+    LaunchedEffect(key1 = true) {
+        launcher.launch(android.Manifest.permission.CAMERA)
+    }
+
+
+    MyScaffold(navController, "QrCodeScanner") { modifier ->
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+        ) {
+            if (hasCamPermission) {
+                Box(modifier = Modifier.weight(1f)) {
+                    Text(text = "正在使用您都相机权限", modifier = Modifier.fillMaxWidth())
+                    AndroidView(
+                        factory = { context ->
+
+                            val previewView = PreviewView(context).also { it ->
+                                it.scaleType = PreviewView.ScaleType.FIT_CENTER
+                                it.previewStreamState.observe(lifecycleOwner) { state ->
+                                    Log.i(
+                                        TAG,
+                                        "previewView size(${state.name}): ${it.width}x${it.height}"
+                                    )
+                                    if (state.name == "STREAMING") {
+
+                                    }
+                                };
+                            }
+
+                            val preview = androidx.camera.core.Preview.Builder().build()
+                            val selector = CameraSelector.Builder()
+                                .requireLensFacing(CameraSelector.LENS_FACING_BACK)
+                                .build()
+                            preview.setSurfaceProvider(previewView.surfaceProvider)
+
+                            val imageAnalysis = ImageAnalysis.Builder()
+                                .setBackpressureStrategy(STRATEGY_KEEP_ONLY_LATEST)
+                                .build()
+                            Log.i(
+                                TAG,
+                                "previewView size: ${previewView.width}x${previewView.height}=${imageAnalysis.resolutionInfo}"
+                            )
+
+
+                            imageAnalysis.setAnalyzer(
+                                ContextCompat.getMainExecutor(context),
+                                QrCodeAnalyzer { result ->
+                                    code = result
+                                }
+                            )
+
+                            try {
+                                cameraProviderFuture.get().bindToLifecycle(
+                                    lifecycleOwner,
+                                    selector,
+                                    preview,
+                                    imageAnalysis
+                                )
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
+                            cameraProviderFuture.get().bindToLifecycle(
+                                lifecycleOwner,
+                                selector,
+                                preview,
+                                imageAnalysis
+                            )
+
+                            previewView
+                        },
+                    )
+                    Text(
+                        text = code,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(32.dp)
+                    )
+                }
+
+            } else {
+                Text(text = "未取得相机权限")
+                Button(onClick = {
+                    launcher.launch(android.Manifest.permission.CAMERA)
+                }) {
+                    Text(text = "授权相机权限")
+                }
+            }
+        }
+    }
+}
+
+
+
