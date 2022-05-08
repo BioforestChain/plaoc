@@ -123,6 +123,7 @@ fun DWebView(
     WebView(
         state = webviewState,
         onCreated = { it ->
+//            it.settings.
             it.settings.javaScriptEnabled = true;
             it.settings.setSupportMultipleWindows(true);
             it.settings.allowFileAccess = true;
@@ -150,6 +151,11 @@ fun DWebView(
 
                         Log.i(TAG, "startActivity!!!")
                     }
+                }
+
+                @JavascriptInterface
+                fun disableBack() {
+
                 }
 
                 @JavascriptInterface
@@ -219,16 +225,17 @@ fun DWebView(
                     isUserGesture: Boolean,
                     resultMsg: Message?
                 ): Boolean {
-                    val href = view!!.handler.obtainMessage()
-                    view!!.requestFocusNodeHref(href)
-                    val url = href.data.getString("url")
-//                    activity.togg
-//                    href.recycle()
-//                    webview.loadUrl(url)
+                    if (view != null) {
+                        val href = view.handler.obtainMessage()
+                        view.requestFocusNodeHref(href)
+                        val url = href.data.getString("url")
+                        if (url != null) {
+                            openDWebWindow(activity = activity, url = url)
+                            return true;
+                        }
+                    }
+                    return super.onCreateWindow(view, isDialog, isUserGesture, resultMsg)
 
-                    openDWebWindow(activity = activity, url = url.toString())
-//                    return super.onCreateWindow(view, isDialog, isUserGesture, resultMsg)
-                    return true;
                 }
 
             }
