@@ -3,8 +3,10 @@ package org.bfchain.plaoc
 //import com.google.accompanist.web.Webview
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -34,6 +36,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.core.content.ContextCompat
 import androidx.navigation.*
 //import androidx.navigation.compose.NavHost
@@ -303,6 +306,15 @@ private fun Profile(navController: NavController, activity: ComponentActivity) {
                 }
             }) {
                 Text(text = "Navigate next")
+            }
+            Button(onClick = {
+//                val intent = Intent(
+//                    Intent.ACTION_PICK,
+//                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+//                startActivityForResult(activity, intent, IntentUtil.instance.openImageGalleryCode);
+
+            }) {
+                Text(text = "选择图片")
             }
             Button(onClick = {
                 val bfs = Boot(activity);

@@ -83,5 +83,12 @@
         my_nav.testCallJs();
       };
     </script>
+
+    <input type="file" accept="image/*" id="image_picker"/>
+    <script>
+      image_picker.onchange = (e) => {
+        console.log(e.files)
+      }
+    </script>
   </body>
 </html>
