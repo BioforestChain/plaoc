@@ -9,7 +9,7 @@ android {
     compileSdk = 32
 
     defaultConfig {
-        applicationId = "org.bfchain.placo.demo"
+        applicationId = "org.bfchain.demo"
         minSdk = 28
         targetSdk = 32
         versionCode = 1

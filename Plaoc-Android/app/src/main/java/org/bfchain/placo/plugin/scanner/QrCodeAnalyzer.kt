@@ -1,7 +1,6 @@
-package org.bfchain.placo.demo.plugin.scanner
+package org.bfchain.placo.plugin.scanner
 
 import android.graphics.ImageFormat
-import android.graphics.Rect
 import android.util.Log
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy

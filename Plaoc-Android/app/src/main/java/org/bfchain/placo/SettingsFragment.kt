@@ -1,4 +1,4 @@
-package org.bfchain.placo.demo
+package org.bfchain.placo
 
 import android.os.Bundle
 import androidx.preference.PreferenceFragmentCompat

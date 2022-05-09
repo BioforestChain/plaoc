@@ -1,4 +1,4 @@
-package org.bfchain.placo.demo
+package org.bfchain.placo
 
 import android.annotation.SuppressLint
 import android.app.ActivityManager
@@ -8,7 +8,6 @@ import android.os.Bundle
 import android.os.Message
 import android.util.Log
 import android.webkit.JavascriptInterface
-import android.webkit.WebSettings
 import android.webkit.WebView
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -18,7 +17,6 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -30,7 +28,7 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
 import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import com.google.accompanist.web.*
-import org.bfchain.placo.demo.ui.theme.PlacoDemoTheme
+import org.bfchain.placo.ui.theme.PlacoDemoTheme
 import java.net.URLDecoder
 import java.net.URLEncoder
 
@@ -53,7 +51,7 @@ class DWebViewActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        DWebViewActivity.ALL.add(this)
+        ALL.add(this)
 
         android.webkit.WebView.setWebContentsDebuggingEnabled(true)
         Log.i(TAG, "onCreate")
@@ -123,13 +121,14 @@ fun DWebView(
     WebView(
         state = webviewState,
         onCreated = { it ->
-//            it.settings.
             it.settings.javaScriptEnabled = true;
             it.settings.setSupportMultipleWindows(true);
             it.settings.allowFileAccess = true;
             it.settings.javaScriptCanOpenWindowsAutomatically = true;
-//            it.settings.pluginState = WebSettings.PluginState.ON;
-
+            it.settings.domStorageEnabled = true;
+            it.settings.databaseEnabled= true;
+            it.settings.safeBrowsingEnabled = true;
+            it.settings.setGeolocationEnabled(true);
 
             class JsObject {
                 @JavascriptInterface
@@ -150,6 +149,21 @@ fun DWebView(
                         openDWebWindow(activity = activity, url = to)
 
                         Log.i(TAG, "startActivity!!!")
+                    }
+                }
+
+                @JavascriptInterface
+                fun jsFunction(a: Int, b: Int) {
+                    Log.e(TAG, "call jsFunction in java.fail~~~")
+                }
+
+                @JavascriptInterface
+                fun testCallJs() {
+//                    jsFunction(1, 2)
+                    activity.runOnUiThread {
+                        it.evaluateJavascript("my_nav.jsFunction2(2,3)") { result ->
+                            Log.i(TAG, "eval jsFunction ${result.toFloat()}")
+                        };
                     }
                 }
 
@@ -188,6 +202,38 @@ fun DWebView(
                 }
             }
             it.addJavascriptInterface(JsObject(), "my_nav")
+
+            class Navigator_FFI {
+                @JavascriptInterface
+                fun init(): String {
+                    return """{"info":{"nid":0,"data":""},"parent:{"nid":0,"data":""}}"""
+                }
+
+                @JavascriptInterface
+                fun  push(nid: Int, route: String): Boolean{
+
+                }
+                @JavascriptInterface
+                fun    pop(nid: number, count: number): number;
+                @JavascriptInterface
+                func    replace(nid: number, at: number, newRoute: Route): boolean;
+                @JavascriptInterface
+                func   fork(nid: number, data : Cloneable, parentNavigatorId: number): number;
+                @JavascriptInterface
+                func   checkout(nid: number, toNid: number): boolean;
+                @JavascriptInterface
+                func    destroy(nid: number, targetNid: number): boolean;
+
+                fun emitActivited(fromNid: Int, toNid: Int) {
+                    it.evaluateJavascript("navigator_ffi.onActivited.emit({fromNid:$fromNid,toNid:$toNid})") {}
+                }
+
+                fun emitUnActivited(fromNid: Int, toNid: Int) {
+                    it.evaluateJavascript("navigator_ffi.onUnActivited.emit({fromNid:$fromNid,toNid:$toNid})") {}
+                }
+            }
+            it.addJavascriptInterface(Navigator_FFI(), "navigator_ffi")
+
         },
         client = remember {
             class MyWebViewClient : AccompanistWebViewClient() {

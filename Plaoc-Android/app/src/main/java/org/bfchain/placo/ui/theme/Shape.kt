@@ -1,4 +1,4 @@
-package org.bfchain.placo.demo.ui.theme
+package org.bfchain.placo.ui.theme
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Shapes

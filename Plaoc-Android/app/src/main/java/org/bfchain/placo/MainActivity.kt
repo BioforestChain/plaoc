@@ -1,24 +1,21 @@
-package org.bfchain.placo.demo
+package org.bfchain.placo
 
 //import com.google.accompanist.web.Webview
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
-import android.util.Size
-import android.widget.StackView
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.animation.*
-import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -27,7 +24,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -35,7 +31,6 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -54,8 +49,8 @@ import com.google.accompanist.navigation.material.ModalBottomSheetLayout
 import com.google.accompanist.web.*
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
-import org.bfchain.placo.demo.plugin.scanner.QrCodeAnalyzer
-import org.bfchain.placo.demo.ui.theme.PlacoDemoTheme
+import org.bfchain.placo.plugin.scanner.QrCodeAnalyzer
+import org.bfchain.placo.ui.theme.PlacoDemoTheme
 import java.lang.Exception
 import java.net.URLDecoder
 
@@ -469,7 +464,7 @@ fun QrCodeScanner(navController: NavController) {
             } else {
                 Text(text = "未取得相机权限")
                 Button(onClick = {
-                    launcher.launch(android.Manifest.permission.CAMERA)
+                    launcher.launch(Manifest.permission.CAMERA)
                 }) {
                     Text(text = "授权相机权限")
                 }

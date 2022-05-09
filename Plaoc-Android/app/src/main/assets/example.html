@@ -1,71 +1,87 @@
 <html>
-
-<head>
+  <head>
     <title>你好🎋</title>
-</head>
+  </head>
 
-<body>
+  <body>
     <h1>This is Example!!<code id="page_id"></code></h1>
     <script>
-        page_id.innerHTML = new Date
+      page_id.innerHTML = new Date();
     </script>
     <ol id="hreflist">
-        <li><a target="_blank" href="http://baidu.com">http://baidu.com</a></li>
-        <li><a target="_blank" href="https://gaubee.com">https://gaubee.com</a></li>
-        <li><a target="_blank" href="file:///android_asset/example.html">file:///android_asset/example.html</a></li>
+      <li><a target="_blank" href="http://baidu.com">http://baidu.com</a></li>
+      <li>
+        <a target="_blank" href="https://gaubee.com">https://gaubee.com</a>
+      </li>
+      <li>
+        <a target="_blank" href="file:///android_asset/example.html"
+          >file:///android_asset/example.html</a
+        >
+      </li>
     </ol>
     <ol id="linklist">
-        <li>http://baidu.com</li>
-        <li>https://gaubee.com</li>
-        <li>file:///android_asset/example.html</li>
+      <li>http://baidu.com</li>
+      <li>https://gaubee.com</li>
+      <li>file:///android_asset/example.html</li>
     </ol>
     <input id="nav_input" value="file:///android_asset/example.html" />
     <button id="do_nav">GO!!!</button>
     <script>
-        do_nav.onclick = () => {
-            const route = nav_input.value.trim();
-            if (
-                route.startsWith("http:") ||
-                route.startsWith("https:") ||
-                route.startsWith("file:")
-            ) {
-                my_nav.navigateWeb(encodeURIComponent(route));
-            } else {
-                my_nav.navigate(route);
-            }
-        };
-        linklist.onclick = (e) => {
-            const liEle = e.target;
-            if (liEle instanceof HTMLElement && liEle.tagName === "LI") {
-                nav_input.value = liEle.textContent;
-            }
-        };
+      do_nav.onclick = () => {
+        const route = nav_input.value.trim();
+        if (
+          route.startsWith("http:") ||
+          route.startsWith("https:") ||
+          route.startsWith("file:")
+        ) {
+          my_nav.navigateWeb(encodeURIComponent(route));
+        } else {
+          my_nav.navigate(route);
+        }
+      };
+      linklist.onclick = (e) => {
+        const liEle = e.target;
+        if (liEle instanceof HTMLElement && liEle.tagName === "LI") {
+          nav_input.value = liEle.textContent;
+        }
+      };
     </script>
 
     <ol id="titlelist">
-        <li>💗ℹ️🧨🤣🎊😹😹🧧🙈🦸‍♀️🆙⚠️📤😚❕💙✅⏰😒🎉❌❤️</li>
-        <li>~Title~</li>
+      <li>💗ℹ️🧨🤣🎊😹😹🧧🙈🦸‍♀️🆙⚠️📤😚❕💙✅⏰😒🎉❌❤️</li>
+      <li>~Title~</li>
     </ol>
     <input id="title_input" value="标题" />
     <button id="do_title">CHANGE!!!</button>
     <script>
-        do_title.onclick = () => {
-            document.title = title_input.value;
-        };
-        titlelist.onclick = (e) => {
-            const liEle = e.target;
-            if (liEle instanceof HTMLElement && liEle.tagName === "LI") {
-                title_input.value = liEle.textContent;
-            }
+      do_title.onclick = () => {
+        document.title = title_input.value;
+      };
+      titlelist.onclick = (e) => {
+        const liEle = e.target;
+        if (liEle instanceof HTMLElement && liEle.tagName === "LI") {
+          title_input.value = liEle.textContent;
         }
+      };
     </script>
 
     <button id="do_back">BACK!!</button>
     <script>
-        do_back.onclick = () => {
-            my_nav.back()
-        }
+      do_back.onclick = () => {
+        my_nav.back();
+      };
     </script>
-</body>
 
+    <button id="call_js">CALL JS!!</button>
+    <script>
+      alert(my_nav.jsFunction);
+      call_js.onclick = () => {
+        my_nav.jsFunction2 = (a, b) => {
+          alert(`hi ${a},${b}`);
+          return a + b;
+        };
+        my_nav.testCallJs();
+      };
+    </script>
+  </body>
 </html>

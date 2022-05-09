@@ -1,4 +1,4 @@
-package org.bfchain.placo.demo
+package org.bfchain.demo
 
 import org.junit.Test
 
