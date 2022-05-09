@@ -1,4 +1,4 @@
-package org.bfchain.placo
+package org.bfchain.plaoc
 
 //import com.google.accompanist.web.Webview
 import android.Manifest
@@ -49,8 +49,10 @@ import com.google.accompanist.navigation.material.ModalBottomSheetLayout
 import com.google.accompanist.web.*
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
-import org.bfchain.placo.plugin.scanner.QrCodeAnalyzer
-import org.bfchain.placo.ui.theme.PlacoDemoTheme
+import org.bfchain.plaoc.R
+import org.bfchain.plaoc.bfs.Boot
+import org.bfchain.plaoc.plugin.scanner.QrCodeAnalyzer
+import org.bfchain.plaoc.ui.theme.PlaocTheme
 import java.lang.Exception
 import java.net.URLDecoder
 
@@ -65,7 +67,7 @@ class MainActivity : ComponentActivity() {
         Log.i(TAG, "onCreate")
 
         setContent {
-            PlacoDemoTheme {
+            PlaocTheme {
 
                 // A surface container using the 'background' color from the theme
                 Surface(
@@ -303,6 +305,11 @@ private fun Profile(navController: NavController, activity: ComponentActivity) {
                 Text(text = "Navigate next")
             }
             Button(onClick = {
+                val bfs = Boot(activity);
+            }) {
+                Text(text = "Start BFS")
+            }
+            Button(onClick = {
 
                 openDWebWindow(activity = activity, url = "file:///android_asset/example.html")
 
@@ -327,8 +334,6 @@ private fun Profile(navController: NavController, activity: ComponentActivity) {
         }
 
     }
-
-
 }
 
 
@@ -336,7 +341,7 @@ private fun Profile(navController: NavController, activity: ComponentActivity) {
 private fun FriendsList(navController: NavController) {
     MyScaffold(navController, title = "FriendsList") { modifier ->
         Column(modifier) {
-            Text(text = "Friend KangKang!")
+            Text(text = "Friend KangKang!${R.xml.root_preferences}")
             Text(text = "FriendsList Dixie!")
             Text(text = "FriendsList Jane!")
         }
@@ -351,7 +356,7 @@ fun Greeting(name: String) {
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
-    PlacoDemoTheme {
+    PlaocTheme {
         Greeting("Android")
     }
 }

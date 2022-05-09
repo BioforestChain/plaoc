@@ -1,4 +1,4 @@
-package org.bfchain.placo
+package org.bfchain.plaoc
 
 import android.annotation.SuppressLint
 import android.app.ActivityManager
@@ -28,11 +28,11 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
 import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import com.google.accompanist.web.*
-import org.bfchain.placo.ui.theme.PlacoDemoTheme
+import org.bfchain.plaoc.ui.theme.PlaocTheme
 import java.net.URLDecoder
 import java.net.URLEncoder
 
-private val TAG = "DWebViewActivity"
+private const val TAG = "DWebViewActivity"
 
 class DWebViewActivity : ComponentActivity() {
     companion object {
@@ -61,7 +61,7 @@ class DWebViewActivity : ComponentActivity() {
 //                val navController = rememberNavController()
         val activity = this;
         setContent {
-            PlacoDemoTheme {
+            PlaocTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background,
@@ -203,36 +203,36 @@ fun DWebView(
             }
             it.addJavascriptInterface(JsObject(), "my_nav")
 
-            class Navigator_FFI {
-                @JavascriptInterface
-                fun init(): String {
-                    return """{"info":{"nid":0,"data":""},"parent:{"nid":0,"data":""}}"""
-                }
-
-                @JavascriptInterface
-                fun  push(nid: Int, route: String): Boolean{
-
-                }
-                @JavascriptInterface
-                fun    pop(nid: number, count: number): number;
-                @JavascriptInterface
-                func    replace(nid: number, at: number, newRoute: Route): boolean;
-                @JavascriptInterface
-                func   fork(nid: number, data : Cloneable, parentNavigatorId: number): number;
-                @JavascriptInterface
-                func   checkout(nid: number, toNid: number): boolean;
-                @JavascriptInterface
-                func    destroy(nid: number, targetNid: number): boolean;
-
-                fun emitActivited(fromNid: Int, toNid: Int) {
-                    it.evaluateJavascript("navigator_ffi.onActivited.emit({fromNid:$fromNid,toNid:$toNid})") {}
-                }
-
-                fun emitUnActivited(fromNid: Int, toNid: Int) {
-                    it.evaluateJavascript("navigator_ffi.onUnActivited.emit({fromNid:$fromNid,toNid:$toNid})") {}
-                }
-            }
-            it.addJavascriptInterface(Navigator_FFI(), "navigator_ffi")
+//            class Navigator_FFI {
+//                @JavascriptInterface
+//                fun init(): String {
+//                    return """{"info":{"nid":0,"data":""},"parent:{"nid":0,"data":""}}"""
+//                }
+//
+//                @JavascriptInterface
+//                fun  push(nid: Int, route: String): Boolean{
+//
+//                }
+//                @JavascriptInterface
+//                fun    pop(nid: number, count: number): number;
+//                @JavascriptInterface
+//                func    replace(nid: number, at: number, newRoute: Route): boolean;
+//                @JavascriptInterface
+//                func   fork(nid: number, data : Cloneable, parentNavigatorId: number): number;
+//                @JavascriptInterface
+//                func   checkout(nid: number, toNid: number): boolean;
+//                @JavascriptInterface
+//                func    destroy(nid: number, targetNid: number): boolean;
+//
+//                fun emitActivited(fromNid: Int, toNid: Int) {
+//                    it.evaluateJavascript("navigator_ffi.onActivited.emit({fromNid:$fromNid,toNid:$toNid})") {}
+//                }
+//
+//                fun emitUnActivited(fromNid: Int, toNid: Int) {
+//                    it.evaluateJavascript("navigator_ffi.onUnActivited.emit({fromNid:$fromNid,toNid:$toNid})") {}
+//                }
+//            }
+//            it.addJavascriptInterface(Navigator_FFI(), "navigator_ffi")
 
         },
         client = remember {

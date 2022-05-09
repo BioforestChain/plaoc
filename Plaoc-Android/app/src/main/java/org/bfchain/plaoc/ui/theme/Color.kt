@@ -1,4 +1,4 @@
-package org.bfchain.placo.ui.theme
+package org.bfchain.plaoc.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

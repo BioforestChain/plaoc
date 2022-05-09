@@ -9,7 +9,7 @@ android {
     compileSdk = 32
 
     defaultConfig {
-        applicationId = "org.bfchain.demo"
+        applicationId = "org.bfchain.plaoc"
         minSdk = 28
         targetSdk = 32
         versionCode = 1
@@ -67,6 +67,7 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:$compose_version")
     debugImplementation("androidx.compose.ui:ui-tooling:$compose_version")
+    implementation("com.google.code.gson:gson:2.9.0")
 
     val nav_version = "2.4.2"
     implementation("androidx.navigation:navigation-compose:$nav_version")

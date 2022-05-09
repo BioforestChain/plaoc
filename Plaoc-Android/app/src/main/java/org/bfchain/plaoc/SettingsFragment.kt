@@ -1,7 +1,8 @@
-package org.bfchain.placo
+package org.bfchain.plaoc
 
 import android.os.Bundle
 import androidx.preference.PreferenceFragmentCompat
+import org.bfchain.plaoc.R
 
 class SettingsFragment : PreferenceFragmentCompat() {
 

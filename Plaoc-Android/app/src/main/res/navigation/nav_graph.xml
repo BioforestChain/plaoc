@@ -6,6 +6,6 @@
 
     <activity
         android:id="@+id/mainActivity"
-        android:name="org.bfchain.placo.MainActivity"
+        android:name="org.bfchain.plaoc.MainActivity"
         android:label="MainActivity" />
 </navigation>

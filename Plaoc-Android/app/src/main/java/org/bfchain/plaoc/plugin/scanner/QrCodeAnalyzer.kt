@@ -1,4 +1,4 @@
-package org.bfchain.placo.plugin.scanner
+package org.bfchain.plaoc.plugin.scanner
 
 import android.graphics.ImageFormat
 import android.util.Log
