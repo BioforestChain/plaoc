@@ -9,6 +9,7 @@ package org.bfchain.plaoc
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ActivityNotFoundException
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
@@ -22,10 +23,14 @@ import android.view.View
 import android.webkit.*
 import android.webkit.GeolocationPermissions.Callback
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.CallSuper
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.fragment.app.Fragment
 import com.google.accompanist.web.*
 import java.io.UnsupportedEncodingException
@@ -757,29 +762,89 @@ fun AdvancedWebView(
     captureBackPresses: Boolean = true,
     navigator: WebViewNavigator = rememberWebViewNavigator(),
     onCreated: (WebView) -> Unit = {},
-    mSettings: AdvancedWebViewSettings = remember {
-        AdvancedWebViewSettings()
-    },
+    mSettings: AdvancedWebViewSettings = remember { AdvancedWebViewSettings() },
+) {
 
+    data class InputFileOptions(
+        val accept: List<String>,
+        val multiple: Boolean,
+        val capture: Boolean
     ) {
 
-    val getContentLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent(),
-        onResult = { result ->
-            Log.i(TAG, "GetContent Result:$result")
-            val uriList = mutableListOf<Uri>()
-            if (result != null) {
-                uriList.add(result)
-            }
-            runChromeFilePathCallback(uriList)
-        });
+    }
 
-    val getMultipleContentLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetMultipleContents(),
+    @RequiresApi(18)
+    open class InputFile :
+        ActivityResultContract<InputFileOptions, List<@JvmSuppressWildcards Uri>>() {
+        @CallSuper
+        override fun createIntent(context: Context, input: InputFileOptions): Intent {
+            return Intent(Intent.ACTION_GET_CONTENT)
+                .addCategory(Intent.CATEGORY_OPENABLE).also { it ->
+                    if (input.multiple) {
+                        it.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+                    }
+                    /**
+                     * @todo Android EXTRA_MIME_TYPES 不支持 HTML-accpet标准中的文件名后缀:
+                     *
+                     * - A valid case-insensitive filename extension, starting with a period (".") character. For example: .jpg, .pdf, or .doc.
+                     * - A valid MIME type string, with no extensions.
+                     * - The string audio/\* meaning "any audio file".
+                     * - The string video/\* meaning "any video file".
+                     * - The string image/\* meaning "any image file".
+                     */
+                    if (input.accept.size > 1) {
+                        it.type = "*/*"
+                        it.putExtra(Intent.EXTRA_MIME_TYPES, input.accept.toTypedArray())
+                    } else {
+                        it.type = input.accept.getOrElse(0) { "*/*" }
+                    }
+                    /**
+                     * @todo 增加 capture 的支持
+                     */
+                }
+
+        }
+
+        final override fun getSynchronousResult(
+            context: Context,
+            input: InputFileOptions
+        ): SynchronousResult<List<@JvmSuppressWildcards Uri>>? = null
+
+        final override fun parseResult(resultCode: Int, intent: Intent?): List<Uri> {
+            return intent.takeIf {
+                resultCode == Activity.RESULT_OK
+            }?.let {
+                // Use a LinkedHashSet to maintain any ordering that may be
+                // present in the ClipData
+                val resultSet = LinkedHashSet<Uri>()
+                it.data?.let { data ->
+                    resultSet.add(data)
+                }
+                val clipData = it.clipData
+                if (clipData == null && resultSet.isEmpty()) {
+                    return emptyList()
+                } else if (clipData != null) {
+                    for (i in 0 until clipData.itemCount) {
+                        val uri = clipData.getItemAt(i).uri
+                        if (uri != null) {
+                            resultSet.add(uri)
+                        }
+                    }
+                }
+                return ArrayList(resultSet)
+            } ?: emptyList()
+        }
+    }
+
+
+    val inputFileLauncher = rememberLauncherForActivityResult(
+        contract = InputFile(),
         onResult = { result ->
-            Log.i(TAG, "GetMultipleContents Result:$result")
+            Log.i(TAG, "InputFile Result:$result")
             runChromeFilePathCallback(result)
         });
+
+    val context = LocalContext.current
 
     WebView(
         state = state,
@@ -806,20 +871,20 @@ fun AdvancedWebView(
             wcc.onShowFileChooser = { webView: WebView?,
                                       filePathCallback: ValueCallback<Array<Uri>?>?,
                                       fileChooserParams: WebChromeClient.FileChooserParams? ->
-                var multi = false
-                var acceptType = "*/*"
+                var multiple = false
+                var capture = false
+                val accept = mutableListOf<String>();
+
                 fileChooserParams?.let { params ->
-                    multi = params.mode == WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE
-                    params.acceptTypes.getOrNull(0)?.let { type ->
-                        acceptType = type
-                    }
+                    capture = params.isCaptureEnabled
+                    multiple = params.mode == WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE
+                    accept.addAll(params.acceptTypes)
                 }
                 chromeFilePathCallback = filePathCallback
-                if (multi) {
-                    getMultipleContentLauncher.launch(acceptType)
-                } else {
-                    getContentLauncher.launch(acceptType)
-                }
+                val options =
+                    InputFileOptions(accept = accept, multiple = multiple, capture = capture)
+                inputFileLauncher.launch(options)
+
                 true
             }
             wcc
