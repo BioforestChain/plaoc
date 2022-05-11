@@ -12,6 +12,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.launch
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST
@@ -294,6 +295,12 @@ private fun MyScaffold(
 private fun Profile(navController: NavController, activity: ComponentActivity) {
     var value by rememberSaveable { mutableStateOf("Hello\nWorld\nInvisible") }
 
+    val pickContactLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickContact(),
+        onResult = { result ->
+            Log.i(TAG, "PickContact Result:$result")
+        });
+
     val context = LocalContext.current
     MyScaffold(navController, "QrCodeScanner") { modifier ->
         Column(modifier = modifier) {
@@ -334,6 +341,17 @@ private fun Profile(navController: NavController, activity: ComponentActivity) {
             }) {
                 Text(text = "Show Sheet")
             }
+            Button(onClick = {
+                pickContactLauncher.launch()
+            }) {
+                Text("获取联系人")
+            }
+
+//            Button(onClick = {
+//                activityLauncher.launch()
+//            }) {
+//                Text("打开文档")
+//            }
 
             TextField(
                 value = value,

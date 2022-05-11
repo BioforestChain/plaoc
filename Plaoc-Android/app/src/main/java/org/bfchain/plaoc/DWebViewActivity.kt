@@ -8,9 +8,13 @@ import android.os.Bundle
 import android.os.Message
 import android.util.Log
 import android.webkit.JavascriptInterface
+import android.webkit.ValueCallback
+import android.webkit.WebChromeClient
 import android.webkit.WebView
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -116,20 +120,52 @@ fun DWebView(
     navController: NavController,
     activity: ComponentActivity
 ) {
+    val mSettings = remember {
+        val settings = AdvancedWebViewSettings()
+
+        class MyWebChromeClient : WebChromeClient() {
+            override fun onReceivedTitle(view: WebView?, title: String?) {
+                super.onReceivedTitle(view, title);
+                Log.i(TAG, "TITLE CHANGED!!!! $title")
+
+                activity.runOnUiThread {
+                    activity.setTaskDescription(ActivityManager.TaskDescription(title ?: ""))
+                }
+            }
+
+            override fun onCreateWindow(
+                view: WebView?,
+                isDialog: Boolean,
+                isUserGesture: Boolean,
+                resultMsg: Message?
+            ): Boolean {
+                if (view != null) {
+                    val href = view.handler.obtainMessage()
+                    view.requestFocusNodeHref(href)
+                    val url = href.data.getString("url")
+                    if (url != null) {
+                        openDWebWindow(activity = activity, url = url)
+                        return true;
+                    }
+                }
+                return super.onCreateWindow(view, isDialog, isUserGesture, resultMsg)
+
+            }
+
+        }
+        settings.setWebChromeClient(MyWebChromeClient())
+        settings.setListener(activity = activity, null)
+
+
+        settings
+    }
+
+
 //    val webviewState = rememberWebViewState(url)
 //    val context = LocalContext.current;
-    WebView(
+    AdvancedWebView(
         state = webviewState,
         onCreated = { it ->
-            it.settings.javaScriptEnabled = true;
-            it.settings.setSupportMultipleWindows(true);
-            it.settings.allowFileAccess = true;
-            it.settings.javaScriptCanOpenWindowsAutomatically = true;
-            it.settings.domStorageEnabled = true;
-            it.settings.databaseEnabled= true;
-            it.settings.safeBrowsingEnabled = true;
-            it.settings.setGeolocationEnabled(true);
-
             class JsObject {
                 @JavascriptInterface
                 fun test(to: String): String {
@@ -235,61 +271,7 @@ fun DWebView(
 //            it.addJavascriptInterface(Navigator_FFI(), "navigator_ffi")
 
         },
-        client = remember {
-            class MyWebViewClient : AccompanistWebViewClient() {
-//                override fun shouldOverrideUrlLoading(
-//                    view: WebView?,
-//                    request: WebResourceRequest?
-//                ): Boolean {
-//                    request?.url?.let {
-//                        view?.loadUrl(it.toString());
-//                        return true;
-//                    }
-//
-//                    return super.shouldOverrideUrlLoading(view, request)
-//                }
-            }
-
-            var client = MyWebViewClient()
-            client
-        },
-        chromeClient = remember {
-
-            class MyWebChromeClient : AccompanistWebChromeClient() {
-                override fun onReceivedTitle(view: WebView?, title: String?) {
-                    super.onReceivedTitle(view, title);
-                    Log.i(TAG, "TITLE CHANGED!!!! $title")
-
-                    activity.runOnUiThread {
-                        activity.setTaskDescription(ActivityManager.TaskDescription(title ?: ""))
-                    }
-                }
-
-                override fun onCreateWindow(
-                    view: WebView?,
-                    isDialog: Boolean,
-                    isUserGesture: Boolean,
-                    resultMsg: Message?
-                ): Boolean {
-                    if (view != null) {
-                        val href = view.handler.obtainMessage()
-                        view.requestFocusNodeHref(href)
-                        val url = href.data.getString("url")
-                        if (url != null) {
-                            openDWebWindow(activity = activity, url = url)
-                            return true;
-                        }
-                    }
-                    return super.onCreateWindow(view, isDialog, isUserGesture, resultMsg)
-
-                }
-
-            }
-
-            var client = MyWebChromeClient()
-
-            client
-        }
+        mSettings = mSettings
     )
 }
 

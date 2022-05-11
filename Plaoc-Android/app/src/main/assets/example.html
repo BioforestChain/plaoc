@@ -84,11 +84,66 @@
       };
     </script>
 
-    <input type="file" accept="image/*" id="image_picker"/>
+    <hr />
+    <div class="file-preview-box">
+      <div id="file_preview"></div>
+    </div>
+    <style>
+      .file-preview-box {
+        overflow: auto;
+      }
+      #file_preview {
+        max-height: 30vmax;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-content: center;
+        align-items: center;
+        justify-content: center;
+        width: min-content;
+      }
+      #file_preview img {
+        max-height: inherit;
+      }
+    </style>
+    <script>
+      function previewFiles(files) {
+        file_preview.innerHTML = "";
+        for (let i = 0; i < files.length; i++) {
+          const file = files.item(i);
+          const url = URL.createObjectURL(file);
+          const img = document.createElement("img");
+          img.src = url;
+          img.alt = file.name;
+          file_preview.appendChild(img);
+        }
+      }
+    </script>
+    <label for="image_picker">单图片选择器</label>
+    <input type="file" accept="image/*" id="image_picker" />
     <script>
       image_picker.onchange = (e) => {
-        console.log(e.files)
-      }
+        console.log(image_picker.files);
+        previewFiles(image_picker.files);
+      };
+    </script>
+    <br />
+    <label for="images_picker">多图片选择器</label>
+    <input type="file" accept="image/*" id="images_picker" multiple />
+    <script>
+      images_picker.onchange = (e) => {
+        console.log(images_picker.files);
+        previewFiles(images_picker.files);
+      };
+    </script>
+    <br />
+    <label for="files_picker">多文件选择器</label>
+    <input type="file" accept="*/*" id="files_picker" multiple />
+    <script>
+      files_picker.onchange = (e) => {
+        console.log(files_picker.files);
+        previewFiles(files_picker.files);
+      };
     </script>
   </body>
 </html>
