@@ -11,11 +11,13 @@ import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
 import android.net.http.SslError
 import android.os.Build
 import android.os.Message
+import android.os.Process
 import android.util.Base64
 import android.util.Log
 import android.view.KeyEvent
@@ -23,8 +25,9 @@ import android.view.View
 import android.webkit.*
 import android.webkit.GeolocationPermissions.Callback
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
+//import androidx.activity.result.contract.ActivityResultContract
+//import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.CallSuper
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
@@ -33,6 +36,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.fragment.app.Fragment
 import com.google.accompanist.web.*
+import org.bfchain.plaoc.plugin.inputFile.InputFileActivityResultContract
+import org.bfchain.plaoc.plugin.inputFile.InputFileOptions
+//import org.bfchain.plaoc.plugin.inputFile.ActivityResultContracts.Companion.InputFile
 import java.io.UnsupportedEncodingException
 import java.lang.ref.WeakReference
 import java.nio.charset.Charset
@@ -752,6 +758,13 @@ fun runChromeFilePathCallback(uriList: List<Uri>) {
     chromeFilePathCallback = null
 }
 
+var requestPermissionCallback: ValueCallback<Boolean>? = null
+fun runRequestPermissionCallback(granted: Boolean) {
+    requestPermissionCallback?.onReceiveValue(granted)
+    requestPermissionCallback = null
+}
+
+
 private const val TAG = "AdvancedWebView"
 
 @SuppressLint("JavascriptInterface")
@@ -765,85 +778,22 @@ fun AdvancedWebView(
     mSettings: AdvancedWebViewSettings = remember { AdvancedWebViewSettings() },
 ) {
 
-    data class InputFileOptions(
-        val accept: List<String>,
-        val multiple: Boolean,
-        val capture: Boolean
-    ) {
-
-    }
-
-    @RequiresApi(18)
-    open class InputFile :
-        ActivityResultContract<InputFileOptions, List<@JvmSuppressWildcards Uri>>() {
-        @CallSuper
-        override fun createIntent(context: Context, input: InputFileOptions): Intent {
-            return Intent(Intent.ACTION_GET_CONTENT)
-                .addCategory(Intent.CATEGORY_OPENABLE).also { it ->
-                    if (input.multiple) {
-                        it.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-                    }
-                    /**
-                     * @todo Android EXTRA_MIME_TYPES 不支持 HTML-accpet标准中的文件名后缀:
-                     *
-                     * - A valid case-insensitive filename extension, starting with a period (".") character. For example: .jpg, .pdf, or .doc.
-                     * - A valid MIME type string, with no extensions.
-                     * - The string audio/\* meaning "any audio file".
-                     * - The string video/\* meaning "any video file".
-                     * - The string image/\* meaning "any image file".
-                     */
-                    if (input.accept.size > 1) {
-                        it.type = "*/*"
-                        it.putExtra(Intent.EXTRA_MIME_TYPES, input.accept.toTypedArray())
-                    } else {
-                        it.type = input.accept.getOrElse(0) { "*/*" }
-                    }
-                    /**
-                     * @todo 增加 capture 的支持
-                     */
-                }
-
-        }
-
-        final override fun getSynchronousResult(
-            context: Context,
-            input: InputFileOptions
-        ): SynchronousResult<List<@JvmSuppressWildcards Uri>>? = null
-
-        final override fun parseResult(resultCode: Int, intent: Intent?): List<Uri> {
-            return intent.takeIf {
-                resultCode == Activity.RESULT_OK
-            }?.let {
-                // Use a LinkedHashSet to maintain any ordering that may be
-                // present in the ClipData
-                val resultSet = LinkedHashSet<Uri>()
-                it.data?.let { data ->
-                    resultSet.add(data)
-                }
-                val clipData = it.clipData
-                if (clipData == null && resultSet.isEmpty()) {
-                    return emptyList()
-                } else if (clipData != null) {
-                    for (i in 0 until clipData.itemCount) {
-                        val uri = clipData.getItemAt(i).uri
-                        if (uri != null) {
-                            resultSet.add(uri)
-                        }
-                    }
-                }
-                return ArrayList(resultSet)
-            } ?: emptyList()
-        }
-    }
-
+//    org.bfchain.plaoc.ActivityResultContracts.Companion.InputFile
 
     val inputFileLauncher = rememberLauncherForActivityResult(
-        contract = InputFile(),
+        contract = InputFileActivityResultContract(),
         onResult = { result ->
             Log.i(TAG, "InputFile Result:$result")
             runChromeFilePathCallback(result)
         });
 
+    val requestPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { granted ->
+            Log.i(TAG, "RequestPermission Result:$granted")
+            runRequestPermissionCallback(granted)
+        }
+    )
     val context = LocalContext.current
 
     WebView(
@@ -880,10 +830,26 @@ fun AdvancedWebView(
                     multiple = params.mode == WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE
                     accept.addAll(params.acceptTypes)
                 }
-                chromeFilePathCallback = filePathCallback
-                val options =
-                    InputFileOptions(accept = accept, multiple = multiple, capture = capture)
-                inputFileLauncher.launch(options)
+
+                val launchFileInput = {
+                    chromeFilePathCallback = filePathCallback
+                    val options =
+                        InputFileOptions(accept = accept, multiple = multiple, capture = capture)
+                    inputFileLauncher.launch(options)
+                }
+                if (capture && PackageManager.PERMISSION_GRANTED != context.checkPermission(
+                        android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Process.myPid(), Process.myUid()
+                    )
+                ) {
+                    requestPermissionCallback = ValueCallback {
+                        launchFileInput()
+                    }
+                    requestPermissionLauncher.launch(android.Manifest.permission.WRITE_EXTERNAL_STORAGE);
+                } else {
+                    launchFileInput()
+                }
+
 
                 true
             }

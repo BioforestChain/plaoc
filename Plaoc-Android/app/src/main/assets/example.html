@@ -102,48 +102,77 @@
         justify-content: center;
         width: min-content;
       }
-      #file_preview img {
+      #file_preview > * {
         max-height: inherit;
+        border: 1px solid blue;
       }
     </style>
     <script>
       function previewFiles(files) {
         file_preview.innerHTML = "";
         for (let i = 0; i < files.length; i++) {
+          /**
+           * @type {File}
+           */
           const file = files.item(i);
-          const url = URL.createObjectURL(file);
-          const img = document.createElement("img");
-          img.src = url;
-          img.alt = file.name;
-          file_preview.appendChild(img);
+          if (file.type.startsWith("image/")) {
+            const url = URL.createObjectURL(file);
+            const img = document.createElement("img");
+            img.src = url;
+            img.alt = file.name;
+            file_preview.appendChild(img);
+          } else if (file.type.startsWith("video/")) {
+            const url = URL.createObjectURL(file);
+            const video = document.createElement("video");
+            video.src = url;
+            video.alt = file.name;
+            video.controls = true;
+            file_preview.appendChild(video);
+          } else {
+            const item = document.createElement("div");
+            item.innerHTML = [
+              `<span>${file.name}<span>`,
+              `<span>${file.type}<span>`,
+              `<span>${file.size}<span>`,
+            ].join("<br/>");
+            file_preview.appendChild(item);
+          }
         }
+      }
+      function inputBindPreviewFiles(inputEle) {
+        inputEle.onchange = (e) => {
+          console.log(inputEle.files);
+          previewFiles(inputEle.files);
+        };
       }
     </script>
     <label for="image_picker">单图片选择器</label>
     <input type="file" accept="image/*" id="image_picker" />
+    <label for="image_picker2">拍摄图片</label>
+    <input type="file" accept="image/*" id="image_picker2" capture />
+    <label for="video_picker">拍摄视频</label>
+    <input type="file" accept="video/*" id="video_picker" capture />
     <script>
-      image_picker.onchange = (e) => {
-        console.log(image_picker.files);
-        previewFiles(image_picker.files);
-      };
+      inputBindPreviewFiles(image_picker);
+      inputBindPreviewFiles(image_picker2);
+      inputBindPreviewFiles(video_picker);
     </script>
     <br />
     <label for="images_picker">多图片选择器</label>
-    <input type="file" accept="image/*" id="images_picker" multiple />
+    <input
+      type="file"
+      accept="image/jpg, image/jpeg, image/png"
+      id="images_picker"
+      multiple
+    />
     <script>
-      images_picker.onchange = (e) => {
-        console.log(images_picker.files);
-        previewFiles(images_picker.files);
-      };
+      inputBindPreviewFiles(images_picker);
     </script>
     <br />
     <label for="files_picker">多文件选择器</label>
-    <input type="file" accept="image/jpg, image/jpeg, image/png" id="files_picker" multiple />
+    <input type="file" accept="*/*" id="files_picker" multiple />
     <script>
-      files_picker.onchange = (e) => {
-        console.log(files_picker.files);
-        previewFiles(files_picker.files);
-      };
+      inputBindPreviewFiles(files_picker);
     </script>
   </body>
 </html>
