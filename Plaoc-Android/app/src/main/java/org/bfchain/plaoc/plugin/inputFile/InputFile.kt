@@ -3,17 +3,18 @@ package org.bfchain.plaoc.plugin.inputFile
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Environment
-import android.os.Process
 import android.provider.MediaStore
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.annotation.CallSuper
 import androidx.annotation.RequiresApi
 import androidx.core.content.FileProvider
+import androidx.core.net.toFile
 import java.io.File
+import java.io.InputStream
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -23,9 +24,11 @@ private const val TAG = "InputFileActivityResultContract"
 open class InputFileActivityResultContract :
     ActivityResultContract<InputFileOptions, List<@JvmSuppressWildcards Uri>>() {
     var captureUri: Uri? = null
+    lateinit var context: Context
 
     @CallSuper
     override fun createIntent(context: Context, input: InputFileOptions): Intent {
+        this.context = context;
         if (input.capture) {
 
             val tempDir =
@@ -49,7 +52,7 @@ open class InputFileActivityResultContract :
                     return Intent(MediaStore.ACTION_IMAGE_CAPTURE)
                         .putExtra(MediaStore.EXTRA_OUTPUT, captureUri)
                 }
-                input.accept[0] === "video/*" -> {
+                input.accept[0] == "video/*" -> {
                     val tempFile: File = File.createTempFile(tmpFileTitle, ".mp4", tempDir)
                     Log.i(TAG, "fileprovider: ${context.packageName + ".fileprovider"}")
                     captureUri =
@@ -62,8 +65,22 @@ open class InputFileActivityResultContract :
                     return Intent(MediaStore.ACTION_VIDEO_CAPTURE)
                         .putExtra(MediaStore.EXTRA_OUTPUT, captureUri)
                 }
-                input.accept[0] === "audio/*" -> {
-
+                input.accept[0] == "audio/*" -> {
+//                    val tempFile: File = File.createTempFile(tmpFileTitle, ".aac", tempDir)
+//                    Log.i(TAG, "fileprovider: ${context.packageName + ".fileprovider"}")
+//                    captureUri =
+//                        FileProvider.getUriForFile(
+//                            context,
+//                            context.packageName + ".fileprovider",
+//                            tempFile
+//                        );
+//                    Log.i(TAG, "tempUri: $captureUri");
+                    /**
+                     * @todo RECORD_SOUND_ACTION 不支持 EXTRA_OUTPUT
+                     * 这里 captureUri 是用在 intent 返回data之后，用来移动到该文件的
+                     */
+                    return Intent(MediaStore.Audio.Media.RECORD_SOUND_ACTION)
+//                        .putExtra(MediaStore.EXTRA_OUTPUT, captureUri)
                 }
             }
         }
@@ -100,12 +117,10 @@ open class InputFileActivityResultContract :
         val tmpCaptureUri = captureUri;
         captureUri = null
         if (resultCode == Activity.RESULT_OK) {
-            return tmpCaptureUri?.let { uri ->
-                listOf(uri)
-            } ?: intent?.let {
+            return intent?.let {
                 // Use a LinkedHashSet to maintain any ordering that may be
                 // present in the ClipData
-                val resultSet = LinkedHashSet<Uri>()
+                val resultSet = mutableSetOf<Uri>()
                 it.data?.let { data ->
                     resultSet.add(data)
                 }
@@ -121,7 +136,26 @@ open class InputFileActivityResultContract :
                     }
                 }
 
+//                if (tmpCaptureUri != null) {
+//                    resultSet.toList().getOrNull(0)?.let { uri ->
+//                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+//                            context.contentResolver.openInputStream(uri)?.let { inStream ->
+//                                context.contentResolver.openOutputStream(tmpCaptureUri)
+//                                    ?.let { outStream ->
+//                                        inStream.copyTo(outStream)
+////                                        context.contentResolver.persistedUriPermissions
+//                                        context.contentResolver.delete(uri, null)
+//                                    }
+//                            }
+//                        } else {
+//                            TODO("VERSION.SDK_INT < R")
+//                        }
+//                    }
+//                }
+
                 return ArrayList(resultSet)
+            } ?: tmpCaptureUri?.let { uri ->
+                listOf(uri)
             } ?: emptyList()
         }
         return emptyList()
