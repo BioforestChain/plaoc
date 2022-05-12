@@ -77,6 +77,7 @@ dependencies {
     implementation("com.google.accompanist:accompanist-webview:$accompanist_version")
     implementation("com.google.accompanist:accompanist-navigation-material:$accompanist_version")
     implementation("com.google.accompanist:accompanist-navigation-animation:$accompanist_version")
+    implementation("com.google.accompanist:accompanist-systemuicontroller:$accompanist_version")
 
     // CameraX
     val camerax_version = "1.1.0-beta03"

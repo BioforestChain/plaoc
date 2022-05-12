@@ -1,23 +1,14 @@
 package org.bfchain.plaoc
 
 //import com.google.accompanist.web.Webview
-import android.Manifest
 import android.annotation.SuppressLint
-import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
-import android.provider.MediaStore
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.launch
-import androidx.camera.core.CameraSelector
-import androidx.camera.core.ImageAnalysis
-import androidx.camera.core.ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST
-import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.camera.view.PreviewView
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.border
@@ -30,15 +21,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.app.ActivityCompat.startActivityForResult
-import androidx.core.content.ContextCompat
 import androidx.navigation.*
 //import androidx.navigation.compose.NavHost
 //import androidx.navigation.compose.composable
@@ -53,11 +39,9 @@ import com.google.accompanist.navigation.material.ModalBottomSheetLayout
 import com.google.accompanist.web.*
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
-import org.bfchain.plaoc.R
 import org.bfchain.plaoc.bfs.Boot
-import org.bfchain.plaoc.plugin.scanner.QrCodeAnalyzer
+import org.bfchain.plaoc.plugin.scanner.QrCodeScanner
 import org.bfchain.plaoc.ui.theme.PlaocTheme
-import java.lang.Exception
 import java.net.URLDecoder
 
 
@@ -106,8 +90,6 @@ val createWebState = { url: String ->
 )
 @Composable
 private fun NavFun(activity: ComponentActivity) {
-
-//                val navController = rememberNavController()
     val bottomSheetNavigator = rememberBottomSheetNavigator()
     val navController = rememberAnimatedNavController(bottomSheetNavigator)
 
@@ -255,7 +237,7 @@ private fun DWebViewList(
 }
 
 @Composable
-private fun MyScaffold(
+fun MyScaffold(
     navController: NavController,
     title: String,
     bodyContentBuilder: @Composable (Modifier) -> Unit
@@ -334,7 +316,15 @@ private fun Profile(navController: NavController, activity: ComponentActivity) {
 
                 Log.i(TAG, "startActivity!!!")
             }) {
-                Text(text = "Go Web")
+                Text(text = "Go Web Example")
+            }
+            Button(onClick = {
+
+                openDWebWindow(activity = activity, url = "file:///android_asset/statusbar.html")
+
+                Log.i(TAG, "startActivity!!!")
+            }) {
+                Text(text = "Go Web StatusBar")
             }
             Button(onClick = {
                 navController.navigate("sheet" + "?arg=From Home Screen")
@@ -388,123 +378,6 @@ fun Greeting(name: String) {
 fun DefaultPreview() {
     PlaocTheme {
         Greeting("Android")
-    }
-}
-
-@Composable
-fun QrCodeScanner(navController: NavController) {
-    var code by remember {
-        mutableStateOf("")
-    }
-    val context = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
-    val cameraProviderFuture = remember {
-        ProcessCameraProvider.getInstance(context)
-    }
-    var hasCamPermission by remember {
-        mutableStateOf(
-            ContextCompat.checkSelfPermission(
-                context,
-                android.Manifest.permission.CAMERA
-            ) == PackageManager.PERMISSION_GRANTED
-        )
-    }
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(),
-        onResult = { granted ->
-            hasCamPermission = granted
-        }
-    )
-    LaunchedEffect(key1 = true) {
-        launcher.launch(android.Manifest.permission.CAMERA)
-    }
-
-
-    MyScaffold(navController, "QrCodeScanner") { modifier ->
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-        ) {
-            if (hasCamPermission) {
-                Box(modifier = Modifier.weight(1f)) {
-                    Text(text = "正在使用您都相机权限", modifier = Modifier.fillMaxWidth())
-                    AndroidView(
-                        factory = { context ->
-
-                            val previewView = PreviewView(context).also { it ->
-                                it.scaleType = PreviewView.ScaleType.FIT_CENTER
-                                it.previewStreamState.observe(lifecycleOwner) { state ->
-                                    Log.i(
-                                        TAG,
-                                        "previewView size(${state.name}): ${it.width}x${it.height}"
-                                    )
-                                    if (state.name == "STREAMING") {
-
-                                    }
-                                };
-                            }
-
-                            val preview = androidx.camera.core.Preview.Builder().build()
-                            val selector = CameraSelector.Builder()
-                                .requireLensFacing(CameraSelector.LENS_FACING_BACK)
-                                .build()
-                            preview.setSurfaceProvider(previewView.surfaceProvider)
-
-                            val imageAnalysis = ImageAnalysis.Builder()
-                                .setBackpressureStrategy(STRATEGY_KEEP_ONLY_LATEST)
-                                .build()
-                            Log.i(
-                                TAG,
-                                "previewView size: ${previewView.width}x${previewView.height}=${imageAnalysis.resolutionInfo}"
-                            )
-
-
-                            imageAnalysis.setAnalyzer(
-                                ContextCompat.getMainExecutor(context),
-                                QrCodeAnalyzer { result ->
-                                    code = result
-                                }
-                            )
-
-                            try {
-                                cameraProviderFuture.get().bindToLifecycle(
-                                    lifecycleOwner,
-                                    selector,
-                                    preview,
-                                    imageAnalysis
-                                )
-                            } catch (e: Exception) {
-                                e.printStackTrace()
-                            }
-                            cameraProviderFuture.get().bindToLifecycle(
-                                lifecycleOwner,
-                                selector,
-                                preview,
-                                imageAnalysis
-                            )
-
-                            previewView
-                        },
-                    )
-                    Text(
-                        text = code,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(32.dp)
-                    )
-                }
-
-            } else {
-                Text(text = "未取得相机权限")
-                Button(onClick = {
-                    launcher.launch(Manifest.permission.CAMERA)
-                }) {
-                    Text(text = "授权相机权限")
-                }
-            }
-        }
     }
 }
 

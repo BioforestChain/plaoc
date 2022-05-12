@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Status bar</title>
+  </head>
+  <body>
+    <input type="color" id="color_rgb" />
+    <input type="range" id="color_a" min="0" max="1" step="0.1" />
+    <button id="set_color">Set System Bars Color</button>
+    <script>
+      set_color.onclick = () => {
+        const color =
+          parseInt(color_rgb.value.slice(1), 16) +
+          (parseInt(color_a.valueAsNumber * 255) << (8 * 3));
+        system_ui.setSystemBarsColor(color, undefined, undefined);
+      };
+    </script>
+
+    <button id="toggle_visible">Toggle System Bars Visible</button>
+    <script>
+      toggle_visible.onclick = () => {
+        system_ui.toggleSystemBarsVisible();
+      };
+    </script>
+  </body>
+</html>

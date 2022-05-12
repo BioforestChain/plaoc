@@ -19,8 +19,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -31,7 +33,9 @@ import androidx.navigation.navDeepLink
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
 import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.google.accompanist.web.*
+import org.bfchain.plaoc.plugin.systemUi.SystemUiFfi
 import org.bfchain.plaoc.ui.theme.PlaocTheme
 import java.net.URLDecoder
 import java.net.URLEncoder
@@ -159,7 +163,20 @@ fun DWebView(
 
         settings
     }
+// Remember a SystemUiController
+    val systemUiController = rememberSystemUiController()
+    val useDarkIcons = MaterialTheme.colors.isLight
 
+    SideEffect {
+        // Update all of the system bar colors to be transparent, and use
+        // dark icons if we're in light theme
+//        systemUiController.setSystemBarsColor(
+//            color = Color.Transparent,
+//            darkIcons = useDarkIcons
+//        )
+
+        // setStatusBarsColor() and setNavigationBarColor() also exist
+    }
 
 //    val webviewState = rememberWebViewState(url)
 //    val context = LocalContext.current;
@@ -239,6 +256,7 @@ fun DWebView(
             }
             it.addJavascriptInterface(JsObject(), "my_nav")
 
+            it.addJavascriptInterface(SystemUiFfi(activity, systemUiController), "system_ui")
 //            class Navigator_FFI {
 //                @JavascriptInterface
 //                fun init(): String {

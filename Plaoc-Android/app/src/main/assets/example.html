@@ -23,6 +23,7 @@
       <li>http://baidu.com</li>
       <li>https://gaubee.com</li>
       <li>file:///android_asset/example.html</li>
+      <li>file:///android_asset/statusbar.html</li>
     </ol>
     <input id="nav_input" value="file:///android_asset/example.html" />
     <button id="do_nav">GO!!!</button>
@@ -74,7 +75,6 @@
 
     <button id="call_js">CALL JS!!</button>
     <script>
-      alert(my_nav.jsFunction);
       call_js.onclick = () => {
         my_nav.jsFunction2 = (a, b) => {
           alert(`hi ${a},${b}`);
