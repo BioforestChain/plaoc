@@ -1,11 +1,15 @@
 package org.bfchain.plaoc.plugin.systemUi
 
+import android.os.Build
 import android.util.Log
+import android.view.View
+import android.view.WindowManager
 import android.webkit.JavascriptInterface
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.toArgb
+import androidx.core.view.WindowCompat
 import com.google.accompanist.systemuicontroller.SystemUiController
 
 private const val TAG = "SystemUiFfi"
@@ -17,31 +21,45 @@ class SystemUiFfi(
     @JavascriptInterface
     fun setSystemBarsColor(
         colorHex: Int,
-        darkIcons: Boolean?,
-        isNavigationBarContrastEnforced: Boolean?
+        darkIcons: Int,
+        isNavigationBarContrastEnforced: Int
     ) {
         val color = Color(colorHex)
         Log.i(TAG, "color: ${color.toArgb()}")
         activity.runOnUiThread {
             systemUiController.setSystemBarsColor(
                 color = color,
-                darkIcons = darkIcons ?: (color.luminance() > 0.5f),
-                isNavigationBarContrastEnforced = isNavigationBarContrastEnforced ?: true,
+                darkIcons = darkIcons.toBoolean { color.luminance() > 0.5f },
+                isNavigationBarContrastEnforced = isNavigationBarContrastEnforced.toBoolean { true },
             )
+        }
+    }
+
+    private fun Int.toBoolean(elseDefault: () -> Boolean = { false }): Boolean {
+        return when {
+            this > 0 -> {
+                true
+            }
+            this < 0 -> {
+                false
+            }
+            else -> {
+                elseDefault()
+            }
         }
     }
 
     @JavascriptInterface
     fun setStatusBarColor(
         colorHex: Int,
-        darkIcons: Boolean?,
+        darkIcons: Int,
     ) {
         val color = Color(colorHex)
         Log.i(TAG, "color: ${color.toArgb()}")
         activity.runOnUiThread {
             systemUiController.setStatusBarColor(
                 color = color,
-                darkIcons = darkIcons ?: (color.luminance() > 0.5f),
+                darkIcons = darkIcons.toBoolean { color.luminance() > 0.5 }
             )
         }
     }
@@ -49,41 +67,44 @@ class SystemUiFfi(
     @JavascriptInterface
     fun setNavigationBarColor(
         colorHex: Int,
-        darkIcons: Boolean?,
-        isNavigationBarContrastEnforced: Boolean?
+        darkIcons: Int,
+        isNavigationBarContrastEnforced: Int
     ) {
         val color = Color(colorHex)
         Log.i(TAG, "color: ${color.toArgb()}")
         activity.runOnUiThread {
             systemUiController.setNavigationBarColor(
                 color = color,
-                darkIcons = darkIcons ?: (color.luminance() > 0.5f),
-                navigationBarContrastEnforced = isNavigationBarContrastEnforced ?: true,
+                darkIcons = darkIcons.toBoolean { color.luminance() > 0.5f },
+                navigationBarContrastEnforced = isNavigationBarContrastEnforced.toBoolean { true },
             )
         }
     }
 
     @JavascriptInterface
-    fun toggleSystemBarsVisible(visible: Boolean?) {
+    fun toggleSystemBarsVisible(visible: Int) {
         activity.runOnUiThread {
             systemUiController.isSystemBarsVisible =
-                visible ?: !systemUiController.isSystemBarsVisible
+                visible.toBoolean { !systemUiController.isSystemBarsVisible }
         }
     }
 
     @JavascriptInterface
-    fun toggleStatusBarVisible(visible: Boolean?) {
+    fun toggleStatusBarVisible(visible: Int) {
         activity.runOnUiThread {
             systemUiController.isStatusBarVisible =
-                visible ?: !systemUiController.isStatusBarVisible
+                visible.toBoolean { !systemUiController.isStatusBarVisible }
+        }
+    }
+
         }
     }
 
     @JavascriptInterface
-    fun toggleNavigationBarVisible(visible: Boolean?) {
+    fun toggleNavigationBarVisible(visible: Int) {
         activity.runOnUiThread {
             systemUiController.isNavigationBarVisible =
-                visible ?: !systemUiController.isNavigationBarVisible
+                visible.toBoolean { !systemUiController.isNavigationBarVisible }
         }
     }
 

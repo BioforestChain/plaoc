@@ -9,39 +9,52 @@
   </head>
   <body>
     <main class="container">
+      <label for="color_rgb">颜色</label>
       <input type="color" id="color_rgb" />
+      <label for="color_a">透明度</label>
       <input type="range" id="color_a" min="0" max="1" step="0.1" />
       <script>
-        function getColor() {
+        function getColorInt() {
           return (
             parseInt(color_rgb.value.slice(1), 16) +
             (parseInt(color_a.valueAsNumber * 255) << (8 * 3))
           );
         }
       </script>
+      <label for="dark_icons">图标颜色</label>
+      <select id="dark_icons">
+        <option value="0">默认(color.luminance>0.5)</option>
+        <option value="1">黑色(dark)</option>
+        <option value="-1">白色(light)</option>
+      </select>
+      <script>
+        function getIsDarkIcons() {
+          return Function(`return ${dark_icons.value}`)();
+        }
+      </script>
       <button id="set_color">Set System Bars Color</button>
       <script>
         set_color.onclick = () => {
-          system_ui.setSystemBarsColor(getColor(), undefined, undefined);
+          system_ui.setSystemBarsColor(getColorInt(), getIsDarkIcons(), 0);
         };
       </script>
       <button id="set_statusbar_color">Set Status Bar Color</button>
       <script>
         set_statusbar_color.onclick = () => {
-          system_ui.setStatusBarColor(getColor(), undefined);
+          system_ui.setStatusBarColor(getColorInt(), getIsDarkIcons());
         };
       </script>
       <button id="set_navigationbar_color">Set Navigation Bar Color</button>
       <script>
         set_navigationbar_color.onclick = () => {
-          system_ui.setNavigationBarColor(getColor(), undefined, undefined);
+          system_ui.setNavigationBarColor(getColorInt(), getIsDarkIcons(), 0);
         };
       </script>
 
       <button id="toggle_visible">Toggle System Bars Visible</button>
       <script>
         toggle_visible.onclick = () => {
-          system_ui.toggleSystemBarsVisible(undefined);
+          system_ui.toggleSystemBarsVisible(0);
         };
       </script>
       <button id="toggle_statusbar_visible">Toggle Status Bar Visible</button>
@@ -55,7 +68,7 @@
       </button>
       <script>
         toggle_navigationbar_visible.onclick = () => {
-          system_ui.toggleNavigationBarVisible(undefined);
+          system_ui.toggleNavigationBarVisible(0);
         };
       </script>
     </main>
