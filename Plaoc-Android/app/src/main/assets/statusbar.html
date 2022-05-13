@@ -5,25 +5,59 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Status bar</title>
+    <link rel="stylesheet" href="./pico.min.css" />
   </head>
   <body>
-    <input type="color" id="color_rgb" />
-    <input type="range" id="color_a" min="0" max="1" step="0.1" />
-    <button id="set_color">Set System Bars Color</button>
-    <script>
-      set_color.onclick = () => {
-        const color =
-          parseInt(color_rgb.value.slice(1), 16) +
-          (parseInt(color_a.valueAsNumber * 255) << (8 * 3));
-        system_ui.setSystemBarsColor(color, undefined, undefined);
-      };
-    </script>
+    <main class="container">
+      <input type="color" id="color_rgb" />
+      <input type="range" id="color_a" min="0" max="1" step="0.1" />
+      <script>
+        function getColor() {
+          return (
+            parseInt(color_rgb.value.slice(1), 16) +
+            (parseInt(color_a.valueAsNumber * 255) << (8 * 3))
+          );
+        }
+      </script>
+      <button id="set_color">Set System Bars Color</button>
+      <script>
+        set_color.onclick = () => {
+          system_ui.setSystemBarsColor(getColor(), undefined, undefined);
+        };
+      </script>
+      <button id="set_statusbar_color">Set Status Bar Color</button>
+      <script>
+        set_statusbar_color.onclick = () => {
+          system_ui.setStatusBarColor(getColor(), undefined);
+        };
+      </script>
+      <button id="set_navigationbar_color">Set Navigation Bar Color</button>
+      <script>
+        set_navigationbar_color.onclick = () => {
+          system_ui.setNavigationBarColor(getColor(), undefined, undefined);
+        };
+      </script>
 
-    <button id="toggle_visible">Toggle System Bars Visible</button>
-    <script>
-      toggle_visible.onclick = () => {
-        system_ui.toggleSystemBarsVisible();
-      };
-    </script>
+      <button id="toggle_visible">Toggle System Bars Visible</button>
+      <script>
+        toggle_visible.onclick = () => {
+          system_ui.toggleSystemBarsVisible(undefined);
+        };
+      </script>
+      <button id="toggle_statusbar_visible">Toggle Status Bar Visible</button>
+      <script>
+        toggle_statusbar_visible.onclick = () => {
+          system_ui.toggleStatusBarVisible(undefined);
+        };
+      </script>
+      <button id="toggle_navigationbar_visible">
+        Toggle Navigation Bar Visible
+      </button>
+      <script>
+        toggle_navigationbar_visible.onclick = () => {
+          system_ui.toggleNavigationBarVisible(undefined);
+        };
+      </script>
+    </main>
   </body>
 </html>

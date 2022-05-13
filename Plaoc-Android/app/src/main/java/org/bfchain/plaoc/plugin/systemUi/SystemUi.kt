@@ -64,22 +64,26 @@ class SystemUiFfi(
     }
 
     @JavascriptInterface
-    fun toggleSystemBarsVisible(visible: Boolean = !systemUiController.isSystemBarsVisible) {
+    fun toggleSystemBarsVisible(visible: Boolean?) {
         activity.runOnUiThread {
-            systemUiController.isSystemBarsVisible = visible
+            systemUiController.isSystemBarsVisible =
+                visible ?: !systemUiController.isSystemBarsVisible
         }
     }
 
     @JavascriptInterface
-    fun toggleStatusBarVisible(visible: Boolean = !systemUiController.isStatusBarVisible) {
+    fun toggleStatusBarVisible(visible: Boolean?) {
         activity.runOnUiThread {
-            systemUiController.isStatusBarVisible = visible
+            systemUiController.isStatusBarVisible =
+                visible ?: !systemUiController.isStatusBarVisible
         }
     }
+
     @JavascriptInterface
-    fun toggleNavigationBarVisible(visible: Boolean = !systemUiController.isNavigationBarVisible) {
+    fun toggleNavigationBarVisible(visible: Boolean?) {
         activity.runOnUiThread {
-            systemUiController.isNavigationBarVisible = visible
+            systemUiController.isNavigationBarVisible =
+                visible ?: !systemUiController.isNavigationBarVisible
         }
     }
 
