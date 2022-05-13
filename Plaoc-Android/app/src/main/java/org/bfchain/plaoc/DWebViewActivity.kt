@@ -165,21 +165,7 @@ fun DWebView(
     }
 // Remember a SystemUiController
     val systemUiController = rememberSystemUiController()
-    val useDarkIcons = MaterialTheme.colors.isLight
 
-    SideEffect {
-        // Update all of the system bar colors to be transparent, and use
-        // dark icons if we're in light theme
-//        systemUiController.setSystemBarsColor(
-//            color = Color.Transparent,
-//            darkIcons = useDarkIcons
-//        )
-
-        // setStatusBarsColor() and setNavigationBarColor() also exist
-    }
-
-//    val webviewState = rememberWebViewState(url)
-//    val context = LocalContext.current;
     AdvancedWebView(
         state = webviewState,
         onCreated = { it ->

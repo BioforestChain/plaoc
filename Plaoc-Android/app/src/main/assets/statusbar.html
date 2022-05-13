@@ -6,6 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Status bar</title>
     <link rel="stylesheet" href="./pico.min.css" />
+    <style>
+      html,
+      body {
+        background: #b2ebf2;
+      }
+    </style>
   </head>
   <body>
     <main class="container">
@@ -60,7 +66,15 @@
       <button id="toggle_statusbar_visible">Toggle Status Bar Visible</button>
       <script>
         toggle_statusbar_visible.onclick = () => {
-          system_ui.toggleStatusBarVisible(undefined);
+          system_ui.toggleStatusBarVisible(0);
+        };
+      </script>
+      <button id="toggle_decor_fits_system_windows">
+        Toggle Decor Fits System Windows
+      </button>
+      <script>
+        toggle_decor_fits_system_windows.onclick = () => {
+          system_ui.toggleDecorFitsSystemWindows();
         };
       </script>
       <button id="toggle_navigationbar_visible">
@@ -69,6 +83,13 @@
       <script>
         toggle_navigationbar_visible.onclick = () => {
           system_ui.toggleNavigationBarVisible(0);
+        };
+      </script>
+
+      <button id="get_statusbar_size">Set Status Bar Size</button>
+      <script>
+        get_statusbar_size.onclick = () => {
+          alert(system_ui.getStatusBarsRect());
         };
       </script>
     </main>

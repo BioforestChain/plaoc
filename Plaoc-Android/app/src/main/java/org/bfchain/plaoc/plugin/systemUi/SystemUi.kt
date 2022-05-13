@@ -9,7 +9,9 @@ import androidx.activity.ComponentActivity
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.toArgb
+import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import com.google.accompanist.systemuicontroller.SystemUiController
 
 private const val TAG = "SystemUiFfi"
@@ -82,11 +84,21 @@ class SystemUiFfi(
     }
 
     @JavascriptInterface
+    fun getSystemBarsVisible(): Boolean {
+        return systemUiController.isSystemBarsVisible
+    }
+
+    @JavascriptInterface
     fun toggleSystemBarsVisible(visible: Int) {
         activity.runOnUiThread {
             systemUiController.isSystemBarsVisible =
                 visible.toBoolean { !systemUiController.isSystemBarsVisible }
         }
+    }
+
+    @JavascriptInterface
+    fun getStatusBarVisible(): Boolean {
+        return systemUiController.isStatusBarVisible
     }
 
     @JavascriptInterface
@@ -97,7 +109,29 @@ class SystemUiFfi(
         }
     }
 
+    private var isDecorFitsSystemWindows: Boolean = true
+
+    @JavascriptInterface
+    fun getDecorFitsSystemWindows(): Boolean {
+        return isDecorFitsSystemWindows
+    }
+
+
+    @JavascriptInterface
+    fun toggleDecorFitsSystemWindows(decorFitsSystemWindows: Int) {
+        activity.runOnUiThread {
+            isDecorFitsSystemWindows =
+                decorFitsSystemWindows.toBoolean { !isDecorFitsSystemWindows }
+            WindowCompat.setDecorFitsSystemWindows(
+                activity.window,
+                isDecorFitsSystemWindows
+            )
         }
+    }
+
+    @JavascriptInterface
+    fun getNavigationBarVisible(): Boolean {
+        return systemUiController.isNavigationBarVisible
     }
 
     @JavascriptInterface
