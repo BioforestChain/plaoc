@@ -102,7 +102,6 @@ class SystemUiFfi(
 
                             jsUtil.setJsValues(
                                 jsVirtualKeyboardNamespace, mapOf(
-                                    "state" to JsValue(JsValueType.String, "progress"),
                                     "x" to JsValue(JsValueType.Number, x.toString()),
                                     "y" to JsValue(JsValueType.Number, y.toString()),
                                     "width" to JsValue(JsValueType.Number, width.toString()),
