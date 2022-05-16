@@ -1,30 +1,97 @@
 package org.bfchain.plaoc.plugin.systemUi
 
-import android.os.Build
+import android.util.DisplayMetrics
 import android.util.Log
-import android.view.View
-import android.view.WindowManager
 import android.webkit.JavascriptInterface
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.toArgb
+import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsAnimationCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.accompanist.systemuicontroller.SystemUiController
+import com.google.gson.Gson
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import org.bfchain.plaoc.plugin.util.JsUtil
+import org.bfchain.plaoc.plugin.util.JsValue
+import org.bfchain.plaoc.plugin.util.JsValueType
+
 
 private const val TAG = "SystemUiFfi"
 
 class SystemUiFfi(
     val activity: ComponentActivity,
-    private val systemUiController: SystemUiController
+    private val systemUiController: SystemUiController,
+    private val jsUtil: JsUtil
 ) {
+    init {
+        ViewCompat.setOnApplyWindowInsetsListener(activity.window.decorView) { _, insets ->
+            val imeVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
+            val imeHeight = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
+            Log.i(TAG, "imeHeight:$imeHeight")
+            insets
+        }
+
+
+        ViewCompat.setWindowInsetsAnimationCallback(
+            activity.window.decorView,
+            object : WindowInsetsAnimationCompat.Callback(DISPATCH_MODE_STOP) {
+                val devicePixelRatio = activity.resources.displayMetrics.density
+
+                // Override methods…
+                override fun onProgress(
+                    insets: WindowInsetsCompat,
+                    runningAnimations: MutableList<WindowInsetsAnimationCompat>
+                ): WindowInsetsCompat {
+                    for (ani in runningAnimations) {
+                        // Find an IME animation.
+                        val imeAnimation = runningAnimations.find {
+                            it.typeMask and WindowInsetsCompat.Type.ime() != 0
+                        } ?: return insets
+
+                        val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
+                        Log.i(TAG, "onProgress:$imeInsets")
+                        GlobalScope.launch {
+                            val x = imeInsets.left / devicePixelRatio;
+                            val y = imeInsets.top / devicePixelRatio;
+                            val width = (imeInsets.right - imeInsets.left) / devicePixelRatio;
+                            val height = (imeInsets.bottom - imeInsets.top) / devicePixelRatio;
+
+                            jsUtil.setCssVars(
+                                "html",
+                                mapOf(
+                                    "--virtual-keyboard-x" to "${x}px",
+                                    "--virtual-keyboard-y" to "${y}px",
+                                    "--virtual-keyboard-width" to "${width}px",
+                                    "--virtual-keyboard-height" to "${height}px",
+                                )
+                            )
+                            jsUtil.setJsValues(
+                                "virtualKeyboard", mapOf(
+                                    "x" to JsValue(JsValueType.Number, x.toString()),
+                                    "y" to JsValue(JsValueType.Number, y.toString()),
+                                    "width" to JsValue(JsValueType.Number, width.toString()),
+                                    "height" to JsValue(JsValueType.Number, height.toString()),
+                                )
+                            )
+                        }
+                    }
+
+                    return insets
+                }
+            }
+        )
+    }
+
     @JavascriptInterface
     fun setSystemBarsColor(
-        colorHex: Int,
-        darkIcons: Int,
-        isNavigationBarContrastEnforced: Int
+        colorHex: ColorInt,
+        darkIcons: BoolInt,
+        isNavigationBarContrastEnforced: BoolInt
     ) {
         val color = Color(colorHex)
         Log.i(TAG, "color: ${color.toArgb()}")
@@ -37,24 +104,10 @@ class SystemUiFfi(
         }
     }
 
-    private fun Int.toBoolean(elseDefault: () -> Boolean = { false }): Boolean {
-        return when {
-            this > 0 -> {
-                true
-            }
-            this < 0 -> {
-                false
-            }
-            else -> {
-                elseDefault()
-            }
-        }
-    }
-
     @JavascriptInterface
     fun setStatusBarColor(
-        colorHex: Int,
-        darkIcons: Int,
+        colorHex: ColorInt,
+        darkIcons: BoolInt,
     ) {
         val color = Color(colorHex)
         Log.i(TAG, "color: ${color.toArgb()}")
@@ -68,9 +121,9 @@ class SystemUiFfi(
 
     @JavascriptInterface
     fun setNavigationBarColor(
-        colorHex: Int,
-        darkIcons: Int,
-        isNavigationBarContrastEnforced: Int
+        colorHex: ColorInt,
+        darkIcons: BoolInt,
+        isNavigationBarContrastEnforced: BoolInt
     ) {
         val color = Color(colorHex)
         Log.i(TAG, "color: ${color.toArgb()}")
@@ -89,7 +142,7 @@ class SystemUiFfi(
     }
 
     @JavascriptInterface
-    fun toggleSystemBarsVisible(visible: Int) {
+    fun toggleSystemBarsVisible(visible: BoolInt) {
         activity.runOnUiThread {
             systemUiController.isSystemBarsVisible =
                 visible.toBoolean { !systemUiController.isSystemBarsVisible }
@@ -102,7 +155,7 @@ class SystemUiFfi(
     }
 
     @JavascriptInterface
-    fun toggleStatusBarVisible(visible: Int) {
+    fun toggleStatusBarVisible(visible: BoolInt) {
         activity.runOnUiThread {
             systemUiController.isStatusBarVisible =
                 visible.toBoolean { !systemUiController.isStatusBarVisible }
@@ -118,7 +171,7 @@ class SystemUiFfi(
 
 
     @JavascriptInterface
-    fun toggleDecorFitsSystemWindows(decorFitsSystemWindows: Int) {
+    fun toggleDecorFitsSystemWindows(decorFitsSystemWindows: BoolInt) {
         activity.runOnUiThread {
             isDecorFitsSystemWindows =
                 decorFitsSystemWindows.toBoolean { !isDecorFitsSystemWindows }
@@ -135,11 +188,77 @@ class SystemUiFfi(
     }
 
     @JavascriptInterface
-    fun toggleNavigationBarVisible(visible: Int) {
+    fun toggleNavigationBarVisible(visible: BoolInt) {
         activity.runOnUiThread {
             systemUiController.isNavigationBarVisible =
                 visible.toBoolean { !systemUiController.isNavigationBarVisible }
         }
     }
 
+    private val insetsCompat: WindowInsetsCompat by lazy {
+        WindowInsetsCompat.toWindowInsetsCompat(
+            activity.window.decorView.rootWindowInsets
+        )
+    }
+
+    private fun Insets.toJson(): String {
+        return """{"top":${top},"left":${left},"bottom":${bottom},"right":${right}}"""
+    }
+
+    @JavascriptInterface
+    fun getInsetsTypeEnum(): String {
+        val gson = Gson()
+        return gson.toJson(InsetsType())
+    }
+
+    class InsetsType {
+        val FIRST = 1
+        val STATUS_BARS = FIRST
+        val NAVIGATION_BARS = 1 shl 1
+        val CAPTION_BAR = 1 shl 2
+
+        val IME = 1 shl 3
+
+        val SYSTEM_GESTURES = 1 shl 4
+        val MANDATORY_SYSTEM_GESTURES = 1 shl 5
+        val TAPPABLE_ELEMENT = 1 shl 6
+
+        val DISPLAY_CUTOUT = 1 shl 7
+
+        val LAST = 1 shl 8
+        val SIZE = 9
+        val WINDOW_DECOR = LAST
+    }
+
+    @JavascriptInterface
+    fun getInsetsRect(typeMask: Int, ignoreVisibility: BoolInt): String {
+        if (ignoreVisibility.toBoolean()) {
+            return insetsCompat.getInsetsIgnoringVisibility(typeMask).toJson()
+        }
+        return insetsCompat.getInsets(typeMask).toJson()
+    }
+
+    @JavascriptInterface
+    fun showInsets(typeMask: Int) {
+        return WindowCompat.getInsetsController(activity.window, activity.window.decorView)
+            .show(typeMask)
+    }
+}
+
+typealias ColorInt = Int
+
+typealias BoolInt = Int
+
+private fun BoolInt.toBoolean(elseDefault: () -> Boolean = { false }): Boolean {
+    return when {
+        this > 0 -> {
+            true
+        }
+        this < 0 -> {
+            false
+        }
+        else -> {
+            elseDefault()
+        }
+    }
 }

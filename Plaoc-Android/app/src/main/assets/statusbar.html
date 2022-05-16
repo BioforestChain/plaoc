@@ -15,10 +15,14 @@
   </head>
   <body>
     <main class="container">
-      <label for="color_rgb">颜色</label>
-      <input type="color" id="color_rgb" />
-      <label for="color_a">透明度</label>
-      <input type="range" id="color_a" min="0" max="1" step="0.1" />
+      <label for="color_rgb">
+        颜色
+        <input type="color" id="color_rgb" />
+      </label>
+      <label for="color_a">
+        透明度
+        <input type="range" id="color_a" min="0" max="1" step="0.1" />
+      </label>
       <script>
         function getColorInt() {
           return (
@@ -27,12 +31,14 @@
           );
         }
       </script>
-      <label for="dark_icons">图标颜色</label>
-      <select id="dark_icons">
-        <option value="0">默认(color.luminance>0.5)</option>
-        <option value="1">黑色(dark)</option>
-        <option value="-1">白色(light)</option>
-      </select>
+      <label for="dark_icons">
+        图标颜色
+        <select id="dark_icons">
+          <option value="0">默认(color.luminance>0.5)</option>
+          <option value="1">黑色(dark)</option>
+          <option value="-1">白色(light)</option>
+        </select>
+      </label>
       <script>
         function getIsDarkIcons() {
           return Function(`return ${dark_icons.value}`)();
@@ -74,7 +80,7 @@
       </button>
       <script>
         toggle_decor_fits_system_windows.onclick = () => {
-          system_ui.toggleDecorFitsSystemWindows();
+          system_ui.toggleDecorFitsSystemWindows(0);
         };
       </script>
       <button id="toggle_navigationbar_visible">
@@ -85,13 +91,82 @@
           system_ui.toggleNavigationBarVisible(0);
         };
       </script>
+      <label for="insets_type">
+        选择类型
+        <select id="insets_type"></select>
+      </label>
 
-      <button id="get_statusbar_size">Set Status Bar Size</button>
       <script>
-        get_statusbar_size.onclick = () => {
-          alert(system_ui.getStatusBarsRect());
+        const INSETS_TYPE = {
+          STATUS_BARS: 1,
+          NAVIGATION_BARS: 1 << 1,
+          CAPTION_BAR: 1 << 2,
+
+          IME: 1 << 3,
+
+          SYSTEM_GESTURES: 1 << 4,
+          MANDATORY_SYSTEM_GESTURES: 1 << 5,
+          TAPPABLE_ELEMENT: 1 << 6,
+
+          DISPLAY_CUTOUT: 1 << 7,
+
+          WINDOW_DECOR: 1 << 8,
+        };
+        for (const key in INSETS_TYPE) {
+          const option = document.createElement("option");
+          option.value = INSETS_TYPE[key];
+          option.innerHTML = key;
+          insets_type.appendChild(option);
+        }
+      </script>
+      <label for="ignore_inserts_visibility">
+        忽略不可见
+        <input type="checkbox" id="ignore_inserts_visibility" role="switch" />
+      </label>
+
+      <button id="get_insets_size">Get Insets Size</button>
+      <script>
+        get_insets_size.onclick = () => {
+          alert(
+            system_ui.getInsetsRect(
+              insets_type.value | 0,
+              ignore_inserts_visibility.checked ? 1 : 0
+            )
+          );
+        };
+      </script>
+      <button id="show_insets">Show Insets</button>
+      <script>
+        show_insets.onclick = () => {
+          system_ui.showInsets(insets_type.value | 0);
         };
       </script>
     </main>
+    <input id="ime" placeholder="IME Test" />
+    <style>
+      #ime {
+        transform: translateY(calc(-1 * var(--virtual-keyboard-height)));
+      }
+    </style>
+    <script>
+      {
+        let isFocus = false;
+        ime.onfocus = () => {
+          isFocus = true;
+          const setValue = () => {
+            try {
+              ime.value = __android_util_js__.virtualKeyboard.height;
+            } catch (e) {}
+            if (isFocus) {
+              requestAnimationFrame(setValue);
+            }
+          };
+          setValue();
+        };
+        ime.onblur = () => {
+          isFocus = false;
+        };
+      }
+    </script>
   </body>
 </html>
