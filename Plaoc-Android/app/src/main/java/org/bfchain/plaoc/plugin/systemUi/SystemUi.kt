@@ -1,8 +1,8 @@
 package org.bfchain.plaoc.plugin.systemUi
 
-import android.util.DisplayMetrics
 import android.util.Log
 import android.webkit.JavascriptInterface
+import android.webkit.WebView
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
@@ -25,14 +25,25 @@ private const val TAG = "SystemUiFfi"
 
 class SystemUiFfi(
     val activity: ComponentActivity,
+    val webView: WebView,
     private val systemUiController: SystemUiController,
     private val jsUtil: JsUtil
 ) {
     init {
+        val jsVirtualKeyboardNamespace = "virtualKeyboard"
+        val devicePixelRatio = activity.resources.displayMetrics.density
+
         ViewCompat.setOnApplyWindowInsetsListener(activity.window.decorView) { _, insets ->
             val imeVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
             val imeHeight = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
             Log.i(TAG, "imeHeight:$imeHeight")
+            GlobalScope.launch {
+                jsUtil.setJsValue(
+                    jsVirtualKeyboardNamespace,
+                    "top",
+                    JsValue(JsValueType.Number, (imeHeight / devicePixelRatio).toString()),
+                );
+            }
             insets
         }
 
@@ -40,9 +51,37 @@ class SystemUiFfi(
         ViewCompat.setWindowInsetsAnimationCallback(
             activity.window.decorView,
             object : WindowInsetsAnimationCompat.Callback(DISPATCH_MODE_STOP) {
-                val devicePixelRatio = activity.resources.displayMetrics.density
+                val cssNamespace = "--virtual-keyboard"
+                val view = activity.window.decorView
+                override fun onPrepare(animation: WindowInsetsAnimationCompat) {
+                    if (animation.typeMask and WindowInsetsCompat.Type.ime() != 0) {
+                        GlobalScope.launch {
+                            jsUtil.setJsValue(
+                                jsVirtualKeyboardNamespace,
+                                "state",
+                                JsValue(JsValueType.String, "prepare"),
+                            );
+                        }
+                    }
+                    return super.onPrepare(animation)
+                }
 
-                // Override methods…
+                override fun onStart(
+                    animation: WindowInsetsAnimationCompat,
+                    bounds: WindowInsetsAnimationCompat.BoundsCompat
+                ): WindowInsetsAnimationCompat.BoundsCompat {
+                    if (animation.typeMask and WindowInsetsCompat.Type.ime() != 0) {
+                        GlobalScope.launch {
+                            jsUtil.setJsValue(
+                                jsVirtualKeyboardNamespace,
+                                "state",
+                                JsValue(JsValueType.String, "start"),
+                            );
+                        }
+                    }
+                    return super.onStart(animation, bounds)
+                }
+
                 override fun onProgress(
                     insets: WindowInsetsCompat,
                     runningAnimations: MutableList<WindowInsetsAnimationCompat>
@@ -61,21 +100,27 @@ class SystemUiFfi(
                             val width = (imeInsets.right - imeInsets.left) / devicePixelRatio;
                             val height = (imeInsets.bottom - imeInsets.top) / devicePixelRatio;
 
-                            jsUtil.setCssVars(
-                                "html",
-                                mapOf(
-                                    "--virtual-keyboard-x" to "${x}px",
-                                    "--virtual-keyboard-y" to "${y}px",
-                                    "--virtual-keyboard-width" to "${width}px",
-                                    "--virtual-keyboard-height" to "${height}px",
-                                )
-                            )
                             jsUtil.setJsValues(
-                                "virtualKeyboard", mapOf(
+                                jsVirtualKeyboardNamespace, mapOf(
+                                    "state" to JsValue(JsValueType.String, "progress"),
                                     "x" to JsValue(JsValueType.Number, x.toString()),
                                     "y" to JsValue(JsValueType.Number, y.toString()),
                                     "width" to JsValue(JsValueType.Number, width.toString()),
                                     "height" to JsValue(JsValueType.Number, height.toString()),
+                                    "animationProgress" to JsValue(
+                                        JsValueType.Number,
+                                        imeAnimation.interpolatedFraction.toString()
+                                    ),
+                                )
+                            )
+                            jsUtil.setCssVars(
+                                "html",
+                                mapOf(
+                                    "$cssNamespace-x" to "${x}px",
+                                    "$cssNamespace-y" to "${y}px",
+                                    "$cssNamespace-width" to "${width}px",
+                                    "$cssNamespace-height" to "${height}px",
+                                    "$cssNamespace-animation-progress" to "${imeAnimation.interpolatedFraction}",
                                 )
                             )
                         }
@@ -83,8 +128,26 @@ class SystemUiFfi(
 
                     return insets
                 }
+
+                override fun onEnd(animation: WindowInsetsAnimationCompat) {
+                    if (animation.typeMask and WindowInsetsCompat.Type.ime() != 0) {
+                        GlobalScope.launch {
+                            jsUtil.setJsValue(
+                                jsVirtualKeyboardNamespace,
+                                "state",
+                                JsValue(JsValueType.String, "end")
+                            );
+                        }
+                    }
+                    return super.onEnd(animation)
+                }
             }
         )
+    }
+
+    @JavascriptInterface
+    fun setBackgroundColor(colorHex: ColorInt) {
+        webView.setBackgroundColor(colorHex)
     }
 
     @JavascriptInterface

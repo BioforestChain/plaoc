@@ -9,7 +9,7 @@
     <style>
       html,
       body {
-        background: #b2ebf2;
+        background: transparent;
       }
     </style>
   </head>
@@ -43,6 +43,12 @@
         function getIsDarkIcons() {
           return Function(`return ${dark_icons.value}`)();
         }
+      </script>
+      <button id="set_background_color">Set Background Color</button>
+      <script>
+        set_background_color.onclick = () => {
+          system_ui.setBackgroundColor(getColorInt());
+        };
       </script>
       <button id="set_color">Set System Bars Color</button>
       <script>

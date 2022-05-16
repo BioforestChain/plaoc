@@ -322,11 +322,10 @@ data class JsValue(val type: JsValueType, val value: String) {
         return false
     }
 
-    lateinit var gson: Gson
-
-    constructor(gson: Gson, type: JsValueType, value: String) : this(type, value) {
-        this.gson = gson
+    companion object {
+        final val gson: Gson by lazy { Gson() }
     }
+
 
     val jsCode: String by lazy {
         when (type) {

@@ -250,7 +250,7 @@ fun DWebView(
 
             it.addJavascriptInterface(
                 SystemUiFfi(
-                    activity, systemUiController, jsUtil
+                    activity, it, systemUiController, jsUtil
                 ), "system_ui"
             )
 //            class Navigator_FFI {
