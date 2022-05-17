@@ -36,12 +36,13 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 import com.google.accompanist.navigation.material.bottomSheet
 import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
-import com.google.accompanist.web.*
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import org.bfchain.plaoc.bfs.Boot
 import org.bfchain.plaoc.plugin.scanner.QrCodeScanner
 import org.bfchain.plaoc.ui.theme.PlaocTheme
+import org.bfchain.plaoc.webkit.AdWebContent
+import org.bfchain.plaoc.webkit.AdWebViewState
 import java.net.URLDecoder
 
 
@@ -70,15 +71,15 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-val webStateMap: MutableMap<String, WebViewState> = mutableMapOf();
+val webStateMap: MutableMap<String, AdWebViewState> = mutableMapOf();
 val getWebState = { url: String ->
     var state = webStateMap[url] ?: createWebState(url);
     webStateMap[url] = state;
     state
 }
 val createWebState = { url: String ->
-    WebViewState(
-        WebContent.Url(
+    AdWebViewState(
+        AdWebContent.Url(
             url = url,
         )
     );
@@ -197,17 +198,15 @@ private fun DwebIntel(navController: NavController) {
     Text("qaq")
 }
 
-val urlList = mutableListOf<WebViewState>()
-
 @SuppressLint("JavascriptInterface")
 @Composable
 private fun DWebViewList(
-    webviewState: WebViewState,
+    webviewState: AdWebViewState,
     navController: NavController,
     activity: ComponentActivity
 ) {
     var urlList by remember {
-        mutableStateOf(setOf<WebViewState>())
+        mutableStateOf(setOf<AdWebViewState>())
     }
 
 //    val exampleState = rememberWebViewState(url)

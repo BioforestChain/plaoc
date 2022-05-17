@@ -10,11 +10,16 @@ import android.util.Log
 import android.webkit.JavascriptInterface
 import android.webkit.WebChromeClient
 import android.webkit.WebView
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -33,6 +38,10 @@ import com.google.accompanist.web.*
 import org.bfchain.plaoc.plugin.systemUi.SystemUiFfi
 import org.bfchain.plaoc.plugin.util.JsUtil
 import org.bfchain.plaoc.ui.theme.PlaocTheme
+import org.bfchain.plaoc.webkit.AdWebChromeClient
+import org.bfchain.plaoc.webkit.AdWebView
+import org.bfchain.plaoc.webkit.AdWebViewState
+import org.bfchain.plaoc.webkit.rememberAdWebViewState
 import java.net.URLDecoder
 import java.net.URLEncoder
 
@@ -101,11 +110,38 @@ private fun NavFun(activity: ComponentActivity) {
                     uriPattern = "dweb://{url}"
                 })
             ) { entry ->
-                DWebView(rememberWebViewState(entry.arguments?.getString("url")
+                Column {
+                    Text(text = "This is Native Text in Background~")
+                    Text(text = "这是Android原生的文本")
+                    Text(text = "If you saw those text, means you changed webView background.")
+                    Text(text = "如果你看到这些文本，说明你改变了webView的背景透明度")
+                    Text(text = "So you can put native view in background.")
+                    Text(text = "所以，你可以防止一些原生的视图在背景上")
+                    Button(onClick = {
+                        Toast.makeText(
+                            activity.applicationContext,
+                            "Showing toast....",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }) {
+                        Text(text = "甚至时可以交互的原生按钮")
+                    }
+                }
+                DWebView(rememberAdWebViewState(entry.arguments?.getString("url")
                     .let { it -> URLDecoder.decode(it, "UTF-8") }
                     ?: "file:///android_asset/demo.html"),
                     navController = navController,
-                    activity = activity)
+                    activity = activity,
+                    modifier = Modifier.clickable(true) {
+                        Toast.makeText(
+                            activity.applicationContext,
+                            "Click WebView",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        Log.i(TAG, "Click WebView")
+                    }
+                )
+
             }
         }
     }
@@ -116,53 +152,25 @@ private fun NavFun(activity: ComponentActivity) {
 @Composable
 fun DWebView(
 //    url: String,
-    webviewState: WebViewState,
+    webviewState: AdWebViewState,
     navController: NavController,
-    activity: ComponentActivity
+    activity: ComponentActivity,
+    modifier: Modifier = Modifier,
 ) {
-    val mSettings = remember {
-        val settings = AdvancedWebViewSettings()
-
-        class MyWebChromeClient : WebChromeClient() {
-            override fun onReceivedTitle(view: WebView?, title: String?) {
-                super.onReceivedTitle(view, title);
-                Log.i(TAG, "TITLE CHANGED!!!! $title")
-
-                activity.runOnUiThread {
-                    activity.setTaskDescription(ActivityManager.TaskDescription(title ?: ""))
-                }
-            }
-
-            override fun onCreateWindow(
-                view: WebView?,
-                isDialog: Boolean,
-                isUserGesture: Boolean,
-                resultMsg: Message?
-            ): Boolean {
-                if (view != null) {
-                    val href = view.handler.obtainMessage()
-                    view.requestFocusNodeHref(href)
-                    val url = href.data.getString("url")
-                    if (url != null) {
-                        openDWebWindow(activity = activity, url = url)
-                        return true;
-                    }
-                }
-                return super.onCreateWindow(view, isDialog, isUserGesture, resultMsg)
-
-            }
-
-        }
-        settings.setWebChromeClient(MyWebChromeClient())
-        settings.setListener(activity = activity, null)
-
-
-        settings
-    }
+//    val mSettings = remember {
+//        val settings = AdvancedWebViewSettings()
+//
+//        settings.setWebChromeClient(MyWebChromeClient())
+//        settings.setListener(activity = activity, null)
+//
+//
+//        settings
+//    }
 // Remember a SystemUiController
     val systemUiController = rememberSystemUiController()
 
-    AdvancedWebView(
+
+    AdWebView(
         state = webviewState,
         onCreated = { it ->
             class JsObject {
@@ -253,39 +261,42 @@ fun DWebView(
                     activity, it, systemUiController, jsUtil
                 ), "system_ui"
             )
-//            class Navigator_FFI {
-//                @JavascriptInterface
-//                fun init(): String {
-//                    return """{"info":{"nid":0,"data":""},"parent:{"nid":0,"data":""}}"""
-//                }
-//
-//                @JavascriptInterface
-//                fun  push(nid: Int, route: String): Boolean{
-//
-//                }
-//                @JavascriptInterface
-//                fun    pop(nid: number, count: number): number;
-//                @JavascriptInterface
-//                func    replace(nid: number, at: number, newRoute: Route): boolean;
-//                @JavascriptInterface
-//                func   fork(nid: number, data : Cloneable, parentNavigatorId: number): number;
-//                @JavascriptInterface
-//                func   checkout(nid: number, toNid: number): boolean;
-//                @JavascriptInterface
-//                func    destroy(nid: number, targetNid: number): boolean;
-//
-//                fun emitActivited(fromNid: Int, toNid: Int) {
-//                    it.evaluateJavascript("navigator_ffi.onActivited.emit({fromNid:$fromNid,toNid:$toNid})") {}
-//                }
-//
-//                fun emitUnActivited(fromNid: Int, toNid: Int) {
-//                    it.evaluateJavascript("navigator_ffi.onUnActivited.emit({fromNid:$fromNid,toNid:$toNid})") {}
-//                }
-//            }
-//            it.addJavascriptInterface(Navigator_FFI(), "navigator_ffi")
 
         },
-        mSettings = mSettings
+        chromeClient = remember {
+            class MyWebChromeClient : AdWebChromeClient() {
+                override fun onReceivedTitle(view: WebView?, title: String?) {
+                    super.onReceivedTitle(view, title);
+                    Log.i(TAG, "TITLE CHANGED!!!! $title")
+
+                    activity.runOnUiThread {
+                        activity.setTaskDescription(ActivityManager.TaskDescription(title ?: ""))
+                    }
+                }
+
+                override fun onCreateWindow(
+                    view: WebView?,
+                    isDialog: Boolean,
+                    isUserGesture: Boolean,
+                    resultMsg: Message?
+                ): Boolean {
+                    if (view != null) {
+                        val href = view.handler.obtainMessage()
+                        view.requestFocusNodeHref(href)
+                        val url = href.data.getString("url")
+                        if (url != null) {
+                            openDWebWindow(activity = activity, url = url)
+                            return true;
+                        }
+                    }
+                    return super.onCreateWindow(view, isDialog, isUserGesture, resultMsg)
+
+                }
+
+            }
+            MyWebChromeClient()
+        },
+        modifier = modifier,
     )
 }
 
