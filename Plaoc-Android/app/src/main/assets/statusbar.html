@@ -20,6 +20,16 @@
   <body>
     <main class="container">
       <fieldset>
+        <label>交互控制</label>
+        <button id="disable_touch_event">Disable Touch Event</button>
+        <script>
+          disable_touch_event.onclick = () => {
+            system_ui.disableTouchEvent();
+            alert("从系统层面禁用了 touch-event，类似css的pointer-event:none");
+          };
+        </script>
+      </fieldset>
+      <fieldset>
         <legend>颜色选择</legend>
 
         <label for="color_rgb">

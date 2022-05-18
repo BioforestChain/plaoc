@@ -20,6 +20,7 @@ import kotlinx.coroutines.launch
 import org.bfchain.plaoc.dweb.js.util.JsUtil
 import org.bfchain.plaoc.dweb.js.util.JsValue
 import org.bfchain.plaoc.dweb.js.util.JsValueType
+import org.bfchain.plaoc.webkit.AdWebViewHook
 
 
 private const val TAG = "SystemUiFfi"
@@ -27,6 +28,7 @@ private const val TAG = "SystemUiFfi"
 class SystemUiFFI(
     val activity: ComponentActivity,
     val webView: WebView,
+    val hook: AdWebViewHook,
     private val systemUiController: SystemUiController,
     private val jsUtil: JsUtil,
     private val isOverlayStatusBar: MutableState<Boolean>,
@@ -107,7 +109,8 @@ class SystemUiFFI(
                             val x = imeInsets.left / devicePixelRatio;
                             val y = imeInsets.top / devicePixelRatio;
                             val width = (imeInsets.right - imeInsets.left) / devicePixelRatio;
-                            val height = (imeInsets.bottom - imeInsets.top - navHeight) / devicePixelRatio;
+                            val height =
+                                (imeInsets.bottom - imeInsets.top - navHeight) / devicePixelRatio;
 
                             jsUtil.setJsValues(
                                 jsVirtualKeyboardNamespace, mapOf(
@@ -151,6 +154,14 @@ class SystemUiFFI(
                 }
             }
         )
+    }
+
+    /**
+     * @TODO 在未来，这里的disable与否，通过
+     */
+    @JavascriptInterface
+    fun disableTouchEvent() {
+        hook.onTouchEvent = { false }
     }
 
     @JavascriptInterface

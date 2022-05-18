@@ -20,9 +20,7 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import org.bfchain.plaoc.dweb.js.systemUi.SystemUiFFI
 import org.bfchain.plaoc.dweb.js.navigator.NavigatorFFI
 import org.bfchain.plaoc.dweb.js.util.JsUtil
-import org.bfchain.plaoc.webkit.AdWebChromeClient
-import org.bfchain.plaoc.webkit.AdWebView
-import org.bfchain.plaoc.webkit.AdWebViewState
+import org.bfchain.plaoc.webkit.*
 
 
 private const val TAG = "DWebView"
@@ -34,8 +32,8 @@ fun DWebView(
     navController: NavController,
     activity: ComponentActivity,
     modifier: Modifier = Modifier,
+    onCreated: (AdAndroidWebView) -> Unit = {},
 ) {
-
     val systemUiController = rememberSystemUiController()
     val isOverlayStatusBar = remember { mutableStateOf(false) }
     val isOverlayNavigationBar = remember { mutableStateOf(false) }
@@ -45,41 +43,40 @@ fun DWebView(
         )
     }
 
-//    Column() {
-//        Button(
-//            onClick = { isOverlayStatusBar.value = !isOverlayStatusBar.value },
-//            modifier = Modifier.statusBarsPadding()
-//        ) {
-//            Text(text = "toggleOverlayStatusBar:${isOverlayStatusBar.value}")
-//        }
-//        Button(onClick = { isOverlayNavigationBar.value = !isOverlayNavigationBar.value }) {
-//            Text(text = "toggleOverlayNavigationBar:${isOverlayNavigationBar.value}")
-//        }
+    val hook = remember {
+        AdWebViewHook()
+    }
+
     AdWebView(
         state = state,
         onCreated = { webView ->
             // 将webView的背景默认设置为透明。不通过systemUi的api提供这个功能，一些手机上动态地修改webView背景颜色，在黑夜模式下，会有问题
             webView.setBackgroundColor(Color.TRANSPARENT);
+            webView.adWebViewHook = hook;
 
+            // 通用的工具类
             val jsUtil = JsUtil(activity, evaluateJavascript = { code, callback ->
                 webView.evaluateJavascript(
                     code,
                     callback
                 )
             });
-            val navigatorFFI = NavigatorFFI(webView, activity, navController)
-            webView.addJavascriptInterface(navigatorFFI, "my_nav")
 
+            val navigatorFFI = NavigatorFFI(webView, activity, navController)
+            webView.addJavascriptInterface(navigatorFFI, "my_nav");
 
             val systemUiFFI = SystemUiFFI(
                 activity,
                 webView,
+                hook,
                 systemUiController,
                 jsUtil,
                 isOverlayStatusBar,
                 isOverlayNavigationBar
             )
             webView.addJavascriptInterface(systemUiFFI, "system_ui")
+
+            onCreated(webView)
         },
         chromeClient = remember {
             class MyWebChromeClient : AdWebChromeClient() {
@@ -132,6 +129,6 @@ fun DWebView(
             }
         },
     )
-//    }
+
 }
 
