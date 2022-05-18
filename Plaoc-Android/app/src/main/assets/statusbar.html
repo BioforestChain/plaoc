@@ -13,144 +13,148 @@
       }
       html {
         margin-top: 50vh;
+        background: rgb(255 254 129 / 30%);
       }
     </style>
   </head>
   <body>
     <main class="container">
-      <label for="color_rgb">
-        颜色
-        <input type="color" id="color_rgb" />
-      </label>
-      <label for="color_a">
-        透明度
-        <input type="range" id="color_a" min="0" max="1" step="0.1" />
-      </label>
-      <script>
-        function getColorInt() {
-          return (
-            parseInt(color_rgb.value.slice(1), 16) +
-            (parseInt(color_a.valueAsNumber * 255) << (8 * 3))
-          );
-        }
-      </script>
-      <label for="dark_icons">
-        图标颜色
-        <select id="dark_icons">
-          <option value="0">默认(color.luminance>0.5)</option>
-          <option value="1">黑色(dark)</option>
-          <option value="-1">白色(light)</option>
-        </select>
-      </label>
-      <script>
-        function getIsDarkIcons() {
-          return Function(`return ${dark_icons.value}`)();
-        }
-      </script>
-      <button id="set_background_color">Set Background Color</button>
-      <script>
-        set_background_color.onclick = () => {
-          system_ui.setBackgroundColor(getColorInt());
-        };
-      </script>
-      <button id="set_color">Set System Bars Color</button>
-      <script>
-        set_color.onclick = () => {
-          system_ui.setSystemBarsColor(getColorInt(), getIsDarkIcons(), 0);
-        };
-      </script>
-      <button id="set_statusbar_color">Set Status Bar Color</button>
-      <script>
-        set_statusbar_color.onclick = () => {
-          system_ui.setStatusBarColor(getColorInt(), getIsDarkIcons());
-        };
-      </script>
-      <button id="set_navigationbar_color">Set Navigation Bar Color</button>
-      <script>
-        set_navigationbar_color.onclick = () => {
-          system_ui.setNavigationBarColor(getColorInt(), getIsDarkIcons(), 0);
-        };
-      </script>
+      <fieldset>
+        <legend>颜色选择</legend>
 
-      <button id="toggle_visible">Toggle System Bars Visible</button>
-      <script>
-        toggle_visible.onclick = () => {
-          system_ui.toggleSystemBarsVisible(0);
-        };
-      </script>
-      <button id="toggle_statusbar_visible">Toggle Status Bar Visible</button>
-      <script>
-        toggle_statusbar_visible.onclick = () => {
-          system_ui.toggleStatusBarVisible(0);
-        };
-      </script>
-      <button id="toggle_decor_fits_system_windows">
-        Toggle Decor Fits System Windows
-      </button>
-      <script>
-        toggle_decor_fits_system_windows.onclick = () => {
-          system_ui.toggleDecorFitsSystemWindows(0);
-        };
-      </script>
-      <button id="toggle_navigationbar_visible">
-        Toggle Navigation Bar Visible
-      </button>
-      <script>
-        toggle_navigationbar_visible.onclick = () => {
-          system_ui.toggleNavigationBarVisible(0);
-        };
-      </script>
-      <label for="insets_type">
-        选择类型
-        <select id="insets_type"></select>
-      </label>
+        <label for="color_rgb">
+          颜色
+          <input type="color" id="color_rgb" />
+        </label>
+        <label for="color_a">
+          透明度
+          <input type="range" id="color_a" min="0" max="1" step="0.1" />
+        </label>
+        <script>
+          function getColorInt() {
+            return (
+              parseInt(color_rgb.value.slice(1), 16) +
+              (parseInt(color_a.valueAsNumber * 255) << (8 * 3))
+            );
+          }
+        </script>
+        <label for="dark_icons">
+          图标颜色
+          <select id="dark_icons">
+            <option value="0">默认(color.luminance>0.5)</option>
+            <option value="1">黑色(dark)</option>
+            <option value="-1">白色(light)</option>
+          </select>
+        </label>
+        <script>
+          function getIsDarkIcons() {
+            return Function(`return ${dark_icons.value}`)();
+          }
+        </script>
+      </fieldset>
+      <fieldset>
+        <legend>Status Bar</legend>
+        <button id="set_statusbar_color">Set Status Bar Color</button>
+        <script>
+          set_statusbar_color.onclick = () => {
+            system_ui.setStatusBarColor(getColorInt(), getIsDarkIcons());
+          };
+        </script>
+        <button id="toggle_statusbar_visible">Toggle Status Bar Visible</button>
+        <script>
+          toggle_statusbar_visible.onclick = () => {
+            system_ui.toggleStatusBarVisible(0);
+          };
+        </script>
+        <button id="toggle_statusbar_overlay">Toggle Status Bar Overlay</button>
+        <script>
+          toggle_statusbar_overlay.onclick = () => {
+            system_ui.toggleStatusBarOverlay(0);
+          };
+        </script>
+      </fieldset>
+      <fieldset>
+        <legend>Navigation Bar</legend>
+        <button id="set_navigationbar_color">Set Navigation Bar Color</button>
+        <script>
+          set_navigationbar_color.onclick = () => {
+            system_ui.setNavigationBarColor(getColorInt(), getIsDarkIcons(), 0);
+          };
+        </script>
+        <button id="toggle_navigationbar_visible">
+          Toggle Navigation Bar Visible
+        </button>
+        <script>
+          toggle_navigationbar_visible.onclick = () => {
+            system_ui.toggleNavigationBarVisible(0);
+          };
+        </script>
+        <button id="toggle_navigationbar_overlay">
+          Toggle Navigation Bar Overlay
+        </button>
+        <script>
+          toggle_navigationbar_overlay.onclick = () => {
+            system_ui.toggleNavigationBarOverlay(0);
+          };
+        </script>
+      </fieldset>
 
-      <script>
-        const INSETS_TYPE = {
-          STATUS_BARS: 1,
-          NAVIGATION_BARS: 1 << 1,
-          CAPTION_BAR: 1 << 2,
+      <fieldset>
+        <legend>insets</legend>
 
-          IME: 1 << 3,
+        <label for="insets_type">
+          选择类型
+          <select id="insets_type"></select>
+        </label>
 
-          SYSTEM_GESTURES: 1 << 4,
-          MANDATORY_SYSTEM_GESTURES: 1 << 5,
-          TAPPABLE_ELEMENT: 1 << 6,
+        <script>
+          const INSETS_TYPE = {
+            STATUS_BARS: 1,
+            NAVIGATION_BARS: 1 << 1,
+            CAPTION_BAR: 1 << 2,
 
-          DISPLAY_CUTOUT: 1 << 7,
+            IME: 1 << 3,
 
-          WINDOW_DECOR: 1 << 8,
-        };
-        for (const key in INSETS_TYPE) {
-          const option = document.createElement("option");
-          option.value = INSETS_TYPE[key];
-          option.innerHTML = key;
-          insets_type.appendChild(option);
-        }
-      </script>
-      <label for="ignore_inserts_visibility">
-        忽略不可见
-        <input type="checkbox" id="ignore_inserts_visibility" role="switch" />
-      </label>
+            SYSTEM_GESTURES: 1 << 4,
+            MANDATORY_SYSTEM_GESTURES: 1 << 5,
+            TAPPABLE_ELEMENT: 1 << 6,
 
-      <button id="get_insets_size">Get Insets Size</button>
-      <script>
-        get_insets_size.onclick = () => {
-          alert(
-            system_ui.getInsetsRect(
-              insets_type.value | 0,
-              ignore_inserts_visibility.checked ? 1 : 0
-            )
-          );
-        };
-      </script>
-      <button id="show_insets">Show Insets</button>
-      <script>
-        show_insets.onclick = () => {
-          system_ui.showInsets(insets_type.value | 0);
-        };
-      </script>
+            DISPLAY_CUTOUT: 1 << 7,
+
+            WINDOW_DECOR: 1 << 8,
+          };
+          for (const key in INSETS_TYPE) {
+            const option = document.createElement("option");
+            option.value = INSETS_TYPE[key];
+            option.innerHTML = key;
+            insets_type.appendChild(option);
+          }
+        </script>
+        <label for="ignore_inserts_visibility">
+          忽略不可见
+          <input type="checkbox" id="ignore_inserts_visibility" role="switch" />
+        </label>
+
+        <button id="get_insets_size">Get Insets Size</button>
+        <script>
+          get_insets_size.onclick = () => {
+            alert(
+              system_ui.getInsetsRect(
+                insets_type.value | 0,
+                ignore_inserts_visibility.checked ? 1 : 0
+              )
+            );
+          };
+        </script>
+        <button id="show_insets">Show Insets</button>
+        <script>
+          show_insets.onclick = () => {
+            system_ui.showInsets(insets_type.value | 0);
+          };
+        </script>
+      </fieldset>
     </main>
+
     <input id="ime" placeholder="IME Test" />
     <style>
       #ime {

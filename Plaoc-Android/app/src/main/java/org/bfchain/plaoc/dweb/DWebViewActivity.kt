@@ -1,21 +1,33 @@
 package org.bfchain.plaoc.dweb
 
+import android.app.ActivityManager
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.Message
+import android.text.method.TextKeyListener.clear
 import android.util.Log
+import android.view.ActionMode
+import android.webkit.WebView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.core.graphics.drawable.toDrawable
+import androidx.core.view.WindowCompat
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -25,8 +37,14 @@ import androidx.navigation.navDeepLink
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
 import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
-import org.bfchain.plaoc.dweb.DWebView
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import org.bfchain.plaoc.R
+import org.bfchain.plaoc.dweb.js.navigator.NavigatorFFI
+import org.bfchain.plaoc.dweb.js.systemUi.SystemUiFFI
+import org.bfchain.plaoc.dweb.js.util.JsUtil
 import org.bfchain.plaoc.ui.theme.PlaocTheme
+import org.bfchain.plaoc.webkit.AdWebChromeClient
+import org.bfchain.plaoc.webkit.AdWebView
 import org.bfchain.plaoc.webkit.rememberAdWebViewState
 import java.net.URLDecoder
 import java.net.URLEncoder
@@ -48,6 +66,41 @@ class DWebViewActivity : ComponentActivity() {
         }
     }
 
+    override fun onActionModeStarted(mode: ActionMode?) {
+        mode?.menu?.let { menu ->
+//            it.clear()
+            menu.add("qaq").apply {
+                this.icon = R.mipmap.ic_launcher.toDrawable()
+                this.setOnMenuItemClickListener {
+                    Log.i(TAG, "qaq")
+                    mode.finish()
+                    true;
+                }
+            }
+            menu.addSubMenu("zzz").apply {
+                this.add("xxx").apply {
+                    this.setOnMenuItemClickListener {
+                        Log.i(TAG, "xxx")
+                        mode.finish()
+                        true;
+                    }
+                }
+            }
+            menu.addSubMenu("www").apply {
+                this.add("yyy").apply {
+                    this.setOnMenuItemClickListener {
+                        Log.i(TAG, "yyy")
+                        mode.finish()
+                        true;
+                    }
+                }
+            }
+        }
+//        mode.
+        super.onActionModeStarted(mode)
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         ALL.add(this)
@@ -55,7 +108,7 @@ class DWebViewActivity : ComponentActivity() {
         android.webkit.WebView.setWebContentsDebuggingEnabled(true)
         Log.i(TAG, "onCreate")
         Log.i(TAG, "actionBar$actionBar")
-
+        WindowCompat.setDecorFitsSystemWindows(window, false)
 
 //                val navController = rememberNavController()
         val activity = this;
@@ -78,7 +131,7 @@ class DWebViewActivity : ComponentActivity() {
 private fun NavFun(activity: ComponentActivity) {
     val bottomSheetNavigator = rememberBottomSheetNavigator()
     val navController = rememberNavController(bottomSheetNavigator)
-    Log.i(TAG, "navController.popBackStack()+${navController.popBackStack()}")
+
 
     ModalBottomSheetLayout(bottomSheetNavigator) {
         NavHost(navController = navController, startDestination = "dweb/{url}") {
@@ -112,22 +165,70 @@ private fun NavFun(activity: ComponentActivity) {
                     }) {
                         Text(text = "甚至时可以交互的原生按钮")
                     }
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
+                    Text(text = "~~~")
                 }
-                DWebView(rememberAdWebViewState(entry.arguments?.getString("url")
-                    .let { it -> URLDecoder.decode(it, "UTF-8") }
-                    ?: "file:///android_asset/demo.html"),
+
+
+                DWebView(
+                    state = rememberAdWebViewState(entry.arguments?.getString("url")
+                        .let { it -> URLDecoder.decode(it, "UTF-8") }
+                        ?: "file:///android_asset/demo.html"),
                     navController = navController,
                     activity = activity,
-                    modifier = Modifier.clickable(true) {
-                        Toast.makeText(
-                            activity.applicationContext,
-                            "Click WebView",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        Log.i(TAG, "Click WebView")
-                    }
                 )
-
             }
         }
     }

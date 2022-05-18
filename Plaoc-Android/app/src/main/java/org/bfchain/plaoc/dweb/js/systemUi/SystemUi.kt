@@ -4,6 +4,7 @@ import android.util.Log
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import androidx.activity.ComponentActivity
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.toArgb
@@ -27,7 +28,9 @@ class SystemUiFFI(
     val activity: ComponentActivity,
     val webView: WebView,
     private val systemUiController: SystemUiController,
-    private val jsUtil: JsUtil
+    private val jsUtil: JsUtil,
+    private val isOverlayStatusBar: MutableState<Boolean>,
+    private val isOverlayNavigationBar: MutableState<Boolean>
 ) {
     init {
         val jsVirtualKeyboardNamespace = "virtualKeyboard"
@@ -93,12 +96,18 @@ class SystemUiFFI(
                         } ?: return insets
 
                         val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
+                        // 如果是 NavigationBar 没有被覆盖，那么需要将其从总高度中减去
+                        val navHeight = if (!isOverlayNavigationBar.value) {
+                            insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
+                        } else {
+                            0
+                        }
                         Log.i(TAG, "onProgress:$imeInsets")
                         GlobalScope.launch {
                             val x = imeInsets.left / devicePixelRatio;
                             val y = imeInsets.top / devicePixelRatio;
                             val width = (imeInsets.right - imeInsets.left) / devicePixelRatio;
-                            val height = (imeInsets.bottom - imeInsets.top) / devicePixelRatio;
+                            val height = (imeInsets.bottom - imeInsets.top - navHeight) / devicePixelRatio;
 
                             jsUtil.setJsValues(
                                 jsVirtualKeyboardNamespace, mapOf(
@@ -142,11 +151,6 @@ class SystemUiFFI(
                 }
             }
         )
-    }
-
-    @JavascriptInterface
-    fun setBackgroundColor(colorHex: ColorInt) {
-        webView.setBackgroundColor(colorHex)
     }
 
     @JavascriptInterface
@@ -224,24 +228,15 @@ class SystemUiFFI(
         }
     }
 
-    private var isDecorFitsSystemWindows: Boolean = true
-
     @JavascriptInterface
-    fun getDecorFitsSystemWindows(): Boolean {
-        return isDecorFitsSystemWindows
+    fun getStatusBarOverlay(): Boolean {
+        return isOverlayStatusBar.value
     }
 
-
     @JavascriptInterface
-    fun toggleDecorFitsSystemWindows(decorFitsSystemWindows: BoolInt) {
-        activity.runOnUiThread {
-            isDecorFitsSystemWindows =
-                decorFitsSystemWindows.toBoolean { !isDecorFitsSystemWindows }
-            WindowCompat.setDecorFitsSystemWindows(
-                activity.window,
-                isDecorFitsSystemWindows
-            )
-        }
+    fun toggleStatusBarOverlay(isOverlay: BoolInt) {
+        isOverlayStatusBar.value = isOverlay.toBoolean { !isOverlayStatusBar.value }
+        Log.i(TAG, "isOverlayStatusBar.value:${isOverlayStatusBar.value}")
     }
 
     @JavascriptInterface
@@ -256,6 +251,19 @@ class SystemUiFFI(
                 visible.toBoolean { !systemUiController.isNavigationBarVisible }
         }
     }
+
+
+    @JavascriptInterface
+    fun getNavigationBarOverlay(): Boolean {
+        return isOverlayNavigationBar.value
+    }
+
+    @JavascriptInterface
+    fun toggleNavigationBarOverlay(isOverlay: BoolInt) {
+        isOverlayNavigationBar.value = isOverlay.toBoolean { !isOverlayNavigationBar.value }
+        Log.i(TAG, "isOverlayNavigationBar.value:${isOverlayNavigationBar.value}")
+    }
+
 
     private val insetsCompat: WindowInsetsCompat by lazy {
         WindowInsetsCompat.toWindowInsetsCompat(

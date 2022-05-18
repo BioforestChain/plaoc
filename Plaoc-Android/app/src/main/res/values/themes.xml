@@ -4,4 +4,8 @@
     <style name="Theme.Plaoc" parent="android:Theme.Material.Light.NoActionBar">
         <item name="android:statusBarColor">@color/purple_700</item>
     </style>
+    <style name="Theme.PlaocDWebView" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">@color/webView_system_ui_color</item>
+        <item name="android:navigationBarColor">@color/webView_system_ui_color</item>
+    </style>
 </resources>

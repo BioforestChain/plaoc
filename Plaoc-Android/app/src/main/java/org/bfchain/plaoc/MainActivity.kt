@@ -230,7 +230,7 @@ private fun DWebViewList(
                     .height(200.dp)
                     .border(2.dp, Color.Red)
             ) {
-                DWebView(webViewState = state, navController = navController, activity = activity)
+                DWebView(state = state, navController = navController, activity = activity)
             }
         }
         Text("mml")
