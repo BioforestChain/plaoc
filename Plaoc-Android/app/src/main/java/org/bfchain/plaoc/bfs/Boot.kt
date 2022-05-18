@@ -3,7 +3,7 @@ package org.bfchain.plaoc.bfs
 import android.util.Log
 import androidx.activity.ComponentActivity
 import com.google.gson.Gson
-import org.bfchain.plaoc.openDWebWindow
+import org.bfchain.plaoc.dweb.openDWebWindow
 
 private const val TAG = "BFS/Boot"
 

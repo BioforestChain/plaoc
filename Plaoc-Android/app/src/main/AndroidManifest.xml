@@ -21,7 +21,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".DWebViewActivity"
+            android:name=".dweb.DWebViewActivity"
             android:exported="true"
             android:theme="@style/Theme.Plaoc"
             android:launchMode="standard"
