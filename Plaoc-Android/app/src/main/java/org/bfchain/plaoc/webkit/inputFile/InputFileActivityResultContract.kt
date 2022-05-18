@@ -1,10 +1,9 @@
-package org.bfchain.plaoc.plugin.inputFile
+package org.bfchain.plaoc.webkit.inputFile
 
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
@@ -12,9 +11,7 @@ import androidx.activity.result.contract.ActivityResultContract
 import androidx.annotation.CallSuper
 import androidx.annotation.RequiresApi
 import androidx.core.content.FileProvider
-import androidx.core.net.toFile
 import java.io.File
-import java.io.InputStream
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 

@@ -39,6 +39,8 @@ import com.google.accompanist.navigation.material.ModalBottomSheetLayout
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import org.bfchain.plaoc.bfs.Boot
+import org.bfchain.plaoc.dweb.DWebView
+import org.bfchain.plaoc.dweb.openDWebWindow
 import org.bfchain.plaoc.plugin.scanner.QrCodeScanner
 import org.bfchain.plaoc.ui.theme.PlaocTheme
 import org.bfchain.plaoc.webkit.AdWebContent
@@ -228,7 +230,7 @@ private fun DWebViewList(
                     .height(200.dp)
                     .border(2.dp, Color.Red)
             ) {
-                DWebView(webviewState = state, navController = navController, activity = activity)
+                DWebView(webViewState = state, navController = navController, activity = activity)
             }
         }
         Text("mml")

@@ -1,4 +1,4 @@
-package org.bfchain.plaoc.plugin.util
+package org.bfchain.plaoc.dweb.js.util
 
 import android.webkit.ValueCallback
 import androidx.activity.ComponentActivity
@@ -6,11 +6,6 @@ import com.google.gson.Gson
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.ConcurrentSkipListSet
-import java.util.concurrent.locks.Lock
-import java.util.concurrent.locks.ReadWriteLock
-import java.util.concurrent.locks.ReentrantLock
-import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 

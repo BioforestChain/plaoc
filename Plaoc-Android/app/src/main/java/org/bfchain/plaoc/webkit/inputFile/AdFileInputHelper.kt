@@ -1,4 +1,4 @@
-package org.bfchain.plaoc.webkit
+package org.bfchain.plaoc.webkit.inputFile
 
 import android.net.Uri
 import android.util.Log
@@ -9,8 +9,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
-import org.bfchain.plaoc.plugin.inputFile.InputFileActivityResultContract
-import org.bfchain.plaoc.plugin.inputFile.InputFileOptions
+import org.bfchain.plaoc.webkit.inputFile.InputFileActivityResultContract
+import org.bfchain.plaoc.webkit.inputFile.InputFileOptions
 
 
 private const val TAG = "AdFileInputHelper"

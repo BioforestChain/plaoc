@@ -7,7 +7,8 @@ import android.os.Process
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebView
-import org.bfchain.plaoc.plugin.inputFile.InputFileOptions
+import org.bfchain.plaoc.webkit.inputFile.AdFileInputHelper
+import org.bfchain.plaoc.webkit.inputFile.InputFileOptions
 
 /**
  * AccompanistWebChromeClient

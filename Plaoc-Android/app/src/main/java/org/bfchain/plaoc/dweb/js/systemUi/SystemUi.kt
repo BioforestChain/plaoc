@@ -1,4 +1,4 @@
-package org.bfchain.plaoc.plugin.systemUi
+package org.bfchain.plaoc.dweb.js.systemUi
 
 import android.util.Log
 import android.webkit.JavascriptInterface
@@ -16,14 +16,14 @@ import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.gson.Gson
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.bfchain.plaoc.plugin.util.JsUtil
-import org.bfchain.plaoc.plugin.util.JsValue
-import org.bfchain.plaoc.plugin.util.JsValueType
+import org.bfchain.plaoc.dweb.js.util.JsUtil
+import org.bfchain.plaoc.dweb.js.util.JsValue
+import org.bfchain.plaoc.dweb.js.util.JsValueType
 
 
 private const val TAG = "SystemUiFfi"
 
-class SystemUiFfi(
+class SystemUiFFI(
     val activity: ComponentActivity,
     val webView: WebView,
     private val systemUiController: SystemUiController,

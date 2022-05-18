@@ -22,6 +22,8 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
+import org.bfchain.plaoc.webkit.inputFile.AdFileInputHelper
+import org.bfchain.plaoc.webkit.inputFile.rememberAdFileInputHelper
 
 /**
  * A wrapper around the Android View WebView to provide a basic WebView composable.
