@@ -21,6 +21,7 @@ import org.bfchain.plaoc.dweb.js.util.JsUtil
 import org.bfchain.plaoc.dweb.js.util.JsValue
 import org.bfchain.plaoc.dweb.js.util.JsValueType
 import org.bfchain.plaoc.webkit.AdWebViewHook
+import kotlin.math.max
 
 
 private const val TAG = "SystemUiFfi"
@@ -36,19 +37,75 @@ class SystemUiFFI(
 ) {
     init {
         val jsVirtualKeyboardNamespace = "virtualKeyboard"
+        val cssVirtualKeyboardNamespace = "--virtual-keyboard"
         val devicePixelRatio = activity.resources.displayMetrics.density
+
+        /**
+         * @TODO 在虚拟键盘弹出后，如果离开activity（比如通过文字选择器，选择input的文本然后跳到别的地方）
+         *       再回来时，虚拟键盘相关的生命周期就没有正确在这里触发，那么虚拟键盘的值就没法正确下将回原位，
+         *       所以需要通过activity的生命周期，为其进行强制性的重新注入这些变量
+         */
+        // 注入虚拟键盘相关的js/css变量
+        fun InjectVirtualKeyboardVars(insets: WindowInsetsCompat, animationProgress: Float = 0.0F) {
+            val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
+            // 如果是 NavigationBar 没有被覆盖，那么需要将其从总高度中减去
+            val navHeight = if (!isOverlayNavigationBar.value) {
+                insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
+            } else {
+                0
+            }
+            Log.i(TAG, "onProgress:$imeInsets")
+            GlobalScope.launch {
+                val x = imeInsets.left / devicePixelRatio;
+                val y = imeInsets.top / devicePixelRatio;
+                val width = (imeInsets.right - imeInsets.left) / devicePixelRatio;
+                val height = max(
+                    0,
+                    (imeInsets.bottom - imeInsets.top - navHeight)
+                ) / devicePixelRatio;
+
+                jsUtil.setJsValues(
+                    jsVirtualKeyboardNamespace, mapOf(
+                        "x" to JsValue(JsValueType.Number, x.toString()),
+                        "y" to JsValue(JsValueType.Number, y.toString()),
+                        "width" to JsValue(JsValueType.Number, width.toString()),
+                        "height" to JsValue(JsValueType.Number, height.toString()),
+                        "animationProgress" to JsValue(
+                            JsValueType.Number,
+                            animationProgress.toString()// imeAnimation.interpolatedFraction.toString()
+                        ),
+                    )
+                )
+                jsUtil.setCssVars(
+                    "html",
+                    mapOf(
+                        "$cssVirtualKeyboardNamespace-x" to "${x}px",
+                        "$cssVirtualKeyboardNamespace-y" to "${y}px",
+                        "$cssVirtualKeyboardNamespace-width" to "${width}px",
+                        "$cssVirtualKeyboardNamespace-height" to "${height}px",
+                        "$cssVirtualKeyboardNamespace-animation-progress" to "${animationProgress}",
+                    )
+                )
+            }
+        }
 
         ViewCompat.setOnApplyWindowInsetsListener(activity.window.decorView) { _, insets ->
             val imeVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
             val imeHeight = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
             Log.i(TAG, "imeHeight:$imeHeight")
             GlobalScope.launch {
-                jsUtil.setJsValue(
+                jsUtil.setJsValues(
                     jsVirtualKeyboardNamespace,
-                    "top",
-                    JsValue(JsValueType.Number, (imeHeight / devicePixelRatio).toString()),
+                    mapOf(
+                        "top" to JsValue(
+                            JsValueType.Number,
+                            (imeHeight / devicePixelRatio).toString()
+                        ),
+                        "state" to JsValue(JsValueType.String, if (imeVisible) "open" else "close")
+                    )
                 );
             }
+            InjectVirtualKeyboardVars(insets)
             insets
         }
 
@@ -56,7 +113,6 @@ class SystemUiFFI(
         ViewCompat.setWindowInsetsAnimationCallback(
             activity.window.decorView,
             object : WindowInsetsAnimationCompat.Callback(DISPATCH_MODE_STOP) {
-                val cssNamespace = "--virtual-keyboard"
                 val view = activity.window.decorView
                 override fun onPrepare(animation: WindowInsetsAnimationCompat) {
                     if (animation.typeMask and WindowInsetsCompat.Type.ime() != 0) {
@@ -64,7 +120,7 @@ class SystemUiFFI(
                             jsUtil.setJsValue(
                                 jsVirtualKeyboardNamespace,
                                 "state",
-                                JsValue(JsValueType.String, "prepare"),
+                                JsValue(JsValueType.String, "opening"),
                             );
                         }
                     }
@@ -80,7 +136,7 @@ class SystemUiFFI(
                             jsUtil.setJsValue(
                                 jsVirtualKeyboardNamespace,
                                 "state",
-                                JsValue(JsValueType.String, "start"),
+                                JsValue(JsValueType.String, "open"),
                             );
                         }
                     }
@@ -97,44 +153,7 @@ class SystemUiFFI(
                             it.typeMask and WindowInsetsCompat.Type.ime() != 0
                         } ?: return insets
 
-                        val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
-                        // 如果是 NavigationBar 没有被覆盖，那么需要将其从总高度中减去
-                        val navHeight = if (!isOverlayNavigationBar.value) {
-                            insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
-                        } else {
-                            0
-                        }
-                        Log.i(TAG, "onProgress:$imeInsets")
-                        GlobalScope.launch {
-                            val x = imeInsets.left / devicePixelRatio;
-                            val y = imeInsets.top / devicePixelRatio;
-                            val width = (imeInsets.right - imeInsets.left) / devicePixelRatio;
-                            val height =
-                                (imeInsets.bottom - imeInsets.top - navHeight) / devicePixelRatio;
-
-                            jsUtil.setJsValues(
-                                jsVirtualKeyboardNamespace, mapOf(
-                                    "x" to JsValue(JsValueType.Number, x.toString()),
-                                    "y" to JsValue(JsValueType.Number, y.toString()),
-                                    "width" to JsValue(JsValueType.Number, width.toString()),
-                                    "height" to JsValue(JsValueType.Number, height.toString()),
-                                    "animationProgress" to JsValue(
-                                        JsValueType.Number,
-                                        imeAnimation.interpolatedFraction.toString()
-                                    ),
-                                )
-                            )
-                            jsUtil.setCssVars(
-                                "html",
-                                mapOf(
-                                    "$cssNamespace-x" to "${x}px",
-                                    "$cssNamespace-y" to "${y}px",
-                                    "$cssNamespace-width" to "${width}px",
-                                    "$cssNamespace-height" to "${height}px",
-                                    "$cssNamespace-animation-progress" to "${imeAnimation.interpolatedFraction}",
-                                )
-                            )
-                        }
+                        InjectVirtualKeyboardVars(insets, imeAnimation.interpolatedFraction)
                     }
 
                     return insets
@@ -146,7 +165,7 @@ class SystemUiFFI(
                             jsUtil.setJsValue(
                                 jsVirtualKeyboardNamespace,
                                 "state",
-                                JsValue(JsValueType.String, "end")
+                                JsValue(JsValueType.String, "close")
                             );
                         }
                     }
@@ -157,7 +176,7 @@ class SystemUiFFI(
     }
 
     /**
-     * @TODO 在未来，这里的disable与否，通过
+     * @TODO 在未来，这里的disable与否，通过更加完善的声明来实现，比如可以声明多个rect
      */
     @JavascriptInterface
     fun disableTouchEvent() {
