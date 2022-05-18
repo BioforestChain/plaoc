@@ -22,6 +22,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.drawable.toDrawable
@@ -65,44 +66,11 @@ class DWebViewActivity : ComponentActivity() {
         }
     }
 
-    override fun onActionModeStarted(mode: ActionMode?) {
-        mode?.menu?.let { menu ->
-//            it.clear()
-            menu.add("qaq").apply {
-                this.icon = R.mipmap.ic_launcher.toDrawable()
-                this.setOnMenuItemClickListener {
-                    Log.i(TAG, "qaq")
-                    mode.finish()
-                    true;
-                }
-            }
-            menu.addSubMenu("zzz").apply {
-                this.add("xxx").apply {
-                    this.setOnMenuItemClickListener {
-                        Log.i(TAG, "xxx")
-                        mode.finish()
-                        true;
-                    }
-                }
-            }
-            menu.addSubMenu("www").apply {
-                this.add("yyy").apply {
-                    this.setOnMenuItemClickListener {
-                        Log.i(TAG, "yyy")
-                        mode.finish()
-                        true;
-                    }
-                }
-            }
-        }
-//        mode.
-        super.onActionModeStarted(mode)
-    }
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         ALL.add(this)
+
+//        theme.setTo(R.style.Theme_PlaocDWebView)
 
         android.webkit.WebView.setWebContentsDebuggingEnabled(true)
         Log.i(TAG, "onCreate")
