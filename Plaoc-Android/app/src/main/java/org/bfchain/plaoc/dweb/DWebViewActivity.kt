@@ -10,12 +10,12 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
@@ -82,10 +82,6 @@ private fun NavFun(activity: ComponentActivity) {
     val bottomSheetNavigator = rememberBottomSheetNavigator()
     val navController = rememberNavController(bottomSheetNavigator)
 
-    var adWebViewHook by remember {
-        mutableStateOf<AdWebViewHook?>(null)
-    }
-
     ModalBottomSheetLayout(bottomSheetNavigator) {
         NavHost(navController = navController, startDestination = "dweb/{url}") {
             composable(
@@ -99,28 +95,6 @@ private fun NavFun(activity: ComponentActivity) {
                     uriPattern = "dweb://{url}"
                 })
             ) { entry ->
-                Column(modifier = Modifier.padding(10.dp)) {
-                    Text(text = "~~~", fontSize = 30.sp)
-                    Text(text = "这是Android原生的文本")
-                    Text(text = "他们渲染在WebView的背景上")
-                    Text(text = "如果你看到这些内容，就说明html的背景是有透明度的")
-                    Text(text = "你可以通过 SystemUI 的 Disable Touch Event 来禁用于 WebView 的交互，从而获得与这一层 Native 交互的能力")
-                    Button(onClick = {
-                        adWebViewHook?.onTouchEvent = null;
-                        Toast.makeText(
-                            activity.applicationContext,
-                            "控制权已经回到Web中了",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }) {
-                        Text(text = "归还Web的交互权")
-                    }
-                    Text(text = "~~~", fontSize = 30.sp)
-                    Text(text = "也就是说，你可以将一些原生的组件防止在这里，仅仅提供渲染，而Web层提供控制与逻辑执行，比如说游戏的渲染")
-                    Text(text = "~~~", fontSize = 30.sp)
-                    Text(text = "又或者，我们也可以制定部分的WebView区域是可控制的，其余的穿透到native层")
-                }
-
 
                 DWebView(
                     state = rememberAdWebViewState(entry.arguments?.getString("url")
@@ -128,8 +102,10 @@ private fun NavFun(activity: ComponentActivity) {
                         ?: "file:///android_asset/demo.html"),
                     navController = navController,
                     activity = activity,
+//                    modifier = Modifier.padding(innerPadding)
                 ) { webView ->
-                    adWebViewHook = webView.adWebViewHook
+//                            webView.addJavascriptInterface()
+//                    adWebViewHook = webView.adWebViewHook
                 }
             }
         }

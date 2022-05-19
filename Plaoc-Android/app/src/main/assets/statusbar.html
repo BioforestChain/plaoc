@@ -4,23 +4,37 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Status bar</title>
+    <title>System UI</title>
     <link rel="stylesheet" href="./pico.min.css" />
     <style>
-      html,
+      html {
+        background: rgb(255 254 129 / 30%);
+        border: 2px solid red;
+      }
       body {
+        margin-top: 50vh;
         background: transparent;
       }
-      html {
-        margin-top: 50vh;
-        background: rgb(255 254 129 / 30%);
+      fieldset {
+        background: rgb(0 0 0 / 60%);
+        padding: 0.5em;
+        border-radius: 0.5em;
+        color: #ddd;
+      }
+      legend {
+        font-size: 1.5em;
+        font-weight: bold;
+        background: rgb(0 0 0 / 60%);
+        color: #fff;
+        padding: 0.2em 1em;
+        border-radius: 0.2em;
       }
     </style>
   </head>
   <body>
     <main class="container">
       <fieldset>
-        <label>交互控制</label>
+        <legend>交互控制</legend>
         <button id="disable_touch_event">Disable Touch Event</button>
         <script>
           disable_touch_event.onclick = () => {
@@ -28,6 +42,20 @@
             alert("从系统层面禁用了 touch-event，类似css的pointer-event:none");
           };
         </script>
+      </fieldset>
+      <fieldset>
+        <legend>AppBar</legend>
+        <label
+          >标题
+          <input id="title_value" />
+          <button id="set_title">修改</button>
+          <script>
+            title_value.value = document.title;
+            set_title.onclick = () => {
+              document.title = title_value.value;
+            };
+          </script>
+        </label>
       </fieldset>
       <fieldset>
         <legend>颜色选择</legend>
