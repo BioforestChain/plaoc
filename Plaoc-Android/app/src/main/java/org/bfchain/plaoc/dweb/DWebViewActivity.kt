@@ -7,6 +7,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -102,6 +103,7 @@ private fun NavFun(activity: ComponentActivity) {
                         ?: "file:///android_asset/demo.html"),
                     navController = navController,
                     activity = activity,
+                    modifier = Modifier.background(Color.Cyan)
 //                    modifier = Modifier.padding(innerPadding)
                 ) { webView ->
 //                            webView.addJavascriptInterface()

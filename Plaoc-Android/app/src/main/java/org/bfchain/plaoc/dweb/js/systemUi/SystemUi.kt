@@ -349,7 +349,7 @@ typealias ColorInt = Int
 
 typealias BoolInt = Int
 
-private fun BoolInt.toBoolean(elseDefault: () -> Boolean = { false }): Boolean {
+ fun BoolInt.toBoolean(elseDefault: () -> Boolean = { false }): Boolean {
     return when {
         this > 0 -> {
             true

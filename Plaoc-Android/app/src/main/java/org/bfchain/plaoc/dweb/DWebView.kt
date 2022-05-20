@@ -7,16 +7,20 @@ import android.util.Log
 import android.webkit.WebView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.*
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowInsetsCompat
@@ -24,6 +28,7 @@ import androidx.navigation.NavController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import org.bfchain.plaoc.dweb.js.systemUi.SystemUiFFI
 import org.bfchain.plaoc.dweb.js.navigator.NavigatorFFI
+import org.bfchain.plaoc.dweb.js.systemUi.TopBarFFI
 import org.bfchain.plaoc.dweb.js.util.JsUtil
 import org.bfchain.plaoc.webkit.*
 
@@ -91,29 +96,65 @@ fun DWebView(
         mutableStateOf("")
     }
 
+    val topBarOverlay = remember {
+        mutableStateOf(false)
+    }
+    val topBarTitle = remember {
+        mutableStateOf<String?>(null)
+    }
+    val topBarHeight = remember {
+        mutableStateOf(0F)
+    }
+    val localDensity = LocalDensity.current
 
+    @Composable
+    fun MyTopAppBar() {
+        TopAppBar(
+            title = {
+                Text(
+                    text = topBarTitle.value ?: titleContent,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
+            actions = {
+                IconButton(onClick = { /*TODO*/ }) {
+//                    Icon(Icons.Filled.Menu, "menuIcon")
+                }
+            },
+            navigationIcon = {
+                IconButton(onClick = {
+                    navController.popBackStack()
+                }) {
+                    Icon(Icons.Filled.ArrowBack, "backIcon")
+                }
+            },
+            backgroundColor = Companion.Transparent,
+            contentColor = androidx.compose.ui.graphics.Color.White,
+            elevation = 0.dp,
+            modifier = Modifier.onGloballyPositioned { coordinates ->
+
+                topBarHeight.value = coordinates.size.height / localDensity.density
+            }
+        )
+    }
+
+
+    val bottomBarOverlay = remember {
+        mutableStateOf(false)
+    }
+
+    @Composable
+    fun MyBottonBar() {
+        BottomAppBar(elevation = 0.dp) {
+
+        }
+    }
 
     Scaffold(
         modifier = modifier.padding(overlayPadding),
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(text = titleContent)
-                },
-                navigationIcon = {
-                    IconButton(onClick = {
-                        navController.popBackStack()
-                    }) {
-                        Icon(Icons.Filled.ArrowBack, "backIcon")
-                    }
-                },
-                backgroundColor = MaterialTheme.colors.primary,
-                contentColor = androidx.compose.ui.graphics.Color.White,
-                elevation = 10.dp,
-//                modifier = Modifier.background(Companion.Transparent)
-//                    .padding(overlayTopPadding)
-            )
-        },
+        bottomBar = {},
+        topBar = { if (!topBarOverlay.value) MyTopAppBar() },
         content = { innerPadding ->
             Column(
                 modifier = Modifier
@@ -140,7 +181,6 @@ fun DWebView(
                 Text(text = "~~~", fontSize = 30.sp)
                 Text(text = "又或者，我们也可以制定部分的WebView区域是可控制的，其余的穿透到native层")
             }
-
 
             AdWebView(
                 state = state,
@@ -170,6 +210,13 @@ fun DWebView(
                         isOverlayNavigationBar
                     )
                     webView.addJavascriptInterface(systemUiFFI, "system_ui")
+
+                    val topBarFFI = TopBarFFI(
+                        topBarOverlay,
+                        topBarTitle,
+                        topBarHeight,
+                    )
+                    webView.addJavascriptInterface(topBarFFI, "top_bar")
 
                     onCreated(webView)
                 },
@@ -211,9 +258,27 @@ fun DWebView(
                     }
                     MyWebChromeClient()
                 },
-                modifier = Modifier
-                    .padding(innerPadding),
+                modifier = Modifier.let { m ->
+                    var top = innerPadding.calculateTopPadding()
+                    var bottom = innerPadding.calculateTopPadding()
+                    val layoutDirection = LocalLayoutDirection.current;
+                    var start = innerPadding.calculateStartPadding(layoutDirection)
+                    var end = innerPadding.calculateEndPadding(layoutDirection)
+                    if (topBarOverlay.value) {
+                        top = 0.dp;
+                    }
+                    if (bottomBarOverlay.value) {
+                        bottom = 0.dp
+                    }
+                    if (topBarOverlay.value and bottomBarOverlay.value) {
+                        start = 0.dp; end = 0.dp;
+                    }
+                    Log.i(TAG, "webview-padding $start, $top, $end, $bottom")
+                    m.padding(start, top, end, bottom)
+                },
             )
+
+            if (topBarOverlay.value) MyTopAppBar()
 
         },
         backgroundColor = Companion.Transparent,

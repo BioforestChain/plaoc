@@ -44,18 +44,29 @@
         </script>
       </fieldset>
       <fieldset>
-        <legend>AppBar</legend>
-        <label
-          >标题
-          <input id="title_value" />
+        <legend>TopBar</legend>
+        <label>
+          标题
+          <input id="title_value" value="MY TOP BAR TITLE👩🏾‍🍳" />
           <button id="set_title">修改</button>
           <script>
-            title_value.value = document.title;
             set_title.onclick = () => {
-              document.title = title_value.value;
+              top_bar.setTitle(title_value.value);
             };
           </script>
         </label>
+        <button id="toggle_topbar_overlay">Toggle TopBar Overlay</button>
+        <script>
+          toggle_topbar_overlay.onclick = () => {
+            top_bar.toggleOverlay(0);
+          };
+        </script>
+        <button id="get_topbar_height">Get TopBar Height</button>
+        <script>
+          get_topbar_height.onclick = () => {
+            alert(top_bar.getHeight());
+          };
+        </script>
       </fieldset>
       <fieldset>
         <legend>颜色选择</legend>
