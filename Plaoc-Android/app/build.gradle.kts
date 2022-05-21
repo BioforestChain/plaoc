@@ -68,6 +68,7 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:$compose_version")
     debugImplementation("androidx.compose.ui:ui-tooling:$compose_version")
     implementation("com.google.code.gson:gson:2.9.0")
+//    implementation("androidx.compose.material:material-icons-extended:$compose_version")
 
     val nav_version = "2.4.2"
     implementation("androidx.navigation:navigation-compose:$nav_version")

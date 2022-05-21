@@ -14,10 +14,10 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color.*
+import androidx.compose.ui.graphics.Color.Companion
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.style.TextAlign
@@ -26,8 +26,8 @@ import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.NavController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import org.bfchain.plaoc.dweb.js.systemUi.SystemUiFFI
 import org.bfchain.plaoc.dweb.js.navigator.NavigatorFFI
+import org.bfchain.plaoc.dweb.js.systemUi.SystemUiFFI
 import org.bfchain.plaoc.dweb.js.systemUi.TopBarFFI
 import org.bfchain.plaoc.dweb.js.util.JsUtil
 import org.bfchain.plaoc.webkit.*
@@ -118,7 +118,30 @@ fun DWebView(
                 )
             },
             actions = {
-                IconButton(onClick = { /*TODO*/ }) {
+                IconButton(onClick = {
+//                    val classLoader = URLClassLoader(
+//                        arrayOf<URL>(URL("file:///c:/projects/myProject/bin/")),
+//                        javaClass.classLoader
+//                    )
+//                    val z =androidx.compose.material.icons.Icons
+//                    val reflections = Reflections("my.project.prefix")
+//                    Log.i(TAG, setOf(Icons.Default))
+
+
+//                    Class.forName("androidx.compose.material.icons.Icons").classes.forEach { c ->
+//                        try {
+//                            Log.i(
+//                                TAG,
+//                                "Icons.Filled.${c.name}(${
+//                                    c.declaredMethods.first()
+//                                        .invoke(null, Icons.Filled) as ImageVector
+//                                })"
+//                            )
+//                        } catch (_: Throwable) {
+//                        }
+//                    }
+                }) {
+                    IconByName("Filled.Menu")
 //                    Icon(Icons.Filled.Menu, "menuIcon")
                 }
             },
@@ -286,4 +309,5 @@ fun DWebView(
     )
 
 }
+
 
