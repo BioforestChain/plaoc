@@ -64,7 +64,7 @@ class DWebViewActivity : ComponentActivity() {
 
         val activity = this;
         setContent {
-            PlaocTheme {
+            PlaocTheme(context = PlaocTheme.WebView) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background,
