@@ -95,6 +95,18 @@
             };
           </script>
         </label>
+        <button id="set_topbar_background_color">Set TopBar Background Color</button>
+        <script>
+          set_topbar_background_color.onclick = ()=>{
+            top_bar.setBackgroundColor(getColorInt())
+          }
+        </script>
+        <button id="set_topbar_foreground_color">Set TopBar Foreground Color</button>
+        <script>
+          set_topbar_foreground_color.onclick = ()=>{
+            top_bar.setForegroundColor(getColorInt())
+          }
+        </script>
       </fieldset>
       <fieldset>
         <legend>颜色选择</legend>

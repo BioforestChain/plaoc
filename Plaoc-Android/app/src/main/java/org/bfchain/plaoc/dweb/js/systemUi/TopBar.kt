@@ -4,6 +4,8 @@ import android.util.Log
 import android.webkit.JavascriptInterface
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import com.google.gson.JsonDeserializer
 import com.google.gson.reflect.TypeToken
 import org.bfchain.plaoc.dweb.js.util.*
@@ -16,6 +18,8 @@ class TopBarFFI(
     val title: MutableState<String?>,
     val height: MutableState<Float>,
     val actions: SnapshotStateList<TopBarAction>,
+    val backgroundColor: MutableState<Color>,
+    val foregroundColor: MutableState<Color>,
 ) {
     @JavascriptInterface
     fun getOverlay(): Boolean {
@@ -55,6 +59,26 @@ class TopBarFFI(
         val actionList = actionListJson.toData<List<TopBarAction>>(object :
             TypeToken<List<TopBarAction>>() {}.type);
         actionList.toCollection(actions)
+    }
+
+    @JavascriptInterface
+    fun getBackgroundColor(): Int {
+        return backgroundColor.value.toArgb()
+    }
+
+    @JavascriptInterface
+    fun setBackgroundColor(color: ColorInt) {
+        backgroundColor.value = Color(color)
+    }
+
+    @JavascriptInterface
+    fun getForegroundColor(): Int {
+        return foregroundColor.value.toArgb()
+    }
+
+    @JavascriptInterface
+    fun setForegroundColor(color: ColorInt) {
+        foregroundColor.value = Color(color)
     }
 
     companion object {

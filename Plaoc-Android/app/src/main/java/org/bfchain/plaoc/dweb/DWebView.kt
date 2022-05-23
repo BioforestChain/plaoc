@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -31,6 +32,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.NavController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import org.bfchain.plaoc.R
 import org.bfchain.plaoc.dweb.js.navigator.NavigatorFFI
 import org.bfchain.plaoc.dweb.js.systemUi.SystemUiFFI
 import org.bfchain.plaoc.dweb.js.systemUi.TopBarAction
@@ -118,6 +120,17 @@ fun DWebView(
     val topBarActions = remember {
         mutableStateListOf<TopBarAction>()
     }
+    val topBarBackgroundColor = MaterialTheme.colors.primarySurface.let { defaultPrimarySurface ->
+        remember {
+            mutableStateOf(defaultPrimarySurface)
+        }
+    }
+    val topBarForegroundColor = MaterialTheme.colors.contentColorFor(topBarBackgroundColor.value)
+        .let { defaultContentColor ->
+            remember {
+                mutableStateOf(defaultContentColor)
+            }
+        }
     val localDensity = LocalDensity.current
 
     @Composable
@@ -148,7 +161,9 @@ fun DWebView(
                             enabled = !action.disabled
                         ) {
                             when (action.iconType) {
-                                TopBarAction.IconType.NamedIcon -> IconByName(name = action.iconValue)
+                                TopBarAction.IconType.NamedIcon -> IconByName(
+                                    name = action.iconValue,
+                                )
                             }
                         }
                     }
@@ -176,8 +191,8 @@ fun DWebView(
                     Icon(Icons.Filled.ArrowBack, "backIcon")
                 }
             },
-            backgroundColor = Companion.Transparent,
-            contentColor = androidx.compose.ui.graphics.Color.White,
+            backgroundColor = topBarBackgroundColor.value,
+            contentColor = topBarForegroundColor.value,
             elevation = 0.dp,
             modifier = Modifier
                 .onGloballyPositioned { coordinates ->
@@ -272,6 +287,8 @@ fun DWebView(
                         topBarTitle,
                         topBarHeight,
                         topBarActions,
+                        topBarBackgroundColor,
+                        topBarForegroundColor,
                     )
                     webView.addJavascriptInterface(topBarFFI, "top_bar")
 
