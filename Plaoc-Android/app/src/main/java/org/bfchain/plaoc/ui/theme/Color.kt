@@ -1,10 +1,9 @@
 package org.bfchain.plaoc.ui.theme
 
 import androidx.compose.ui.graphics.Color
-import androidx.core.graphics.toColor
-import org.bfchain.plaoc.R
 
-
+// Android定义在resource中的color，拿到的是一个 resourceId，要拿到具体的值，需要context上下文
+// 所以这里只能写死这些值
 
 val Purple200 =  Color(0xFFBB86FC)
 val Purple500 = Color(0xFF6200EE)
