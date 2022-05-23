@@ -2,12 +2,19 @@ package org.bfchain.plaoc.dweb.js.util
 
 import android.webkit.ValueCallback
 import androidx.activity.ComponentActivity
-import com.google.gson.Gson
+import com.google.gson.*
+import com.google.gson.internal.bind.TreeTypeAdapter
+import com.google.gson.internal.bind.TypeAdapters
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
+import java.lang.reflect.Type
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+import kotlin.reflect.KProperty
+
 
 class JsUtil(
     val activity: ComponentActivity,
@@ -310,21 +317,54 @@ class JsUtil(
     suspend fun delJsValue(namespace: String, name: String): Boolean {
         return getJsNamespace(namespace).delProperty(name)
     }
+
+    companion object {
+
+        fun <T> resetableLazy(initializer: () -> T) = ResetableDelegate(initializer)
+
+        class ResetableDelegate<T>(private val initializer: () -> T) {
+            private val lazyRef: AtomicReference<Lazy<T>> = AtomicReference(
+                lazy(
+                    initializer
+                )
+            )
+
+            operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
+                return lazyRef.get().getValue(thisRef, property)
+            }
+
+            fun reset() {
+                lazyRef.set(lazy(initializer))
+            }
+        }
+
+        private val gsonBuilder = GsonBuilder()
+        private val gsonDelegate =  resetableLazy {
+            gsonBuilder.create()
+        }
+         val gson by gsonDelegate
+
+        fun <T> registerGsonDeserializer(type: Type, typeAdapter: JsonDeserializer<T>) {
+            gsonBuilder.registerTypeAdapter(type, typeAdapter)
+            gsonDelegate.reset()
+        }
+    }
 }
+
+
+//private val gson by lazy {
+//    JsUtil.gson
+//}
+
 
 data class JsValue(val type: JsValueType, val value: String) {
     fun isNullOrEmpty(): Boolean {
         return false
     }
 
-    companion object {
-        final val gson: Gson by lazy { Gson() }
-    }
-
-
     val jsCode: String by lazy {
         when (type) {
-            JsValueType.String -> gson.toJson(value)
+            JsValueType.String -> JsUtil.gson.toJson(value)
             JsValueType.Number -> value.toDoubleOrNull()?.let { value } ?: "NaN"
             JsValueType.Boolean -> if (value == "true") "true" else "false"
             JsValueType.RegExp -> "/$value/"
@@ -339,4 +379,38 @@ enum class JsValueType {
     Boolean,
     RegExp,
     RAW,
+}
+
+typealias ColorInt = Int
+
+typealias BoolInt = Int
+
+fun BoolInt.toBoolean(elseDefault: () -> Boolean = { false }): Boolean {
+    return when {
+        this > 0 -> {
+            true
+        }
+        this < 0 -> {
+            false
+        }
+        else -> {
+            elseDefault()
+        }
+    }
+}
+
+typealias DataString<T> = String
+
+@Throws(JsonSyntaxException::class)
+fun <T> DataString<T>.toData(classOfT: Class<T>): T {
+    return JsUtil.gson.fromJson(this, classOfT)
+}
+
+fun <T> DataString<T>.toData(typeOfT: Type): T {
+    val res: T = JsUtil.gson.fromJson(this, typeOfT)
+    return res
+}
+
+fun <T> DataString_From(v: T): DataString<T> {
+    return JsUtil.gson.toJson(v)
 }

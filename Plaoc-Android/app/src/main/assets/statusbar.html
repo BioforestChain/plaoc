@@ -67,6 +67,34 @@
             alert(top_bar.getHeight());
           };
         </script>
+        <label>
+          自定义Actions
+          <span id="topbar_action_1"></span>
+          <span id="topbar_action_2"></span>
+          <input id="custom_topbar_actions" type="checkbox" role="switch" />
+          <script>
+            custom_topbar_actions.onchange = () => {
+              if (custom_topbar_actions.checked) {
+                top_bar.setActions(
+                  JSON.stringify([
+                    {
+                      iconValue: "Filled.AddCircle",
+                      onClickCode:
+                        "topbar_action_1.innerHTML = 1+(parseInt(topbar_action_1.innerHTML)||0)",
+                    },
+                    {
+                      iconValue: "Filled.Add",
+                      onClickCode:
+                        "topbar_action_2.innerHTML = Math.random().toString(36).substring(2)",
+                    },
+                  ])
+                );
+              } else {
+                top_bar.setActions(JSON.stringify([]));
+              }
+            };
+          </script>
+        </label>
       </fieldset>
       <fieldset>
         <legend>颜色选择</legend>

@@ -7,16 +7,21 @@ import android.util.Log
 import android.webkit.WebView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.*
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.RequestDisallowInterceptTouchEvent
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -28,6 +33,7 @@ import androidx.navigation.NavController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import org.bfchain.plaoc.dweb.js.navigator.NavigatorFFI
 import org.bfchain.plaoc.dweb.js.systemUi.SystemUiFFI
+import org.bfchain.plaoc.dweb.js.systemUi.TopBarAction
 import org.bfchain.plaoc.dweb.js.systemUi.TopBarFFI
 import org.bfchain.plaoc.dweb.js.util.JsUtil
 import org.bfchain.plaoc.webkit.*
@@ -35,6 +41,7 @@ import org.bfchain.plaoc.webkit.*
 
 private const val TAG = "DWebView"
 
+@OptIn(ExperimentalComposeUiApi::class)
 @SuppressLint("JavascriptInterface", "UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun DWebView(
@@ -51,6 +58,9 @@ fun DWebView(
         WindowInsetsCompat.toWindowInsetsCompat(
             activity.window.decorView.rootWindowInsets
         )
+    }
+    var jsUtil by remember {
+        mutableStateOf<JsUtil?>(null)
     }
 
     val hook = remember {
@@ -105,6 +115,9 @@ fun DWebView(
     val topBarHeight = remember {
         mutableStateOf(0F)
     }
+    val topBarActions = remember {
+        mutableStateListOf<TopBarAction>()
+    }
     val localDensity = LocalDensity.current
 
     @Composable
@@ -114,51 +127,71 @@ fun DWebView(
                 Text(
                     text = topBarTitle.value ?: titleContent,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+//                        .pointerInteropFilter { event ->
+//                            Log.i(TAG, "filter Title event $event")
+//                            false
+//                        }
+//                        .clickable {
+//                            Log.i(TAG, "Clicked Title")
+//                        }
                 )
             },
             actions = {
-                IconButton(onClick = {
-//                    val classLoader = URLClassLoader(
-//                        arrayOf<URL>(URL("file:///c:/projects/myProject/bin/")),
-//                        javaClass.classLoader
-//                    )
-//                    val z =androidx.compose.material.icons.Icons
-//                    val reflections = Reflections("my.project.prefix")
-//                    Log.i(TAG, setOf(Icons.Default))
-
-
-//                    Class.forName("androidx.compose.material.icons.Icons").classes.forEach { c ->
-//                        try {
-//                            Log.i(
-//                                TAG,
-//                                "Icons.Filled.${c.name}(${
-//                                    c.declaredMethods.first()
-//                                        .invoke(null, Icons.Filled) as ImageVector
-//                                })"
-//                            )
-//                        } catch (_: Throwable) {
-//                        }
-//                    }
-                }) {
-                    IconByName("Filled.Menu")
-//                    Icon(Icons.Filled.Menu, "menuIcon")
+                if (topBarActions.size > 0) {
+                    for (action in topBarActions) {
+                        IconButton(
+                            onClick = {
+                                jsUtil?.evalQueue { action.onClickCode }
+                            },
+                            enabled = !action.disabled
+                        ) {
+                            when (action.iconType) {
+                                TopBarAction.IconType.NamedIcon -> IconByName(name = action.iconValue)
+                            }
+                        }
+                    }
+                } else {
+                    /// 占位，只是为了让 title 居中
+                    IconButton(
+                        onClick = {},
+                        enabled = false,
+                        modifier = Modifier.clickable(false) {}) { }
                 }
             },
             navigationIcon = {
-                IconButton(onClick = {
-                    navController.popBackStack()
-                }) {
+                IconButton(
+                    onClick = {
+                        navController.popBackStack()
+                    }, modifier = Modifier
+//                        .pointerInteropFilter { event ->
+//                            Log.i(TAG, "filter NavigationIcon event $event")
+//                            true
+//                        }
+//                        .clickable {
+//                            Log.i(TAG, "Clicked NavigationIcon")
+//                        }
+                ) {
                     Icon(Icons.Filled.ArrowBack, "backIcon")
                 }
             },
             backgroundColor = Companion.Transparent,
             contentColor = androidx.compose.ui.graphics.Color.White,
             elevation = 0.dp,
-            modifier = Modifier.onGloballyPositioned { coordinates ->
-
-                topBarHeight.value = coordinates.size.height / localDensity.density
-            }
+            modifier = Modifier
+                .onGloballyPositioned { coordinates ->
+                    topBarHeight.value = coordinates.size.height / localDensity.density
+                }
+//                .pointerInteropFilter { event ->
+//                    Log.i(TAG, "filter TopAppBar event $event")
+//
+//                    // false 会穿透，在穿透后，返回按钮也能点击了
+//                    // true 不会穿透，但是返回按钮也无法点击了
+//                    false
+//                }.clickable {
+//                    Log.i(TAG, "Clicked TopAppBar")
+//                }
         )
     }
 
@@ -213,7 +246,7 @@ fun DWebView(
                     webView.adWebViewHook = hook;
 
                     // 通用的工具类
-                    val jsUtil = JsUtil(activity, evaluateJavascript = { code, callback ->
+                    jsUtil = JsUtil(activity, evaluateJavascript = { code, callback ->
                         webView.evaluateJavascript(
                             code,
                             callback
@@ -228,7 +261,7 @@ fun DWebView(
                         webView,
                         hook,
                         systemUiController,
-                        jsUtil,
+                        jsUtil!!,
                         isOverlayStatusBar,
                         isOverlayNavigationBar
                     )
@@ -238,6 +271,7 @@ fun DWebView(
                         topBarOverlay,
                         topBarTitle,
                         topBarHeight,
+                        topBarActions,
                     )
                     webView.addJavascriptInterface(topBarFFI, "top_bar")
 

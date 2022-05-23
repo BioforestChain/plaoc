@@ -17,9 +17,7 @@ import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.gson.Gson
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.bfchain.plaoc.dweb.js.util.JsUtil
-import org.bfchain.plaoc.dweb.js.util.JsValue
-import org.bfchain.plaoc.dweb.js.util.JsValueType
+import org.bfchain.plaoc.dweb.js.util.*
 import org.bfchain.plaoc.webkit.AdWebViewHook
 import kotlin.math.max
 
@@ -342,23 +340,5 @@ class SystemUiFFI(
     fun showInsets(typeMask: Int) {
         return WindowCompat.getInsetsController(activity.window, activity.window.decorView)
             .show(typeMask)
-    }
-}
-
-typealias ColorInt = Int
-
-typealias BoolInt = Int
-
- fun BoolInt.toBoolean(elseDefault: () -> Boolean = { false }): Boolean {
-    return when {
-        this > 0 -> {
-            true
-        }
-        this < 0 -> {
-            false
-        }
-        else -> {
-            elseDefault()
-        }
     }
 }
