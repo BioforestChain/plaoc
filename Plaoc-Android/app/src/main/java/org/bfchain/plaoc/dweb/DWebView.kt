@@ -125,6 +125,9 @@ fun DWebView(
             mutableStateOf(defaultPrimarySurface)
         }
     }
+    // https://developer.android.com/jetpack/compose/themes/material#emphasis
+    // Material Design 文本易读性建议一文建议通过不同的不透明度来表示不同的重要程度。
+    // TopAppBar 组件内部已经强制写死了 CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high)
     val topBarForegroundColor = MaterialTheme.colors.contentColorFor(topBarBackgroundColor.value)
         .let { defaultContentColor ->
             remember {
