@@ -26,6 +26,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
+import coil.ImageLoader
+import coil.decode.SvgDecoder
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
 import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
@@ -40,7 +42,7 @@ private const val TAG = "DWebViewActivity"
 
 class DWebViewActivity : ComponentActivity() {
     companion object {
-        val ALL = mutableListOf<DWebViewActivity>()
+        val ALL = mutableSetOf<DWebViewActivity>()
     }
 
     override fun onBackPressed() {
@@ -51,6 +53,11 @@ class DWebViewActivity : ComponentActivity() {
         } else {
             this.startActivity(this.parentActivityIntent)
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        ALL.remove(this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

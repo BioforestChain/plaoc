@@ -5,30 +5,21 @@ import android.webkit.JavascriptInterface
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import com.google.gson.JsonDeserializer
 import com.google.gson.reflect.TypeToken
 import org.bfchain.plaoc.dweb.js.util.*
 
 
-private const val TAG = "TopBarFFI"
+private const val TAG = "BottomBarFFI"
 
-class TopBarFFI(
-    val onClickBackBotton: () -> Unit,
+class BottomBarFFI(
     val enabled: MutableState<Boolean>,
     val overlay: MutableState<Boolean>,
-    val title: MutableState<String?>,
     val height: MutableState<Float>,
-    val actions: SnapshotStateList<TopBarAction>,
+    val actions: SnapshotStateList<BottomBarAction>,
     val backgroundColor: MutableState<Color>,
     val foregroundColor: MutableState<Color>,
 ) {
-
-    @JavascriptInterface
-    fun back() {
-        onClickBackBotton()
-    }
-
     @JavascriptInterface
     fun getEnabled(): Boolean {
         return enabled.value
@@ -54,67 +45,35 @@ class TopBarFFI(
     }
 
     @JavascriptInterface
-    fun getTitle(): String {
-        return title.value ?: ""
-    }
-
-    @JavascriptInterface
-    fun hasTitle(): Boolean {
-        return title.value != null
-    }
-
-    @JavascriptInterface
-    fun setTitle(str: String) {
-        title.value = str
-    }
-
-
-    @JavascriptInterface
     fun getHeight(): Float {
         return height.value
     }
 
+
     @JavascriptInterface
-    fun getActions(): DataString<List<TopBarAction>> {
+    fun getActions(): DataString<List<BottomBarAction>> {
         return DataString_From(actions)//.map { action -> toDataString(action) }
     }
 
     @JavascriptInterface
-    fun setActions(actionListJson: DataString<List<TopBarAction>>) {
+    fun setActions(actionListJson: DataString<List<BottomBarAction>>) {
         actions.clear()
-        val actionList = actionListJson.toData<List<TopBarAction>>(object :
-            TypeToken<List<TopBarAction>>() {}.type);
+        val actionList = actionListJson.toData<List<BottomBarAction>>(object :
+            TypeToken<List<BottomBarAction>>() {}.type);
         actionList.toCollection(actions)
     }
 
-    @JavascriptInterface
-    fun getBackgroundColor(): Int {
-        return backgroundColor.value.toArgb()
-    }
-
-    @JavascriptInterface
-    fun setBackgroundColor(color: ColorInt) {
-        backgroundColor.value = Color(color)
-    }
-
-    @JavascriptInterface
-    fun getForegroundColor(): Int {
-        return foregroundColor.value.toArgb()
-    }
-
-    @JavascriptInterface
-    fun setForegroundColor(color: ColorInt) {
-        foregroundColor.value = Color(color)
-    }
 
     companion object {
-        val _x = TopBarAction._gson
+        private val _x = BottomBarAction._gson
     }
 }
 
-data class TopBarAction(
+
+data class BottomBarAction(
     val icon: DWebIcon,
     val onClickCode: String,
+    val label: String,
     val disabled: Boolean,
 ) {
 
@@ -122,17 +81,19 @@ data class TopBarAction(
         operator fun invoke(
             icon: DWebIcon,
             onClickCode: String,
-            disabled: Boolean? = null
-        ) = TopBarAction(
-            icon, onClickCode, disabled ?: false
+            label: String? = null,
+            disabled: Boolean? = null,
+        ) = BottomBarAction(
+            icon, onClickCode, label ?: "", disabled ?: false,
         )
 
         val _gson = JsUtil.registerGsonDeserializer(
-            TopBarAction::class.java, JsonDeserializer { json, typeOfT, context ->
+            BottomBarAction::class.java, JsonDeserializer { json, typeOfT, context ->
                 val jsonObject = json.asJsonObject
-                TopBarAction(
+                BottomBarAction(
                     context.deserialize(jsonObject["icon"], DWebIcon::class.java),
                     jsonObject["onClickCode"].asString,
+                    jsonObject["label"]?.asString,
                     jsonObject["disabled"]?.asBoolean,
                 )
             }

@@ -12,36 +12,36 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.Color.Companion
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.input.pointer.RequestDisallowInterceptTouchEvent
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.NavController
+import coil.ImageLoader
+import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
+import coil.decode.SvgDecoder
+import coil.request.ImageRequest
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import org.bfchain.plaoc.R
 import org.bfchain.plaoc.dweb.js.navigator.NavigatorFFI
-import org.bfchain.plaoc.dweb.js.systemUi.SystemUiFFI
-import org.bfchain.plaoc.dweb.js.systemUi.TopBarAction
-import org.bfchain.plaoc.dweb.js.systemUi.TopBarFFI
+import org.bfchain.plaoc.dweb.js.systemUi.*
 import org.bfchain.plaoc.dweb.js.util.JsUtil
 import org.bfchain.plaoc.webkit.*
 
 
 private const val TAG = "DWebView"
+
 
 @OptIn(ExperimentalComposeUiApi::class)
 @SuppressLint("JavascriptInterface", "UnusedMaterialScaffoldPaddingParameter")
@@ -53,6 +53,16 @@ fun DWebView(
     modifier: Modifier = Modifier,
     onCreated: (AdAndroidWebView) -> Unit = {},
 ) {
+
+    val svgLoader by remember(activity) {
+        lazy {
+            ImageLoader.Builder(activity.applicationContext)
+                .components {
+                    add(SvgDecoder.Factory())
+                }
+                .build()
+        }
+    }
     val systemUiController = rememberSystemUiController()
     val isOverlayStatusBar = remember { mutableStateOf(false) }
     val isOverlayNavigationBar = remember { mutableStateOf(false) }
@@ -104,10 +114,13 @@ fun DWebView(
         )
     }
 
-    var titleContent by remember {
+    var webTitleContent by remember {
         mutableStateOf("")
     }
 
+    val topBarEnabled = remember {
+        mutableStateOf(true)
+    }
     val topBarOverlay = remember {
         mutableStateOf(false)
     }
@@ -134,6 +147,7 @@ fun DWebView(
                 mutableStateOf(defaultContentColor)
             }
         }
+
     val localDensity = LocalDensity.current
 
     @Composable
@@ -141,7 +155,7 @@ fun DWebView(
         TopAppBar(
             title = {
                 Text(
-                    text = topBarTitle.value ?: titleContent,
+                    text = topBarTitle.value ?: webTitleContent,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -163,11 +177,7 @@ fun DWebView(
                             },
                             enabled = !action.disabled
                         ) {
-                            when (action.iconType) {
-                                TopBarAction.IconType.NamedIcon -> IconByName(
-                                    name = action.iconValue,
-                                )
-                            }
+                            DWebIcon(action.icon)
                         }
                     }
                 } else {
@@ -181,7 +191,7 @@ fun DWebView(
             navigationIcon = {
                 IconButton(
                     onClick = {
-                        navController.popBackStack()
+                        activity.onBackPressed()
                     }, modifier = Modifier
 //                        .pointerInteropFilter { event ->
 //                            Log.i(TAG, "filter NavigationIcon event $event")
@@ -198,6 +208,13 @@ fun DWebView(
             contentColor = topBarForegroundColor.value,
             elevation = 0.dp,
             modifier = Modifier
+//                .graphicsLayer(
+//                    renderEffect = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) createBlurEffect(
+//                        25f,
+//                        25f,
+//                        Shader.TileMode.MIRROR
+//                    ).asComposeRenderEffect() else null
+//                )
                 .onGloballyPositioned { coordinates ->
                     topBarHeight.value = coordinates.size.height / localDensity.density
                 }
@@ -214,20 +231,53 @@ fun DWebView(
     }
 
 
+    val bottomBarEnabled = remember {
+        mutableStateOf(true)
+    }
     val bottomBarOverlay = remember {
         mutableStateOf(false)
     }
+    val bottomBarHeight = remember {
+        mutableStateOf(0F)
+    }
+    val bottomBarActions = remember {
+        mutableStateListOf<BottomBarAction>()
+    }
+
+    val bottomBarBackgroundColor =
+        MaterialTheme.colors.primarySurface.let { defaultPrimarySurface ->
+            remember {
+                mutableStateOf(defaultPrimarySurface)
+            }
+        }
+    val bottomBarForegroundColor =
+        MaterialTheme.colors.contentColorFor(bottomBarBackgroundColor.value)
+            .let { defaultContentColor ->
+                remember {
+                    mutableStateOf(defaultContentColor)
+                }
+            }
+
 
     @Composable
-    fun MyBottonBar() {
-        BottomAppBar(elevation = 0.dp) {
+    fun MyBottomAppBar() {
+        BottomAppBar(
+            elevation = 0.dp,
+            modifier = Modifier.onGloballyPositioned { coordinates ->
+                bottomBarHeight.value = coordinates.size.height / localDensity.density
+            },
+            backgroundColor = bottomBarBackgroundColor.value,
+            contentColor = bottomBarForegroundColor.value,
+        ) {
 
         }
     }
 
+
+
     Scaffold(
         modifier = modifier.padding(overlayPadding),
-        bottomBar = {},
+        bottomBar = { if (!bottomBarOverlay.value) MyBottomAppBar() },
         topBar = { if (!topBarOverlay.value) MyTopAppBar() },
         content = { innerPadding ->
             Column(
@@ -286,6 +336,8 @@ fun DWebView(
                     webView.addJavascriptInterface(systemUiFFI, "system_ui")
 
                     val topBarFFI = TopBarFFI(
+                        { activity.onBackPressed() },
+                        topBarEnabled,
                         topBarOverlay,
                         topBarTitle,
                         topBarHeight,
@@ -295,13 +347,23 @@ fun DWebView(
                     )
                     webView.addJavascriptInterface(topBarFFI, "top_bar")
 
+                    val bottomBarFFI = BottomBarFFI(
+                        bottomBarEnabled,
+                        bottomBarOverlay,
+                        bottomBarHeight,
+                        bottomBarActions,
+                        bottomBarBackgroundColor,
+                        bottomBarForegroundColor,
+                    )
+                    webView.addJavascriptInterface(topBarFFI, "bottom_bar")
+
                     onCreated(webView)
                 },
                 chromeClient = remember {
                     class MyWebChromeClient : AdWebChromeClient() {
                         override fun onReceivedTitle(view: WebView?, title: String?) {
                             super.onReceivedTitle(view, title);
-                            titleContent = title ?: ""
+                            webTitleContent = title ?: ""
                             Log.i(TAG, "TITLE CHANGED!!!! $title")
 
                             activity.runOnUiThread {
@@ -356,6 +418,7 @@ fun DWebView(
             )
 
             if (topBarOverlay.value) MyTopAppBar()
+            if (bottomBarOverlay.value) MyBottomAppBar()
 
         },
         backgroundColor = Companion.Transparent,

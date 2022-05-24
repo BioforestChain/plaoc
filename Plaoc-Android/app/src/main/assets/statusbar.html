@@ -78,14 +78,24 @@
                 top_bar.setActions(
                   JSON.stringify([
                     {
-                      iconValue: "Filled.AddCircle",
+                      icon: { source: "Filled.AddCircle" },
                       onClickCode:
                         "topbar_action_1.innerHTML = 1+(parseInt(topbar_action_1.innerHTML)||0)",
                     },
                     {
-                      iconValue: "Filled.Add",
+                      icon: { source: "Filled.Add" },
                       onClickCode:
                         "topbar_action_2.innerHTML = Math.random().toString(36).substring(2)",
+                    },
+                    {
+                      icon: {
+                        source: new URL(
+                          "./icon/ico_bottom_tab_publisher.svg",
+                          location.href
+                        ).href,
+                        type: "AssetIcon",
+                      },
+                      onClickCode: "topbar_action_2.innerHTML = '100%OK'",
                     },
                   ])
                 );
@@ -95,17 +105,21 @@
             };
           </script>
         </label>
-        <button id="set_topbar_background_color">Set TopBar Background Color</button>
+        <button id="set_topbar_background_color">
+          Set TopBar Background Color
+        </button>
         <script>
-          set_topbar_background_color.onclick = ()=>{
-            top_bar.setBackgroundColor(getColorInt())
-          }
+          set_topbar_background_color.onclick = () => {
+            top_bar.setBackgroundColor(getColorInt());
+          };
         </script>
-        <button id="set_topbar_foreground_color">Set TopBar Foreground Color</button>
+        <button id="set_topbar_foreground_color">
+          Set TopBar Foreground Color
+        </button>
         <script>
-          set_topbar_foreground_color.onclick = ()=>{
-            top_bar.setForegroundColor(getColorInt())
-          }
+          set_topbar_foreground_color.onclick = () => {
+            top_bar.setForegroundColor(getColorInt());
+          };
         </script>
       </fieldset>
       <fieldset>
