@@ -9,14 +9,19 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.contentColorFor
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.primarySurface
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.*
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -43,8 +48,8 @@ import org.bfchain.plaoc.webkit.*
 private const val TAG = "DWebView"
 
 
-@OptIn(ExperimentalComposeUiApi::class)
-@SuppressLint("JavascriptInterface", "UnusedMaterialScaffoldPaddingParameter")
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
+@SuppressLint("JavascriptInterface")
 @Composable
 fun DWebView(
     state: AdWebViewState,
@@ -152,13 +157,11 @@ fun DWebView(
 
     @Composable
     fun MyTopAppBar() {
-        TopAppBar(
+        CenterAlignedTopAppBar(
             title = {
                 Text(
                     text = topBarTitle.value ?: webTitleContent,
-                    textAlign = TextAlign.Center,
                     modifier = Modifier
-                        .fillMaxWidth()
 //                        .pointerInteropFilter { event ->
 //                            Log.i(TAG, "filter Title event $event")
 //                            false
@@ -180,12 +183,6 @@ fun DWebView(
                             DWebIcon(action.icon)
                         }
                     }
-                } else {
-                    /// 占位，只是为了让 title 居中
-                    IconButton(
-                        onClick = {},
-                        enabled = false,
-                        modifier = Modifier.clickable(false) {}) { }
                 }
             },
             navigationIcon = {
@@ -204,9 +201,27 @@ fun DWebView(
                     Icon(Icons.Filled.ArrowBack, "backIcon")
                 }
             },
-            backgroundColor = topBarBackgroundColor.value,
-            contentColor = topBarForegroundColor.value,
-            elevation = 0.dp,
+            colors = @Stable object : TopAppBarColors {
+                @Composable
+                override fun actionIconContentColor(scrollFraction: Float): State<Color> {
+                    return topBarForegroundColor
+                }
+
+                @Composable
+                override fun containerColor(scrollFraction: Float): State<Color> {
+                    return topBarBackgroundColor
+                }
+
+                @Composable
+                override fun navigationIconContentColor(scrollFraction: Float): State<Color> {
+                    return topBarForegroundColor
+                }
+
+                @Composable
+                override fun titleContentColor(scrollFraction: Float): State<Color> {
+                    return topBarForegroundColor
+                }
+            },
             modifier = Modifier
 //                .graphicsLayer(
 //                    renderEffect = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) createBlurEffect(
@@ -232,7 +247,7 @@ fun DWebView(
 
 
     val bottomBarEnabled = remember {
-        mutableStateOf(true)
+        mutableStateOf<Boolean?>(null)
     }
     val bottomBarOverlay = remember {
         mutableStateOf(false)
@@ -258,18 +273,48 @@ fun DWebView(
                 }
             }
 
+    val bottomBarFFI = remember {
+        BottomBarFFI(
+            bottomBarEnabled,
+            bottomBarOverlay,
+            bottomBarHeight,
+            bottomBarActions,
+            bottomBarBackgroundColor,
+            bottomBarForegroundColor,
+        )
+    }
+
 
     @Composable
     fun MyBottomAppBar() {
-        BottomAppBar(
-            elevation = 0.dp,
-            modifier = Modifier.onGloballyPositioned { coordinates ->
+        NavigationBar(
+            modifier = modifier.onGloballyPositioned { coordinates ->
                 bottomBarHeight.value = coordinates.size.height / localDensity.density
             },
-            backgroundColor = bottomBarBackgroundColor.value,
+            containerColor = bottomBarBackgroundColor.value,
             contentColor = bottomBarForegroundColor.value,
         ) {
+            if (bottomBarActions.size > 0) {
+                var selectedItem by remember(bottomBarActions) {
+                    mutableStateOf(bottomBarActions.indexOfFirst { it.selected }
+                        .let { if (it == -1) 0 else it })
+                }
+                bottomBarActions.forEachIndexed { index, action ->
+                    NavigationBarItem(
+                        icon = {
 
+                            DWebIcon(action.icon)
+                        },
+                        label = { if (action.label.isNotEmpty()) Text(action.label) },
+                        enabled = !action.disabled,
+                        onClick = {
+                            selectedItem = index
+                            jsUtil?.evalQueue { action.onClickCode }
+                        },
+                        selected = selectedItem == index
+                    )
+                }
+            }
         }
     }
 
@@ -277,8 +322,8 @@ fun DWebView(
 
     Scaffold(
         modifier = modifier.padding(overlayPadding),
-        bottomBar = { if (!bottomBarOverlay.value) MyBottomAppBar() },
-        topBar = { if (!topBarOverlay.value) MyTopAppBar() },
+        topBar = { if (!topBarOverlay.value and topBarEnabled.value) MyTopAppBar() },
+        bottomBar = { if (!bottomBarOverlay.value and bottomBarFFI.isEnabled) MyBottomAppBar() },
         content = { innerPadding ->
             Column(
                 modifier = Modifier
@@ -347,15 +392,7 @@ fun DWebView(
                     )
                     webView.addJavascriptInterface(topBarFFI, "top_bar")
 
-                    val bottomBarFFI = BottomBarFFI(
-                        bottomBarEnabled,
-                        bottomBarOverlay,
-                        bottomBarHeight,
-                        bottomBarActions,
-                        bottomBarBackgroundColor,
-                        bottomBarForegroundColor,
-                    )
-                    webView.addJavascriptInterface(topBarFFI, "bottom_bar")
+                    webView.addJavascriptInterface(bottomBarFFI, "bottom_bar")
 
                     onCreated(webView)
                 },
@@ -399,17 +436,17 @@ fun DWebView(
                 },
                 modifier = Modifier.let { m ->
                     var top = innerPadding.calculateTopPadding()
-                    var bottom = innerPadding.calculateTopPadding()
+                    var bottom = innerPadding.calculateBottomPadding()
                     val layoutDirection = LocalLayoutDirection.current;
                     var start = innerPadding.calculateStartPadding(layoutDirection)
                     var end = innerPadding.calculateEndPadding(layoutDirection)
-                    if (topBarOverlay.value) {
+                    if (topBarOverlay.value or !topBarEnabled.value) {
                         top = 0.dp;
                     }
-                    if (bottomBarOverlay.value) {
+                    if (bottomBarOverlay.value or !bottomBarFFI.isEnabled) {
                         bottom = 0.dp
                     }
-                    if (topBarOverlay.value and bottomBarOverlay.value) {
+                    if ((top.value == 0F) and (bottom.value == 0F)) {
                         start = 0.dp; end = 0.dp;
                     }
                     Log.i(TAG, "webview-padding $start, $top, $end, $bottom")
@@ -417,11 +454,16 @@ fun DWebView(
                 },
             )
 
-            if (topBarOverlay.value) MyTopAppBar()
-            if (bottomBarOverlay.value) MyBottomAppBar()
+            if (topBarOverlay.value and topBarEnabled.value) MyTopAppBar()
+            if (bottomBarOverlay.value and bottomBarFFI.isEnabled) {
+                Box(
+                    contentAlignment = Alignment.BottomCenter,
+                    modifier = Modifier.fillMaxSize()
+                ) { MyBottomAppBar() }
+            }
 
         },
-        backgroundColor = Companion.Transparent,
+        containerColor = Companion.Transparent,
 //        contentColor = Companion.Transparent
     )
 

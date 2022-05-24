@@ -13,23 +13,34 @@ import org.bfchain.plaoc.dweb.js.util.*
 private const val TAG = "BottomBarFFI"
 
 class BottomBarFFI(
-    val enabled: MutableState<Boolean>,
-    val overlay: MutableState<Boolean>,
-    val height: MutableState<Float>,
-    val actions: SnapshotStateList<BottomBarAction>,
-    val backgroundColor: MutableState<Color>,
-    val foregroundColor: MutableState<Color>,
+    private val enabled: MutableState<Boolean?>,
+    private val overlay: MutableState<Boolean>,
+    private val height: MutableState<Float>,
+    private val actions: SnapshotStateList<BottomBarAction>,
+    private val backgroundColor: MutableState<Color>,
+    private val foregroundColor: MutableState<Color>,
 ) {
     @JavascriptInterface
     fun getEnabled(): Boolean {
-        return enabled.value
+        return if (enabled.value == null) {
+            actions.size > 0
+        } else {
+            enabled.value as Boolean
+        }
     }
+
+    val isEnabled: Boolean
+        get() {
+            return getEnabled()
+        }
+
 
     @JavascriptInterface
     fun toggleEnabled(isEnabled: BoolInt): Boolean {
-        enabled.value = isEnabled.toBoolean { !enabled.value }
-        Log.i(TAG, "toggleEnabled:${enabled.value}")
-        return enabled.value
+        val isEnabledBool = isEnabled.toBooleanOrNull()
+        enabled.value = isEnabledBool
+        Log.i(TAG, "toggleEnabled:${isEnabledBool}")
+        return getEnabled()
     }
 
     @JavascriptInterface
@@ -74,6 +85,7 @@ data class BottomBarAction(
     val icon: DWebIcon,
     val onClickCode: String,
     val label: String,
+    val selected: Boolean,
     val disabled: Boolean,
 ) {
 
@@ -82,9 +94,10 @@ data class BottomBarAction(
             icon: DWebIcon,
             onClickCode: String,
             label: String? = null,
+            selected: Boolean? = null,
             disabled: Boolean? = null,
         ) = BottomBarAction(
-            icon, onClickCode, label ?: "", disabled ?: false,
+            icon, onClickCode, label ?: "", selected ?: false, disabled ?: false,
         )
 
         val _gson = JsUtil.registerGsonDeserializer(
@@ -94,6 +107,7 @@ data class BottomBarAction(
                     context.deserialize(jsonObject["icon"], DWebIcon::class.java),
                     jsonObject["onClickCode"].asString,
                     jsonObject["label"]?.asString,
+                    jsonObject["selected"]?.asBoolean,
                     jsonObject["disabled"]?.asBoolean,
                 )
             }

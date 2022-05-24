@@ -45,6 +45,12 @@
       </fieldset>
       <fieldset>
         <legend>TopBar</legend>
+        <button id="toggle_topbar_enabled">Toggle TopBar Enabled</button>
+        <script>
+          toggle_topbar_enabled.onclick = () => {
+            top_bar.toggleEnabled(0);
+          };
+        </script>
         <label>
           标题
           <input id="title_value" value="MY TOP BAR TITLE👩🏾‍🍳" />
@@ -119,6 +125,85 @@
         <script>
           set_topbar_foreground_color.onclick = () => {
             top_bar.setForegroundColor(getColorInt());
+          };
+        </script>
+      </fieldset>
+
+      <fieldset>
+        <legend>BottomBar</legend>
+        <button id="toggle_bottombar_enabled">Toggle BottomBar Enabled</button>
+        <script>
+          toggle_bottombar_enabled.onclick = () => {
+            bottom_bar.toggleEnabled(0);
+          };
+        </script>
+        <button id="toggle_bottombar_overlay">Toggle BottomBar Overlay</button>
+        <script>
+          toggle_bottombar_overlay.onclick = () => {
+            bottom_bar.toggleOverlay(0);
+          };
+        </script>
+        <button id="get_bottombar_height">Get BottomBar Height</button>
+        <script>
+          get_bottombar_height.onclick = () => {
+            alert(bottom_bar.getHeight());
+          };
+        </script>
+        <label>
+          自定义Actions
+          <span id="bottombar_action_1"></span>
+          <span id="bottombar_action_2"></span>
+          <input id="custom_bottombar_actions" type="checkbox" role="switch" />
+          <script>
+            custom_bottombar_actions.onchange = () => {
+              if (custom_bottombar_actions.checked) {
+                bottom_bar.setActions(
+                  JSON.stringify([
+                    {
+                      icon: { source: "Filled.AddCircle" },
+                      onClickCode:
+                        "bottombar_action_1.innerHTML = 1+(parseInt(bottombar_action_1.innerHTML)||0)",
+                      label: "add",
+                      selected: true,
+                    },
+                    {
+                      icon: {
+                        source: new URL(
+                          "./icon/ico_bottom_tab_publisher.svg",
+                          location.href
+                        ).href,
+                        type: "AssetIcon",
+                      },
+                      onClickCode: "bottombar_action_2.innerHTML = '100%OK'",
+                    },
+                    {
+                      icon: { source: "Filled.Add" },
+                      onClickCode:
+                        "bottombar_action_2.innerHTML = Math.random().toString(36).substring(2)",
+                      label: "add",
+                    },
+                  ])
+                );
+              } else {
+                bottom_bar.setActions(JSON.stringify([]));
+              }
+            };
+          </script>
+        </label>
+        <button id="set_bottombar_background_color">
+          Set BottomBar Background Color
+        </button>
+        <script>
+          set_bottombar_background_color.onclick = () => {
+            bottom_bar.setBackgroundColor(getColorInt());
+          };
+        </script>
+        <button id="set_bottombar_foreground_color">
+          Set BottomBar Foreground Color
+        </button>
+        <script>
+          set_bottombar_foreground_color.onclick = () => {
+            bottom_bar.setForegroundColor(getColorInt());
           };
         </script>
       </fieldset>

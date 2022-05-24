@@ -399,6 +399,21 @@ fun BoolInt.toBoolean(elseDefault: () -> Boolean = { false }): Boolean {
     }
 }
 
+fun BoolInt.toBooleanOrNull(): Boolean? {
+    return when {
+        this > 0 -> {
+            true
+        }
+        this < 0 -> {
+            false
+        }
+        else -> {
+            null
+        }
+    }
+}
+
+
 typealias DataString<T> = String
 
 @Throws(JsonSyntaxException::class)
