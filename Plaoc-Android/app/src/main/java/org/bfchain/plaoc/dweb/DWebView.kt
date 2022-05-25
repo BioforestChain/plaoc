@@ -7,7 +7,7 @@ import android.util.Log
 import android.webkit.WebView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.contentColorFor
@@ -23,22 +23,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.NavController
-import coil.ImageLoader
-import coil.compose.AsyncImage
-import coil.compose.rememberAsyncImagePainter
-import coil.decode.SvgDecoder
-import coil.request.ImageRequest
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import org.bfchain.plaoc.R
 import org.bfchain.plaoc.dweb.js.navigator.NavigatorFFI
 import org.bfchain.plaoc.dweb.js.systemUi.*
 import org.bfchain.plaoc.dweb.js.util.JsUtil
@@ -58,16 +49,6 @@ fun DWebView(
     modifier: Modifier = Modifier,
     onCreated: (AdAndroidWebView) -> Unit = {},
 ) {
-
-    val svgLoader by remember(activity) {
-        lazy {
-            ImageLoader.Builder(activity.applicationContext)
-                .components {
-                    add(SvgDecoder.Factory())
-                }
-                .build()
-        }
-    }
     val systemUiController = rememberSystemUiController()
     val isOverlayStatusBar = remember { mutableStateOf(false) }
     val isOverlayNavigationBar = remember { mutableStateOf(false) }
@@ -135,6 +116,9 @@ fun DWebView(
     val topBarHeight = remember {
         mutableStateOf(0F)
     }
+//    val topBarNavigationIcon = remember {
+//
+//    }
     val topBarActions = remember {
         mutableStateListOf<TopBarAction>()
     }
@@ -288,11 +272,14 @@ fun DWebView(
     @Composable
     fun MyBottomAppBar() {
         NavigationBar(
-            modifier = modifier.onGloballyPositioned { coordinates ->
-                bottomBarHeight.value = coordinates.size.height / localDensity.density
-            },
+            modifier = modifier
+                .background(Companion.Transparent)
+                .onGloballyPositioned { coordinates ->
+                    bottomBarHeight.value = coordinates.size.height / localDensity.density
+                },
             containerColor = bottomBarBackgroundColor.value,
             contentColor = bottomBarForegroundColor.value,
+            tonalElevation = 0.dp,
         ) {
             if (bottomBarActions.size > 0) {
                 var selectedItem by remember(bottomBarActions) {
