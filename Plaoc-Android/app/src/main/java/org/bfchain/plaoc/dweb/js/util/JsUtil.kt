@@ -32,16 +32,17 @@ class JsUtil(
     }
 
     private var _curJob: Job? = null
-    private var _queueJobsCode = ConcurrentHashMap<String?, () -> String>()
+    private var _queueJobsCode = ConcurrentHashMap<String, () -> String>()
     fun evalQueue(id: String? = null, codeGetter: () -> String) {
         if (_curJob != null) {
-            _queueJobsCode[id] = codeGetter
+            _queueJobsCode[id ?: "__null__"] = codeGetter
         }
         _curJob = GlobalScope.launch {
             var curCode = codeGetter();
             eval@ while (true) {
                 eval(curCode)
                 if (_queueJobsCode.isNotEmpty()) {
+                    _queueJobsCode.toMap()
                     curCode = _queueJobsCode.map {
                         _queueJobsCode.remove(it.key)// 在迭代的时候删除，而不是map完clear，这里是为了确保线程并行时逻辑正常
                         it.value()
@@ -339,10 +340,10 @@ class JsUtil(
         }
 
         private val gsonBuilder = GsonBuilder()
-        private val gsonDelegate =  resetableLazy {
+        private val gsonDelegate = resetableLazy {
             gsonBuilder.create()
         }
-         val gson by gsonDelegate
+        val gson by gsonDelegate
 
         fun <T> registerGsonDeserializer(type: Type, typeAdapter: JsonDeserializer<T>) {
             gsonBuilder.registerTypeAdapter(type, typeAdapter)
