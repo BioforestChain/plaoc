@@ -25,8 +25,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.*
 import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.NavController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -34,11 +33,28 @@ import org.bfchain.plaoc.dweb.js.navigator.NavigatorFFI
 import org.bfchain.plaoc.dweb.js.systemUi.*
 import org.bfchain.plaoc.dweb.js.util.JsUtil
 import org.bfchain.plaoc.webkit.*
+import kotlin.math.min
 
 
 private const val TAG = "DWebView"
 
+inline fun <T : Any> multiLet(vararg elements: T, closure: (List<T>) -> Unit) {
+    closure(elements.asList())
+}
 
+@SuppressLint("RememberReturnType")
+@Composable
+fun <T : Any, R> rememberLet(
+    vararg elements: T,
+    closure: (Array<out T>) -> R
+): R {
+    return remember(*elements) {
+        Log.i(TAG, "rememberLet-CHAGED!!!!")
+        closure(elements)
+    }
+}
+
+@ExperimentalLayoutApi
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @SuppressLint("JavascriptInterface")
 @Composable
@@ -49,56 +65,47 @@ fun DWebView(
     modifier: Modifier = Modifier,
     onCreated: (AdAndroidWebView) -> Unit = {},
 ) {
-    val systemUiController = rememberSystemUiController()
-    val isOverlayStatusBar = remember { mutableStateOf(false) }
-    val isOverlayNavigationBar = remember { mutableStateOf(false) }
-    val insetsCompat = remember(activity.window.decorView.rootWindowInsets) {
-        WindowInsetsCompat.toWindowInsetsCompat(
-            activity.window.decorView.rootWindowInsets
-        )
-    }
     var jsUtil by remember {
         mutableStateOf<JsUtil?>(null)
     }
-
     val hook = remember {
         AdWebViewHook()
     }
 
-    var typeMask = 0
-    if (!isOverlayStatusBar.value) {
-        typeMask = typeMask or WindowInsetsCompat.Type.statusBars()
+    val systemUiController = rememberSystemUiController()
+    val isOverlayStatusBar = remember { mutableStateOf(false) }
+    val isOverlayNavigationBar = remember { mutableStateOf(false) }
+
+
+    val isOverlayVirtualKeyboard = remember {
+        mutableStateOf(false)
     }
-    if (!isOverlayNavigationBar.value) {
-        typeMask = typeMask or WindowInsetsCompat.Type.navigationBars()
-    }
-    val overlayInsets = insetsCompat.getInsets(typeMask)
-    val overlayPadding = with(LocalDensity.current) {
-        PaddingValues(
-            top = overlayInsets.top.toDp(),
-            bottom = overlayInsets.bottom.toDp(),
-            // @TODO 这里应该判定布局的方向
-            start = overlayInsets.left.toDp(),
-            end = overlayInsets.right.toDp(),
-        )
-    }
-    val overlayTopPadding = with(LocalDensity.current) {
-        PaddingValues(
-            top = overlayInsets.top.toDp(),
-            // @TODO 这里应该判定布局的方向
-            start = overlayInsets.left.toDp(),
-            end = overlayInsets.right.toDp(),
+    jsUtil?.apply {
+        InputMethodEditorFFI.InjectVirtualKeyboardVars(
+            this,
+            LocalDensity.current, LocalLayoutDirection.current,
+            isOverlayVirtualKeyboard.value, WindowInsets.ime,
+            isOverlayNavigationBar.value, WindowInsets.navigationBars,
         )
     }
 
-    val overlayBottomPadding = with(LocalDensity.current) {
-        PaddingValues(
-            bottom = overlayInsets.bottom.toDp(),
-            // @TODO 这里应该判定布局的方向
-            start = overlayInsets.left.toDp(),
-            end = overlayInsets.right.toDp(),
-        )
-    }
+
+    var overlayOffset = IntOffset(0, 0);
+    val overlayPadding = WindowInsets.statusBars.let {
+        if (!isOverlayVirtualKeyboard.value && WindowInsets.isImeVisible) {
+//            it.add(WindowInsets.ime) // ime本身就包含了navigationBars的高度
+            overlayOffset =
+                IntOffset(
+                    0, min(
+                        0, -WindowInsets.ime.getBottom(LocalDensity.current)
+                                + WindowInsets.navigationBars.getBottom(LocalDensity.current)
+                    )
+                )
+        }
+        it.add(WindowInsets.navigationBars)
+    }.asPaddingValues()
+
+    Log.i(TAG, "overlayPadding:$overlayPadding")
 
     var webTitleContent by remember {
         mutableStateOf("")
@@ -116,9 +123,6 @@ fun DWebView(
     val topBarHeight = remember {
         mutableStateOf(0F)
     }
-//    val topBarNavigationIcon = remember {
-//
-//    }
     val topBarActions = remember {
         mutableStateListOf<TopBarAction>()
     }
@@ -308,36 +312,15 @@ fun DWebView(
 
 
     Scaffold(
-        modifier = modifier.padding(overlayPadding),
+        modifier = modifier
+            .padding(overlayPadding)
+            .offset { overlayOffset },
         topBar = { if (!topBarOverlay.value and topBarEnabled.value) MyTopAppBar() },
         bottomBar = { if (!bottomBarOverlay.value and bottomBarFFI.isEnabled) MyBottomAppBar() },
         content = { innerPadding ->
-            Column(
-                modifier = Modifier
-                    .padding(innerPadding)
-                    .padding(10.dp)
-            ) {
-                Text(text = "~~~", fontSize = 30.sp)
-                Text(text = "这是Android原生的文本")
-                Text(text = "他们渲染在WebView的背景上")
-                Text(text = "如果你看到这些内容，就说明html的背景是有透明度的")
-                Text(text = "你可以通过 SystemUI 的 Disable Touch Event 来禁用于 WebView 的交互，从而获得与这一层 Native 交互的能力")
-                Button(onClick = {
-                    hook?.onTouchEvent = null;
-                    Toast.makeText(
-                        activity.applicationContext,
-                        "控制权已经回到Web中了",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }) {
-                    Text(text = "归还Web的交互权")
-                }
-                Text(text = "~~~", fontSize = 30.sp)
-                Text(text = "也就是说，你可以将一些原生的组件防止在这里，仅仅提供渲染，而Web层提供控制与逻辑执行，比如说游戏的渲染")
-                Text(text = "~~~", fontSize = 30.sp)
-                Text(text = "又或者，我们也可以制定部分的WebView区域是可控制的，其余的穿透到native层")
-            }
+            DWebBackground(innerPadding, hook, activity)
 
+            Log.i(TAG, "innerPadding:${innerPadding}");
             AdWebView(
                 state = state,
                 onCreated = { webView ->
@@ -380,6 +363,9 @@ fun DWebView(
                     webView.addJavascriptInterface(topBarFFI, "top_bar")
 
                     webView.addJavascriptInterface(bottomBarFFI, "bottom_bar")
+
+                    val inputMethodEditorFFI = InputMethodEditorFFI(isOverlayVirtualKeyboard)
+                    webView.addJavascriptInterface(inputMethodEditorFFI, "input_method_eidtor")
 
                     onCreated(webView)
                 },
@@ -456,4 +442,39 @@ fun DWebView(
 
 }
 
+private operator fun <T> Array<T>.component6(): Any {
+    return this.elementAt(5) as Any
+}
 
+@Composable
+private fun DWebBackground(
+    innerPadding: PaddingValues,
+    hook: AdWebViewHook,
+    activity: ComponentActivity
+) {
+    Column(
+        modifier = Modifier
+            .padding(innerPadding)
+            .padding(10.dp)
+    ) {
+        Text(text = "~~~", fontSize = 30.sp)
+        Text(text = "这是Android原生的文本")
+        Text(text = "他们渲染在WebView的背景上")
+        Text(text = "如果你看到这些内容，就说明html的背景是有透明度的")
+        Text(text = "你可以通过 SystemUI 的 Disable Touch Event 来禁用于 WebView 的交互，从而获得与这一层 Native 交互的能力")
+        Button(onClick = {
+            hook?.onTouchEvent = null;
+            Toast.makeText(
+                activity.applicationContext,
+                "控制权已经回到Web中了",
+                Toast.LENGTH_SHORT
+            ).show()
+        }) {
+            Text(text = "归还Web的交互权")
+        }
+        Text(text = "~~~", fontSize = 30.sp)
+        Text(text = "也就是说，你可以将一些原生的组件防止在这里，仅仅提供渲染，而Web层提供控制与逻辑执行，比如说游戏的渲染")
+        Text(text = "~~~", fontSize = 30.sp)
+        Text(text = "又或者，我们也可以制定部分的WebView区域是可控制的，其余的穿透到native层")
+    }
+}

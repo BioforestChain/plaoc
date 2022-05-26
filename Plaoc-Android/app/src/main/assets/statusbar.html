@@ -13,6 +13,7 @@
       }
       body {
         margin-top: 50vh;
+        margin-bottom: 50vh;
         background: transparent;
       }
       fieldset {
@@ -341,33 +342,53 @@
           };
         </script>
       </fieldset>
-    </main>
-
-    <input id="ime" placeholder="IME Test" />
-    <style>
-      #ime {
-        transform: translateY(calc(-1 * var(--virtual-keyboard-height)));
-      }
-    </style>
-    <script>
-      {
-        let isFocus = false;
-        ime.onfocus = () => {
-          isFocus = true;
-          const setValue = () => {
-            try {
-              ime.value = __android_util_js__.virtualKeyboard.height;
-            } catch (e) {}
-            if (isFocus) {
-              requestAnimationFrame(setValue);
-            }
+      <fieldset>
+        <legend>IME</legend>
+        <button id="toggle_ime_overlay">Toggle IME Overlay</button>
+        <script>
+          toggle_ime_overlay.onclick = () => {
+            input_method_eidtor.toggleOverlay(0);
           };
-          setValue();
-        };
-        ime.onblur = () => {
-          isFocus = false;
-        };
-      }
-    </script>
+        </script>
+        <input id="ime" placeholder="IME Test" />
+        <style>
+          #ime {
+            transform: translateY(calc(-1 * var(--virtual-keyboard-safe-area-bottom)));
+          }
+        </style>
+        <script>
+          {
+            let isFocus = false;
+            ime.onfocus = () => {
+              isFocus = true;
+              const setValue = () => {
+                try {
+                  ime.value = __android_util_js__.virtualKeyboardSafeArea.bottom;
+                } catch (e) {}
+                if (isFocus) {
+                  requestAnimationFrame(setValue);
+                }
+              };
+              setValue();
+            };
+            ime.onblur = () => {
+              isFocus = false;
+            };
+          }
+        </script>
+        <button id="get_ime_safe_area">Get IME Safe Area</button>
+        <script>
+          get_ime_safe_area.onclick = () => {
+            alert(input_method_eidtor.getSafeArea());
+          };
+        </script>
+        <button id="get_ime_height">Get IME Height</button>
+        <script>
+          get_ime_height.onclick = () => {
+            alert(input_method_eidtor.getHeight());
+          };
+        </script>
+      </fieldset>
+    </main>
   </body>
 </html>

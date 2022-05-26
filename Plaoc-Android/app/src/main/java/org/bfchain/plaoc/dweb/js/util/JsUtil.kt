@@ -42,7 +42,6 @@ class JsUtil(
             eval@ while (true) {
                 eval(curCode)
                 if (_queueJobsCode.isNotEmpty()) {
-                    _queueJobsCode.toMap()
                     curCode = _queueJobsCode.map {
                         _queueJobsCode.remove(it.key)// 在迭代的时候删除，而不是map完clear，这里是为了确保线程并行时逻辑正常
                         it.value()

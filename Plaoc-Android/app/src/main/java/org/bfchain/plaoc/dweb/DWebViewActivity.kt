@@ -84,7 +84,9 @@ class DWebViewActivity : ComponentActivity() {
     }
 }
 
-@OptIn(ExperimentalMaterialNavigationApi::class)
+@OptIn(ExperimentalMaterialNavigationApi::class,
+    androidx.compose.foundation.layout.ExperimentalLayoutApi::class
+)
 @Composable
 private fun NavFun(activity: ComponentActivity) {
     val bottomSheetNavigator = rememberBottomSheetNavigator()
