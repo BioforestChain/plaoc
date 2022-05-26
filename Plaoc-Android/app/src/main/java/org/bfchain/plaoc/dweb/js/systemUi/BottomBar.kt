@@ -22,7 +22,7 @@ private const val TAG = "BottomBarFFI"
 class BottomBarFFI(
     private val enabled: MutableState<Boolean?>,
     private val overlay: MutableState<Boolean>,
-    private val height: MutableState<Float>,
+    private val height: MutableState<Float?>,
     private val actions: SnapshotStateList<BottomBarAction>,
     private val backgroundColor: MutableState<Color>,
     private val foregroundColor: MutableState<Color>,
@@ -64,7 +64,12 @@ class BottomBarFFI(
 
     @JavascriptInterface
     fun getHeight(): Float {
-        return height.value
+        return height.value ?: 0F
+    }
+
+    @JavascriptInterface
+    fun setHeight(heightDp: Float) {
+        height.value = heightDp
     }
 
 

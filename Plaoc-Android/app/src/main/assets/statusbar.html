@@ -202,6 +202,27 @@
             };
           </script>
         </label>
+        <input
+          id="set_bottombar_height"
+          type="range"
+          min="0"
+          max="100"
+          value="50"
+          step="1"
+        />
+        <script>
+          let defaultHeight = 0;
+          set_bottombar_height.oninput = () => {
+            if (defaultHeight === 0) {
+              defaultHeight = bottom_bar.getHeight();
+            }
+            if (defaultHeight !== 0) {
+              bottom_bar.setHeight(
+                defaultHeight + set_bottombar_height.valueAsNumber - 50
+              );
+            }
+          };
+        </script>
         <button id="set_bottombar_background_color">
           Set BottomBar Background Color
         </button>

@@ -242,7 +242,7 @@ fun DWebView(
         mutableStateOf(false)
     }
     val bottomBarHeight = remember {
-        mutableStateOf(0F)
+        mutableStateOf<Float?>(null)
     }
     val bottomBarActions = remember {
         mutableStateListOf<BottomBarAction>()
@@ -278,6 +278,15 @@ fun DWebView(
     fun MyBottomAppBar() {
         NavigationBar(
             modifier = Modifier
+                .let {
+                    bottomBarHeight.value?.let { height ->
+                        if (height >= 0) {
+                            it.height(height.dp)
+                        } else {
+                            it
+                        }
+                    } ?: it
+                }
                 .onGloballyPositioned { coordinates ->
                     bottomBarHeight.value = coordinates.size.height / localDensity.density
                 },
