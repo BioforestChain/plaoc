@@ -1,16 +1,14 @@
 package org.bfchain.plaoc.dweb
 
-import androidx.compose.material.Icon
-import androidx.compose.material.LocalContentAlpha
-import androidx.compose.material.LocalContentColor
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material.icons.sharp.*
 import androidx.compose.material.icons.twotone.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.NonRestartableComposable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -296,12 +294,11 @@ private val materialSystemIcons = mutableMapOf<String, ImageVector>().let { umap
 
 
 @Composable
-@NonRestartableComposable
 fun IconByName(
     name: String,
     contentDescription: String? = null,
     modifier: Modifier = Modifier,
-    tint: Color = LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+    tint: Color = LocalContentColor.current//.copy(alpha = LocalContentAlpha.current)
 ) {
     val icon = materialSystemIcons[name]
     if (icon != null) {

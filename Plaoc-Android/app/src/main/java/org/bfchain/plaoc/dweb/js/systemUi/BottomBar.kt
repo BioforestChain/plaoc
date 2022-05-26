@@ -2,10 +2,16 @@ package org.bfchain.plaoc.dweb.js.systemUi
 
 import android.util.Log
 import android.webkit.JavascriptInterface
+import androidx.compose.material3.NavigationBarItemColors
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.core.graphics.toColor
 import com.google.gson.JsonDeserializer
 import com.google.gson.reflect.TypeToken
 import org.bfchain.plaoc.dweb.js.util.*
@@ -108,7 +114,65 @@ data class BottomBarAction(
     val selected: Boolean,
     val selectable: Boolean,
     val disabled: Boolean,
+    val colors: Colors?
 ) {
+
+    data class Colors(
+        val indicatorColor: ColorInt?,
+        val iconColor: ColorInt?,
+        val iconColorSelected: ColorInt?,
+        val textColor: ColorInt?,
+        val textColorSelected: ColorInt?
+    ) {
+        data class ColorState(override val value: Color) : State<Color> {}
+
+        @Composable
+        fun toNavigationBarItemColors(): NavigationBarItemColors {
+            val defaultColors = NavigationBarItemDefaults.colors()
+            val indicatorColor = indicatorColor?.toComposeColor() ?: defaultColors.indicatorColor;
+            val iconColor =
+                ColorState(iconColor?.toComposeColor() ?: defaultColors.iconColor(false).value)
+            val iconColorSelected = ColorState(
+                textColorSelected?.toComposeColor() ?: defaultColors.indicatorColor
+            );
+            val textColor =
+                ColorState(textColor?.toComposeColor() ?: defaultColors.textColor(false).value)
+            val textColorSelected = ColorState(
+                textColorSelected?.toComposeColor() ?: defaultColors.indicatorColor
+            );
+
+            val colors = @Stable object : NavigationBarItemColors {
+                override val indicatorColor: Color
+                    @Composable get() = indicatorColor
+
+
+                /**
+                 * Represents the icon color for this item, depending on whether it is [selected].
+                 *
+                 * @param selected whether the item is selected
+                 */
+                @Composable
+                override fun iconColor(selected: Boolean) = if (selected) {
+                    iconColorSelected
+                } else {
+                    iconColor
+                }
+
+                /**
+                 * Represents the text color for this item, depending on whether it is [selected].
+                 *
+                 * @param selected whether the item is selected
+                 */
+                @Composable
+                override fun textColor(selected: Boolean) = if (selected) {
+                    textColorSelected
+                } else {
+                    textColor
+                }
+            }
+            return colors
+        }
+    }
 
     companion object {
         operator fun invoke(
@@ -118,6 +182,7 @@ data class BottomBarAction(
             selected: Boolean? = null,
             selectable: Boolean? = null,
             disabled: Boolean? = null,
+            colors: Colors? = null
         ) = BottomBarAction(
             icon,
             onClickCode,
@@ -125,6 +190,7 @@ data class BottomBarAction(
             selected ?: false,
             selectable ?: true,
             disabled ?: false,
+            colors,
         )
 
         val _gson = JsUtil.registerGsonDeserializer(
@@ -137,6 +203,9 @@ data class BottomBarAction(
                     jsonObject["selected"]?.asBoolean,
                     jsonObject["selectable"]?.asBoolean,
                     jsonObject["disabled"]?.asBoolean,
+                    jsonObject["colors"]?.let {
+                        context.deserialize(jsonObject["colors"], Colors::class.java)
+                    }
                 )
             }
         )

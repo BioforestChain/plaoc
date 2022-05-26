@@ -166,6 +166,12 @@
                         "bottombar_action_1.innerHTML = 1+(parseInt(bottombar_action_1.innerHTML)||0)",
                       label: "add",
                       selected: true,
+                      colors: {
+                        textColor: 0xffaa0000,
+                        textColorSelected: 0xaa00ff00,
+                        iconColor: 0xffaa0000,
+                        iconColorSelected: 0xaa00ff00,
+                      },
                     },
                     {
                       icon: {
@@ -184,6 +190,9 @@
                       onClickCode:
                         "bottombar_action_2.innerHTML = Math.random().toString(36).substring(2)",
                       label: "add",
+                      colors: {
+                        indicatorColor: 0xdd0000ff,
+                      },
                     },
                   ])
                 );

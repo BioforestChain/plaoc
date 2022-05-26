@@ -2,6 +2,7 @@ package org.bfchain.plaoc.dweb.js.util
 
 import android.webkit.ValueCallback
 import androidx.activity.ComponentActivity
+import androidx.compose.ui.graphics.Color
 import com.google.gson.*
 import com.google.gson.internal.bind.TreeTypeAdapter
 import com.google.gson.internal.bind.TypeAdapters
@@ -382,6 +383,9 @@ enum class JsValueType {
 }
 
 typealias ColorInt = Int
+
+fun ColorInt.toComposeColor() = Color(this)
+
 
 typealias BoolInt = Int
 

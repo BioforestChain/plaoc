@@ -86,7 +86,7 @@ fun DWebIcon(icon: DWebIcon, modifier: Modifier = Modifier) {
         DWebIcon.IconType.NamedIcon -> IconByName(
             name = icon.source,
             contentDescription = icon.description,
-            modifier = internal_modifier
+            modifier = internal_modifier,
         )
         DWebIcon.IconType.AssetIcon -> {
             val painter = rememberAsyncImagePainter(icon.source, imageLoader = _getSvgLoader())
@@ -94,7 +94,7 @@ fun DWebIcon(icon: DWebIcon, modifier: Modifier = Modifier) {
                 painter = painter,
                 contentDescription = icon.description,
                 tint = Color.Unspecified,
-                modifier = internal_modifier
+                modifier = internal_modifier,
             )
         }
     }

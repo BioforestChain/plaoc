@@ -13,6 +13,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.contentColorFor
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.twotone.AddCircle
 import androidx.compose.material.primarySurface
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -306,7 +307,9 @@ fun DWebView(
                             }
                             jsUtil?.evalQueue { action.onClickCode }
                         },
-                        selected = selectedItem == index
+                        selected = selectedItem == index,
+                        colors = action.colors?.toNavigationBarItemColors()
+                            ?: NavigationBarItemDefaults.colors(),
                     )
                 }
             }
