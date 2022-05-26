@@ -106,6 +106,7 @@ data class BottomBarAction(
     val onClickCode: String,
     val label: String,
     val selected: Boolean,
+    val selectable: Boolean,
     val disabled: Boolean,
 ) {
 
@@ -115,9 +116,15 @@ data class BottomBarAction(
             onClickCode: String,
             label: String? = null,
             selected: Boolean? = null,
+            selectable: Boolean? = null,
             disabled: Boolean? = null,
         ) = BottomBarAction(
-            icon, onClickCode, label ?: "", selected ?: false, disabled ?: false,
+            icon,
+            onClickCode,
+            label ?: "",
+            selected ?: false,
+            selectable ?: true,
+            disabled ?: false,
         )
 
         val _gson = JsUtil.registerGsonDeserializer(
@@ -128,6 +135,7 @@ data class BottomBarAction(
                     jsonObject["onClickCode"].asString,
                     jsonObject["label"]?.asString,
                     jsonObject["selected"]?.asBoolean,
+                    jsonObject["selectable"]?.asBoolean,
                     jsonObject["disabled"]?.asBoolean,
                 )
             }

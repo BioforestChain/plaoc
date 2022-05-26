@@ -97,7 +97,7 @@
                     {
                       icon: {
                         source: new URL(
-                          "./icon/ico_bottom_tab_publisher.svg",
+                          "./icon/coil_logo_colored.svg",
                           location.href
                         ).href,
                         type: "AssetIcon",
@@ -174,7 +174,9 @@
                           location.href
                         ).href,
                         type: "AssetIcon",
+                        size: 50,
                       },
+                      selectable: false,
                       onClickCode: "bottombar_action_2.innerHTML = '100%OK'",
                     },
                     {
@@ -353,7 +355,9 @@
         <input id="ime" placeholder="IME Test" />
         <style>
           #ime {
-            transform: translateY(calc(-1 * var(--virtual-keyboard-safe-area-bottom)));
+            transform: translateY(
+              calc(-1 * var(--virtual-keyboard-safe-area-bottom))
+            );
           }
         </style>
         <script>
@@ -363,7 +367,8 @@
               isFocus = true;
               const setValue = () => {
                 try {
-                  ime.value = __android_util_js__.virtualKeyboardSafeArea.bottom;
+                  ime.value =
+                    __android_util_js__.virtualKeyboardSafeArea.bottom;
                 } catch (e) {}
                 if (isFocus) {
                   requestAnimationFrame(setValue);

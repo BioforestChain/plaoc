@@ -276,8 +276,7 @@ fun DWebView(
     @Composable
     fun MyBottomAppBar() {
         NavigationBar(
-            modifier = modifier
-                .background(Companion.Transparent)
+            modifier = Modifier
                 .onGloballyPositioned { coordinates ->
                     bottomBarHeight.value = coordinates.size.height / localDensity.density
                 },
@@ -293,13 +292,18 @@ fun DWebView(
                 bottomBarActions.forEachIndexed { index, action ->
                     NavigationBarItem(
                         icon = {
-
                             DWebIcon(action.icon)
                         },
-                        label = { if (action.label.isNotEmpty()) Text(action.label) },
+                        label = if (action.label.isNotEmpty()) {
+                            { Text(action.label) }
+                        } else {
+                            null
+                        },
                         enabled = !action.disabled,
                         onClick = {
-                            selectedItem = index
+                            if (action.selectable) {
+                                selectedItem = index
+                            }
                             jsUtil?.evalQueue { action.onClickCode }
                         },
                         selected = selectedItem == index
