@@ -30,7 +30,6 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import org.bfchain.plaoc.dweb.js.navigator.NavigatorFFI
@@ -389,50 +388,21 @@ fun DWebView(
 
             Log.i(TAG, "innerPadding:${innerPadding}");
 
-            data class JsAlertConfigation(
-                val result: JsResult,
-                val title: String,
-                val content: String,
-                val confirmText: String,
-                val dismissOnBackPress: Boolean = true,
-                val dismissOnClickOutside: Boolean = false,
-            )
 
-            var jsAlertConfigation by remember {
-                mutableStateOf<JsAlertConfigation?>(null)
+            val jsAlertConfig = remember {
+                mutableStateOf<JsAlertConfiguration?>(null)
             }
 
-            data class JsPromptConfigation(
-                val result: JsPromptResult,
-                val title: String,
-                val label: String,
-                val defaultValue: String,
-                val confirmText: String,
-                val cancelText: String,
-                val dismissOnBackPress: Boolean = true,
-                val dismissOnClickOutside: Boolean = false,
-            )
-
-            var jsPromptConfigation by remember {
-                mutableStateOf<JsPromptConfigation?>(null)
+            val jsPromptConfig = remember {
+                mutableStateOf<JsPromptConfiguration?>(null)
             }
 
-            data class JsConfirmConfigation(
-                val result: JsResult,
-                val title: String,
-                val message: String,
-                val confirmText: String,
-                val cancelText: String,
-                val dismissOnBackPress: Boolean = true,
-                val dismissOnClickOutside: Boolean = false,
-            )
-
-            var jsConfirmConfigation by remember {
-                mutableStateOf<JsConfirmConfigation?>(null)
+            val jsConfirmConfig = remember {
+                mutableStateOf<JsConfirmConfiguration?>(null)
             }
 
-            var jsBeforeUnloadConfigation by remember {
-                mutableStateOf<JsConfirmConfigation?>(null)
+            val jsBeforeUnloadConfig = remember {
+                mutableStateOf<JsConfirmConfiguration?>(null)
             }
 
             AdWebView(
@@ -483,23 +453,19 @@ fun DWebView(
                     val inputMethodEditorFFI = InputMethodEditorFFI(isOverlayVirtualKeyboard)
                     webView.addJavascriptInterface(inputMethodEditorFFI, "input_method_eidtor")
 
+                    val dialogFFI = DialogFFI(
+                        jsUtil!!,
+                        jsAlertConfig,
+                        jsPromptConfig,
+                        jsConfirmConfig,
+                        jsBeforeUnloadConfig
+                    )
+                    webView.addJavascriptInterface(dialogFFI, "native_dialog")
+
                     onCreated(webView)
                 },
                 chromeClient = remember {
                     class MyWebChromeClient : AdWebChromeClient() {
-//                        override fun onReceivedTitle(view: WebView?, title: String?) {
-//                            super.onReceivedTitle(view, title);
-//                            webTitleContent = title ?: ""
-//                            Log.i(TAG, "TITLE CHANGED!!!! $title")
-//
-//                            activity.runOnUiThread {
-//                                activity.setTaskDescription(
-//                                    ActivityManager.TaskDescription(
-//                                        title ?: ""
-//                                    )
-//                                )
-//                            }
-//                        }
 
                         override fun onCreateWindow(
                             view: WebView?,
@@ -537,13 +503,11 @@ fun DWebView(
                             if (result == null) {
                                 return super.onJsAlert(view, url, message, result)
                             }
-                            jsAlertConfigation =
-                                JsAlertConfigation(
-                                    result,
-                                    getJsDialogTitle(url, "显示"),
-                                    message ?: "",
-                                    getJsDialogConfirmText(),
-                                )
+                            jsAlertConfig.value = JsAlertConfiguration(
+                                getJsDialogTitle(url, "显示"),
+                                message ?: "",
+                                getJsDialogConfirmText(),
+                            ).bindCallback(result)
                             return true
                         }
 
@@ -557,14 +521,13 @@ fun DWebView(
                             if (result == null) {
                                 return super.onJsPrompt(view, url, message, defaultValue, result)
                             }
-                            jsPromptConfigation = JsPromptConfigation(
-                                result,
+                            jsPromptConfig.value = JsPromptConfiguration(
                                 getJsDialogTitle(url, "填入"),
                                 message ?: "",
                                 defaultValue ?: "",
                                 getJsDialogConfirmText(),
                                 getJsDialogCancelText(),
-                            )
+                            ).bindCallback(result)
                             return true
                         }
 
@@ -577,13 +540,12 @@ fun DWebView(
                             if (result == null) {
                                 return super.onJsConfirm(view, url, message, result)
                             }
-                            jsConfirmConfigation = JsConfirmConfigation(
-                                result,
+                            jsConfirmConfig.value = JsConfirmConfiguration(
                                 getJsDialogTitle(url, "询问"),
                                 message ?: "",
                                 getJsDialogConfirmText(),
                                 getJsDialogCancelText(),
-                            )
+                            ).bindCallback(result)
                             return true
                         }
 
@@ -596,15 +558,14 @@ fun DWebView(
                             if (result == null) {
                                 return super.onJsBeforeUnload(view, url, message, result)
                             }
-                            jsBeforeUnloadConfigation = JsConfirmConfigation(
-                                result,
+                            jsBeforeUnloadConfig.value = JsConfirmConfiguration(
                                 getJsDialogTitle(url, "提示您"),
                                 message ?: "",
                                 "离开",
                                 "留下",
                                 dismissOnBackPress = true,
                                 dismissOnClickOutside = true,
-                            )
+                            ).bindCallback(result)
                             return true
                         }
 
@@ -631,6 +592,8 @@ fun DWebView(
                 },
             )
 
+            //<editor-fold desc="Native UI">
+
             if (topBarOverlay.value and topBarEnabled.value) MyTopAppBar()
             if (bottomBarOverlay.value and bottomBarFFI.isEnabled) {
                 Box(
@@ -639,118 +602,12 @@ fun DWebView(
                 ) { MyBottomAppBar() }
             }
 
-            jsAlertConfigation?.also { config ->
-                val closeAlert = {
-                    config.result.confirm()
-                    jsAlertConfigation = null
-                }
-                AlertDialog(
-                    icon = { Icon(Icons.Filled.Notifications, contentDescription = "Alert") },
-                    onDismissRequest = closeAlert,
-                    title = { Text(text = config.title) },
-                    text = { Text(text = config.content) },
-                    confirmButton = {
-                        TextButton(onClick = closeAlert) { Text(config.confirmText) }
-                    },
-                    properties = DialogProperties(
-                        dismissOnBackPress = config.dismissOnBackPress,
-                        dismissOnClickOutside = config.dismissOnClickOutside
-                    ),
-                )
-            }
+            jsAlertConfig.value?.openAlertDialog { jsAlertConfig.value = null }
+            jsPromptConfig.value?.openPromptDialog { jsPromptConfig.value = null }
+            jsConfirmConfig.value?.openConfirmDialog { jsConfirmConfig.value = null }
+            jsBeforeUnloadConfig.value?.openBeforeUnloadDialog { jsBeforeUnloadConfig.value = null }
 
-            jsPromptConfigation?.also { config ->
-                var resultText by remember {
-                    mutableStateOf(config.defaultValue)
-                }
-                val submitPrompt = {
-                    config.result.confirm(resultText)
-                    jsPromptConfigation = null
-                }
-                val cancelPrompt = {
-                    config.result.cancel()
-                    jsPromptConfigation = null
-                }
-                AlertDialog(
-                    icon = { Icon(Icons.Filled.Edit, contentDescription = "Prompt") },
-                    onDismissRequest = cancelPrompt,
-                    title = { Text(text = config.title) },
-                    text = {
-                        TextField(
-                            value = resultText,
-                            singleLine = true,
-                            onValueChange = {
-                                resultText = it
-                            }, label = { Text(text = config.label) }
-                        )
-                    },
-                    confirmButton = {
-                        TextButton(onClick = submitPrompt) { Text(config.confirmText) }
-                    },
-                    dismissButton = {
-                        TextButton(onClick = cancelPrompt) { Text(config.cancelText) }
-                    },
-                    properties = DialogProperties(
-                        dismissOnBackPress = config.dismissOnBackPress,
-                        dismissOnClickOutside = config.dismissOnClickOutside
-                    ),
-                )
-            }
-
-            jsConfirmConfigation?.also { config ->
-                val submitConfirm = {
-                    config.result.confirm()
-                    jsConfirmConfigation = null
-                }
-                val cancelConfirm = {
-                    config.result.cancel()
-                    jsConfirmConfigation = null
-                }
-                AlertDialog(
-                    icon = { Icon(Icons.Filled.QuestionMark, contentDescription = "Confirm") },
-                    onDismissRequest = cancelConfirm,
-                    title = { Text(text = config.title) },
-                    text = { Text(text = config.message) },
-                    confirmButton = {
-                        TextButton(onClick = submitConfirm) { Text(config.confirmText) }
-                    },
-                    dismissButton = {
-                        TextButton(onClick = cancelConfirm) { Text(config.cancelText) }
-                    },
-                    properties = DialogProperties(
-                        dismissOnBackPress = config.dismissOnBackPress,
-                        dismissOnClickOutside = config.dismissOnClickOutside
-                    ),
-                )
-            }
-
-            jsBeforeUnloadConfigation?.also { config ->
-                val submitConfirm = {
-                    config.result.confirm()
-                    jsBeforeUnloadConfigation = null
-                }
-                val cancelConfirm = {
-                    config.result.cancel()
-                    jsBeforeUnloadConfigation = null
-                }
-                AlertDialog(
-                    icon = { Icon(Icons.Filled.Warning, contentDescription = "Before Unload") },
-                    onDismissRequest = cancelConfirm,
-                    title = { Text(text = config.title) },
-                    text = { Text(text = config.message) },
-                    confirmButton = {
-                        TextButton(onClick = submitConfirm) { Text(config.confirmText) }
-                    },
-                    dismissButton = {
-                        TextButton(onClick = cancelConfirm) { Text(config.cancelText) }
-                    },
-                    properties = DialogProperties(
-                        dismissOnBackPress = config.dismissOnBackPress,
-                        dismissOnClickOutside = config.dismissOnClickOutside
-                    ),
-                )
-            }
-
+            //</editor-fold>
         },
         containerColor = Companion.Transparent,
 //        contentColor = Companion.Transparent

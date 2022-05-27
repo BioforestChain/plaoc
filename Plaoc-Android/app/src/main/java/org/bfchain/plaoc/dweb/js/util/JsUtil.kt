@@ -433,3 +433,9 @@ fun <T> DataString<T>.toData(typeOfT: Type): T {
 fun <T> DataString_From(v: T): DataString<T> {
     return JsUtil.gson.toJson(v)
 }
+
+typealias CallbackString = String
+
+fun CallbackString.callJs(callId: String, jsUtil: JsUtil, vararg args: String) {
+    jsUtil.evalQueue(callId) { "$this(${args.joinToString(",")})" };
+}

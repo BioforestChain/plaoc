@@ -434,6 +434,28 @@
         <script>
           show_alert_dialog.onclick = () => alert(message.value);
         </script>
+        <button id="show_native_alert_dialog">Show Native Alert Dialog</button>
+        <script>
+          show_native_alert_dialog.onclick = () => {
+            native_dialog.openAlert(
+              JSON.stringify({
+                title: "自定义标题",
+                content: "内容",
+                confirmText: "好吧",
+              }),
+              "show_native_alert_dialog.callback"
+            );
+          };
+
+          show_native_alert_dialog.callback = () => {
+            const BASE_TEXT = "Show Native Alert Dialog ";
+            show_native_alert_dialog.times =
+              1 + (show_native_alert_dialog.times | 0);
+            show_native_alert_dialog.innerHTML =
+              BASE_TEXT + " " + show_native_alert_dialog.times;
+          };
+        </script>
+
         <input id="prompt_value" value="Default Value From JS" />
         <button id="show_prompt_dialog">Show Prompt Dialog</button>
         <script>
