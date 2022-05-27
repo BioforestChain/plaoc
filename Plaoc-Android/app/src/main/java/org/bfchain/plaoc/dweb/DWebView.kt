@@ -37,7 +37,7 @@ import org.bfchain.plaoc.dweb.js.navigator.NavigatorFFI
 import org.bfchain.plaoc.dweb.js.systemUi.*
 import org.bfchain.plaoc.dweb.js.util.JsUtil
 import org.bfchain.plaoc.webkit.*
-import java.net.URL
+import java.net.URI
 import kotlin.math.min
 
 
@@ -296,17 +296,10 @@ fun DWebView(
                 }
             }
 
-    val bottomBarFFI = remember {
-        BottomBarFFI(
-            bottomBarEnabled,
-            bottomBarOverlay,
-            bottomBarHeight,
-            bottomBarActions,
-            bottomBarBackgroundColor,
-            bottomBarForegroundColor,
-        )
+    val bottomBarFfiState = remember {
+        mutableStateOf<BottomBarFFI?>(null)
     }
-
+    var bottomBarFFI by bottomBarFfiState
 
     @Composable
     fun MyBottomAppBar() {
@@ -366,7 +359,7 @@ fun DWebView(
             .padding(overlayPadding)
             .offset { overlayOffset },
         topBar = { if (!topBarOverlay.value and topBarEnabled.value) MyTopAppBar() },
-        bottomBar = { if (!bottomBarOverlay.value and bottomBarFFI.isEnabled) MyBottomAppBar() },
+        bottomBar = { if (!bottomBarOverlay.value and (bottomBarFFI?.isEnabled == true)) MyBottomAppBar() },
         content = { innerPadding ->
             DWebBackground(innerPadding, hook, activity)
 
@@ -432,6 +425,16 @@ fun DWebView(
                     )
                     webView.addJavascriptInterface(topBarFFI, "top_bar")
 
+
+                    val bottomBarFFI = BottomBarFFI(
+                        bottomBarEnabled,
+                        bottomBarOverlay,
+                        bottomBarHeight,
+                        bottomBarActions,
+                        bottomBarBackgroundColor,
+                        bottomBarForegroundColor,
+                    )
+                    bottomBarFfiState.value = bottomBarFFI
                     webView.addJavascriptInterface(bottomBarFFI, "bottom_bar")
 
                     val virtualKeyboardFFI = VirtualKeyboardFFI(
@@ -478,7 +481,7 @@ fun DWebView(
                             var title = state.pageTitle
                             try {
                                 if (url != null) {
-                                    val host = URL(url).host
+                                    val host = URI(url).host
                                     if (host.isNotEmpty()) {
                                         title = host
                                     }
@@ -578,7 +581,7 @@ fun DWebView(
                     if (topBarOverlay.value or !topBarEnabled.value) {
                         top = 0.dp;
                     }
-                    if (bottomBarOverlay.value or !bottomBarFFI.isEnabled) {
+                    if (bottomBarOverlay.value or (bottomBarFFI?.isEnabled != true)) {
                         bottom = 0.dp
                     }
                     if ((top.value == 0F) and (bottom.value == 0F)) {
@@ -592,7 +595,7 @@ fun DWebView(
             //<editor-fold desc="Native UI">
 
             if (topBarOverlay.value and topBarEnabled.value) MyTopAppBar()
-            if (bottomBarOverlay.value and bottomBarFFI.isEnabled) {
+            if (bottomBarOverlay.value and (bottomBarFFI?.isEnabled == true)) {
                 Box(
                     contentAlignment = Alignment.BottomCenter,
                     modifier = Modifier.fillMaxSize()

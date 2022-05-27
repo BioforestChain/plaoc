@@ -11,7 +11,6 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.core.graphics.toColor
 import com.google.gson.JsonDeserializer
 import com.google.gson.reflect.TypeToken
 import org.bfchain.plaoc.dweb.js.util.*
@@ -43,10 +42,13 @@ class BottomBarFFI(
 
 
     @JavascriptInterface
-    fun toggleEnabled(isEnabled: BoolInt): Boolean {
-        val isEnabledBool = isEnabled.toBooleanOrNull()
-        enabled.value = isEnabledBool
-        Log.i(TAG, "toggleEnabled:${isEnabledBool}")
+    fun toggleEnabled(isEnabledInt: BoolInt): Boolean {
+        var isEnabled = isEnabledInt.toBooleanOrNull()
+        if (isEnabled == null && enabled.value == null) {
+            isEnabled = !this.isEnabled
+        }
+        enabled.value = isEnabled
+        Log.i(TAG, "toggleEnabled:${isEnabled}")
         return getEnabled()
     }
 
