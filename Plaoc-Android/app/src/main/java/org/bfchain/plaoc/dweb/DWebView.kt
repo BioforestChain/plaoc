@@ -14,7 +14,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.contentColorFor
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.primarySurface
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -42,23 +43,6 @@ import kotlin.math.min
 
 private const val TAG = "DWebView"
 
-inline fun <T : Any> multiLet(vararg elements: T, closure: (List<T>) -> Unit) {
-    closure(elements.asList())
-}
-
-@SuppressLint("RememberReturnType")
-@Composable
-fun <T : Any, R> rememberLet(
-    vararg elements: T,
-    closure: (Array<out T>) -> R
-): R {
-    return remember(*elements) {
-        Log.i(TAG, "rememberLet-CHAGED!!!!")
-        closure(elements)
-    }
-}
-
-
 private const val LEAVE_URI_SYMBOL = ":~:dweb=leave";
 
 @ExperimentalLayoutApi
@@ -72,6 +56,8 @@ fun DWebView(
     modifier: Modifier = Modifier,
     onCreated: (AdAndroidWebView) -> Unit = {},
 ) {
+    val currentView = LocalView.current;
+
     var jsUtil by remember(state) {
         mutableStateOf<JsUtil?>(null)
     }
@@ -105,10 +91,10 @@ fun DWebView(
     }
 
 
-    val webTitleContent by remember(state.pageTitle, state.pageIcon) {
+    val _title_icon by remember(state.pageTitle, state.pageIcon) {
         val pageTitle = state.pageTitle ?: ""
         val pageIcon = state.pageIcon
-        Log.i(TAG, "TITLE CHANGED!!!! $pageTitle")
+
         activity.runOnUiThread {
             activity.setTaskDescription(
                 ActivityManager.TaskDescription(
@@ -116,11 +102,9 @@ fun DWebView(
                 )
             )
         }
+
         mutableStateOf(pageTitle)
     }
-//    var webTitleContent by remember {
-//        mutableStateOf("")
-//    }
 
 
     val systemUiController = rememberSystemUiController()
@@ -132,7 +116,7 @@ fun DWebView(
         mutableStateOf(false)
     }
     jsUtil?.apply {
-        InputMethodEditorFFI.InjectVirtualKeyboardVars(
+        VirtualKeyboardFFI.InjectVirtualKeyboardVars(
             this,
             LocalDensity.current, LocalLayoutDirection.current,
             isOverlayVirtualKeyboard.value, WindowInsets.ime,
@@ -450,8 +434,12 @@ fun DWebView(
 
                     webView.addJavascriptInterface(bottomBarFFI, "bottom_bar")
 
-                    val inputMethodEditorFFI = InputMethodEditorFFI(isOverlayVirtualKeyboard)
-                    webView.addJavascriptInterface(inputMethodEditorFFI, "input_method_eidtor")
+                    val virtualKeyboardFFI = VirtualKeyboardFFI(
+                        isOverlayVirtualKeyboard,
+                        activity,
+                        webView,
+                    )
+                    webView.addJavascriptInterface(virtualKeyboardFFI, "virtual_keyboard")
 
                     val dialogFFI = DialogFFI(
                         jsUtil!!,
@@ -486,10 +474,19 @@ fun DWebView(
 
                         }
 
-                        private inline fun getJsDialogTitle(url: String?, label: String) =
-                            URL(url ?: "").host.let { host ->
-                                "${host.ifEmpty { webTitleContent }} $label"
+                        private inline fun getJsDialogTitle(url: String?, label: String): String {
+                            var title = state.pageTitle
+                            try {
+                                if (url != null) {
+                                    val host = URL(url).host
+                                    if (host.isNotEmpty()) {
+                                        title = host
+                                    }
+                                }
+                            } catch (e: Exception) {
                             }
+                            return "$title $label"
+                        }
 
                         private inline fun getJsDialogConfirmText() = "确认"
                         private inline fun getJsDialogCancelText() = "取消"

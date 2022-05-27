@@ -378,16 +378,16 @@
         </script>
       </fieldset>
       <fieldset>
-        <legend>IME</legend>
-        <button id="toggle_ime_overlay">Toggle IME Overlay</button>
+        <legend>V-Keyboard</legend>
+        <button id="toggle_vk_overlay">Toggle V-Keyboard Overlay</button>
         <script>
-          toggle_ime_overlay.onclick = () => {
-            input_method_eidtor.toggleOverlay(0);
+          toggle_vk_overlay.onclick = () => {
+            virtual_keyboard.toggleOverlay(0);
           };
         </script>
-        <input id="ime" placeholder="IME Test" />
+        <input id="vk" placeholder="V-Keyboard Test" />
         <style>
-          #ime {
+          #vk {
             transform: translateY(
               calc(-1 * var(--virtual-keyboard-safe-area-bottom))
             );
@@ -396,12 +396,11 @@
         <script>
           {
             let isFocus = false;
-            ime.onfocus = () => {
+            vk.onfocus = () => {
               isFocus = true;
               const setValue = () => {
                 try {
-                  ime.value =
-                    __android_util_js__.virtualKeyboardSafeArea.bottom;
+                  vk.value = __android_util_js__.virtualKeyboardSafeArea.bottom;
                 } catch (e) {}
                 if (isFocus) {
                   requestAnimationFrame(setValue);
@@ -409,21 +408,29 @@
               };
               setValue();
             };
-            ime.onblur = () => {
+            vk.onblur = () => {
               isFocus = false;
             };
           }
         </script>
-        <button id="get_ime_safe_area">Get IME Safe Area</button>
+        <button id="get_vk_safe_area">Get V-Keyboard Safe Area</button>
         <script>
-          get_ime_safe_area.onclick = () => {
-            alert(input_method_eidtor.getSafeArea());
+          get_vk_safe_area.onclick = () => {
+            alert(virtual_keyboard.getSafeArea());
           };
         </script>
-        <button id="get_ime_height">Get IME Height</button>
+        <button id="get_vk_height">Get V-Keyboard Height</button>
         <script>
-          get_ime_height.onclick = () => {
-            alert(input_method_eidtor.getHeight());
+          get_vk_height.onclick = () => {
+            alert(virtual_keyboard.getHeight());
+          };
+        </script>
+        <button id="show_vk">Show V-Keyboard After 0.5s</button>
+        <script>
+          show_vk.onclick = () => {
+            setTimeout(() => {
+              virtual_keyboard.show();
+            }, 500);
           };
         </script>
       </fieldset>

@@ -1,7 +1,11 @@
 package org.bfchain.plaoc.dweb.js.systemUi
 
+import android.content.Context
 import android.util.Log
+import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.webkit.JavascriptInterface
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.exclude
 import androidx.compose.runtime.MutableState
@@ -11,9 +15,13 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.bfchain.plaoc.dweb.js.util.*
 
-private const val TAG = "InputMethodEditorFFI"
+private const val TAG = "VirtualKeyboardFFI"
 
-class InputMethodEditorFFI(val overlay: MutableState<Boolean>) {
+class VirtualKeyboardFFI(
+    val overlay: MutableState<Boolean>,
+    val activity: ComponentActivity,
+    val view: View
+) {
 
     companion object {
 
@@ -127,13 +135,22 @@ class InputMethodEditorFFI(val overlay: MutableState<Boolean>) {
         return overlay.value
     }
 
+
+    val imm by lazy { activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager }
+
     @JavascriptInterface
     fun show() {
-
+        activity.runOnUiThread {
+            if (view.requestFocus()) {
+                imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
+            }
+        }
     }
 
     @JavascriptInterface
     fun hide() {
-
+        activity.runOnUiThread {
+            imm.hideSoftInputFromWindow(view.windowToken, 0)
+        }
     }
 }
