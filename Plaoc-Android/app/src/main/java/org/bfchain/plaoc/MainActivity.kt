@@ -150,21 +150,6 @@ private fun NavFun(activity: ComponentActivity) {
 //                    activity
 //                )
             }
-            composable("demo-web/{url}", arguments = listOf(
-                navArgument("url") {
-                    type = NavType.StringType
-                }
-            )) { entry ->
-                val url = entry.arguments?.getString("url")
-                    .let { it -> URLDecoder.decode(it, "UTF-8") }
-                    ?: "file:///android_asset/demo.html"
-
-                DWebViewList(
-                    getWebState(url),
-                    navController,
-                    activity
-                )
-            }
             bottomSheet(route = "sheet") {
                 Text("This is a cool bottom sheet!")
             }
@@ -198,43 +183,6 @@ private fun DwebIntel(navController: NavController) {
         }
     }
     Text("qaq")
-}
-
-@SuppressLint("JavascriptInterface")
-@Composable
-private fun DWebViewList(
-    webviewState: AdWebViewState,
-    navController: NavController,
-    activity: ComponentActivity
-) {
-    var urlList by remember {
-        mutableStateOf(setOf<AdWebViewState>())
-    }
-
-//    val exampleState = rememberWebViewState(url)
-
-//    LaunchedEffect(Unit) {
-    urlList += webviewState;
-//    }
-    DisposableEffect(Unit) {
-        onDispose {
-            urlList -= webviewState;
-        }
-    }
-    Column {
-        Text("qaq")
-        urlList.forEach { state ->
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
-                    .border(2.dp, Color.Red)
-            ) {
-                DWebView(state = state, navController = navController, activity = activity)
-            }
-        }
-        Text("mml")
-    }
 }
 
 @Composable

@@ -4,16 +4,17 @@ import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.os.Message
 import android.util.Log
+import android.webkit.JsPromptResult
+import android.webkit.JsResult
 import android.webkit.WebView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.compose.foundation.background
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.contentColorFor
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.twotone.AddCircle
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material.primarySurface
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -26,14 +27,17 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.unit.*
-import androidx.core.view.WindowInsetsCompat
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import org.bfchain.plaoc.dweb.js.navigator.NavigatorFFI
 import org.bfchain.plaoc.dweb.js.systemUi.*
 import org.bfchain.plaoc.dweb.js.util.JsUtil
 import org.bfchain.plaoc.webkit.*
+import java.net.URL
 import kotlin.math.min
 
 
@@ -55,6 +59,9 @@ fun <T : Any, R> rememberLet(
     }
 }
 
+
+private const val LEAVE_URI_SYMBOL = ":~:dweb=leave";
+
 @ExperimentalLayoutApi
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @SuppressLint("JavascriptInterface")
@@ -66,12 +73,56 @@ fun DWebView(
     modifier: Modifier = Modifier,
     onCreated: (AdAndroidWebView) -> Unit = {},
 ) {
-    var jsUtil by remember {
+    var jsUtil by remember(state) {
         mutableStateOf<JsUtil?>(null)
     }
     val hook = remember {
         AdWebViewHook()
     }
+    val adNavigator = rememberAdWebViewNavigator()
+    val adCaptureBackPresses by remember {
+        mutableStateOf(true)
+    }
+
+    val doBack = state.content.getCurrentUrl()?.endsWith(LEAVE_URI_SYMBOL) == true
+    BackHandler(
+        // 如果要执行doBack，那么要禁用拦截
+        !doBack
+                // 如果有js上下文
+                and
+                (jsUtil != null)
+                // 并且没有历史记录了，说明返回按钮会触发"退出行为"
+                and
+                !(adCaptureBackPresses && adNavigator.canGoBack)
+    ) {
+        // 这种 location.replace 行为不会触发 Navigator 的长度发生变化的同时，还能自动触发 onbeforeunload
+        // @TODO 这里的风险在于，如果js代码卡住，那么这段代码会无法正常执行，那么就永远无法退出
+        jsUtil!!.evalQueue("leave_page") { "location.replace(location.href+'#$LEAVE_URI_SYMBOL')" }
+    }
+    if (doBack) {
+        SideEffect {
+            activity.onBackPressed()
+        }
+    }
+
+
+    val webTitleContent by remember(state.pageTitle, state.pageIcon) {
+        val pageTitle = state.pageTitle ?: ""
+        val pageIcon = state.pageIcon
+        Log.i(TAG, "TITLE CHANGED!!!! $pageTitle")
+        activity.runOnUiThread {
+            activity.setTaskDescription(
+                ActivityManager.TaskDescription(
+                    pageTitle, pageIcon
+                )
+            )
+        }
+        mutableStateOf(pageTitle)
+    }
+//    var webTitleContent by remember {
+//        mutableStateOf("")
+//    }
+
 
     val systemUiController = rememberSystemUiController()
     val isOverlayStatusBar = remember { mutableStateOf(false) }
@@ -108,9 +159,6 @@ fun DWebView(
 
     Log.i(TAG, "overlayPadding:$overlayPadding")
 
-    var webTitleContent by remember {
-        mutableStateOf("")
-    }
 
     val topBarEnabled = remember {
         mutableStateOf(true)
@@ -144,12 +192,31 @@ fun DWebView(
 
     val localDensity = LocalDensity.current
 
+    val tryLeave = {
+        activity.onBackPressed()
+    }
+
     @Composable
     fun MyTopAppBar() {
         CenterAlignedTopAppBar(
+            navigationIcon = {
+                IconButton(
+                    onClick = { tryLeave() },
+                    modifier = Modifier
+//                        .pointerInteropFilter { event ->
+//                            Log.i(TAG, "filter NavigationIcon event $event")
+//                            true
+//                        }
+//                        .clickable {
+//                            Log.i(TAG, "Clicked NavigationIcon")
+//                        }
+                ) {
+                    Icon(Icons.Filled.ArrowBack, "backIcon")
+                }
+            },
             title = {
                 Text(
-                    text = topBarTitle.value ?: webTitleContent,
+                    text = topBarTitle.value ?: state.pageTitle ?: "",
                     modifier = Modifier
 //                        .pointerInteropFilter { event ->
 //                            Log.i(TAG, "filter Title event $event")
@@ -172,22 +239,6 @@ fun DWebView(
                             DWebIcon(action.icon)
                         }
                     }
-                }
-            },
-            navigationIcon = {
-                IconButton(
-                    onClick = {
-                        activity.onBackPressed()
-                    }, modifier = Modifier
-//                        .pointerInteropFilter { event ->
-//                            Log.i(TAG, "filter NavigationIcon event $event")
-//                            true
-//                        }
-//                        .clickable {
-//                            Log.i(TAG, "Clicked NavigationIcon")
-//                        }
-                ) {
-                    Icon(Icons.Filled.ArrowBack, "backIcon")
                 }
             },
             colors = @Stable object : TopAppBarColors {
@@ -337,8 +388,57 @@ fun DWebView(
             DWebBackground(innerPadding, hook, activity)
 
             Log.i(TAG, "innerPadding:${innerPadding}");
+
+            data class JsAlertConfigation(
+                val result: JsResult,
+                val title: String,
+                val content: String,
+                val confirmText: String,
+                val dismissOnBackPress: Boolean = true,
+                val dismissOnClickOutside: Boolean = false,
+            )
+
+            var jsAlertConfigation by remember {
+                mutableStateOf<JsAlertConfigation?>(null)
+            }
+
+            data class JsPromptConfigation(
+                val result: JsPromptResult,
+                val title: String,
+                val label: String,
+                val defaultValue: String,
+                val confirmText: String,
+                val cancelText: String,
+                val dismissOnBackPress: Boolean = true,
+                val dismissOnClickOutside: Boolean = false,
+            )
+
+            var jsPromptConfigation by remember {
+                mutableStateOf<JsPromptConfigation?>(null)
+            }
+
+            data class JsConfirmConfigation(
+                val result: JsResult,
+                val title: String,
+                val message: String,
+                val confirmText: String,
+                val cancelText: String,
+                val dismissOnBackPress: Boolean = true,
+                val dismissOnClickOutside: Boolean = false,
+            )
+
+            var jsConfirmConfigation by remember {
+                mutableStateOf<JsConfirmConfigation?>(null)
+            }
+
+            var jsBeforeUnloadConfigation by remember {
+                mutableStateOf<JsConfirmConfigation?>(null)
+            }
+
             AdWebView(
                 state = state,
+                navigator = adNavigator,
+                captureBackPresses = adCaptureBackPresses,
                 onCreated = { webView ->
                     // 将webView的背景默认设置为透明。不通过systemUi的api提供这个功能，一些手机上动态地修改webView背景颜色，在黑夜模式下，会有问题
                     webView.setBackgroundColor(Companion.Transparent.toArgb());
@@ -387,19 +487,19 @@ fun DWebView(
                 },
                 chromeClient = remember {
                     class MyWebChromeClient : AdWebChromeClient() {
-                        override fun onReceivedTitle(view: WebView?, title: String?) {
-                            super.onReceivedTitle(view, title);
-                            webTitleContent = title ?: ""
-                            Log.i(TAG, "TITLE CHANGED!!!! $title")
-
-                            activity.runOnUiThread {
-                                activity.setTaskDescription(
-                                    ActivityManager.TaskDescription(
-                                        title ?: ""
-                                    )
-                                )
-                            }
-                        }
+//                        override fun onReceivedTitle(view: WebView?, title: String?) {
+//                            super.onReceivedTitle(view, title);
+//                            webTitleContent = title ?: ""
+//                            Log.i(TAG, "TITLE CHANGED!!!! $title")
+//
+//                            activity.runOnUiThread {
+//                                activity.setTaskDescription(
+//                                    ActivityManager.TaskDescription(
+//                                        title ?: ""
+//                                    )
+//                                )
+//                            }
+//                        }
 
                         override fun onCreateWindow(
                             view: WebView?,
@@ -418,6 +518,94 @@ fun DWebView(
                             }
                             return super.onCreateWindow(view, isDialog, isUserGesture, resultMsg)
 
+                        }
+
+                        private inline fun getJsDialogTitle(url: String?, label: String) =
+                            URL(url ?: "").host.let { host ->
+                                "${host.ifEmpty { webTitleContent }} $label"
+                            }
+
+                        private inline fun getJsDialogConfirmText() = "确认"
+                        private inline fun getJsDialogCancelText() = "取消"
+
+                        override fun onJsAlert(
+                            view: WebView?,
+                            url: String?,
+                            message: String?,
+                            result: JsResult?
+                        ): Boolean {
+                            if (result == null) {
+                                return super.onJsAlert(view, url, message, result)
+                            }
+                            jsAlertConfigation =
+                                JsAlertConfigation(
+                                    result,
+                                    getJsDialogTitle(url, "显示"),
+                                    message ?: "",
+                                    getJsDialogConfirmText(),
+                                )
+                            return true
+                        }
+
+                        override fun onJsPrompt(
+                            view: WebView?,
+                            url: String?,
+                            message: String?,
+                            defaultValue: String?,
+                            result: JsPromptResult?
+                        ): Boolean {
+                            if (result == null) {
+                                return super.onJsPrompt(view, url, message, defaultValue, result)
+                            }
+                            jsPromptConfigation = JsPromptConfigation(
+                                result,
+                                getJsDialogTitle(url, "填入"),
+                                message ?: "",
+                                defaultValue ?: "",
+                                getJsDialogConfirmText(),
+                                getJsDialogCancelText(),
+                            )
+                            return true
+                        }
+
+                        override fun onJsConfirm(
+                            view: WebView?,
+                            url: String?,
+                            message: String?,
+                            result: JsResult?
+                        ): Boolean {
+                            if (result == null) {
+                                return super.onJsConfirm(view, url, message, result)
+                            }
+                            jsConfirmConfigation = JsConfirmConfigation(
+                                result,
+                                getJsDialogTitle(url, "询问"),
+                                message ?: "",
+                                getJsDialogConfirmText(),
+                                getJsDialogCancelText(),
+                            )
+                            return true
+                        }
+
+                        override fun onJsBeforeUnload(
+                            view: WebView?,
+                            url: String?,
+                            message: String?,
+                            result: JsResult?
+                        ): Boolean {
+                            if (result == null) {
+                                return super.onJsBeforeUnload(view, url, message, result)
+                            }
+                            jsBeforeUnloadConfigation = JsConfirmConfigation(
+                                result,
+                                getJsDialogTitle(url, "提示您"),
+                                message ?: "",
+                                "离开",
+                                "留下",
+                                dismissOnBackPress = true,
+                                dismissOnClickOutside = true,
+                            )
+                            return true
                         }
 
                     }
@@ -449,6 +637,118 @@ fun DWebView(
                     contentAlignment = Alignment.BottomCenter,
                     modifier = Modifier.fillMaxSize()
                 ) { MyBottomAppBar() }
+            }
+
+            jsAlertConfigation?.also { config ->
+                val closeAlert = {
+                    config.result.confirm()
+                    jsAlertConfigation = null
+                }
+                AlertDialog(
+                    icon = { Icon(Icons.Filled.Notifications, contentDescription = "Alert") },
+                    onDismissRequest = closeAlert,
+                    title = { Text(text = config.title) },
+                    text = { Text(text = config.content) },
+                    confirmButton = {
+                        TextButton(onClick = closeAlert) { Text(config.confirmText) }
+                    },
+                    properties = DialogProperties(
+                        dismissOnBackPress = config.dismissOnBackPress,
+                        dismissOnClickOutside = config.dismissOnClickOutside
+                    ),
+                )
+            }
+
+            jsPromptConfigation?.also { config ->
+                var resultText by remember {
+                    mutableStateOf(config.defaultValue)
+                }
+                val submitPrompt = {
+                    config.result.confirm(resultText)
+                    jsPromptConfigation = null
+                }
+                val cancelPrompt = {
+                    config.result.cancel()
+                    jsPromptConfigation = null
+                }
+                AlertDialog(
+                    icon = { Icon(Icons.Filled.Edit, contentDescription = "Prompt") },
+                    onDismissRequest = cancelPrompt,
+                    title = { Text(text = config.title) },
+                    text = {
+                        TextField(
+                            value = resultText,
+                            singleLine = true,
+                            onValueChange = {
+                                resultText = it
+                            }, label = { Text(text = config.label) }
+                        )
+                    },
+                    confirmButton = {
+                        TextButton(onClick = submitPrompt) { Text(config.confirmText) }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = cancelPrompt) { Text(config.cancelText) }
+                    },
+                    properties = DialogProperties(
+                        dismissOnBackPress = config.dismissOnBackPress,
+                        dismissOnClickOutside = config.dismissOnClickOutside
+                    ),
+                )
+            }
+
+            jsConfirmConfigation?.also { config ->
+                val submitConfirm = {
+                    config.result.confirm()
+                    jsConfirmConfigation = null
+                }
+                val cancelConfirm = {
+                    config.result.cancel()
+                    jsConfirmConfigation = null
+                }
+                AlertDialog(
+                    icon = { Icon(Icons.Filled.QuestionMark, contentDescription = "Confirm") },
+                    onDismissRequest = cancelConfirm,
+                    title = { Text(text = config.title) },
+                    text = { Text(text = config.message) },
+                    confirmButton = {
+                        TextButton(onClick = submitConfirm) { Text(config.confirmText) }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = cancelConfirm) { Text(config.cancelText) }
+                    },
+                    properties = DialogProperties(
+                        dismissOnBackPress = config.dismissOnBackPress,
+                        dismissOnClickOutside = config.dismissOnClickOutside
+                    ),
+                )
+            }
+
+            jsBeforeUnloadConfigation?.also { config ->
+                val submitConfirm = {
+                    config.result.confirm()
+                    jsBeforeUnloadConfigation = null
+                }
+                val cancelConfirm = {
+                    config.result.cancel()
+                    jsBeforeUnloadConfigation = null
+                }
+                AlertDialog(
+                    icon = { Icon(Icons.Filled.Warning, contentDescription = "Before Unload") },
+                    onDismissRequest = cancelConfirm,
+                    title = { Text(text = config.title) },
+                    text = { Text(text = config.message) },
+                    confirmButton = {
+                        TextButton(onClick = submitConfirm) { Text(config.confirmText) }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = cancelConfirm) { Text(config.cancelText) }
+                    },
+                    properties = DialogProperties(
+                        dismissOnBackPress = config.dismissOnBackPress,
+                        dismissOnClickOutside = config.dismissOnClickOutside
+                    ),
+                )
             }
 
         },

@@ -30,6 +30,9 @@
         padding: 0.2em 1em;
         border-radius: 0.2em;
       }
+      input {
+        color: #eee;
+      }
     </style>
   </head>
   <body>
@@ -422,6 +425,56 @@
           get_ime_height.onclick = () => {
             alert(input_method_eidtor.getHeight());
           };
+        </script>
+      </fieldset>
+      <fieldset>
+        <legend>Dialog</legend>
+        <input id="message" value="Hello Dialog" />
+        <button id="show_alert_dialog">Show Alert Dialog</button>
+        <script>
+          show_alert_dialog.onclick = () => alert(message.value);
+        </script>
+        <input id="prompt_value" value="Default Value From JS" />
+        <button id="show_prompt_dialog">Show Prompt Dialog</button>
+        <script>
+          show_prompt_dialog.onclick = () => {
+            prompt_value.value = prompt(message.value, prompt_value.value);
+          };
+        </script>
+
+        <button id="show_confirm_dialog">
+          Show Confirm Dialog
+          <input id="confirm_value" type="checkbox" role="switch" />
+        </button>
+        <script>
+          show_confirm_dialog.onclick = () => {
+            confirm_value.checked = confirm(message.value);
+          };
+        </script>
+        <label for="toggle_before_unload">注册 Before Unload</label>
+        <input id="toggle_before_unload" type="checkbox" role="switch" />
+        <script>
+          toggle_before_unload.onchange = () => {
+            if (toggle_before_unload.checked) {
+              window.onbeforeunload = (e) => {
+                var dialogText = message.value;
+                e.returnValue = dialogText;
+                return dialogText;
+              };
+            } else {
+              window.onbeforeunload = null;
+            }
+          };
+        </script>
+        <button id="reload_page">Reload Page</button>
+        <script>
+          reload_page.onclick = () => {
+            location.search = `?title=${encodeURIComponent(message.value)}`;
+          };
+          const customTitle = new URLSearchParams(location.search).get("title");
+          if (customTitle) {
+            document.title = customTitle;
+          }
         </script>
       </fieldset>
     </main>
