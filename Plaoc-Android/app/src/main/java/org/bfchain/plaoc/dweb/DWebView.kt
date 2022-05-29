@@ -19,7 +19,6 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalView
@@ -86,22 +85,27 @@ fun DWebView(
         }
     }
 
-
-    val _title_icon by remember(state.pageTitle, state.pageIcon) {
-        val pageTitle = state.pageTitle ?: ""
-        val pageIcon = state.pageIcon
-
-        activity.runOnUiThread {
-            activity.setTaskDescription(
-                ActivityManager.TaskDescription(
-                    pageTitle, pageIcon
-                )
-            )
+    @Composable
+    fun SetTaskDescription() {
+        var pageTitle by remember {
+            mutableStateOf(state.pageTitle)
         }
-
-        mutableStateOf(pageTitle)
+        var pageIcon by remember {
+            mutableStateOf(state.pageIcon)
+        }
+        if (pageTitle != state.pageTitle || pageIcon != state.pageIcon) {
+            pageTitle = state.pageTitle
+            pageIcon = state.pageIcon
+            activity.runOnUiThread {
+                activity.setTaskDescription(
+                    ActivityManager.TaskDescription(
+                        pageTitle, pageIcon
+                    )
+                )
+            }
+        }
     }
-
+    SetTaskDescription()
 
     val systemUiController = rememberSystemUiController()
     val isOverlayStatusBar = remember { mutableStateOf(false) }
@@ -139,144 +143,33 @@ fun DWebView(
     Log.i(TAG, "overlayPadding:$overlayPadding")
 
 
-    val topBarEnabled = remember {
-        mutableStateOf(true)
-    }
-    val topBarOverlay = remember {
-        mutableStateOf(false)
-    }
-
-    val topBarBackgroundColor = MaterialTheme.colors.primarySurface.let { defaultPrimarySurface ->
-        remember {
-            mutableStateOf(defaultPrimarySurface)
+    val presseBack = remember {
+        return@remember {
+            activity.onBackPressed()
         }
     }
-    // https://developer.android.com/jetpack/compose/themes/material#emphasis
-    // Material Design 文本易读性建议一文建议通过不同的不透明度来表示不同的重要程度。
-    // TopAppBar 组件内部已经强制写死了 CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high)
-    val topBarForegroundColor = MaterialTheme.colors.contentColorFor(topBarBackgroundColor.value)
-        .let { defaultContentColor ->
-            remember {
-                mutableStateOf(defaultContentColor)
-            }
-        }
 
-    val localDensity = LocalDensity.current
-
-    val presseBack:(() -> Unit) = {
-        activity.onBackPressed()
-    }
-
-    val topBarState =  remember {
-        TopBarState(
-            title = mutableStateOf(null),
-            actions = mutableStateListOf(),
-            foregroundColor = topBarForegroundColor,
-            backgroundColor = topBarBackgroundColor,
-            height = mutableStateOf(0F),
-            doBack = presseBack,
-        )
-    }
-
+    val topBarState = TopBarState.Default(presseBack)
 
     @Composable
     fun TopAppBar() {
-        DWebTopAppBar(jsUtil, state, topBarState)
+        DWebTopBar(jsUtil, state, topBarState)
     }
 
-    TopAppBar()
 
-    val bottomBarEnabled = remember {
-        mutableStateOf<Boolean?>(null)
-    }
-    val bottomBarOverlay = remember {
-        mutableStateOf(false)
-    }
-    val bottomBarHeight = remember {
-        mutableStateOf<Float?>(null)
-    }
-    val bottomBarActions = remember {
-        mutableStateListOf<BottomBarAction>()
-    }
-
-    val bottomBarBackgroundColor =
-        MaterialTheme.colors.primarySurface.let { defaultPrimarySurface ->
-            remember {
-                mutableStateOf(defaultPrimarySurface)
-            }
-        }
-    val bottomBarForegroundColor =
-        MaterialTheme.colors.contentColorFor(bottomBarBackgroundColor.value)
-            .let { defaultContentColor ->
-                remember {
-                    mutableStateOf(defaultContentColor)
-                }
-            }
-
-    val bottomBarFfiState = remember {
-        mutableStateOf<BottomBarFFI?>(null)
-    }
-    var bottomBarFFI by bottomBarFfiState
+    val bottomBarState = BottomBarState.Default()
 
     @Composable
-    fun MyBottomAppBar() {
-        NavigationBar(
-            modifier = Modifier
-                .let {
-                    bottomBarHeight.value?.let { height ->
-                        if (height >= 0) {
-                            it.height(height.dp)
-                        } else {
-                            it
-                        }
-                    } ?: it
-                }
-                .onGloballyPositioned { coordinates ->
-                    bottomBarHeight.value = coordinates.size.height / localDensity.density
-                },
-            containerColor = bottomBarBackgroundColor.value,
-            contentColor = bottomBarForegroundColor.value,
-            tonalElevation = 0.dp,
-        ) {
-            if (bottomBarActions.size > 0) {
-                var selectedItem by remember(bottomBarActions) {
-                    mutableStateOf(bottomBarActions.indexOfFirst { it.selected }
-                        .let { if (it == -1) 0 else it })
-                }
-                bottomBarActions.forEachIndexed { index, action ->
-                    NavigationBarItem(
-                        icon = {
-                            DWebIcon(action.icon)
-                        },
-                        label = if (action.label.isNotEmpty()) {
-                            { Text(action.label) }
-                        } else {
-                            null
-                        },
-                        enabled = !action.disabled,
-                        onClick = {
-                            if (action.selectable) {
-                                selectedItem = index
-                            }
-                            jsUtil?.evalQueue { action.onClickCode }
-                        },
-                        selected = selectedItem == index,
-                        colors = action.colors?.toNavigationBarItemColors()
-                            ?: NavigationBarItemDefaults.colors(),
-                    )
-                }
-            }
-        }
+    fun BottomAppBar() {
+        DWebBottomBar(jsUtil, bottomBarState)
     }
-
-
 
     Scaffold(
         modifier = modifier
             .padding(overlayPadding)
             .offset { overlayOffset },
-        topBar = { if (!topBarOverlay.value and topBarEnabled.value) TopAppBar() },
-        bottomBar = { if (!bottomBarOverlay.value and (bottomBarFFI?.isEnabled == true)) MyBottomAppBar() },
+        topBar = { if (!topBarState.overlay.value and topBarState.enabled.value) TopAppBar() },
+        bottomBar = { if (!bottomBarState.overlay.value and bottomBarState.isEnabled) BottomAppBar() },
         content = { innerPadding ->
             DWebBackground(innerPadding, hook, activity)
 
@@ -331,23 +224,12 @@ fun DWebView(
                     webView.addJavascriptInterface(systemUiFFI, "system_ui")
 
                     val topBarFFI = TopBarFFI(
-                        { activity.onBackPressed() },
-                        topBarEnabled,
-                        topBarOverlay,
                         topBarState,
                     )
                     webView.addJavascriptInterface(topBarFFI, "top_bar")
 
 
-                    val bottomBarFFI = BottomBarFFI(
-                        bottomBarEnabled,
-                        bottomBarOverlay,
-                        bottomBarHeight,
-                        bottomBarActions,
-                        bottomBarBackgroundColor,
-                        bottomBarForegroundColor,
-                    )
-                    bottomBarFfiState.value = bottomBarFFI
+                    val bottomBarFFI = BottomBarFFI(bottomBarState)
                     webView.addJavascriptInterface(bottomBarFFI, "bottom_bar")
 
                     val virtualKeyboardFFI = VirtualKeyboardFFI(
@@ -513,10 +395,10 @@ fun DWebView(
                     val layoutDirection = LocalLayoutDirection.current;
                     var start = innerPadding.calculateStartPadding(layoutDirection)
                     var end = innerPadding.calculateEndPadding(layoutDirection)
-                    if (topBarOverlay.value or !topBarEnabled.value) {
+                    if (topBarState.overlay.value or !topBarState.enabled.value) {
                         top = 0.dp;
                     }
-                    if (bottomBarOverlay.value or (bottomBarFFI?.isEnabled != true)) {
+                    if (bottomBarState.overlay.value or !bottomBarState.isEnabled) {
                         bottom = 0.dp
                     }
                     if ((top.value == 0F) and (bottom.value == 0F)) {
@@ -529,12 +411,12 @@ fun DWebView(
 
             //<editor-fold desc="Native UI">
 
-            if (topBarOverlay.value and topBarEnabled.value) TopAppBar()
-            if (bottomBarOverlay.value and (bottomBarFFI?.isEnabled == true)) {
+            if (topBarState.overlay.value and topBarState.enabled.value) TopAppBar()
+            if (bottomBarState.overlay.value and bottomBarState.isEnabled) {
                 Box(
                     contentAlignment = Alignment.BottomCenter,
                     modifier = Modifier.fillMaxSize()
-                ) { MyBottomAppBar() }
+                ) { BottomAppBar() }
             }
 
             jsAlertConfig.value?.openAlertDialog { jsAlertConfig.value = null }

@@ -13,99 +13,88 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.google.gson.JsonDeserializer
 import com.google.gson.reflect.TypeToken
+import org.bfchain.plaoc.dweb.BottomBarState
 import org.bfchain.plaoc.dweb.js.util.*
 
 
 private const val TAG = "BottomBarFFI"
 
 class BottomBarFFI(
-    private val enabled: MutableState<Boolean?>,
-    private val overlay: MutableState<Boolean>,
-    private val height: MutableState<Float?>,
-    private val actions: SnapshotStateList<BottomBarAction>,
-    private val backgroundColor: MutableState<Color>,
-    private val foregroundColor: MutableState<Color>,
+    val state: BottomBarState,
+//
+//    private val height: MutableState<Float?>,
+//    private val actions: SnapshotStateList<BottomBarAction>,
+//    private val backgroundColor: MutableState<Color>,
+//    private val foregroundColor: MutableState<Color>,
 ) {
     @JavascriptInterface
-    fun getEnabled(): Boolean {
-        return if (enabled.value == null) {
-            actions.size > 0
-        } else {
-            enabled.value as Boolean
-        }
-    }
-
-    val isEnabled: Boolean
-        get() {
-            return getEnabled()
-        }
-
+    fun getEnabled() = state.isEnabled
 
     @JavascriptInterface
     fun toggleEnabled(isEnabledInt: BoolInt): Boolean {
         var isEnabled = isEnabledInt.toBooleanOrNull()
-        if (isEnabled == null && enabled.value == null) {
-            isEnabled = !this.isEnabled
+        if (isEnabled == null && state.enabled.value == null) {
+            isEnabled = !state.isEnabled
         }
-        enabled.value = isEnabled
+        state.enabled.value = isEnabled
         Log.i(TAG, "toggleEnabled:${isEnabled}")
         return getEnabled()
     }
 
     @JavascriptInterface
     fun getOverlay(): Boolean {
-        return overlay.value
+        return state.overlay.value
     }
 
     @JavascriptInterface
     fun toggleOverlay(isOverlay: BoolInt): Boolean {
-        overlay.value = isOverlay.toBoolean { !overlay.value }
-        Log.i(TAG, "toggleOverlay:${overlay.value}")
-        return overlay.value
+        state.overlay.value = isOverlay.toBoolean { !state.overlay.value }
+        Log.i(TAG, "toggleOverlay:${state.overlay.value}")
+        return state.overlay.value
     }
 
     @JavascriptInterface
     fun getHeight(): Float {
-        return height.value ?: 0F
+        return state.height.value ?: 0F
     }
 
     @JavascriptInterface
     fun setHeight(heightDp: Float) {
-        height.value = heightDp
+        state.height.value = heightDp
     }
 
 
     @JavascriptInterface
     fun getActions(): DataString<List<BottomBarAction>> {
-        return DataString_From(actions)//.map { action -> toDataString(action) }
+        return DataString_From(state.actions)//.map { action -> toDataString(action) }
     }
 
     @JavascriptInterface
     fun setActions(actionListJson: DataString<List<BottomBarAction>>) {
-        actions.clear()
+        state.actions.clear()
         val actionList = actionListJson.toData<List<BottomBarAction>>(object :
             TypeToken<List<BottomBarAction>>() {}.type);
-        actionList.toCollection(actions)
+        actionList.toCollection(state.actions)
     }
 
     @JavascriptInterface
     fun getBackgroundColor(): Int {
-        return backgroundColor.value.toArgb()
+        return state.backgroundColor.value.toArgb()
     }
 
     @JavascriptInterface
     fun setBackgroundColor(color: ColorInt) {
-        backgroundColor.value = Color(color)
+        state.backgroundColor.value = Color(color)
     }
 
     @JavascriptInterface
     fun getForegroundColor(): Int {
-        return foregroundColor.value.toArgb()
+        return state.foregroundColor.value.toArgb()
     }
 
     @JavascriptInterface
     fun setForegroundColor(color: ColorInt) {
-        foregroundColor.value = Color(color)
+        state.foregroundColor.value = Color(color)
     }
 
     companion object {
