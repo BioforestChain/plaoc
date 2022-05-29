@@ -4,24 +4,19 @@ import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.os.Message
 import android.util.Log
-import android.webkit.JsPromptResult
-import android.webkit.JsResult
-import android.webkit.WebView
+import android.webkit.*
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.contentColorFor
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.primarySurface
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -55,7 +50,8 @@ fun DWebView(
     activity: ComponentActivity,
     modifier: Modifier = Modifier,
     onCreated: (AdAndroidWebView) -> Unit = {},
-) {
+
+    ) {
     val currentView = LocalView.current;
 
     var jsUtil by remember(state) {
@@ -149,15 +145,7 @@ fun DWebView(
     val topBarOverlay = remember {
         mutableStateOf(false)
     }
-    val topBarTitle = remember {
-        mutableStateOf<String?>(null)
-    }
-    val topBarHeight = remember {
-        mutableStateOf(0F)
-    }
-    val topBarActions = remember {
-        mutableStateListOf<TopBarAction>()
-    }
+
     val topBarBackgroundColor = MaterialTheme.colors.primarySurface.let { defaultPrimarySurface ->
         remember {
             mutableStateOf(defaultPrimarySurface)
@@ -175,99 +163,28 @@ fun DWebView(
 
     val localDensity = LocalDensity.current
 
-    val tryLeave = {
+    val presseBack:(() -> Unit) = {
         activity.onBackPressed()
     }
 
-    @Composable
-    fun MyTopAppBar() {
-        CenterAlignedTopAppBar(
-            navigationIcon = {
-                IconButton(
-                    onClick = { tryLeave() },
-                    modifier = Modifier
-//                        .pointerInteropFilter { event ->
-//                            Log.i(TAG, "filter NavigationIcon event $event")
-//                            true
-//                        }
-//                        .clickable {
-//                            Log.i(TAG, "Clicked NavigationIcon")
-//                        }
-                ) {
-                    Icon(Icons.Filled.ArrowBack, "backIcon")
-                }
-            },
-            title = {
-                Text(
-                    text = topBarTitle.value ?: state.pageTitle ?: "",
-                    modifier = Modifier
-//                        .pointerInteropFilter { event ->
-//                            Log.i(TAG, "filter Title event $event")
-//                            false
-//                        }
-//                        .clickable {
-//                            Log.i(TAG, "Clicked Title")
-//                        }
-                )
-            },
-            actions = {
-                if (topBarActions.size > 0) {
-                    for (action in topBarActions) {
-                        IconButton(
-                            onClick = {
-                                jsUtil?.evalQueue { action.onClickCode }
-                            },
-                            enabled = !action.disabled
-                        ) {
-                            DWebIcon(action.icon)
-                        }
-                    }
-                }
-            },
-            colors = @Stable object : TopAppBarColors {
-                @Composable
-                override fun actionIconContentColor(scrollFraction: Float): State<Color> {
-                    return topBarForegroundColor
-                }
-
-                @Composable
-                override fun containerColor(scrollFraction: Float): State<Color> {
-                    return topBarBackgroundColor
-                }
-
-                @Composable
-                override fun navigationIconContentColor(scrollFraction: Float): State<Color> {
-                    return topBarForegroundColor
-                }
-
-                @Composable
-                override fun titleContentColor(scrollFraction: Float): State<Color> {
-                    return topBarForegroundColor
-                }
-            },
-            modifier = Modifier
-//                .graphicsLayer(
-//                    renderEffect = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) createBlurEffect(
-//                        25f,
-//                        25f,
-//                        Shader.TileMode.MIRROR
-//                    ).asComposeRenderEffect() else null
-//                )
-                .onGloballyPositioned { coordinates ->
-                    topBarHeight.value = coordinates.size.height / localDensity.density
-                }
-//                .pointerInteropFilter { event ->
-//                    Log.i(TAG, "filter TopAppBar event $event")
-//
-//                    // false 会穿透，在穿透后，返回按钮也能点击了
-//                    // true 不会穿透，但是返回按钮也无法点击了
-//                    false
-//                }.clickable {
-//                    Log.i(TAG, "Clicked TopAppBar")
-//                }
+    val topBarState =  remember {
+        TopBarState(
+            title = mutableStateOf(null),
+            actions = mutableStateListOf(),
+            foregroundColor = topBarForegroundColor,
+            backgroundColor = topBarBackgroundColor,
+            height = mutableStateOf(0F),
+            doBack = presseBack,
         )
     }
 
+
+    @Composable
+    fun TopAppBar() {
+        DWebTopAppBar(jsUtil, state, topBarState)
+    }
+
+    TopAppBar()
 
     val bottomBarEnabled = remember {
         mutableStateOf<Boolean?>(null)
@@ -358,7 +275,7 @@ fun DWebView(
         modifier = modifier
             .padding(overlayPadding)
             .offset { overlayOffset },
-        topBar = { if (!topBarOverlay.value and topBarEnabled.value) MyTopAppBar() },
+        topBar = { if (!topBarOverlay.value and topBarEnabled.value) TopAppBar() },
         bottomBar = { if (!bottomBarOverlay.value and (bottomBarFFI?.isEnabled == true)) MyBottomAppBar() },
         content = { innerPadding ->
             DWebBackground(innerPadding, hook, activity)
@@ -417,11 +334,7 @@ fun DWebView(
                         { activity.onBackPressed() },
                         topBarEnabled,
                         topBarOverlay,
-                        topBarTitle,
-                        topBarHeight,
-                        topBarActions,
-                        topBarBackgroundColor,
-                        topBarForegroundColor,
+                        topBarState,
                     )
                     webView.addJavascriptInterface(topBarFFI, "top_bar")
 
@@ -457,7 +370,6 @@ fun DWebView(
                 },
                 chromeClient = remember {
                     class MyWebChromeClient : AdWebChromeClient() {
-
                         override fun onCreateWindow(
                             view: WebView?,
                             isDialog: Boolean,
@@ -572,6 +484,29 @@ fun DWebView(
                     }
                     MyWebChromeClient()
                 },
+                client = remember {
+                    class MyWebViewClient : AdWebViewClient() {
+                        override fun shouldInterceptRequest(
+                            view: WebView?,
+                            request: WebResourceRequest?
+                        ): WebResourceResponse? {
+                            Log.i(TAG, "shouldInterceptRequest: ${request?.url}")
+                            return super.shouldInterceptRequest(view, request)
+                        }
+
+                        override fun shouldOverrideUrlLoading(
+                            view: WebView?,
+                            request: WebResourceRequest?
+                        ): Boolean {
+                            Log.i(TAG, "shouldOverrideUrlLoading: ${request?.url}")
+                            if ((request?.url?.host ?: "").endsWith("baidu.com")) {
+//return
+                            }
+                            return super.shouldOverrideUrlLoading(view, request)
+                        }
+                    }
+                    MyWebViewClient()
+                },
                 modifier = Modifier.let { m ->
                     var top = innerPadding.calculateTopPadding()
                     var bottom = innerPadding.calculateBottomPadding()
@@ -594,7 +529,7 @@ fun DWebView(
 
             //<editor-fold desc="Native UI">
 
-            if (topBarOverlay.value and topBarEnabled.value) MyTopAppBar()
+            if (topBarOverlay.value and topBarEnabled.value) TopAppBar()
             if (bottomBarOverlay.value and (bottomBarFFI?.isEnabled == true)) {
                 Box(
                     contentAlignment = Alignment.BottomCenter,

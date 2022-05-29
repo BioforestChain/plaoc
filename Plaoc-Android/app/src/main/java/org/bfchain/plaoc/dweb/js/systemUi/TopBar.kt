@@ -8,6 +8,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.google.gson.JsonDeserializer
 import com.google.gson.reflect.TypeToken
+import org.bfchain.plaoc.dweb.TopBarState
 import org.bfchain.plaoc.dweb.js.util.*
 
 
@@ -17,11 +18,7 @@ class TopBarFFI(
     val onClickBackBotton: () -> Unit,
     val enabled: MutableState<Boolean>,
     val overlay: MutableState<Boolean>,
-    val title: MutableState<String?>,
-    val height: MutableState<Float>,
-    val actions: SnapshotStateList<TopBarAction>,
-    val backgroundColor: MutableState<Color>,
-    val foregroundColor: MutableState<Color>,
+    val topBarState: TopBarState,
 ) {
 
     @JavascriptInterface
@@ -55,56 +52,56 @@ class TopBarFFI(
 
     @JavascriptInterface
     fun getTitle(): String {
-        return title.value ?: ""
+        return topBarState.title.value ?: ""
     }
 
     @JavascriptInterface
     fun hasTitle(): Boolean {
-        return title.value != null
+        return topBarState.title.value != null
     }
 
     @JavascriptInterface
     fun setTitle(str: String) {
-        title.value = str
+        topBarState.title.value = str
     }
 
 
     @JavascriptInterface
     fun getHeight(): Float {
-        return height.value
+        return topBarState.height.value
     }
 
     @JavascriptInterface
     fun getActions(): DataString<List<TopBarAction>> {
-        return DataString_From(actions)//.map { action -> toDataString(action) }
+        return DataString_From(topBarState.actions)//.map { action -> toDataString(action) }
     }
 
     @JavascriptInterface
     fun setActions(actionListJson: DataString<List<TopBarAction>>) {
-        actions.clear()
+        topBarState.actions.clear()
         val actionList = actionListJson.toData<List<TopBarAction>>(object :
             TypeToken<List<TopBarAction>>() {}.type);
-        actionList.toCollection(actions)
+        actionList.toCollection(topBarState.actions)
     }
 
     @JavascriptInterface
     fun getBackgroundColor(): Int {
-        return backgroundColor.value.toArgb()
+        return topBarState.backgroundColor.value.toArgb()
     }
 
     @JavascriptInterface
     fun setBackgroundColor(color: ColorInt) {
-        backgroundColor.value = Color(color)
+        topBarState.backgroundColor.value = Color(color)
     }
 
     @JavascriptInterface
     fun getForegroundColor(): Int {
-        return foregroundColor.value.toArgb()
+        return topBarState.foregroundColor.value.toArgb()
     }
 
     @JavascriptInterface
     fun setForegroundColor(color: ColorInt) {
-        foregroundColor.value = Color(color)
+        topBarState.foregroundColor.value = Color(color)
     }
 
     companion object {
