@@ -1,71 +1,19 @@
-package org.bfchain.plaoc.dweb
+package org.bfchain.plaoc.dweb.topbar
+
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.contentColorFor
-import androidx.compose.material.primarySurface
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
-import org.bfchain.plaoc.dweb.js.systemUi.DWebIcon
-import org.bfchain.plaoc.dweb.js.systemUi.TopBarAction
+import org.bfchain.plaoc.dweb.icon.DWebIcon
 import org.bfchain.plaoc.dweb.js.util.JsUtil
 import org.bfchain.plaoc.webkit.AdWebViewState
-
-@Stable
-class TopBarState(
-    val enabled: MutableState<Boolean>,
-    val overlay: MutableState<Boolean>,
-    val title: MutableState<String?>,
-    val actions: SnapshotStateList<TopBarAction>,
-    val foregroundColor: MutableState<Color>,
-    val backgroundColor: MutableState<Color>,
-    val height: MutableState<Float>,
-    val doBack: () -> Unit,
-) {
-    companion object {
-        @Composable
-        fun Default(doBack: () -> Unit): TopBarState {
-
-            val backgroundColor =
-                MaterialTheme.colors.primarySurface.let { defaultPrimarySurface ->
-                    remember {
-                        mutableStateOf(defaultPrimarySurface)
-                    }
-                }
-            // https://developer.android.com/jetpack/compose/themes/material#emphasis
-            // Material Design 文本易读性建议一文建议通过不同的不透明度来表示不同的重要程度。
-            // TopAppBar 组件内部已经强制写死了 CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high)
-            val foregroundColor =
-                MaterialTheme.colors.contentColorFor(backgroundColor.value)
-                    .let { defaultContentColor ->
-                        remember {
-                            mutableStateOf(defaultContentColor)
-                        }
-                    }
-
-
-            return remember(doBack) {
-                TopBarState(
-                    enabled = mutableStateOf(true),
-                    overlay = mutableStateOf(false),
-                    title = mutableStateOf(null),
-                    actions = mutableStateListOf(),
-                    foregroundColor = foregroundColor,
-                    backgroundColor = backgroundColor,
-                    height = mutableStateOf(0F),
-                    doBack = doBack,
-                )
-            }
-        }
-    }
-
-}
 
 @Composable
 fun DWebTopBar(

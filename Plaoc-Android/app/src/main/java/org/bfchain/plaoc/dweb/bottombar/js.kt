@@ -1,31 +1,25 @@
-package org.bfchain.plaoc.dweb.js.systemUi
+package org.bfchain.plaoc.dweb.bottombar
+
 
 import android.util.Log
 import android.webkit.JavascriptInterface
 import androidx.compose.material3.NavigationBarItemColors
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.google.gson.JsonDeserializer
 import com.google.gson.reflect.TypeToken
-import org.bfchain.plaoc.dweb.BottomBarState
+import org.bfchain.plaoc.dweb.icon.DWebIcon
 import org.bfchain.plaoc.dweb.js.util.*
 
 
 private const val TAG = "BottomBarFFI"
 
 class BottomBarFFI(
-    val state: BottomBarState,
-//
-//    private val height: MutableState<Float?>,
-//    private val actions: SnapshotStateList<BottomBarAction>,
-//    private val backgroundColor: MutableState<Color>,
-//    private val foregroundColor: MutableState<Color>,
+    private val state: BottomBarState,
 ) {
     @JavascriptInterface
     fun getEnabled() = state.isEnabled

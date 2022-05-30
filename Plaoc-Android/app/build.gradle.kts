@@ -54,6 +54,7 @@ android {
 
 dependencies {
 
+    implementation("androidx.annotation:annotation:1.3.0")
     implementation("androidx.core:core-ktx:1.7.0")
     implementation("androidx.compose.ui:ui:$compose_version")
     implementation("androidx.compose.ui:ui-util:$compose_version")

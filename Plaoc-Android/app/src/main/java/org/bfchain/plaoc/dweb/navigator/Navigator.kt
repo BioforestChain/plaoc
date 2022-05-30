@@ -1,4 +1,4 @@
-package org.bfchain.plaoc.dweb.js.navigator
+package org.bfchain.plaoc.dweb.navigator
 
 import android.util.Log
 import android.webkit.JavascriptInterface

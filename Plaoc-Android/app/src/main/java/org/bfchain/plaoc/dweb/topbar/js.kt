@@ -1,4 +1,4 @@
-package org.bfchain.plaoc.dweb.js.systemUi
+package org.bfchain.plaoc.dweb.topbar
 
 import android.util.Log
 import android.webkit.JavascriptInterface
@@ -6,7 +6,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.google.gson.JsonDeserializer
 import com.google.gson.reflect.TypeToken
-import org.bfchain.plaoc.dweb.TopBarState
+import org.bfchain.plaoc.dweb.icon.DWebIcon
 import org.bfchain.plaoc.dweb.js.util.*
 
 

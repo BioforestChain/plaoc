@@ -2,6 +2,7 @@ package org.bfchain.plaoc.dweb
 
 import android.annotation.SuppressLint
 import android.app.ActivityManager
+import android.os.Build
 import android.os.Message
 import android.util.Log
 import android.webkit.*
@@ -9,10 +10,10 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.contentColorFor
-import androidx.compose.material.primarySurface
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -21,15 +22,22 @@ import androidx.compose.ui.graphics.Color.Companion
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import org.bfchain.plaoc.dweb.js.navigator.NavigatorFFI
-import org.bfchain.plaoc.dweb.js.systemUi.*
+import org.bfchain.plaoc.dweb.bottombar.BottomBarFFI
+import org.bfchain.plaoc.dweb.bottombar.BottomBarState
+import org.bfchain.plaoc.dweb.bottombar.DWebBottomBar
+import org.bfchain.plaoc.dweb.dialog.*
+import org.bfchain.plaoc.dweb.navigator.NavigatorFFI
 import org.bfchain.plaoc.dweb.js.util.JsUtil
+import org.bfchain.plaoc.dweb.systemui.SystemUIState
+import org.bfchain.plaoc.dweb.systemui.SystemUiFFI
+import org.bfchain.plaoc.dweb.systemui.js.VirtualKeyboardFFI
+import org.bfchain.plaoc.dweb.topbar.DWebTopBar
+import org.bfchain.plaoc.dweb.topbar.TopBarFFI
+import org.bfchain.plaoc.dweb.topbar.TopBarState
 import org.bfchain.plaoc.webkit.*
 import java.net.URI
 import kotlin.math.min
@@ -49,9 +57,7 @@ fun DWebView(
     activity: ComponentActivity,
     modifier: Modifier = Modifier,
     onCreated: (AdAndroidWebView) -> Unit = {},
-
-    ) {
-    val currentView = LocalView.current;
+) {
 
     var jsUtil by remember(state) {
         mutableStateOf<JsUtil?>(null)
@@ -85,49 +91,30 @@ fun DWebView(
         }
     }
 
-    @Composable
-    fun SetTaskDescription() {
-        var pageTitle by remember {
-            mutableStateOf(state.pageTitle)
-        }
-        var pageIcon by remember {
-            mutableStateOf(state.pageIcon)
-        }
-        if (pageTitle != state.pageTitle || pageIcon != state.pageIcon) {
-            pageTitle = state.pageTitle
-            pageIcon = state.pageIcon
-            activity.runOnUiThread {
-                activity.setTaskDescription(
-                    ActivityManager.TaskDescription(
-                        pageTitle, pageIcon
-                    )
-                )
-            }
-        }
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        SetTaskDescription(state, activity)
     }
-    SetTaskDescription()
 
-    val systemUiController = rememberSystemUiController()
-    val isOverlayStatusBar = remember { mutableStateOf(false) }
-    val isOverlayNavigationBar = remember { mutableStateOf(false) }
+    val systemUIState = SystemUIState.Default(activity)
 
-
-    val isOverlayVirtualKeyboard = remember {
-        mutableStateOf(false)
-    }
     jsUtil?.apply {
-        VirtualKeyboardFFI.InjectVirtualKeyboardVars(
+        VirtualKeyboardFFI.injectVirtualKeyboardVars(
             this,
             LocalDensity.current, LocalLayoutDirection.current,
-            isOverlayVirtualKeyboard.value, WindowInsets.ime,
-            isOverlayNavigationBar.value, WindowInsets.navigationBars,
+            systemUIState.virtualKeyboard.overlay.value, WindowInsets.ime,
+            systemUIState.navigationBar.overlay.value, WindowInsets.navigationBars,
         )
     }
 
 
     var overlayOffset = IntOffset(0, 0);
-    val overlayPadding = WindowInsets.statusBars.let {
-        if (!isOverlayVirtualKeyboard.value && WindowInsets.isImeVisible) {
+    val overlayPadding = WindowInsets(0).let {
+        var res = it;
+        if (!systemUIState.statusBar.overlay.value) {
+            res = res.add(WindowInsets.statusBars)
+        }
+
+        if (!systemUIState.virtualKeyboard.overlay.value && WindowInsets.isImeVisible) {
 //            it.add(WindowInsets.ime) // ime本身就包含了navigationBars的高度
             overlayOffset =
                 IntOffset(
@@ -136,8 +123,10 @@ fun DWebView(
                                 + WindowInsets.navigationBars.getBottom(LocalDensity.current)
                     )
                 )
+        } else if (!systemUIState.navigationBar.overlay.value) {
+            res = res.add(WindowInsets.navigationBars)
         }
-        it.add(WindowInsets.navigationBars)
+        res
     }.asPaddingValues()
 
     Log.i(TAG, "overlayPadding:$overlayPadding")
@@ -216,12 +205,11 @@ fun DWebView(
                         activity,
                         webView,
                         hook,
-                        systemUiController,
                         jsUtil!!,
-                        isOverlayStatusBar,
-                        isOverlayNavigationBar
+                        systemUIState,
                     )
                     webView.addJavascriptInterface(systemUiFFI, "system_ui")
+                    webView.addJavascriptInterface(systemUiFFI.virtualKeyboard, "virtual_keyboard")
 
                     val topBarFFI = TopBarFFI(
                         topBarState,
@@ -231,13 +219,6 @@ fun DWebView(
 
                     val bottomBarFFI = BottomBarFFI(bottomBarState)
                     webView.addJavascriptInterface(bottomBarFFI, "bottom_bar")
-
-                    val virtualKeyboardFFI = VirtualKeyboardFFI(
-                        isOverlayVirtualKeyboard,
-                        activity,
-                        webView,
-                    )
-                    webView.addJavascriptInterface(virtualKeyboardFFI, "virtual_keyboard")
 
                     val dialogFFI = DialogFFI(
                         jsUtil!!,
@@ -271,7 +252,7 @@ fun DWebView(
 
                         }
 
-                        private inline fun getJsDialogTitle(url: String?, label: String): String {
+                        private fun getJsDialogTitle(url: String?, label: String): String {
                             var title = state.pageTitle
                             try {
                                 if (url != null) {
@@ -285,8 +266,8 @@ fun DWebView(
                             return "$title $label"
                         }
 
-                        private inline fun getJsDialogConfirmText() = "确认"
-                        private inline fun getJsDialogCancelText() = "取消"
+                        private fun getJsDialogConfirmText() = "确认"
+                        private fun getJsDialogCancelText() = "取消"
 
                         override fun onJsAlert(
                             view: WebView?,
@@ -411,11 +392,26 @@ fun DWebView(
 
             //<editor-fold desc="Native UI">
 
-            if (topBarState.overlay.value and topBarState.enabled.value) TopAppBar()
+            if (topBarState.overlay.value and topBarState.enabled.value) {
+                Box(
+                    contentAlignment = Alignment.TopCenter,
+                    modifier = if (systemUIState.statusBar.overlay.value) {
+                        with(LocalDensity.current) {
+                            Modifier.offset(y = WindowInsets.statusBars.getTop(this).toDp())
+                        }
+                    } else {
+                        Modifier
+                    }
+                ) {
+                    TopAppBar()
+                }
+            }
             if (bottomBarState.overlay.value and bottomBarState.isEnabled) {
                 Box(
                     contentAlignment = Alignment.BottomCenter,
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize().let {
+                        it
+                    }
                 ) { BottomAppBar() }
             }
 
@@ -466,5 +462,28 @@ private fun DWebBackground(
         Text(text = "也就是说，你可以将一些原生的组件防止在这里，仅仅提供渲染，而Web层提供控制与逻辑执行，比如说游戏的渲染")
         Text(text = "~~~", fontSize = 30.sp)
         Text(text = "又或者，我们也可以制定部分的WebView区域是可控制的，其余的穿透到native层")
+    }
+}
+
+
+@androidx.annotation.RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+@Composable
+inline fun SetTaskDescription(state: AdWebViewState, activity: ComponentActivity) {
+    var pageTitle by remember {
+        mutableStateOf(state.pageTitle)
+    }
+    var pageIcon by remember {
+        mutableStateOf(state.pageIcon)
+    }
+    if (pageTitle != state.pageTitle || pageIcon != state.pageIcon) {
+        pageTitle = state.pageTitle
+        pageIcon = state.pageIcon
+        activity.runOnUiThread {
+            activity.setTaskDescription(
+                ActivityManager.TaskDescription(
+                    pageTitle, pageIcon
+                )
+            )
+        }
     }
 }

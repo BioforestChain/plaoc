@@ -1,4 +1,4 @@
-package org.bfchain.plaoc.dweb.js.systemUi
+package org.bfchain.plaoc.dweb.systemui.js
 
 import android.content.Context
 import android.util.Log
@@ -18,15 +18,15 @@ import org.bfchain.plaoc.dweb.js.util.*
 private const val TAG = "VirtualKeyboardFFI"
 
 class VirtualKeyboardFFI(
-    val overlay: MutableState<Boolean>,
-    val activity: ComponentActivity,
-    val view: View
+    private val overlay: MutableState<Boolean>,
+    private val activity: ComponentActivity,
+    private val view: View
 ) {
 
     companion object {
 
-        val jsVirtualKeyboardNamespace = "virtualKeyboardSafeArea"
-        val cssVirtualKeyboardNamespace = "--virtual-keyboard-safe-area"
+        private const val jsVirtualKeyboardNamespace = "virtualKeyboardSafeArea"
+        private const val cssVirtualKeyboardNamespace = "--virtual-keyboard-safe-area"
 
         data class KeyboardSafeArea(
             val top: Float,
@@ -45,7 +45,7 @@ class VirtualKeyboardFFI(
          *       所以需要通过activity的生命周期，为其进行强制性的重新注入这些变量
          */
         // 注入虚拟键盘相关的js/css变量
-        fun InjectVirtualKeyboardVars(
+        fun injectVirtualKeyboardVars(
             jsUtil: JsUtil,
             density: Density,
             layoutDirection: LayoutDirection,
