@@ -30,14 +30,15 @@ import org.bfchain.plaoc.dweb.bottombar.BottomBarFFI
 import org.bfchain.plaoc.dweb.bottombar.BottomBarState
 import org.bfchain.plaoc.dweb.bottombar.DWebBottomBar
 import org.bfchain.plaoc.dweb.dialog.*
-import org.bfchain.plaoc.dweb.navigator.NavigatorFFI
 import org.bfchain.plaoc.dweb.js.util.JsUtil
+import org.bfchain.plaoc.dweb.navigator.NavigatorFFI
 import org.bfchain.plaoc.dweb.systemui.SystemUIState
 import org.bfchain.plaoc.dweb.systemui.SystemUiFFI
 import org.bfchain.plaoc.dweb.systemui.js.VirtualKeyboardFFI
 import org.bfchain.plaoc.dweb.topbar.DWebTopBar
 import org.bfchain.plaoc.dweb.topbar.TopBarFFI
 import org.bfchain.plaoc.dweb.topbar.TopBarState
+import org.bfchain.plaoc.dweb.urlscheme.CustomUrlScheme
 import org.bfchain.plaoc.webkit.*
 import java.net.URI
 import kotlin.math.min
@@ -55,6 +56,7 @@ fun DWebView(
     state: AdWebViewState,
     navController: NavController,
     activity: ComponentActivity,
+    customUrlScheme: CustomUrlScheme? = null,
     modifier: Modifier = Modifier,
     onCreated: (AdAndroidWebView) -> Unit = {},
 ) {
@@ -134,7 +136,9 @@ fun DWebView(
 
     val presseBack = remember {
         return@remember {
-            activity.onBackPressed()
+            activity.runOnUiThread {
+                activity.onBackPressed()
+            }
         }
     }
 
@@ -349,11 +353,15 @@ fun DWebView(
                 },
                 client = remember {
                     class MyWebViewClient : AdWebViewClient() {
+                        private val ITAG = "$TAG/CUSTOM-SCHEME"
                         override fun shouldInterceptRequest(
                             view: WebView?,
                             request: WebResourceRequest?
                         ): WebResourceResponse? {
-                            Log.i(TAG, "shouldInterceptRequest: ${request?.url}")
+                            Log.i(ITAG, "Intercept Request: ${request?.url}")
+                            if (request !== null && customUrlScheme?.isMatch(request) == true) {
+                                return customUrlScheme.handleRequest(request)
+                            }
                             return super.shouldInterceptRequest(view, request)
                         }
 
@@ -361,9 +369,9 @@ fun DWebView(
                             view: WebView?,
                             request: WebResourceRequest?
                         ): Boolean {
-                            Log.i(TAG, "shouldOverrideUrlLoading: ${request?.url}")
-                            if ((request?.url?.host ?: "").endsWith("baidu.com")) {
-//return
+                            Log.i(ITAG, "Override Url Loading: ${request?.url}")
+                            if (request !== null && customUrlScheme?.isCrossDomain(request) == true) {
+                                return false
                             }
                             return super.shouldOverrideUrlLoading(view, request)
                         }

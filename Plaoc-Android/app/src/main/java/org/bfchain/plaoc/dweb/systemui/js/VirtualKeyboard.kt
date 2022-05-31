@@ -135,8 +135,7 @@ class VirtualKeyboardFFI(
         return overlay.value
     }
 
-
-    val imm by lazy { activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager }
+    private val imm by lazy { activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager }
 
     @JavascriptInterface
     fun show() {

@@ -4,21 +4,15 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.view.WindowCompat
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -26,16 +20,16 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
-import coil.ImageLoader
-import coil.decode.SvgDecoder
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
 import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
+import org.bfchain.plaoc.dweb.urlscheme.CustomUrlScheme
+import org.bfchain.plaoc.dweb.urlscheme.requestHandlerFromAssets
 import org.bfchain.plaoc.ui.theme.PlaocTheme
-import org.bfchain.plaoc.webkit.AdWebViewHook
 import org.bfchain.plaoc.webkit.rememberAdWebViewState
 import java.net.URLDecoder
 import java.net.URLEncoder
+import kotlin.io.path.Path
 
 
 private const val TAG = "DWebViewActivity"
@@ -84,7 +78,8 @@ class DWebViewActivity : ComponentActivity() {
     }
 }
 
-@OptIn(ExperimentalMaterialNavigationApi::class,
+@OptIn(
+    ExperimentalMaterialNavigationApi::class,
     androidx.compose.foundation.layout.ExperimentalLayoutApi::class
 )
 @Composable
@@ -105,14 +100,30 @@ private fun NavFun(activity: ComponentActivity) {
                     uriPattern = "dweb://{url}"
                 })
             ) { entry ->
+                var urlStr = entry.arguments?.getString("url")
+                    .let { it -> URLDecoder.decode(it, "UTF-8") }
+                    ?: "file:///android_asset/demo.html"
+                var customUrlScheme: CustomUrlScheme? = null;
+                // 内建应用的路径
+                val internalAppFilePathPrefix = "file:///android_asset/app/"
+                if (urlStr.startsWith(internalAppFilePathPrefix)) {
+                    val host = Path(urlStr.substring(internalAppFilePathPrefix.length)).getName(0)
+                        .toString()
+                    val assetBasePath = "app/$host/"
 
+                    customUrlScheme = CustomUrlScheme(
+                        "dweb", host,
+                        requestHandlerFromAssets(LocalContext.current.assets, assetBasePath)
+                    )
+                    urlStr =
+                        customUrlScheme.resolveUrl(urlStr.substring(internalAppFilePathPrefix.length + host.length))
+                }
                 DWebView(
-                    state = rememberAdWebViewState(entry.arguments?.getString("url")
-                        .let { it -> URLDecoder.decode(it, "UTF-8") }
-                        ?: "file:///android_asset/demo.html"),
+                    state = rememberAdWebViewState(urlStr),
                     navController = navController,
                     activity = activity,
-                    modifier = Modifier.background(Color.Cyan)
+                    modifier = Modifier.background(Color.Cyan),
+                    customUrlScheme = customUrlScheme,
 //                    modifier = Modifier.padding(innerPadding)
                 ) { webView ->
 //                            webView.addJavascriptInterface()
