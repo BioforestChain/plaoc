@@ -87,7 +87,7 @@ data class JsPromptConfiguration(
                 val jsonObject = json.asJsonObject
                 JsPromptConfiguration(
                     jsonObject["title"]?.asString ?: "",
-                    jsonObject["content"]?.asString ?: "",
+                    jsonObject["label"]?.asString ?: "",
                     jsonObject["defaultValue"]?.asString ?: "",
                     jsonObject["confirmText"]?.asString ?: "",
                     jsonObject["cancelText"]?.asString ?: "",

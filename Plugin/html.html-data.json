@@ -1,0 +1,22 @@
+{
+  "version": 1.1,
+  "tags": [
+    {
+      "name": "dweb-top-bar",
+      "description": "dweb topbar web components",
+      "attributes": [
+        { "name": "title", "description": "title" },
+        { "name": "backgroundColor", "description": "backgroundColor" },
+        { "name": "foregroundColor", "description": "foregroundColor" },
+        {
+          "name": "overlay",
+          "description": "overlay"
+        },
+        {
+          "name": "disabled",
+          "description": "a boolean value that reflects the disabled HTML attribute, which indicates whether the control is disabled."
+        }
+      ]
+    }
+  ]
+}
