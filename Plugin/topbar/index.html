@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nav Demo</title>
+    <script type="module" src="./dist/esm/index.mjs"></script>
+</head>
+<body>
+    <dweb-top-bar id="topbar" title="test"  ></dweb-top-bar>
+    
+    <p>test</p>
+    <button id="settings_title">settings title</button>
+    <script>
+        settings_title.onclick = () => {
+            topbar.setTitle("haha");
+        }
+    </script>
+</body>
+</html>
