@@ -8,14 +8,20 @@
         { "name": "title", "description": "title" },
         { "name": "backgroundColor", "description": "backgroundColor" },
         { "name": "foregroundColor", "description": "foregroundColor" },
-        {
-          "name": "overlay",
-          "description": "overlay"
-        },
+        { "name": "overlay", "description": "overlay" },
         {
           "name": "disabled",
           "description": "a boolean value that reflects the disabled HTML attribute, which indicates whether the control is disabled."
         }
+      ]
+    },
+    {
+      "name": "dweb-bottom-bar",
+      "description": "dweb bottombar web components",
+      "attributes": [
+        { "name": "backgroundColor", "description": "backgroundColor" },
+        { "name": "foregroundColor", "description": "foregroundColor" },
+        { "name": "overlay", "description": "overlay" }
       ]
     }
   ]
