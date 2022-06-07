@@ -13,10 +13,8 @@ export class BfcsTopBar extends HTMLElement {
     this._ffi.back();
   }
 
-  toggleEnabled(isEnabled: boolean) {
-    const enabledInt = isEnabled ? 1 : 0;
-
-    this._ffi.toggleEnabled(enabledInt);
+  toggleEnabled() {
+    this._ffi.toggleEnabled(0);
   }
 
   getEnabled() {
@@ -39,10 +37,8 @@ export class BfcsTopBar extends HTMLElement {
     return this._ffi.getOverlay();
   }
 
-  toggleOverlay(isOverlay: boolean) {
-    const overlayInt = isOverlay ? 1 : 0;
-
-    this._ffi.toggleOverlay(overlayInt);
+  toggleOverlay() {
+    this._ffi.toggleOverlay(0);
   }
 
   getHeight(): number {
@@ -65,12 +61,12 @@ export class BfcsTopBar extends HTMLElement {
     this._ffi.setForegroundColor(color);
   }
 
-  getActions(): string {
-    return this._ffi.getActions();
+  getActions(): Bfcs.TopBarAction[] {
+    return JSON.parse(this._ffi.getActions());
   }
 
-  setActions(action: string) {
-    this._ffi.setActions(action);
+  setActions(actionList: Bfcs.TopBarAction[]) {
+    this._ffi.setActions(JSON.stringify(actionList));
   }
 
   static get observedAttributes() {
@@ -80,31 +76,26 @@ export class BfcsTopBar extends HTMLElement {
       "backgroudColor",
       "foregroundColor",
       "overlay",
+      // "action",
     ];
   }
 
-  attributeChangedCallback(
-    attrName: string,
-    oldVal: Bfcs.ValueType,
-    newVal: Bfcs.ValueType
-  ) {
+  attributeChangedCallback(attrName: string, oldVal: unknown, newVal: unknown) {
     if (attrName === "title") {
       this.setTitle(newVal as string);
     } else if (attrName === "backgroudColor") {
       this.setBackgroundColor(newVal as number);
     } else if (attrName === "foregroundColor") {
       this.setForegroundColor(newVal as number);
+      // } else if (attrName === "action") {
+      //   this.setActions(newVal as Bfcs.TopBarAction[]);
     } else if (attrName === "overlay") {
       if (this.hasAttribute(attrName)) {
-        this.toggleOverlay(true);
-      } else {
-        this.toggleOverlay(false);
+        this._ffi.toggleOverlay(1);
       }
     } else if (attrName === "disabled") {
       if (this.hasAttribute(attrName)) {
-        this.toggleEnabled(false);
-      } else {
-        this.toggleEnabled(true);
+        this._ffi.toggleEnabled(1);
       }
     }
   }

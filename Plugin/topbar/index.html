@@ -6,15 +6,68 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nav Demo</title>
     <script type="module" src="./dist/esm/index.mjs"></script>
+    <style>
+        button {
+            display: block;
+        }
+    </style>
 </head>
 <body>
-    <dweb-top-bar id="topbar" title="test"  ></dweb-top-bar>
+    <dweb-top-bar id="topbar" title="test"></dweb-top-bar>
     
+    <p id="first_action">test</p>
+    <p id="second_action">test</p>
+    <p id="third_action">test</p>
     <p>test</p>
     <button id="settings_title">settings title</button>
+    <button id="toggle_enabled">toggle enabled</button>
+    <button id="settings_backgroundcolor">background color</button>
+    <button id="settings_foregroundcolor">foreground color</button>
+    <button id="toggle_overlay">toggle overlay</button>
+    <button id="back">back</button>
+    <button id="show_action">show action</button>
     <script>
         settings_title.onclick = () => {
             topbar.setTitle("haha");
+        }
+        toggle_enabled.onclick = () => {
+            topbar.toggleEnabled();
+        }
+        settings_backgroundcolor.onclick = () => {
+            topbar.setBackgroundColor(1);
+        }
+        settings_foregroundcolor.onclick = () => {
+            topbar.setForegroundColor(1);
+        }
+        toggle_overlay.onclick = () => {
+            topbar.toggleOverlay();
+        }
+        back.onclick = () => {
+            topbar.back();
+        }
+        show_action.onclick = () => {
+            topbar.setActions([
+                {
+                    icon: { source: "Filled.AddCircle" },
+                    onClickCode:
+                    "first_action.innerHTML = 1+(parseInt(first_action.innerHTML)||0)",
+                },
+                {
+                    icon: { source: "Filled.Add" },
+                    onClickCode:
+                    "second_action.innerHTML = Math.random().toString(36).substring(2)",
+                },
+                {
+                    icon: {
+                    source: new URL(
+                        "./icon/coil_logo_colored.svg",
+                        "http://172.30.95.56:5500/Plaoc-Android/app/src/main/assets/"
+                    ).href,
+                    type: "AssetIcon",
+                    },
+                    onClickCode: "third_action.innerHTML = '100%OK'",
+                },
+            ]);
         }
     </script>
 </body>
