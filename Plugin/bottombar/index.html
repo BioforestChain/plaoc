@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nav Demo</title>
+    <script type="module" src="./dist/esm/index.mjs"></script>
+    <style>
+        button {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+
+    <p>test</p>
+    <button id="settings_backgroundcolor">background color</button>
+    <button id="settings_foregroundcolor">foreground color</button>
+    <button id="toggle_overlay">toggle overlay</button>
+    <button id="toggle_enabled">toggle enabled</button>
+    <button id="show_action">show action</button>
+
+    <p id="first_action">test</p>
+    <p id="second_action">test</p>
+    <p id="third_action">test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <dweb-bottom-bar id="bottombar" overlay></dweb-bottom-bar>
+    <script>
+        settings_backgroundcolor.onclick = () => {
+            bottombar.setBackgroundColor(1);
+        }
+        settings_foregroundcolor.onclick = () => {
+            bottombar.setForegroundColor(1);
+        }
+        toggle_overlay.onclick = () => {
+            bottombar.toggleOverlay();
+        }
+        toggle_enabled.onclick = () => {
+            bottombar.toggleEnabled();
+        }
+        show_action.onclick = () => {
+            bottombar.setActions([{
+                    icon: {
+                        source: "Filled.AddCircle"
+                    },
+                    onClickCode: "first_action.innerHTML = 1+(parseInt(first_action.innerHTML)||0)",
+                    label: "add",
+                    selected: true,
+                    colors: {
+                        textColor: 0xffaa0000,
+                        textColorSelected: 0xaa00ff00,
+                        iconColor: 0xffaa0000,
+                        iconColorSelected: 0xaa00ff00,
+                    },
+                },
+                {
+                    icon: {
+                        source: new URL(
+                            "./icon/ico_bottom_tab_publisher.svg",
+                            "http://172.30.95.56:5500/Plaoc-Android/app/src/main/assets/"
+                        ).href,
+                        type: "AssetIcon",
+                        size: 50,
+                    },
+                    selectable: false,
+                    onClickCode: "second_action.innerHTML = '100%OK'",
+                },
+                {
+                    icon: {
+                        source: "Filled.Add"
+                    },
+                    onClickCode: "third_action.innerHTML = Math.random().toString(36).substring(2)",
+                    label: "add",
+                    colors: {
+                        indicatorColor: 0xdd0000ff,
+                    },
+                },
+            ]);
+        }
+    </script>
+</body>
+
+</html>
