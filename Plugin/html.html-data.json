@@ -23,6 +23,11 @@
         { "name": "foregroundColor", "description": "foregroundColor" },
         { "name": "overlay", "description": "overlay" }
       ]
+    },
+    {
+      "name": "dweb-keyboard",
+      "description": "dweb keyboard web components",
+      "attributes": [{ "name": "overlay", "description": "overlay" }]
     }
   ]
 }

@@ -16,7 +16,10 @@ class Boot(private val activity: ComponentActivity) {
             1,
             setOf(),
             "index",
-            mapOf("index" to ManifestEntry("http://172.30.93.161:8080/index.html"))
+            // mapOf("index" to ManifestEntry("http://172.30.93.161:8080/index.html"))
+            // mapOf("index" to ManifestEntry("http://172.30.95.56:5500/Plugin/topbar/index.html"))
+            // mapOf("index" to ManifestEntry("http://172.30.95.56:5500/Plugin/bottombar/index.html"))
+            mapOf("index" to ManifestEntry("http://172.30.95.56:5500/Plugin/keyboard/index.html"))
         )
         val gson = Gson();
         Log.i(TAG, gson.toJson(app))
