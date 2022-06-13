@@ -6,12 +6,12 @@ plugins {
 val compose_version = "1.2.0-alpha08"
 
 android {
-    compileSdk = 32
+    compileSdk = 33
 
     defaultConfig {
         applicationId = "org.bfchain.plaoc"
         minSdk = 28
-        targetSdk = 32
+        targetSdk = 33
         versionCode = 1
         versionName = "1.0"
 

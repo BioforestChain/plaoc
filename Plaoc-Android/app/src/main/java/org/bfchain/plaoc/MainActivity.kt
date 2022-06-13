@@ -235,42 +235,29 @@ private fun Profile(navController: NavController, activity: ComponentActivity) {
     val context = LocalContext.current
     MyScaffold(navController, "QrCodeScanner") { modifier ->
         Column(modifier = modifier) {
-            Button(onClick = { navController.navigate("qrcode") }) {
-                Text(text = "qrcode scanner")
-            }
+//            Button(onClick = { navController.navigate("qrcode") }) {
+//                Text(text = "qrcode scanner")
+//            }
+//            Button(onClick = {
+//                navController.navigate("friendslist") {
+//                    popUpTo("home")
+//                }
+//            }) {
+//                Text(text = "Navigate next")
+//            }
+//            Button(onClick = {
+//                val bfs = Boot(activity);
+//            }) {
+//                Text(text = "Start BFS")
+//            }
             Button(onClick = {
-                navController.navigate("friendslist") {
-                    popUpTo("home")
-                }
-            }) {
-                Text(text = "Navigate next")
-            }
-            Button(onClick = {
-//                val intent = Intent(
-//                    Intent.ACTION_PICK,
-//                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-//                startActivityForResult(activity, intent, IntentUtil.instance.openImageGalleryCode);
-
-            }) {
-                Text(text = "选择图片")
-            }
-            Button(onClick = {
-                val bfs = Boot(activity);
-            }) {
-                Text(text = "Start BFS")
-            }
-            Button(onClick = {
-
                 openDWebWindow(activity = activity, url = "file:///android_asset/example.html")
-
                 Log.i(TAG, "startActivity!!!")
             }) {
                 Text(text = "Go Web Example")
             }
             Button(onClick = {
-
                 openDWebWindow(activity = activity, url = "file:///android_asset/statusbar.html")
-
                 Log.i(TAG, "startActivity!!!")
             }) {
                 Text(text = "Go Web StatusBar")
