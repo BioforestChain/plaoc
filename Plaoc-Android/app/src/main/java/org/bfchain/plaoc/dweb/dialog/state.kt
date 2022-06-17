@@ -123,14 +123,14 @@ data class JsConfirmConfiguration(
     companion object {
         operator fun invoke(
             title: String,
-            label: String,
+            message: String,
             confirmText: String,
             cancelText: String,
             dismissOnBackPress: Boolean? = null,
             dismissOnClickOutside: Boolean? = null,
         ) = JsConfirmConfiguration(
             title,
-            label,
+            message,
             confirmText,
             cancelText,
             dismissOnBackPress ?: true,
@@ -142,7 +142,7 @@ data class JsConfirmConfiguration(
                 val jsonObject = json.asJsonObject
                 JsConfirmConfiguration(
                     jsonObject["title"]?.asString ?: "",
-                    jsonObject["content"]?.asString ?: "",
+                    jsonObject["message"]?.asString ?: "",
                     jsonObject["confirmText"]?.asString ?: "",
                     jsonObject["cancelText"]?.asString ?: "",
                     jsonObject["dismissOnBackPress"]?.asBoolean,
