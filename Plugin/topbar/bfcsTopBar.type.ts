@@ -1,4 +1,4 @@
-declare namespace Bfcs {
+declare namespace Plaoc {
   type TopBarFFI = {
     back(): void;
     getEnabled(): boolean;
@@ -19,23 +19,11 @@ declare namespace Bfcs {
 
   type DataString<T> = string;
 
-  enum IconType {
-    NamedIcon = "NamedIcon",
-    AssetIcon = "AssetIcon",
-  }
-
-  interface DwebIcon {
-    source: string;
-    type: IconType;
-    description?: string;
-    size?: number;
-  }
-
   interface TopBarAction {
-    icon: DwebIcon;
+    icon: Plaoc.IPlaocIcon;
     onClickCode: string;
-    disabled: boolean;
+    disabled?: boolean;
   }
 }
 
-declare const top_bar: Bfcs.TopBarFFI;
+declare const top_bar: Plaoc.TopBarFFI;
