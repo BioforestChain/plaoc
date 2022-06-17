@@ -1,3 +1,8 @@
 .DS_Store
 .*.bak
 # .vscode
+.bfsw
+node_modules
+yarn.lock
+package.json
+tsconfig.json

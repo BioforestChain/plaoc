@@ -4,14 +4,44 @@
     {
       "name": "dweb-top-bar",
       "description": "dweb topbar web components",
+      "ts": {
+        "extends": "HTMLDialogElement"
+      },
+      "references": [
+        {
+          "name": "dweb-top-bar reference",
+          "url": "https://github.com/BioforestChain/plaoc"
+        }
+      ],
       "attributes": [
         { "name": "title", "description": "title" },
         { "name": "backgroundColor", "description": "backgroundColor" },
         { "name": "foregroundColor", "description": "foregroundColor" },
-        { "name": "overlay", "description": "overlay" },
+        { "name": "overlay", "description": "overlay", "valueSet": "v" },
         {
           "name": "disabled",
-          "description": "a boolean value that reflects the disabled HTML attribute, which indicates whether the control is disabled."
+          "description": {
+            "kind": "markdown",
+            "value": "a boolean value that reflects the disabled HTML attribute, which indicates whether the control is disabled."
+          },
+          "valueSet": "v"
+        }
+      ]
+    },
+    {
+      "name": "dweb-top-bar-button",
+      "description": "dweb topbar button web components",
+      "ts": {
+        "extends": "HTMLDialogElement"
+      },
+      "attributes": [
+        {
+          "name": "disabled",
+          "description": {
+            "kind": "markdown",
+            "value": "a boolean value that reflects the disabled HTML attribute, which indicates whether the control is disabled."
+          },
+          "valueSet": "v"
         }
       ]
     },
@@ -21,13 +51,37 @@
       "attributes": [
         { "name": "backgroundColor", "description": "backgroundColor" },
         { "name": "foregroundColor", "description": "foregroundColor" },
-        { "name": "overlay", "description": "overlay" }
+        { "name": "overlay", "description": "overlay", "valueSet": "v" }
       ]
     },
     {
-      "name": "dweb-keyboard",
-      "description": "dweb keyboard web components",
-      "attributes": [{ "name": "overlay", "description": "overlay" }]
+      "name": "dweb-icon",
+      "description": "dweb icon web components",
+      "attributes": [
+        {
+          "name": "source",
+          "description": {
+            "kind": "markdown",
+            "value": ""
+          }
+        },
+        {
+          "name": "type",
+          "description": {
+            "kind": "markdown",
+            "value": "NamedIcon or AssetIcon"
+          }
+        },
+        {
+          "name": "description",
+          "description": "description"
+        },
+        {
+          "name": "size",
+          "description": "set icon size"
+        }
+      ]
     }
-  ]
+  ],
+  "valueSets": []
 }
