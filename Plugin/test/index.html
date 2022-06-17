@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nav Demo</title>
+    <script type="module" src="./dist/esm/test/index.mjs"></script>
+    <style>
+        button {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <dweb-top-bar id="topbar" title="test">
+        <dweb-top-bar-button id="aaa">
+            <dweb-icon source="Filled.AddCircle"></dweb-icon>
+        </dweb-top-bar-button>
+        <dweb-top-bar-button id="bbb" disabled>
+            <dweb-icon source="Filled.Add" size="20"></dweb-icon>
+        </dweb-top-bar-button>
+        <dweb-top-bar-button id="ccc">
+            <dweb-icon source="http://172.30.95.56:5500/Plaoc-Android/app/src/main/assets/icon/coil_logo_colored.svg" type="AssetIcon"></dweb-icon>
+        </dweb-top-bar-button>
+    </dweb-top-bar>
+    <div id="content">
+        <p>test</p>
+    </div>
+    <script>
+        aaa.onclick = async () => {
+            content.innerHTML = "content";
+            alert(1);
+            await topbar.setTitle("title");
+        }
+    </script>
+</body>
+</html>
