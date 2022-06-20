@@ -20,7 +20,6 @@ export class BfcsTopBar extends HTMLElement {
       childList: true,
       attributes: true,
       attributeFilter: [
-        "action",
         "disabled",
         "icon",
         "type",
@@ -101,32 +100,47 @@ export class BfcsTopBar extends HTMLElement {
     });
   }
 
-  getBackgroundColor(): Promise<number> {
-    return new Promise<number>((resolve, reject) => {
-      const color = this._ffi.getBackgroundColor();
+  getColorInt(color: string = "#ffffff", opacity: number = 0.5) {
+    return parseInt(color.slice(1), 16) + ((opacity * 255) << (8 * 3));
+  }
 
-      resolve(color);
+  getBackgroundColor(): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      const color = this._ffi.getBackgroundColor();
+      const colorHex = "#" + color.toString(16).slice(2);
+
+      resolve(colorHex);
     });
   }
 
-  setBackgroundColor(color: number): Promise<void> {
+  setBackgroundColor(colorHex: string = "#ffffff"): Promise<void> {
     return new Promise<void>((resolve, reject) => {
+      const opacity = this.getAttribute("opacity")
+        ? parseFloat(this.getAttribute("opacity")!)
+        : 0.5;
+      const color = this.getColorInt(colorHex, opacity);
       this._ffi.setBackgroundColor(color);
 
       resolve();
     });
   }
 
-  getForegroundColor(): Promise<number> {
-    return new Promise<number>((resolve, reject) => {
+  getForegroundColor(): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
       const color = this._ffi.getForegroundColor();
+      const colorHex = "#" + color.toString(16).slice(2);
 
-      resolve(color);
+      resolve(colorHex);
     });
   }
 
-  setForegroundColor(color: number): Promise<void> {
+  setForegroundColor(colorHex: string = "#ffffff"): Promise<void> {
     return new Promise<void>((resolve, reject) => {
+      const opacity = this.getAttribute("opacity")
+        ? parseFloat(this.getAttribute("opacity")!)
+        : 0.5;
+      const color = this.getColorInt(colorHex, opacity);
+
       this._ffi.setForegroundColor(color);
 
       resolve();
@@ -208,6 +222,7 @@ export class BfcsTopBar extends HTMLElement {
       "backgroudColor",
       "foregroundColor",
       "overlay",
+      "opacity",
     ];
   }
 
@@ -215,9 +230,9 @@ export class BfcsTopBar extends HTMLElement {
     if (attrName === "title") {
       this.setTitle(newVal as string);
     } else if (attrName === "backgroudColor") {
-      this.setBackgroundColor(newVal as number);
+      this.setBackgroundColor(newVal as string);
     } else if (attrName === "foregroundColor") {
-      this.setForegroundColor(newVal as number);
+      this.setForegroundColor(newVal as string);
     } else if (attrName === "overlay") {
       if (this.hasAttribute(attrName)) {
         this._ffi.toggleOverlay(1);

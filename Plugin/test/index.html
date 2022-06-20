@@ -13,6 +13,9 @@
     </style>
 </head>
 <body>
+    <dweb-status-bar>
+        <dweb-status-bar-color id="sss" darkicons="0" colorhex="#ff0000" opacity="0.5"></dweb-status-bar-color>
+    </dweb-status-bar>
     <dweb-top-bar id="topbar" title="test">
         <dweb-top-bar-button id="aaa">
             <dweb-icon source="Filled.AddCircle"></dweb-icon>
@@ -57,6 +60,8 @@
         ddd.onclick = async () => {
             content.innerHTML = "bottom";
             alert(2);
+            await topbar.setBackgroundColor("#ff0000");
+            alert(await topbar.getBackgroundColor());
         }
     </script>
 </body>

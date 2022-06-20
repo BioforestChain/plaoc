@@ -10,10 +10,10 @@ import icon from "./icon/#bfsp";
 export default defineWorkspace(() => {
   const config: Bfsw.Workspace = {
     projects: [
-      // bottombar,
+      bottombar,
       // dialogs,
       // keyboard,
-      // statusbar,
+      statusbar,
       topbar,
       icon,
     ],

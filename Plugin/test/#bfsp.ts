@@ -9,6 +9,7 @@ export default defineConfig((info) => {
       "@plaoc/plugin-icon",
       "@plaoc/plugin-top-bar",
       "@plaoc/plugin-bottom-bar",
+      "@plaoc/plugin-status-bar",
     ],
     packageJson: {
       license: "MIT",

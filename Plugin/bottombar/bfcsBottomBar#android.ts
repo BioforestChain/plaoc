@@ -69,32 +69,46 @@ export class BfcsBottomBar extends HTMLElement {
     });
   }
 
-  getBackgroundColor(): Promise<number> {
-    return new Promise<number>((resolve, reject) => {
-      const colorInt = this._ffi.getBackgroundColor();
+  getColorInt(color: string = "#ffffff", opacity: number = 0.5) {
+    return parseInt(color.slice(1), 16) + ((opacity * 255) << (8 * 3));
+  }
 
-      resolve(colorInt);
+  getBackgroundColor(): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      const color = this._ffi.getBackgroundColor();
+      const colorHex = "#" + color.toString(16).slice(2);
+
+      resolve(colorHex);
     });
   }
 
-  setBackgroundColor(color: number): Promise<void> {
+  setBackgroundColor(colorHex: string = "#ffffff"): Promise<void> {
     return new Promise<void>((resolve, reject) => {
+      const opacity = this.getAttribute("opacity")
+        ? parseFloat(this.getAttribute("opacity")!)
+        : 0.5;
+      const color = this.getColorInt(colorHex, opacity);
       this._ffi.setBackgroundColor(color);
 
       resolve();
     });
   }
 
-  getForegroundColor(): Promise<number> {
-    return new Promise<number>((resolve, reject) => {
-      const colorInt = this._ffi.getForegroundColor();
+  getForegroundColor(): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      const color = this._ffi.getForegroundColor();
+      const colorHex = "#" + color.toString(16).slice(2);
 
-      resolve(colorInt);
+      resolve(colorHex);
     });
   }
 
-  setForegroundColor(color: number): Promise<void> {
+  setForegroundColor(colorHex: string = "#ffffff"): Promise<void> {
     return new Promise<void>((resolve, reject) => {
+      const opacity = this.getAttribute("opacity")
+        ? parseFloat(this.getAttribute("opacity")!)
+        : 0.5;
+      const color = this.getColorInt(colorHex, opacity);
       this._ffi.setForegroundColor(color);
 
       resolve();
@@ -179,14 +193,15 @@ export class BfcsBottomBar extends HTMLElement {
       "foregroundColor",
       "overlay",
       "height",
+      "opacity",
     ];
   }
 
   attributeChangedCallback(attrName: string, oldVal: unknown, newVal: unknown) {
     if (attrName === "backgroudColor") {
-      this.setBackgroundColor(newVal as number);
+      this.setBackgroundColor(newVal as string);
     } else if (attrName === "foregroundColor") {
-      this.setForegroundColor(newVal as number);
+      this.setForegroundColor(newVal as string);
     } else if (attrName === "height") {
       this.setHeight(newVal as number);
     } else if (attrName === "overlay") {

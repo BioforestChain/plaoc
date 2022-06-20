@@ -17,6 +17,7 @@
         { "name": "title", "description": "title" },
         { "name": "backgroundColor", "description": "backgroundColor" },
         { "name": "foregroundColor", "description": "foregroundColor" },
+        { "name": "opacity", "description": "opacity" },
         { "name": "overlay", "description": "overlay", "valueSet": "v" },
         {
           "name": "disabled",
@@ -52,7 +53,8 @@
         { "name": "backgroundColor", "description": "backgroundColor" },
         { "name": "foregroundColor", "description": "foregroundColor" },
         { "name": "overlay", "description": "overlay", "valueSet": "v" },
-        { "name": "height", "description": "height", "valueSet": "v" }
+        { "name": "height", "description": "height", "valueSet": "v" },
+        { "name": "opacity", "description": "opacity" }
       ]
     },
     {
@@ -121,6 +123,23 @@
           "name": "size",
           "description": "set icon size"
         }
+      ]
+    },
+    {
+      "name": "dweb-status-bar",
+      "description": "dweb status bar web components",
+      "attributes": [
+        { "name": "overlay", "description": "overlay", "valueSet": "v" },
+        { "name": "hidden", "description": "hidden", "valueSet": "v" }
+      ]
+    },
+    {
+      "name": "dweb-status-bar-color",
+      "description": "dweb status bar color web components",
+      "attributes": [
+        { "name": "color", "description": "color" },
+        { "name": "opacity", "description": "opacity" },
+        { "name": "darkicons", "description": "darkicons" }
       ]
     }
   ],
