@@ -47,11 +47,52 @@
     },
     {
       "name": "dweb-bottom-bar",
-      "description": "dweb bottombar web components",
+      "description": "dweb bottom bar web components",
       "attributes": [
         { "name": "backgroundColor", "description": "backgroundColor" },
         { "name": "foregroundColor", "description": "foregroundColor" },
-        { "name": "overlay", "description": "overlay", "valueSet": "v" }
+        { "name": "overlay", "description": "overlay", "valueSet": "v" },
+        { "name": "height", "description": "height", "valueSet": "v" }
+      ]
+    },
+    {
+      "name": "dweb-bottom-bar-button",
+      "description": "dweb bottom bar button web components",
+      "ts": {
+        "extends": "HTMLDialogElement"
+      },
+      "attributes": [
+        {
+          "name": "disabled",
+          "description": {
+            "kind": "markdown",
+            "value": "a boolean value that reflects the disabled HTML attribute, which indicates whether the control is disabled."
+          },
+          "valueSet": "v"
+        },
+        {
+          "name": "selected",
+          "description": {
+            "kind": "markdown",
+            "value": "selected"
+          },
+          "valueSet": "v"
+        },
+        {
+          "name": "selectable",
+          "description": {
+            "kind": "markdown",
+            "value": "selectable"
+          },
+          "valueSet": "v"
+        },
+        {
+          "name": "colors",
+          "description": {
+            "kind": "markdown",
+            "value": "colors"
+          }
+        }
       ]
     },
     {

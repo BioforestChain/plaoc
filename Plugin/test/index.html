@@ -27,11 +27,36 @@
     <div id="content">
         <p>test</p>
     </div>
+    <dweb-bottom-bar id="bottom_bar">
+        <dweb-bottom-bar-button id="ddd" selectable>
+            <dweb-icon source="Filled.AddCircle"></dweb-icon>
+        </dweb-bottom-bar-button>
+        <dweb-bottom-bar-button disabled>
+            <dweb-icon source="http://172.30.95.56:5500/Plaoc-Android/app/src/main/assets/icon/ico_bottom_tab_publisher.svg" type="AssetIcon"></dweb-icon>
+        </dweb-bottom-bar-button>
+        <dweb-bottom-bar-button selected selectable>
+            <dweb-icon source="Filled.Add"></dweb-icon>
+        </dweb-bottom-bar-button>
+    </dweb-bottom-bar>
     <script>
         aaa.onclick = async () => {
             content.innerHTML = "content";
             alert(1);
             await topbar.setTitle("title");
+        }
+
+        let colors = {
+            textColor: 0xffaa0000,
+            textColorSelected: 0xaa00ff00,
+            iconColor: 0xffaa0000,
+            iconColorSelected: 0xaa00ff00,
+        };
+
+        ddd.setAttribute("colors", JSON.stringify(colors));
+
+        ddd.onclick = async () => {
+            content.innerHTML = "bottom";
+            alert(2);
         }
     </script>
 </body>

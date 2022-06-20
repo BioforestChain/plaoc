@@ -5,7 +5,11 @@ export default defineConfig((info) => {
     exports: {
       ".": "./index.ts",
     },
-    deps: ["@plaoc/plugin-icon", "@plaoc/plugin-top-bar"],
+    deps: [
+      "@plaoc/plugin-icon",
+      "@plaoc/plugin-top-bar",
+      "@plaoc/plugin-bottom-bar",
+    ],
     packageJson: {
       license: "MIT",
       author: "bnqkl",
