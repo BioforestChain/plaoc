@@ -6,6 +6,7 @@ export default defineConfig((info) => {
     exports: {
       ".": "./index.ts",
     },
+    deps: ["@plaoc/plugin-icon"],
     packageJson: {
       license: "MIT",
       author: "bnqkl",

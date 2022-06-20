@@ -1,4 +1,4 @@
-declare namespace Bfcs {
+declare namespace Plaoc {
   type BottomBarFFI = {
     getEnabled(): boolean;
     toggleEnabled(isEnabled: number): void;
@@ -16,18 +16,6 @@ declare namespace Bfcs {
 
   type DataString<T> = string;
 
-  interface DwebIcon {
-    source: string;
-    type: IconType;
-    description?: string;
-    size?: number;
-  }
-
-  enum IconType {
-    NamedIcon = "NamedIcon",
-    AssetIcon = "AssetIcon",
-  }
-
   interface Colors {
     indicatorColor?: number;
     iconColor?: number;
@@ -37,14 +25,14 @@ declare namespace Bfcs {
   }
 
   interface BottomBarAction {
-    icon: DwebIcon;
+    icon: Plaoc.IPlaocIcon;
     onClickCode: string;
-    label: string;
-    selected: boolean;
-    selectable: boolean;
-    disabled: boolean;
-    color?: Colors;
+    label?: string;
+    selected?: boolean;
+    selectable?: boolean;
+    disabled?: boolean;
+    colors?: Colors;
   }
 }
 
-declare const bottom_bar: Bfcs.BottomBarFFI;
+declare const bottom_bar: Plaoc.BottomBarFFI;
