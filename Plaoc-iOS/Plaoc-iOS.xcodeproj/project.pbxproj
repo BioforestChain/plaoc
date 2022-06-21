@@ -1,0 +1,669 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 55;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0419F102286051B200EF8DC2 /* WebViewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0419F101286051B200EF8DC2 /* WebViewViewController.swift */; };
+		0419F106286051F500EF8DC2 /* UIView_extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0419F104286051F500EF8DC2 /* UIView_extension.swift */; };
+		0419F107286051F500EF8DC2 /* UIDevice_extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0419F105286051F500EF8DC2 /* UIDevice_extension.swift */; };
+		0419F1092860560400EF8DC2 /* CustomNaviViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0419F1082860560400EF8DC2 /* CustomNaviViewController.swift */; };
+		0419F10C2860564300EF8DC2 /* example.html in Resources */ = {isa = PBXBuildFile; fileRef = 0419F10A2860564300EF8DC2 /* example.html */; };
+		0419F10D2860564300EF8DC2 /* statusbar.html in Resources */ = {isa = PBXBuildFile; fileRef = 0419F10B2860564300EF8DC2 /* statusbar.html */; };
+		04BC499A2858758E003FE6D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04BC49992858758E003FE6D9 /* AppDelegate.swift */; };
+		04BC499E2858758E003FE6D9 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04BC499D2858758E003FE6D9 /* ViewController.swift */; };
+		04BC49A12858758E003FE6D9 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 04BC499F2858758E003FE6D9 /* Main.storyboard */; };
+		04BC49A328587590003FE6D9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 04BC49A228587590003FE6D9 /* Assets.xcassets */; };
+		04BC49A628587590003FE6D9 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 04BC49A428587590003FE6D9 /* LaunchScreen.storyboard */; };
+		04BC49B128587591003FE6D9 /* Plaoc_iOSTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04BC49B028587591003FE6D9 /* Plaoc_iOSTests.swift */; };
+		04BC49BB28587591003FE6D9 /* Plaoc_iOSUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04BC49BA28587591003FE6D9 /* Plaoc_iOSUITests.swift */; };
+		04BC49BD28587591003FE6D9 /* Plaoc_iOSUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04BC49BC28587591003FE6D9 /* Plaoc_iOSUITestsLaunchTests.swift */; };
+		04BC49CA285875B6003FE6D9 /* CustomWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04BC49C9285875B6003FE6D9 /* CustomWebView.swift */; };
+		04BC49CD2858768E003FE6D9 /* LeadScriptHandle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04BC49CB2858768E003FE6D9 /* LeadScriptHandle.swift */; };
+		04BC49CE2858768E003FE6D9 /* LeadReplyHandle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04BC49CC2858768E003FE6D9 /* LeadReplyHandle.swift */; };
+		04D022662860514C0018716E /* StatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D022632860514C0018716E /* StatusView.swift */; };
+		04D022672860514C0018716E /* BottomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D022642860514C0018716E /* BottomView.swift */; };
+		04D022682860514C0018716E /* NaviView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D022652860514C0018716E /* NaviView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		04BC49AD28587591003FE6D9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 04BC498E2858758E003FE6D9 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 04BC49952858758E003FE6D9;
+			remoteInfo = "Plaoc-iOS";
+		};
+		04BC49B728587591003FE6D9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 04BC498E2858758E003FE6D9 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 04BC49952858758E003FE6D9;
+			remoteInfo = "Plaoc-iOS";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		0419F101286051B200EF8DC2 /* WebViewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewViewController.swift; sourceTree = "<group>"; };
+		0419F104286051F500EF8DC2 /* UIView_extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIView_extension.swift; sourceTree = "<group>"; };
+		0419F105286051F500EF8DC2 /* UIDevice_extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIDevice_extension.swift; sourceTree = "<group>"; };
+		0419F1082860560400EF8DC2 /* CustomNaviViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomNaviViewController.swift; sourceTree = "<group>"; };
+		0419F10A2860564300EF8DC2 /* example.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = example.html; sourceTree = "<group>"; };
+		0419F10B2860564300EF8DC2 /* statusbar.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = statusbar.html; sourceTree = "<group>"; };
+		04BC49962858758E003FE6D9 /* Plaoc-iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Plaoc-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		04BC49992858758E003FE6D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		04BC499D2858758E003FE6D9 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		04BC49A02858758E003FE6D9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		04BC49A228587590003FE6D9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		04BC49A528587590003FE6D9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		04BC49A728587590003FE6D9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		04BC49AC28587591003FE6D9 /* Plaoc-iOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Plaoc-iOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		04BC49B028587591003FE6D9 /* Plaoc_iOSTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Plaoc_iOSTests.swift; sourceTree = "<group>"; };
+		04BC49B628587591003FE6D9 /* Plaoc-iOSUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Plaoc-iOSUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		04BC49BA28587591003FE6D9 /* Plaoc_iOSUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Plaoc_iOSUITests.swift; sourceTree = "<group>"; };
+		04BC49BC28587591003FE6D9 /* Plaoc_iOSUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Plaoc_iOSUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		04BC49C9285875B6003FE6D9 /* CustomWebView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomWebView.swift; sourceTree = "<group>"; };
+		04BC49CB2858768E003FE6D9 /* LeadScriptHandle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LeadScriptHandle.swift; sourceTree = "<group>"; };
+		04BC49CC2858768E003FE6D9 /* LeadReplyHandle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LeadReplyHandle.swift; sourceTree = "<group>"; };
+		04D022632860514C0018716E /* StatusView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatusView.swift; sourceTree = "<group>"; };
+		04D022642860514C0018716E /* BottomView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BottomView.swift; sourceTree = "<group>"; };
+		04D022652860514C0018716E /* NaviView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NaviView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		04BC49932858758E003FE6D9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		04BC49A928587591003FE6D9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		04BC49B328587591003FE6D9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		0419F103286051D700EF8DC2 /* extension */ = {
+			isa = PBXGroup;
+			children = (
+				0419F105286051F500EF8DC2 /* UIDevice_extension.swift */,
+				0419F104286051F500EF8DC2 /* UIView_extension.swift */,
+			);
+			path = extension;
+			sourceTree = "<group>";
+		};
+		04BC498D2858758E003FE6D9 = {
+			isa = PBXGroup;
+			children = (
+				04BC49982858758E003FE6D9 /* Plaoc-iOS */,
+				04BC49AF28587591003FE6D9 /* Plaoc-iOSTests */,
+				04BC49B928587591003FE6D9 /* Plaoc-iOSUITests */,
+				04BC49972858758E003FE6D9 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		04BC49972858758E003FE6D9 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				04BC49962858758E003FE6D9 /* Plaoc-iOS.app */,
+				04BC49AC28587591003FE6D9 /* Plaoc-iOSTests.xctest */,
+				04BC49B628587591003FE6D9 /* Plaoc-iOSUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		04BC49982858758E003FE6D9 /* Plaoc-iOS */ = {
+			isa = PBXGroup;
+			children = (
+				0419F103286051D700EF8DC2 /* extension */,
+				04D02262286051170018716E /* customView */,
+				04D0225B28604FF70018716E /* jsFile */,
+				04BC49CC2858768E003FE6D9 /* LeadReplyHandle.swift */,
+				04BC49CB2858768E003FE6D9 /* LeadScriptHandle.swift */,
+				04BC49C9285875B6003FE6D9 /* CustomWebView.swift */,
+				04BC49992858758E003FE6D9 /* AppDelegate.swift */,
+				04BC499D2858758E003FE6D9 /* ViewController.swift */,
+				0419F101286051B200EF8DC2 /* WebViewViewController.swift */,
+				0419F1082860560400EF8DC2 /* CustomNaviViewController.swift */,
+				04BC499F2858758E003FE6D9 /* Main.storyboard */,
+				04BC49A228587590003FE6D9 /* Assets.xcassets */,
+				04BC49A428587590003FE6D9 /* LaunchScreen.storyboard */,
+				04BC49A728587590003FE6D9 /* Info.plist */,
+			);
+			path = "Plaoc-iOS";
+			sourceTree = "<group>";
+		};
+		04BC49AF28587591003FE6D9 /* Plaoc-iOSTests */ = {
+			isa = PBXGroup;
+			children = (
+				04BC49B028587591003FE6D9 /* Plaoc_iOSTests.swift */,
+			);
+			path = "Plaoc-iOSTests";
+			sourceTree = "<group>";
+		};
+		04BC49B928587591003FE6D9 /* Plaoc-iOSUITests */ = {
+			isa = PBXGroup;
+			children = (
+				04BC49BA28587591003FE6D9 /* Plaoc_iOSUITests.swift */,
+				04BC49BC28587591003FE6D9 /* Plaoc_iOSUITestsLaunchTests.swift */,
+			);
+			path = "Plaoc-iOSUITests";
+			sourceTree = "<group>";
+		};
+		04D0225B28604FF70018716E /* jsFile */ = {
+			isa = PBXGroup;
+			children = (
+				0419F10A2860564300EF8DC2 /* example.html */,
+				0419F10B2860564300EF8DC2 /* statusbar.html */,
+			);
+			path = jsFile;
+			sourceTree = "<group>";
+		};
+		04D02262286051170018716E /* customView */ = {
+			isa = PBXGroup;
+			children = (
+				04D022642860514C0018716E /* BottomView.swift */,
+				04D022652860514C0018716E /* NaviView.swift */,
+				04D022632860514C0018716E /* StatusView.swift */,
+			);
+			path = customView;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		04BC49952858758E003FE6D9 /* Plaoc-iOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 04BC49C028587591003FE6D9 /* Build configuration list for PBXNativeTarget "Plaoc-iOS" */;
+			buildPhases = (
+				04BC49922858758E003FE6D9 /* Sources */,
+				04BC49932858758E003FE6D9 /* Frameworks */,
+				04BC49942858758E003FE6D9 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Plaoc-iOS";
+			productName = "Plaoc-iOS";
+			productReference = 04BC49962858758E003FE6D9 /* Plaoc-iOS.app */;
+			productType = "com.apple.product-type.application";
+		};
+		04BC49AB28587591003FE6D9 /* Plaoc-iOSTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 04BC49C328587591003FE6D9 /* Build configuration list for PBXNativeTarget "Plaoc-iOSTests" */;
+			buildPhases = (
+				04BC49A828587591003FE6D9 /* Sources */,
+				04BC49A928587591003FE6D9 /* Frameworks */,
+				04BC49AA28587591003FE6D9 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				04BC49AE28587591003FE6D9 /* PBXTargetDependency */,
+			);
+			name = "Plaoc-iOSTests";
+			productName = "Plaoc-iOSTests";
+			productReference = 04BC49AC28587591003FE6D9 /* Plaoc-iOSTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		04BC49B528587591003FE6D9 /* Plaoc-iOSUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 04BC49C628587591003FE6D9 /* Build configuration list for PBXNativeTarget "Plaoc-iOSUITests" */;
+			buildPhases = (
+				04BC49B228587591003FE6D9 /* Sources */,
+				04BC49B328587591003FE6D9 /* Frameworks */,
+				04BC49B428587591003FE6D9 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				04BC49B828587591003FE6D9 /* PBXTargetDependency */,
+			);
+			name = "Plaoc-iOSUITests";
+			productName = "Plaoc-iOSUITests";
+			productReference = 04BC49B628587591003FE6D9 /* Plaoc-iOSUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		04BC498E2858758E003FE6D9 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1330;
+				LastUpgradeCheck = 1330;
+				TargetAttributes = {
+					04BC49952858758E003FE6D9 = {
+						CreatedOnToolsVersion = 13.3.1;
+					};
+					04BC49AB28587591003FE6D9 = {
+						CreatedOnToolsVersion = 13.3.1;
+						TestTargetID = 04BC49952858758E003FE6D9;
+					};
+					04BC49B528587591003FE6D9 = {
+						CreatedOnToolsVersion = 13.3.1;
+						TestTargetID = 04BC49952858758E003FE6D9;
+					};
+				};
+			};
+			buildConfigurationList = 04BC49912858758E003FE6D9 /* Build configuration list for PBXProject "Plaoc-iOS" */;
+			compatibilityVersion = "Xcode 13.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 04BC498D2858758E003FE6D9;
+			productRefGroup = 04BC49972858758E003FE6D9 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				04BC49952858758E003FE6D9 /* Plaoc-iOS */,
+				04BC49AB28587591003FE6D9 /* Plaoc-iOSTests */,
+				04BC49B528587591003FE6D9 /* Plaoc-iOSUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		04BC49942858758E003FE6D9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0419F10D2860564300EF8DC2 /* statusbar.html in Resources */,
+				04BC49A628587590003FE6D9 /* LaunchScreen.storyboard in Resources */,
+				04BC49A328587590003FE6D9 /* Assets.xcassets in Resources */,
+				04BC49A12858758E003FE6D9 /* Main.storyboard in Resources */,
+				0419F10C2860564300EF8DC2 /* example.html in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		04BC49AA28587591003FE6D9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		04BC49B428587591003FE6D9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		04BC49922858758E003FE6D9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0419F106286051F500EF8DC2 /* UIView_extension.swift in Sources */,
+				04BC49CD2858768E003FE6D9 /* LeadScriptHandle.swift in Sources */,
+				04D022662860514C0018716E /* StatusView.swift in Sources */,
+				04BC499E2858758E003FE6D9 /* ViewController.swift in Sources */,
+				04D022682860514C0018716E /* NaviView.swift in Sources */,
+				0419F1092860560400EF8DC2 /* CustomNaviViewController.swift in Sources */,
+				04BC499A2858758E003FE6D9 /* AppDelegate.swift in Sources */,
+				0419F107286051F500EF8DC2 /* UIDevice_extension.swift in Sources */,
+				04BC49CE2858768E003FE6D9 /* LeadReplyHandle.swift in Sources */,
+				04BC49CA285875B6003FE6D9 /* CustomWebView.swift in Sources */,
+				0419F102286051B200EF8DC2 /* WebViewViewController.swift in Sources */,
+				04D022672860514C0018716E /* BottomView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		04BC49A828587591003FE6D9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				04BC49B128587591003FE6D9 /* Plaoc_iOSTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		04BC49B228587591003FE6D9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				04BC49BD28587591003FE6D9 /* Plaoc_iOSUITestsLaunchTests.swift in Sources */,
+				04BC49BB28587591003FE6D9 /* Plaoc_iOSUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		04BC49AE28587591003FE6D9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 04BC49952858758E003FE6D9 /* Plaoc-iOS */;
+			targetProxy = 04BC49AD28587591003FE6D9 /* PBXContainerItemProxy */;
+		};
+		04BC49B828587591003FE6D9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 04BC49952858758E003FE6D9 /* Plaoc-iOS */;
+			targetProxy = 04BC49B728587591003FE6D9 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		04BC499F2858758E003FE6D9 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				04BC49A02858758E003FE6D9 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		04BC49A428587590003FE6D9 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				04BC49A528587590003FE6D9 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		04BC49BE28587591003FE6D9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		04BC49BF28587591003FE6D9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		04BC49C128587591003FE6D9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Plaoc-iOS/Info.plist";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.bngl.BFChain.Plaoc-iOS";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		04BC49C228587591003FE6D9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Plaoc-iOS/Info.plist";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.bngl.BFChain.Plaoc-iOS";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		04BC49C428587591003FE6D9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.bngl.BFChain.Plaoc-iOSTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Plaoc-iOS.app/Plaoc-iOS";
+			};
+			name = Debug;
+		};
+		04BC49C528587591003FE6D9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.bngl.BFChain.Plaoc-iOSTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Plaoc-iOS.app/Plaoc-iOS";
+			};
+			name = Release;
+		};
+		04BC49C728587591003FE6D9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.bngl.BFChain.Plaoc-iOSUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "Plaoc-iOS";
+			};
+			name = Debug;
+		};
+		04BC49C828587591003FE6D9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.bngl.BFChain.Plaoc-iOSUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "Plaoc-iOS";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		04BC49912858758E003FE6D9 /* Build configuration list for PBXProject "Plaoc-iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				04BC49BE28587591003FE6D9 /* Debug */,
+				04BC49BF28587591003FE6D9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		04BC49C028587591003FE6D9 /* Build configuration list for PBXNativeTarget "Plaoc-iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				04BC49C128587591003FE6D9 /* Debug */,
+				04BC49C228587591003FE6D9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		04BC49C328587591003FE6D9 /* Build configuration list for PBXNativeTarget "Plaoc-iOSTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				04BC49C428587591003FE6D9 /* Debug */,
+				04BC49C528587591003FE6D9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		04BC49C628587591003FE6D9 /* Build configuration list for PBXNativeTarget "Plaoc-iOSUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				04BC49C728587591003FE6D9 /* Debug */,
+				04BC49C828587591003FE6D9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 04BC498E2858758E003FE6D9 /* Project object */;
+}
