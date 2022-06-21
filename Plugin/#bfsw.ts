@@ -11,7 +11,7 @@ export default defineWorkspace(() => {
   const config: Bfsw.Workspace = {
     projects: [
       bottombar,
-      // dialogs,
+      dialogs,
       // keyboard,
       statusbar,
       topbar,

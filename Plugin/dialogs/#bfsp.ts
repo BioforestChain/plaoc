@@ -1,17 +1,11 @@
 import { defineConfig } from "@bfchain/pkgm-bfsp";
 export default defineConfig((info) => {
   const config: Bfsp.UserConfig = {
-    name: "@plaoc/test",
+    name: "@plaoc/plugin-dialogs",
+    profiles: ["android"],
     exports: {
       ".": "./index.ts",
     },
-    deps: [
-      "@plaoc/plugin-icon",
-      "@plaoc/plugin-top-bar",
-      "@plaoc/plugin-bottom-bar",
-      "@plaoc/plugin-status-bar",
-      "@plaoc/plugin-dialogs",
-    ],
     packageJson: {
       license: "MIT",
       author: "bnqkl",
