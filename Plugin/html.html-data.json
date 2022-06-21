@@ -141,6 +141,88 @@
         { "name": "opacity", "description": "opacity" },
         { "name": "darkicons", "description": "darkicons" }
       ]
+    },
+    {
+      "name": "dweb-dialog-alert",
+      "description": "dweb dialog alert web components",
+      "attributes": [
+        { "name": "visible", "description": "visible", "valueSet": "v" },
+        { "name": "title", "description": "title" },
+        { "name": "content", "description": "content" },
+        {
+          "name": "dismissOnBackPress",
+          "description": "dismissOnBackPress",
+          "valueSet": "v"
+        },
+        {
+          "name": "dismissOnClickOutSide",
+          "description": "dismissOnClickOutSide",
+          "valueSet": "v"
+        }
+      ]
+    },
+    {
+      "name": "dweb-dialog-prompt",
+      "description": "dweb dialog prompt web components",
+      "attributes": [
+        { "name": "visible", "description": "visible", "valueSet": "v" },
+        { "name": "title", "description": "title" },
+        { "name": "label", "description": "label" },
+        { "name": "defaultValue", "description": "defaultValue" },
+        {
+          "name": "dismissOnBackPress",
+          "description": "dismissOnBackPress",
+          "valueSet": "v"
+        },
+        {
+          "name": "dismissOnClickOutSide",
+          "description": "dismissOnClickOutSide",
+          "valueSet": "v"
+        }
+      ]
+    },
+    {
+      "name": "dweb-dialog-confirm",
+      "description": "dweb dialog confirm web components",
+      "attributes": [
+        { "name": "visible", "description": "visible", "valueSet": "v" },
+        { "name": "title", "description": "title" },
+        { "name": "message", "description": "message" },
+        {
+          "name": "dismissOnBackPress",
+          "description": "dismissOnBackPress",
+          "valueSet": "v"
+        },
+        {
+          "name": "dismissOnClickOutSide",
+          "description": "dismissOnClickOutSide",
+          "valueSet": "v"
+        }
+      ]
+    },
+    {
+      "name": "dweb-dialog-before-unload",
+      "description": "dweb dialog before unload web components",
+      "attributes": [
+        { "name": "visible", "description": "visible", "valueSet": "v" },
+        { "name": "title", "description": "title" },
+        { "name": "message", "description": "message" },
+        {
+          "name": "dismissOnBackPress",
+          "description": "dismissOnBackPress",
+          "valueSet": "v"
+        },
+        {
+          "name": "dismissOnClickOutSide",
+          "description": "dismissOnClickOutSide",
+          "valueSet": "v"
+        }
+      ]
+    },
+    {
+      "name": "dweb-dialog-button",
+      "description": "dweb dialog button web components",
+      "attributes": []
     }
   ],
   "valueSets": []
