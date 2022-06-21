@@ -11,6 +11,7 @@ export default defineConfig((info) => {
       "@plaoc/plugin-bottom-bar",
       "@plaoc/plugin-status-bar",
       "@plaoc/plugin-dialogs",
+      "@plaoc/plugin-keyboard",
     ],
     packageJson: {
       license: "MIT",

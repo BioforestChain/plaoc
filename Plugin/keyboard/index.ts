@@ -1,4 +1,4 @@
 /// <reference lib="dom" />
 
-import { BfcsKeyboard } from "#bfcsKeyboard";
+import { BfcsKeyboard } from "./bfcsKeyboard";
 customElements.define("dweb-keyboard", BfcsKeyboard);

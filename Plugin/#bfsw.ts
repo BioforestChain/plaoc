@@ -12,10 +12,11 @@ export default defineWorkspace(() => {
     projects: [
       bottombar,
       dialogs,
-      // keyboard,
+      keyboard,
       statusbar,
       topbar,
       icon,
+      //
     ],
   };
 

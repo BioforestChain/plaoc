@@ -1,7 +1,7 @@
 import { defineConfig } from "@bfchain/pkgm-bfsp";
 export default defineConfig((info) => {
   const config: Bfsp.UserConfig = {
-    name: "@bfchain/plugin-keyboard",
+    name: "@plaoc/plugin-keyboard",
     profiles: ["android"],
     exports: {
       ".": "./index.ts",

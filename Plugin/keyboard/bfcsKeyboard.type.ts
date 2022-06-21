@@ -1,4 +1,4 @@
-declare namespace Bfcs {
+declare namespace Plaoc {
   type VirtualKeyboardFFI = {
     getSafeArea(): DataString<KeyboardSafeArea>;
     getHeight(): number;
@@ -18,4 +18,4 @@ declare namespace Bfcs {
   }
 }
 
-declare const virtual_keyboard: Bfcs.VirtualKeyboardFFI;
+declare const virtual_keyboard: Plaoc.VirtualKeyboardFFI;
