@@ -64,7 +64,7 @@ class CustomWebView: UIView {
     }
     
     private func addScriptMessageHandlerWithReply(config: WKWebViewConfiguration) {
-        let array = ["calendar","naviHeight","bottomHeight","getEnabled","getTitle","getOverlay","getBackgroundColor","getForegroundColor"]
+        let array = ["calendar","naviHeight","bottomHeight","getNaviEnabled","hasNaviTitle","getNaviOverlay","getNaviBackgroundColor","getNaviForegroundColor"]
         for name in array {
             config.userContentController.addScriptMessageHandler(self, contentWorld: .page, name: name)
         }
@@ -247,28 +247,28 @@ extension CustomWebView: WKScriptMessageHandlerWithReply {
         } else if message.name == "bottomHeight" {
             let naviHeight = 49 + UIDevice.current.tabbarSpaceHeight()
             replyHandler(naviHeight,nil)
-        } else if message.name == "getEnabled" {
+        } else if message.name == "getNaviEnabled" {
             let controller = currentViewController() as? WebViewViewController
             let isHidden = controller?.navigationController?.isNavigationBarHidden
             replyHandler(isHidden,nil)
-        } else if message.name == "getTitle" {
+        } else if message.name == "getNaviTitle" {
             let controller = currentViewController() as? WebViewViewController
             let title = controller?.titleString()
             replyHandler(title,nil)
-        } else if message.name == "hasTitle" {
+        } else if message.name == "hasNaviTitle" {
             let controller = currentViewController() as? WebViewViewController
             let title = controller?.titleString() ?? ""
             let hasTitle = title.count > 0 ? true : false
             replyHandler(hasTitle,nil)
-        } else if message.name == "getOverlay" {
+        } else if message.name == "getNaviOverlay" {
             let controller = currentViewController() as? WebViewViewController
             let overlay = controller?.overlay()
             replyHandler(overlay,nil)
-        } else if message.name == "getBackgroundColor" {
+        } else if message.name == "getNaviBackgroundColor" {
             let controller = currentViewController() as? WebViewViewController
             let color = controller?.naviViewBackgroundColor()
             replyHandler(color,nil)
-        } else if message.name == "getForegroundColor" {
+        } else if message.name == "getNaviForegroundColor" {
             let controller = currentViewController() as? WebViewViewController
             let color = controller?.naviViewForegroundColor()
             replyHandler(color,nil)
