@@ -33,37 +33,8 @@ class CustomWebView: UIView {
         
         let config = WKWebViewConfiguration()
         config.userContentController = WKUserContentController()
-        config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "hiddenBottomView")
-        config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "updateBottomViewAlpha")
-        config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "updateBottomViewBackgroundColor")
-        config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "hiddenBottomViewButton")
-        config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "hiddenNaviBarButton")
-        config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "updateStatusAlpha")
-        config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "updateStatusBackgroundColor")
-        config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "updateStatusStyle")
-        config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "updateStatusHidden")
-        config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "hiddenNaviBar")
-        config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "updateNaviBarAlpha")
-        config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "updateNaviBarBackgroundColor")
-        config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "updateNaviBarTintColor")
-        config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "backAction")
-        config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "jumpWeb")
-        config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "updateTitle")
-        config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "startLoad")
-        config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "LoadingComplete")
-        config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "onPush")
-        config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "onFork")
-        config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "onPop")
-        config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "onDestroy")
-        config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "onCheckout")
-        config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "savePhoto")
-        config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "startCamera")
-        config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "photoFromPhotoLibrary")
-        config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "startShare")
-        config.userContentController.addScriptMessageHandler(self, contentWorld: .page, name: "test")
-        config.userContentController.addScriptMessageHandler(self, contentWorld: .page, name: "calendar")
-        config.userContentController.addScriptMessageHandler(self, contentWorld: .page, name: "naviHeight")
-        config.userContentController.addScriptMessageHandler(self, contentWorld: .page, name: "bottomHeight")
+        addScriptMessageHandler(config: config)
+        addScriptMessageHandlerWithReply(config: config)
         if self.scripts != nil {
             for script in self.scripts! {
                 config.userContentController.addUserScript(script)
@@ -84,6 +55,20 @@ class CustomWebView: UIView {
         }
         return webView
     }()
+    
+    private func addScriptMessageHandler(config: WKWebViewConfiguration) {
+        let array = ["hiddenBottomView","updateBottomViewAlpha","updateBottomViewBackgroundColor","hiddenBottomViewButton","hiddenNaviBarButton","updateStatusAlpha","updateStatusBackgroundColor","updateStatusStyle","updateStatusHidden","hiddenNaviBar","updateNaviBarAlpha","updateNaviBarBackgroundColor","updateNaviBarTintColor","back","jumpWeb","updateTitle","startLoad","LoadingComplete","savePhoto","startCamera","photoFromPhotoLibrary","startShare"]
+        for name in array {
+            config.userContentController.add(LeadScriptHandle(messageHandle: self), name: name)
+        }
+    }
+    
+    private func addScriptMessageHandlerWithReply(config: WKWebViewConfiguration) {
+        let array = ["calendar","naviHeight","bottomHeight","getEnabled","getTitle","getOverlay","getBackgroundColor","getForegroundColor"]
+        for name in array {
+            config.userContentController.addScriptMessageHandler(self, contentWorld: .page, name: name)
+        }
+    }
     
 }
 
@@ -176,30 +161,39 @@ extension CustomWebView:  WKScriptMessageHandler {
         }else if message.name == "updateTitle" {
             guard let titleString = message.body as? String else { return }
             callback?(titleString)
-        } else if message.name == "backAction" {
+        } else if message.name == "back" {
             let controller = currentViewController()
             controller.navigationController?.popViewController(animated: true)
         } else if message.name == "hiddenNaviBar" {
+            guard let hidden = message.body as? String else { return }
             let controller = currentViewController() as? WebViewViewController
-            controller?.hiddenNavigationBar()
+            let isHidden = hidden == "1" ? true : false
+            controller?.hiddenNavigationBar(isHidden: isHidden)
         } else if message.name == "updateNaviBarAlpha" {
+            guard let alpha = message.body as? String else { return }
             let controller = currentViewController() as? WebViewViewController
-            controller?.updateNavigationBarAlpha()
+            let isAlpha = alpha == "1" ? true : false
+            controller?.updateNavigationBarAlpha(isAlpha: isAlpha)
         } else if message.name == "updateNaviBarBackgroundColor" {
+            guard let colorString = message.body as? String else { return }
             let controller = currentViewController() as? WebViewViewController
-            controller?.updateNavigationBarBackgroundColor()
+            controller?.updateNavigationBarBackgroundColor(colorString: colorString)
         } else if message.name == "updateNaviBarTintColor" {
+            guard let colorString = message.body as? String else { return }
             let controller = currentViewController() as? WebViewViewController
-            controller?.updateNavigationBarTintColor()
+            controller?.updateNavigationBarTintColor(colorString: colorString)
         } else if message.name == "updateStatusBackgroundColor" {
+            guard let colorString = message.body as? String else { return }
             let controller = currentViewController() as? WebViewViewController
-            controller?.updateStatusBackgroundColor()
+            controller?.updateStatusBackgroundColor(colorString: colorString)
         } else if message.name == "updateStatusStyle" {
             let controller = currentViewController() as? WebViewViewController
             controller?.updateStatusStyle()
         } else if message.name == "updateStatusHidden" {
+            guard let hidden = message.body as? String else { return }
             let controller = currentViewController() as? WebViewViewController
-            controller?.updateStatusHidden()
+            let isHidden = hidden == "1" ? true : false
+            controller?.updateStatusHidden(isHidden: isHidden)
         } else if message.name == "updateStatusAlpha" {
             let controller = currentViewController() as? WebViewViewController
             controller?.updateStatusBarAlpha()
@@ -208,14 +202,19 @@ extension CustomWebView:  WKScriptMessageHandler {
             let controller = currentViewController() as? WebViewViewController
             controller?.hiddenNaviButton(hiddenString: bodyString)
         }  else if message.name == "hiddenBottomView" {
+            guard let hidden = message.body as? String else { return }
             let controller = currentViewController() as? WebViewViewController
-            controller?.hiddenBottomView()
+            let isHidden = hidden == "1" ? true : false
+            controller?.hiddenBottomView(isHidden: isHidden)
         } else if message.name == "updateBottomViewAlpha" {
+            guard let alpha = message.body as? String else { return }
             let controller = currentViewController() as? WebViewViewController
-            controller?.updateBottomViewAlpha()
+            let isAlpha = alpha == "1" ? true : false
+            controller?.updateBottomViewAlpha(isAlpha: isAlpha)
         } else if message.name == "updateBottomViewBackgroundColor" {
+            guard let colorString = message.body as? String else { return }
             let controller = currentViewController() as? WebViewViewController
-            controller?.updateBottomViewBackgroundColor()
+            controller?.updateBottomViewBackgroundColor(colorString: colorString)
         } else if message.name == "hiddenBottomViewButton" {
             guard let bodyString = message.body as? String else { return }
             let controller = currentViewController() as? WebViewViewController
@@ -248,6 +247,31 @@ extension CustomWebView: WKScriptMessageHandlerWithReply {
         } else if message.name == "bottomHeight" {
             let naviHeight = 49 + UIDevice.current.tabbarSpaceHeight()
             replyHandler(naviHeight,nil)
+        } else if message.name == "getEnabled" {
+            let controller = currentViewController() as? WebViewViewController
+            let isHidden = controller?.navigationController?.isNavigationBarHidden
+            replyHandler(isHidden,nil)
+        } else if message.name == "getTitle" {
+            let controller = currentViewController() as? WebViewViewController
+            let title = controller?.titleString()
+            replyHandler(title,nil)
+        } else if message.name == "hasTitle" {
+            let controller = currentViewController() as? WebViewViewController
+            let title = controller?.titleString() ?? ""
+            let hasTitle = title.count > 0 ? true : false
+            replyHandler(hasTitle,nil)
+        } else if message.name == "getOverlay" {
+            let controller = currentViewController() as? WebViewViewController
+            let overlay = controller?.overlay()
+            replyHandler(overlay,nil)
+        } else if message.name == "getBackgroundColor" {
+            let controller = currentViewController() as? WebViewViewController
+            let color = controller?.naviViewBackgroundColor()
+            replyHandler(color,nil)
+        } else if message.name == "getForegroundColor" {
+            let controller = currentViewController() as? WebViewViewController
+            let color = controller?.naviViewForegroundColor()
+            replyHandler(color,nil)
         }
     }
 }

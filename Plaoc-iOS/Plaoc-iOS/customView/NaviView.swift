@@ -15,10 +15,11 @@ class NaviView: UIView {
         }
     }
     
-    var tineColor: UIColor? {
+    var tineColor: String? {
         didSet {
-            titleLabel.textColor = tineColor
-            backButton.setTitleColor(tineColor, for: .normal)
+            guard tineColor != nil else { return }
+            titleLabel.textColor = UIColor(hexString: tineColor!)
+            backButton.setTitleColor(UIColor(hexString: tineColor!), for: .normal)
         }
     }
     
