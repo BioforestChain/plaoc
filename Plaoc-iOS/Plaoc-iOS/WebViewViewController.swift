@@ -82,32 +82,12 @@ class WebViewViewController: UIViewController {
 
 }
 
+// naviBar和js的交互
 extension WebViewViewController {
     
-    func updateTopBarBackgroundColor() {
-        updateNavigationBarBackgroundColor()
-        updateStatusBackgroundColor()
-    }
-    
-    func updateTopBarForegroundColor() {
-        updateNavigationBarTintColor()
-    }
-    
-    func updateTopBarAlpha() {
-        updateNavigationBarAlpha()
-    }
-    
-    func updateTopBarHidden() {
-        hiddenNavigationBar()
-        updateStatusHidden()
-    }
-}
-
-extension WebViewViewController {
-    
-    func hiddenNavigationBar() {
-        isNaviHidden = !isNaviHidden
-        naviView.isHidden = isNaviHidden
+    func hiddenNavigationBar(isHidden: Bool) {
+        isNaviHidden = isHidden
+        naviView.isHidden = isHidden
         
         guard !isNaviAlpha else { return }
         var frame = webView.frame
@@ -126,9 +106,9 @@ extension WebViewViewController {
         }
     }
     
-    func updateNavigationBarAlpha() {
-        isNaviAlpha = !isNaviAlpha
-        naviView.alpha = isNaviAlpha ? 0.5 : 1.0
+    func updateNavigationBarAlpha(isAlpha: Bool) {
+        isNaviAlpha = isAlpha
+        naviView.alpha = isAlpha ? 0.5 : 1.0
         guard !isNaviHidden else { return }
         var frame = webView.frame
         if isNaviAlpha {
@@ -144,8 +124,8 @@ extension WebViewViewController {
         }
     }
     
-    func updateNavigationBarBackgroundColor() {
-        naviView.backgroundColor = .orange
+    func updateNavigationBarBackgroundColor(colorString: String) {
+        naviView.backgroundColor = UIColor(hexString: colorString)
         
 //        self.navigationController?.navigationBar.backgroundColor = .orange
 //        let image = createImageWithColor(.orange, frame: CGRect(x: 0, y: 0.5, width: 1, height: 0.5))
@@ -173,23 +153,38 @@ extension WebViewViewController {
         return image
     }
     
-    func updateNavigationBarTintColor() {
-        naviView.tineColor = .red
-//        self.navigationController?.navigationBar.tintColor = .red
-//        self.navigationController?.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.red]
+    func updateNavigationBarTintColor(colorString: String) {
+        naviView.tineColor = colorString
     }
     
     func hiddenNaviButton(hiddenString: String) {
         naviView.hiddenBtn = hiddenString == "1" ? false : true
     }
     
+    func titleString() -> String {
+        return naviView.titleString ?? ""
+    }
+    
+    func overlay() -> Bool {
+        return isNaviAlpha
+    }
+    
+    func naviViewBackgroundColor() -> UIColor {
+        return naviView.backgroundColor ?? .white
+    }
+    
+    func naviViewForegroundColor() -> String {
+        return naviView.tineColor ?? ""
+    }
+    
 }
 
+// statusBar和js的交互
 extension WebViewViewController {
     
-    func updateStatusBackgroundColor() {
+    func updateStatusBackgroundColor(colorString: String) {
 //        UIApplication.statusBarBackgroundColor = .orange
-        statusView.backgroundColor = .orange
+        statusView.backgroundColor = UIColor(hexString: colorString)
     }
     
     func updateStatusStyle() {
@@ -201,8 +196,8 @@ extension WebViewViewController {
         setNeedsStatusBarAppearanceUpdate()
     }
     
-    func updateStatusHidden() {
-        isStatusHidden = !isStatusHidden
+    func updateStatusHidden(isHidden: Bool) {
+        isStatusHidden = isHidden
         setNeedsStatusBarAppearanceUpdate()
     }
     
@@ -228,12 +223,12 @@ extension WebViewViewController {
 //        }
     }
 }
-
+// bottomBar和js的交互
 extension WebViewViewController {
     
-    func hiddenBottomView() {
-        isBottomHidden = !isBottomHidden
-        bottomView.isHidden = isBottomHidden
+    func hiddenBottomView(isHidden: Bool) {
+        isBottomHidden = isHidden
+        bottomView.isHidden = isHidden
         guard !isBottomAlpha else { return }
         var frame = webView.frame
         
@@ -249,9 +244,9 @@ extension WebViewViewController {
         }
     }
     
-    func updateBottomViewAlpha() {
-        isBottomAlpha = !isBottomAlpha
-        bottomView.alpha = isBottomAlpha ? 0.5 : 1.0
+    func updateBottomViewAlpha(isAlpha: Bool) {
+        isBottomAlpha = isAlpha
+        bottomView.alpha = isAlpha ? 0.5 : 1.0
         guard !isBottomHidden else { return }
         var frame = webView.frame
         
@@ -267,8 +262,8 @@ extension WebViewViewController {
         }
     }
     
-    func updateBottomViewBackgroundColor() {
-        bottomView.backgroundColor = .orange
+    func updateBottomViewBackgroundColor(colorString: String) {
+        bottomView.backgroundColor = UIColor(hexString: colorString)
     }
     
     func hiddenBottomViewButton(hiddenString: String) {

@@ -53,7 +53,7 @@
         <script>
           toggle_topbar_enabled.onclick = () => {
 <!--            top_bar.toggleEnabled(0);-->
-                window.webkit.messageHandlers.hiddenNaviBar.postMessage(null); 
+                window.webkit.messageHandlers.hiddenNaviBar.postMessage("1");
           };
         </script>
         <label>
@@ -71,7 +71,7 @@
         <script>
           toggle_topbar_overlay.onclick = () => {
 <!--            top_bar.toggleOverlay(0);-->
-                window.webkit.messageHandlers.updateNaviBarAlpha.postMessage(null);
+                window.webkit.messageHandlers.updateNaviBarAlpha.postMessage("1");
           };
         </script>
         <button id="get_topbar_height">Get TopBar Height</button>
@@ -135,7 +135,7 @@
         <script>
           set_topbar_background_color.onclick = () => {
 <!--            top_bar.setBackgroundColor(getColorInt());-->
-            window.webkit.messageHandlers.updateNaviBarBackgroundColor.postMessage(null);
+            window.webkit.messageHandlers.updateNaviBarBackgroundColor.postMessage("#ff9900");
           };
         </script>
         <button id="set_topbar_foreground_color">
@@ -144,7 +144,7 @@
         <script>
           set_topbar_foreground_color.onclick = () => {
 <!--            top_bar.setForegroundColor(getColorInt());-->
-            window.webkit.messageHandlers.updateNaviBarTintColor.postMessage(null);
+            window.webkit.messageHandlers.updateNaviBarTintColor.postMessage("99ccff");
           };
         </script>
       </fieldset>
@@ -155,14 +155,14 @@
         <script>
           toggle_bottombar_enabled.onclick = () => {
 <!--            bottom_bar.toggleEnabled(0);-->
-            window.webkit.messageHandlers.hiddenBottomView.postMessage(null);
+            window.webkit.messageHandlers.hiddenBottomView.postMessage("1");
           };
         </script>
         <button id="toggle_bottombar_overlay">Toggle BottomBar Overlay</button>
         <script>
           toggle_bottombar_overlay.onclick = () => {
 <!--            bottom_bar.toggleOverlay(0);-->
-             window.webkit.messageHandlers.updateBottomViewAlpha.postMessage(null);
+             window.webkit.messageHandlers.updateBottomViewAlpha.postMessage("1");
           };
         </script>
         <button id="get_bottombar_height">Get BottomBar Height</button>
@@ -261,7 +261,7 @@
         <script>
           set_bottombar_background_color.onclick = () => {
 <!--            bottom_bar.setBackgroundColor(getColorInt());-->
-            window.webkit.messageHandlers.updateBottomViewBackgroundColor.postMessage(null);
+            window.webkit.messageHandlers.updateBottomViewBackgroundColor.postMessage("ff9900");
           };
         </script>
         <button id="set_bottombar_foreground_color">
@@ -312,14 +312,14 @@
         <script>
           set_statusbar_color.onclick = () => {
 <!--            system_ui.setStatusBarColor(getColorInt(), getIsDarkIcons());-->
-            window.webkit.messageHandlers.updateStatusBackgroundColor.postMessage(null);
+            window.webkit.messageHandlers.updateStatusBackgroundColor.postMessage("#ff9900");
           };
         </script>
         <button id="toggle_statusbar_visible">Toggle Status Bar Visible</button>
         <script>
           toggle_statusbar_visible.onclick = () => {
 <!--            system_ui.toggleStatusBarVisible(0);-->
-            window.webkit.messageHandlers.updateStatusHidden.postMessage(null);
+            window.webkit.messageHandlers.updateStatusHidden.postMessage("1");
           };
         </script>
         <button id="toggle_statusbar_overlay">Toggle Status Bar Overlay</button>
