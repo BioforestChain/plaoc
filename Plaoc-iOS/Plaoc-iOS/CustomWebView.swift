@@ -7,6 +7,7 @@
 
 import UIKit
 import WebKit
+import SwiftyJSON
 
 typealias UpdateTitleCallback = (String) -> Void
 
@@ -57,14 +58,14 @@ class CustomWebView: UIView {
     }()
     
     private func addScriptMessageHandler(config: WKWebViewConfiguration) {
-        let array = ["hiddenBottomView","updateBottomViewAlpha","updateBottomViewBackgroundColor","hiddenBottomViewButton","hiddenNaviBarButton","updateStatusAlpha","updateStatusBackgroundColor","updateStatusStyle","updateStatusHidden","hiddenNaviBar","updateNaviBarAlpha","updateNaviBarBackgroundColor","updateNaviBarTintColor","back","jumpWeb","updateTitle","startLoad","LoadingComplete","savePhoto","startCamera","photoFromPhotoLibrary","startShare"]
+        let array = ["hiddenBottomView","updateBottomViewAlpha","updateBottomViewBackgroundColor","hiddenBottomViewButton","updateStatusAlpha","updateStatusBackgroundColor","updateStatusStyle","updateStatusHidden","hiddenNaviBar","updateNaviBarAlpha","updateNaviBarBackgroundColor","updateNaviBarTintColor","back","jumpWeb","updateTitle","startLoad","LoadingComplete","savePhoto","startCamera","photoFromPhotoLibrary","startShare","updateBottomViewForegroundColor","customNaviActions","openAlert","openPrompt","openConfirm","openBeforeUnload"]
         for name in array {
             config.userContentController.add(LeadScriptHandle(messageHandle: self), name: name)
         }
     }
     
     private func addScriptMessageHandlerWithReply(config: WKWebViewConfiguration) {
-        let array = ["calendar","naviHeight","bottomHeight","getNaviEnabled","hasNaviTitle","getNaviOverlay","getNaviBackgroundColor","getNaviForegroundColor"]
+        let array = ["calendar","naviHeight","bottomHeight","getNaviEnabled","hasNaviTitle","getNaviOverlay","getNaviBackgroundColor","getNaviForegroundColor","getBottomBarEnabled","getBottomBarOverlay","getBottomBarActions"]
         for name in array {
             config.userContentController.addScriptMessageHandler(self, contentWorld: .page, name: name)
         }
@@ -174,6 +175,12 @@ extension CustomWebView:  WKScriptMessageHandler {
             let controller = currentViewController() as? WebViewViewController
             let isAlpha = alpha == "1" ? true : false
             controller?.updateNavigationBarAlpha(isAlpha: isAlpha)
+        } else if message.name == "customNaviActions" {
+            guard let body = message.body as? [[String:Any]] else { return }
+            let controller = currentViewController() as? WebViewViewController
+            let list = JSON(body)
+            let buttons = list.arrayValue.map { ButtonModel(dict: $0) }
+            controller?.fetchCustomButtons(buttons: buttons)
         } else if message.name == "updateNaviBarBackgroundColor" {
             guard let colorString = message.body as? String else { return }
             let controller = currentViewController() as? WebViewViewController
@@ -183,9 +190,9 @@ extension CustomWebView:  WKScriptMessageHandler {
             let controller = currentViewController() as? WebViewViewController
             controller?.updateNavigationBarTintColor(colorString: colorString)
         } else if message.name == "updateStatusBackgroundColor" {
-            guard let colorString = message.body as? String else { return }
+            guard let colorDict = message.body as? [String: String] else { return }
             let controller = currentViewController() as? WebViewViewController
-            controller?.updateStatusBackgroundColor(colorString: colorString)
+            controller?.updateStatusBackgroundColor(dict: colorDict)
         } else if message.name == "updateStatusStyle" {
             let controller = currentViewController() as? WebViewViewController
             controller?.updateStatusStyle()
@@ -195,13 +202,11 @@ extension CustomWebView:  WKScriptMessageHandler {
             let isHidden = hidden == "1" ? true : false
             controller?.updateStatusHidden(isHidden: isHidden)
         } else if message.name == "updateStatusAlpha" {
+            guard let overlay = message.body as? String else { return }
             let controller = currentViewController() as? WebViewViewController
-            controller?.updateStatusBarAlpha()
-        } else if message.name == "hiddenNaviBarButton" {
-            guard let bodyString = message.body as? String else { return }
-            let controller = currentViewController() as? WebViewViewController
-            controller?.hiddenNaviButton(hiddenString: bodyString)
-        }  else if message.name == "hiddenBottomView" {
+            let isOverlay = overlay == "1" ? true : false
+            controller?.updateStatusBarAlpha(isOverlay: isOverlay)
+        } else if message.name == "hiddenBottomView" {
             guard let hidden = message.body as? String else { return }
             let controller = currentViewController() as? WebViewViewController
             let isHidden = hidden == "1" ? true : false
@@ -219,6 +224,79 @@ extension CustomWebView:  WKScriptMessageHandler {
             guard let bodyString = message.body as? String else { return }
             let controller = currentViewController() as? WebViewViewController
             controller?.hiddenBottomViewButton(hiddenString: bodyString)
+        } else if message.name == "updateBottomViewForegroundColor" {
+            guard let bodyString = message.body as? String else { return }
+            let controller = currentViewController() as? WebViewViewController
+            controller?.hiddenBottomViewButton(hiddenString: bodyString)
+        } else if message.name == "customBottomActions" {
+            guard let body = message.body as? [[String:Any]] else { return }
+            let controller = currentViewController() as? WebViewViewController
+            let list = JSON(body)
+            let buttons = list.arrayValue.map { BottomBarModel(dict: $0) }
+            controller?.fetchBottomButtons(buttons: buttons)
+        } else if message.name == "openAlert" {
+            guard let body = message.body as? [String:Any] else { return }
+            let alertModel = AlertConfiguration(dict: JSON(body))
+            let alertView = CustomAlertPopView(frame: CGRect(x: 0, y: 0, width: screen_width, height: screen_height))
+            alertView.alertModel = alertModel
+            alertView.callback = { [weak self] type in
+                guard let strongSelf = self else { return }
+                let jsString = alertModel.confirmFunc ?? ""
+                guard jsString.count > 0 else { return }
+                strongSelf.handleJavascriptString(inputJS: "\(jsString)()")
+            }
+            alertView.show()
+        } else if message.name == "openPrompt" {
+            guard let body = message.body as? [String:Any] else { return }
+            let promptModel = PromptConfiguration(dict: JSON(body))
+            let alertView = CustomPromptPopView(frame: CGRect(x: 0, y: 0, width: screen_width, height: screen_height))
+            alertView.promptModel = promptModel
+            alertView.callback = { [weak self] type in
+                guard let strongSelf = self else { return }
+                var jsString: String = ""
+                if type == .confirm {
+                    jsString = promptModel.confirmFunc ?? ""
+                } else if type == .cancel {
+                    jsString = promptModel.cancelFunc ?? ""
+                }
+                guard jsString.count > 0 else { return }
+                strongSelf.handleJavascriptString(inputJS: "\(jsString)()")
+            }
+            alertView.show()
+        } else if message.name == "openConfirm" {
+            guard let body = message.body as? [String:Any] else { return }
+            let confirmModel = ConfirmConfiguration(dict: JSON(body))
+            let alertView = CustomConfirmPopView(frame: CGRect(x: 0, y: 0, width: screen_width, height: screen_height))
+            alertView.confirmModel = confirmModel
+            alertView.callback = { [weak self] type in
+                guard let strongSelf = self else { return }
+                var jsString: String = ""
+                if type == .confirm {
+                    jsString = confirmModel.confirmFunc ?? ""
+                } else if type == .cancel {
+                    jsString = confirmModel.cancelFunc ?? ""
+                }
+                guard jsString.count > 0 else { return }
+                strongSelf.handleJavascriptString(inputJS: "\(jsString)()")
+            }
+            alertView.show()
+        } else if message.name == "openBeforeUnload" {
+            guard let body = message.body as? [String:Any] else { return }
+            let confirmModel = ConfirmConfiguration(dict: JSON(body))
+            let alertView = CustomConfirmPopView(frame: CGRect(x: 0, y: 0, width: screen_width, height: screen_height))
+            alertView.confirmModel = confirmModel
+            alertView.callback = { [weak self] type in
+                guard let strongSelf = self else { return }
+                var jsString: String = ""
+                if type == .confirm {
+                    jsString = confirmModel.confirmFunc ?? ""
+                } else if type == .cancel {
+                    jsString = confirmModel.cancelFunc ?? ""
+                }
+                guard jsString.count > 0 else { return }
+                strongSelf.handleJavascriptString(inputJS: "\(jsString)()")
+            }
+            alertView.show()
         }
     }
     
@@ -272,6 +350,34 @@ extension CustomWebView: WKScriptMessageHandlerWithReply {
             let controller = currentViewController() as? WebViewViewController
             let color = controller?.naviViewForegroundColor()
             replyHandler(color,nil)
+        } else if message.name == "getNaviActions" {
+            let controller = currentViewController() as? WebViewViewController
+            let dict = controller?.naviActions()
+            replyHandler(dict,nil)
+        } else if message.name == "getBottomBarEnabled" {
+            let controller = currentViewController() as? WebViewViewController
+            let isEnabled = controller?.bottombarEnabled()
+            replyHandler(isEnabled,nil)
+        } else if message.name == "getBottomBarOverlay" {
+            let controller = currentViewController() as? WebViewViewController
+            let overlay = controller?.bottombarOverlay()
+            replyHandler(overlay,nil)
+        } else if message.name == "getBottomBarActions" {
+            let controller = currentViewController() as? WebViewViewController
+            let overlay = controller?.bottombarButtonHidden()
+            replyHandler(overlay,nil)
+        } else if message.name == "getBottomBarBackgroundColor" {
+            let controller = currentViewController() as? WebViewViewController
+            let color = controller?.bottomBarBackgroundColor()
+            replyHandler(color,nil)
+        } else if message.name == "getStatusBarVisible" {
+            let controller = currentViewController() as? WebViewViewController
+            let visible = controller?.statusBarVisible()
+            replyHandler(visible,nil)
+        } else if message.name == "getStatusBarOverlay" {
+            let controller = currentViewController() as? WebViewViewController
+            let overlay = controller?.statusBarOverlay()
+            replyHandler(overlay,nil)
         }
     }
 }
@@ -310,6 +416,8 @@ extension CustomWebView: WKNavigationDelegate {
     
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         print("didFinish")
+        let keyboardString = "setHeight('\(49 + UIDevice.current.tabbarSpaceHeight())')"
+        handleJavascriptString(inputJS: keyboardString)
     }
     
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
@@ -359,7 +467,11 @@ extension CustomWebView: WKUIDelegate {
         let sureAction = UIAlertAction(title: "OK", style: .default) { action in
             completionHandler(alert.textFields?.first?.text ?? "")
         }
+        let sureAction2 = UIAlertAction(title: "CANCEL", style: .default) { action in
+            completionHandler(alert.textFields?.first?.text ?? "")
+        }
         alert.addAction(sureAction)
+        alert.addAction(sureAction2)
         alert.addTextField { textField in
             textField.text = prompt
             textField.placeholder = defaultText

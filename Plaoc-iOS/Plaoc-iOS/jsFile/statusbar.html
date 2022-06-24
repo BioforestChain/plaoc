@@ -135,7 +135,7 @@
         <script>
           set_topbar_background_color.onclick = () => {
 <!--            top_bar.setBackgroundColor(getColorInt());-->
-            window.webkit.messageHandlers.updateNaviBarBackgroundColor.postMessage("#ff9900");
+            window.webkit.messageHandlers.updateNaviBarBackgroundColor.postMessage({"color": "#ff9900", "alpha":0.2});
           };
         </script>
         <button id="set_topbar_foreground_color">
@@ -269,7 +269,8 @@
         </button>
         <script>
           set_bottombar_foreground_color.onclick = () => {
-            bottom_bar.setForegroundColor(getColorInt());
+<!--            bottom_bar.setForegroundColor(getColorInt());-->
+            window.webkit.messageHandlers.updateBottomViewForegroundColor.postMessage("ff9900");
           };
         </script>
       </fieldset>
@@ -481,16 +482,23 @@
         <button id="show_native_alert_dialog">Show Native Alert Dialog</button>
         <script>
           show_native_alert_dialog.onclick = () => {
-            native_dialog.openAlert(
-              JSON.stringify({
+<!--            native_dialog.openAlert(-->
+<!--              JSON.stringify({-->
+<!--                title: "自定义标题",-->
+<!--                content: "内容",-->
+<!--                confirmText: "好吧",-->
+<!--              }),-->
+<!--              "show_native_alert_dialog.callback"-->
+<!--            );-->
+            window.webkit.messageHandlers.openAlert.postMessage({
                 title: "自定义标题",
                 content: "内容",
                 confirmText: "好吧",
-              }),
-              "show_native_alert_dialog.callback"
-            );
+                confirmFunc: "show_native_alert_dialog.callback",
+                  });
           };
 
+            
           show_native_alert_dialog.callback = () => {
             const BASE_TEXT = "Show Native Alert Dialog ";
             show_native_alert_dialog.times =
