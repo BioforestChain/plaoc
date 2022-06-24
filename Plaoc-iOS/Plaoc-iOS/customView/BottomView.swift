@@ -15,10 +15,36 @@ class BottomView: UIView {
         }
     }
     
+    var buttons: [BottomBarModel]? {
+        didSet {
+            guard buttons != nil else { return }
+            let space: CGFloat = 16
+            let width: CGFloat = 44
+            for i in stride(from: 0, to: buttons!.count, by: 1) {
+                let model = buttons![i]
+                let button = UIButton(type: .contactAdd)
+                let imageName = model.iconModel?.source ?? ""
+                if model.iconModel?.type == "AssetIcon" {
+                    button.sd_setImage(with: URL(string: imageName), for: .normal)
+                } else {
+                    if imageName.hasSuffix("svg") {
+                        button.setImage(UIImage.svgImageNamed(imageName, size: CGSize(width: width, height: width)), for: .normal)
+                    } else {
+                        button.setImage(UIImage(named: imageName), for: .normal)
+                    }
+                }
+                button.isEnabled = model.disabled ?? true
+                button.menu = menuAction()
+                button.showsMenuAsPrimaryAction = true
+                button.frame = CGRect(x: self.frame.width - CGFloat((i + 1)) * (width + space), y: 0, width: 44, height: 44)
+                self.addSubview(button)
+            }
+        }
+    }
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.backgroundColor = .white
-        self.addSubview(addButton)
     }
     
     required init?(coder: NSCoder) {

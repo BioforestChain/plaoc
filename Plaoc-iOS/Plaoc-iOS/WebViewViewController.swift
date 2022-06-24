@@ -86,6 +86,7 @@ class WebViewViewController: UIViewController {
 extension WebViewViewController {
     
     func hiddenNavigationBar(isHidden: Bool) {
+        guard isNaviHidden != isHidden else { return }
         isNaviHidden = isHidden
         naviView.isHidden = isHidden
         
@@ -107,6 +108,7 @@ extension WebViewViewController {
     }
     
     func updateNavigationBarAlpha(isAlpha: Bool) {
+        guard isNaviAlpha != isAlpha else { return }
         isNaviAlpha = isAlpha
         naviView.alpha = isAlpha ? 0.5 : 1.0
         guard !isNaviHidden else { return }
@@ -157,8 +159,8 @@ extension WebViewViewController {
         naviView.tineColor = colorString
     }
     
-    func hiddenNaviButton(hiddenString: String) {
-        naviView.hiddenBtn = hiddenString == "1" ? false : true
+    func fetchCustomButtons(buttons: [ButtonModel]) {
+        naviView.buttons = buttons
     }
     
     func titleString() -> String {
@@ -177,14 +179,27 @@ extension WebViewViewController {
         return naviView.tineColor ?? ""
     }
     
+    func naviActions() -> [[String:Any]] {
+        guard let buttons = naviView.buttons else { return [] }
+        var array: [[String:Any]] = []
+        for button in buttons {
+            array.append(button.buttonDict)
+        }
+        return array
+    }
 }
 
 // statusBar和js的交互
 extension WebViewViewController {
     
-    func updateStatusBackgroundColor(colorString: String) {
+    func updateStatusBackgroundColor(dict: [String:Any]) {
 //        UIApplication.statusBarBackgroundColor = .orange
-        statusView.backgroundColor = UIColor(hexString: colorString)
+        if let color = dict["colorHex"] as? String {
+            statusView.backgroundColor = UIColor(hexString: color)
+        }
+        if let alpha = dict["darkIcons"] as? CGFloat {
+            statusView.alpha = alpha
+        }
     }
     
     func updateStatusStyle() {
@@ -201,8 +216,8 @@ extension WebViewViewController {
         setNeedsStatusBarAppearanceUpdate()
     }
     
-    func updateStatusBarAlpha() {
-        isStatusAlpha = !isStatusAlpha
+    func updateStatusBarAlpha(isOverlay: Bool) {
+        isStatusAlpha = isOverlay
         statusView.alpha = isStatusAlpha ? 0.5 : 1.0
 //        var frame = webView.frame
 //        if isStatusAlpha {
@@ -222,11 +237,20 @@ extension WebViewViewController {
 //            self.webView.updateFrame(frame: frame)
 //        }
     }
+    
+    func statusBarVisible() -> Bool {
+        return isStatusHidden
+    }
+    
+    func statusBarOverlay() -> Bool {
+        return isStatusAlpha
+    }
 }
 // bottomBar和js的交互
 extension WebViewViewController {
     
     func hiddenBottomView(isHidden: Bool) {
+        guard isBottomHidden != isHidden else { return }
         isBottomHidden = isHidden
         bottomView.isHidden = isHidden
         guard !isBottomAlpha else { return }
@@ -245,8 +269,10 @@ extension WebViewViewController {
     }
     
     func updateBottomViewAlpha(isAlpha: Bool) {
+        guard isBottomAlpha != isAlpha else { return }
         isBottomAlpha = isAlpha
         bottomView.alpha = isAlpha ? 0.5 : 1.0
+        
         guard !isBottomHidden else { return }
         var frame = webView.frame
         
@@ -268,6 +294,35 @@ extension WebViewViewController {
     
     func hiddenBottomViewButton(hiddenString: String) {
         bottomView.hiddenBtn = hiddenString == "1" ? false : true
+    }
+    
+    func bottombarEnabled() -> Bool{
+        return isBottomHidden
+    }
+    
+    func bottombarOverlay() -> Bool {
+        return isBottomAlpha
+    }
+    
+    func bottombarButtonHidden() -> Bool {
+        return bottomView.hiddenBtn
+    }
+    
+    func bottomBarBackgroundColor() -> UIColor {
+        return bottomView.backgroundColor ?? .white
+    }
+    
+    func fetchBottomButtons(buttons: [BottomBarModel]) {
+        bottomView.buttons = buttons
+    }
+    
+    func bottomActions() -> [[String:Any]] {
+        guard let buttons = bottomView.buttons else { return [] }
+        var array: [[String:Any]] = []
+        for button in buttons {
+            array.append(button.buttonDict)
+        }
+        return array
     }
     
 }

@@ -3,3 +3,4 @@
 //
 
 #import "UIColor+Hex.h"
+#import "UIImage+SVG.h"
