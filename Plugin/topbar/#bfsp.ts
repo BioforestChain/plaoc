@@ -16,10 +16,10 @@ export default defineConfig((info) => {
         name: "@plaoc/plugin-top-bar-android",
         profiles: ["android"],
       },
-      // {
-      //   name: "@plaoc/plugin-top-bar-ios",
-      //   profiles: ["ios"],
-      // },
+      {
+        name: "@plaoc/plugin-top-bar-ios",
+        profiles: ["ios"],
+      },
     ],
   };
   return config;
