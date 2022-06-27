@@ -12,7 +12,7 @@ let screen_height = UIScreen.main.bounds.height
 
 class ViewController: UIViewController, UIGestureRecognizerDelegate {
 
-    private let dataSource: [String] = ["example","statusbar"]
+    private let dataSource: [String] = ["example","statusbar","http://127.0.0.1:5500/Plaoc-iOS/Plaoc-iOS/jsFile/test/index.html"]
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = .white
@@ -63,7 +63,9 @@ extension ViewController: UITableViewDelegate {
         
         let controller = WebViewViewController()
         if let path = Bundle.main.path(forResource: dataSource[indexPath.row], ofType: "html") {
-            controller.urlString = path
+            controller.urlString = "iosqmkkx:/index.html"//path
+        } else {
+            controller.urlString = dataSource[indexPath.row];
         }
         self.navigationController?.pushViewController(controller, animated: true)
     }

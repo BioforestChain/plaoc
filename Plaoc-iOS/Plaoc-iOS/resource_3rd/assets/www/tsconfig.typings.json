@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "isolatedModules": false,
+    "noEmit": false,
+    "emitDeclarationOnly": true,
+    "outDir": ".bfsp\\tsc"
+  },
+  "files": [
+    "./index.ts"
+  ],
+  "references": []
+}

@@ -8,6 +8,8 @@
 import UIKit
 import SDWebImage
 
+typealias ClickViewCallback = (String) -> Void
+
 class NaviView: UIView {
 
     var titleString: String? {
@@ -32,6 +34,7 @@ class NaviView: UIView {
             for i in stride(from: 0, to: buttons!.count, by: 1) {
                 let model = buttons![i]
                 let button = UIButton(type: .contactAdd)
+                button.tag = i
                 let imageName = model.iconModel?.source ?? ""
                 if model.iconModel?.type == "AssetIcon" {
                     button.sd_setImage(with: URL(string: imageName), for: .normal)
@@ -42,14 +45,17 @@ class NaviView: UIView {
                         button.setImage(UIImage(named: imageName), for: .normal)
                     }
                 }
-                button.isEnabled = model.disabled ?? true
-                button.menu = menuAction()
+                button.isEnabled = !(model.disabled ?? false)
+//                button.menu = menuAction()
+                button.addTarget(self, action: #selector(clickAction(sender:)), for: .touchUpInside)
                 button.showsMenuAsPrimaryAction = true
                 button.frame = CGRect(x: self.frame.width - CGFloat((i + 1)) * (width + space), y: 0, width: 44, height: 44)
                 self.addSubview(button)
             }
         }
     }
+    
+    var callback: ClickViewCallback?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -76,15 +82,6 @@ class NaviView: UIView {
         label.font = UIFont.systemFont(ofSize: 18)
         label.textAlignment = .center
         return label
-    }()
-    
-    lazy var addButton: UIButton = {
-        let button = UIButton(type: .contactAdd)
-        button.menu = menuAction()
-        button.showsMenuAsPrimaryAction = true
-        button.frame = CGRect(x: self.frame.width - 60, y: 0, width: 44, height: 44)
-        button.isHidden = true
-        return button
     }()
 }
 
@@ -114,5 +111,13 @@ extension NaviView {
         //itemの追加
         return UIMenu(title: "菜单", children: [items,photo,destruct])
     
+    }
+    
+    @objc private func clickAction(sender: UIButton) {
+        guard buttons != nil, sender.tag < buttons!.count else { return }
+        let model = buttons![sender.tag]
+        let code = model.onClickCode ?? ""
+        guard code.count > 0 else { return }
+        callback?(code)
     }
 }

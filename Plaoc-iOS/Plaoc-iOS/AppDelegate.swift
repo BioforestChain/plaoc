@@ -16,6 +16,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         window = UIWindow(frame: UIScreen.main.bounds)
         window?.rootViewController = CustomNaviViewController(rootViewController: ViewController())
+        
+        let str = NSString(string: Bundle.main.bundlePath)
+        let path = str.appendingPathComponent("resource_3rd/assets/www")
+        Schemehandler.setupHTMLCache(fromPath: path)
+        
         window?.makeKeyAndVisible()
         return true
     }

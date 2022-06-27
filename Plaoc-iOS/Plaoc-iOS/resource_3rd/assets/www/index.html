@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nav Demo</title>
+    <script type="module" src="./dist/esm/test/index.mjs"></script>
+    <style>
+        button {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- <dweb-status-bar overlay>
+        <dweb-status-bar-color id="sss" darkicons="0" colorhex="#ff0000" alpha="0.5"></dweb-status-bar-color>
+    </dweb-status-bar> -->
+    <dweb-top-bar id="topbar" title="test">
+        <dweb-top-bar-button id="aaa">
+            <dweb-icon source="Filled.AddCircle"></dweb-icon>
+        </dweb-top-bar-button>
+        <dweb-top-bar-button id="bbb" disabled>
+            <dweb-icon source="Filled.Add" size="20"></dweb-icon>
+        </dweb-top-bar-button>
+        <dweb-top-bar-button id="ccc">
+            <dweb-icon source="http://172.30.95.56:5500/Plaoc-Android/app/src/main/assets/icon/coil_logo_colored.svg" type="AssetIcon"></dweb-icon>
+        </dweb-top-bar-button>
+    </dweb-top-bar>
+    <div id="content">
+        <p>test</p>
+    </div>
+    <!-- <dweb-bottom-bar id="bottom_bar">
+        <dweb-bottom-bar-button id="ddd" selectable>
+            <dweb-icon source="Filled.AddCircle"></dweb-icon>
+        </dweb-bottom-bar-button>
+        <dweb-bottom-bar-button disabled>
+            <dweb-icon source="http://172.30.95.56:5500/Plaoc-Android/app/src/main/assets/icon/ico_bottom_tab_publisher.svg" type="AssetIcon"></dweb-icon>
+        </dweb-bottom-bar-button>
+        <dweb-bottom-bar-button selected selectable>
+            <dweb-icon source="Filled.Add"></dweb-icon>
+        </dweb-bottom-bar-button>
+    </dweb-bottom-bar>
+    <dweb-keyboard for="key"></dweb-keyboard>
+    <dweb-dialog-alert title="alert" content="content">
+        <dweb-dialog-button id="ddb">ok</dweb-dialog-button>
+    </dweb-dialog-alert>
+    <dweb-dialog-prompt title="prompt" label="label" defaultValue="default">
+        <dweb-dialog-button>ok</dweb-dialog-button>
+        <dweb-dialog-button>No</dweb-dialog-button>
+    </dweb-dialog-prompt>
+    <dweb-dialog-confirm title="confirm" message="message" visible>
+        <dweb-dialog-button id="ok">ok</dweb-dialog-button>
+        <dweb-dialog-button id="no">No</dweb-dialog-button>
+    </dweb-dialog-confirm>
+    <dweb-dialog-before-unload id="before_unload" title="test" message="before-unload">
+        <dweb-dialog-button>ok</dweb-dialog-button>
+        <dweb-dialog-button>No</dweb-dialog-button>
+    </dweb-dialog-before-unload> -->
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <input id="key" type="text" value="test input" />
+
+    <script>
+        aaa.onclick = async () => {
+            content.innerHTML = "content";
+            alert(1);
+            await topbar.setTitle("title");
+        }
+
+        let colors = {
+            textColor: 0xffaa0000,
+            textColorSelected: 0xaa00ff00,
+            iconColor: 0xffaa0000,
+            iconColorSelected: 0xaa00ff00,
+        };
+
+        ddd.setAttribute("colors", JSON.stringify(colors));
+
+        ddd.onclick = async () => {
+            content.innerHTML = "bottom";
+            alert(2);
+            await topbar.setBackgroundColor("#ff0000");
+            alert(await topbar.getBackgroundColor());
+            before_unload.setAttribute("visible", "");
+        }
+
+        ddb.onclick = () => {
+            content.innerHTML = "alert";
+        };
+
+        ok.onclick = () => {
+            content.innerHTML = "ok";
+        }
+        // no.onclick = () => {
+        //     content.innerHTML = "no";
+        // }
+    </script>
+</body>
+</html>

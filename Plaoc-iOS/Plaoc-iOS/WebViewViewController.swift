@@ -46,11 +46,12 @@ class WebViewViewController: UIViewController {
 
         self.view.backgroundColor = .white
         
-        if urlString.hasPrefix("http") || urlString.hasPrefix("https") {
-            webView.openWebView(html: urlString)
-        } else {
-            webView.openLocalWebView(name: urlString)
-        }
+        webView.openWebView(html: urlString)
+//        if urlString.hasPrefix("http") || urlString.hasPrefix("https") {
+//            webView.openWebView(html: urlString)
+//        } else {
+//            webView.openLocalWebView(name: urlString)
+//        }
     }
     
 
@@ -61,6 +62,10 @@ class WebViewViewController: UIViewController {
     
     lazy var naviView: NaviView = {
         let naviView = NaviView(frame: CGRect(x: 0, y: self.statusView.frame.maxY, width: UIScreen.main.bounds.width, height: 44))
+        naviView.callback = { [weak self] code in
+            guard let strongSelf = self else { return }
+            strongSelf.webView.handleJavascriptString(inputJS: code)
+        }
         return naviView
     }()
     
@@ -77,6 +82,10 @@ class WebViewViewController: UIViewController {
     lazy var bottomView: BottomView = {
         let bottomView = BottomView(frame: CGRect(x: 0, y: UIScreen.main.bounds.height - 49 - UIDevice.current.tabbarSpaceHeight(), width: UIScreen.main.bounds.width, height: 49 + UIDevice.current.tabbarSpaceHeight()))
         bottomView.isHidden = true
+        bottomView.callback = { [weak self] code in
+            guard let strongSelf = self else { return }
+            strongSelf.webView.handleJavascriptString(inputJS: code)
+        }
         return bottomView
     }()
 
@@ -160,7 +169,7 @@ extension WebViewViewController {
     }
     
     func fetchCustomButtons(buttons: [ButtonModel]) {
-        naviView.buttons = buttons
+        naviView.buttons = buttons.reversed()
     }
     
     func titleString() -> String {
@@ -302,10 +311,6 @@ extension WebViewViewController {
     
     func bottombarOverlay() -> Bool {
         return isBottomAlpha
-    }
-    
-    func bottombarButtonHidden() -> Bool {
-        return bottomView.hiddenBtn
     }
     
     func bottomBarBackgroundColor() -> UIColor {

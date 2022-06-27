@@ -17,13 +17,15 @@ class CustomWebView: UIView {
     var superVC: UIViewController?
     private var scripts: [WKUserScript]?
     private let imageUrl_key: String = "imageUrl"
+    private var isKeyboardOverlay: Bool = true
     
     init(frame: CGRect, jsNames: [String]) {
         super.init(frame: frame)
         scripts = addUserScript(jsNames: jsNames)
         self.addSubview(webView)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(observerKeyboard(noti:)), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(observerShowKeyboard(noti:)), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(observerHiddenKeyboard(noti:)), name: UIResponder.keyboardWillHideNotification, object: nil)
     }
     
     required init?(coder: NSCoder) {
@@ -45,6 +47,7 @@ class CustomWebView: UIView {
         prefreen.javaScriptCanOpenWindowsAutomatically = true
         config.preferences = prefreen
         config.setValue(true, forKey: "allowUniversalAccessFromFileURLs")
+        config.setURLSchemeHandler(Schemehandler(), forURLScheme: schemeString)
         let webView = WKWebView(frame: self.bounds, configuration: config)
         webView.navigationDelegate = self
         webView.uiDelegate = self
@@ -58,14 +61,14 @@ class CustomWebView: UIView {
     }()
     
     private func addScriptMessageHandler(config: WKWebViewConfiguration) {
-        let array = ["hiddenBottomView","updateBottomViewAlpha","updateBottomViewBackgroundColor","hiddenBottomViewButton","updateStatusAlpha","updateStatusBackgroundColor","updateStatusStyle","updateStatusHidden","hiddenNaviBar","updateNaviBarAlpha","updateNaviBarBackgroundColor","updateNaviBarTintColor","back","jumpWeb","updateTitle","startLoad","LoadingComplete","savePhoto","startCamera","photoFromPhotoLibrary","startShare","updateBottomViewForegroundColor","customNaviActions","openAlert","openPrompt","openConfirm","openBeforeUnload"]
+        let array = ["hiddenBottomView","updateBottomViewAlpha","updateBottomViewBackgroundColor","hiddenBottomViewButton","updateStatusAlpha","updateStatusBackgroundColor","updateStatusStyle","updateStatusHidden","hiddenNaviBar","updateNaviBarAlpha","updateNaviBarBackgroundColor","updateNaviBarTintColor","back","jumpWeb","updateTitle","startLoad","LoadingComplete","savePhoto","startCamera","photoFromPhotoLibrary","startShare","updateBottomViewForegroundColor","customNaviActions","openAlert","openPrompt","openConfirm","openBeforeUnload","setKeyboardOverlay"]
         for name in array {
             config.userContentController.add(LeadScriptHandle(messageHandle: self), name: name)
         }
     }
     
     private func addScriptMessageHandlerWithReply(config: WKWebViewConfiguration) {
-        let array = ["calendar","naviHeight","bottomHeight","getNaviEnabled","hasNaviTitle","getNaviOverlay","getNaviBackgroundColor","getNaviForegroundColor","getBottomBarEnabled","getBottomBarOverlay","getBottomBarActions"]
+        let array = ["calendar","naviHeight","bottomHeight","getNaviEnabled","hasNaviTitle","getNaviOverlay","getNaviBackgroundColor","getNaviForegroundColor","getBottomBarEnabled","getBottomBarOverlay","getBottomActions","getBottomBarBackgroundColor","getKeyboardOverlay"]
         for name in array {
             config.userContentController.addScriptMessageHandler(self, contentWorld: .page, name: name)
         }
@@ -129,11 +132,13 @@ extension CustomWebView {
         }
     }
     
-    @objc private func observerKeyboard(noti: Notification) {
+    @objc private func observerShowKeyboard(noti: Notification) {
         
         guard let keyboardBound = noti.userInfo?["UIKeyboardFrameEndUserInfoKey"] as? CGRect else { return }
         let keyboardString = "getKeyboardFrame('\(keyboardBound)')"
         handleJavascriptString(inputJS: keyboardString)
+        
+        let safeArea = UIEdgeInsets(top: 0, left: 0, bottom: keyboardBound.height, right: 0)
         
         /**
          ([AnyHashable("UIKeyboardAnimationCurveUserInfoKey"): 7,
@@ -145,6 +150,9 @@ extension CustomWebView {
          AnyHashable("UIKeyboardAnimationDurationUserInfoKey"): 0.25,
          AnyHashable("UIKeyboardCenterEndUserInfoKey"): NSPoint: {187.5, 622}])
          */
+    }
+    @objc private func observerHiddenKeyboard(noti: Notification) {
+        let safeArea = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
     }
 }
 
@@ -176,6 +184,7 @@ extension CustomWebView:  WKScriptMessageHandler {
             let isAlpha = alpha == "1" ? true : false
             controller?.updateNavigationBarAlpha(isAlpha: isAlpha)
         } else if message.name == "customNaviActions" {
+            print(message.body)
             guard let body = message.body as? [[String:Any]] else { return }
             let controller = currentViewController() as? WebViewViewController
             let list = JSON(body)
@@ -297,6 +306,9 @@ extension CustomWebView:  WKScriptMessageHandler {
                 strongSelf.handleJavascriptString(inputJS: "\(jsString)()")
             }
             alertView.show()
+        } else if message.name == "setKeyboardOverlay" {
+            guard let body = message.body as? String else { return }
+            isKeyboardOverlay = body == "1" ? true : false
         }
     }
     
@@ -362,10 +374,6 @@ extension CustomWebView: WKScriptMessageHandlerWithReply {
             let controller = currentViewController() as? WebViewViewController
             let overlay = controller?.bottombarOverlay()
             replyHandler(overlay,nil)
-        } else if message.name == "getBottomBarActions" {
-            let controller = currentViewController() as? WebViewViewController
-            let overlay = controller?.bottombarButtonHidden()
-            replyHandler(overlay,nil)
         } else if message.name == "getBottomBarBackgroundColor" {
             let controller = currentViewController() as? WebViewViewController
             let color = controller?.bottomBarBackgroundColor()
@@ -378,6 +386,12 @@ extension CustomWebView: WKScriptMessageHandlerWithReply {
             let controller = currentViewController() as? WebViewViewController
             let overlay = controller?.statusBarOverlay()
             replyHandler(overlay,nil)
+        } else if message.name == "getBottomActions" {
+            let controller = currentViewController() as? WebViewViewController
+            let dict = controller?.bottomActions()
+            replyHandler(dict,nil)
+        } else if message.name == "getKeyboardOverlay" {
+            replyHandler(isKeyboardOverlay,nil)
         }
     }
 }
