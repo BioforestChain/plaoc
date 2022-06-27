@@ -61,14 +61,14 @@ class CustomWebView: UIView {
     }()
     
     private func addScriptMessageHandler(config: WKWebViewConfiguration) {
-        let array = ["hiddenBottomView","updateBottomViewAlpha","updateBottomViewBackgroundColor","hiddenBottomViewButton","updateStatusAlpha","updateStatusBackgroundColor","updateStatusStyle","updateStatusHidden","hiddenNaviBar","updateNaviBarAlpha","updateNaviBarBackgroundColor","updateNaviBarTintColor","back","jumpWeb","updateTitle","startLoad","LoadingComplete","savePhoto","startCamera","photoFromPhotoLibrary","startShare","updateBottomViewForegroundColor","customNaviActions","openAlert","openPrompt","openConfirm","openBeforeUnload","setKeyboardOverlay"]
+        let array = ["hiddenBottomView","updateBottomViewAlpha","updateBottomViewBackgroundColor","hiddenBottomViewButton","updateStatusAlpha","updateStatusBackgroundColor","updateStatusStyle","updateStatusHidden","hiddenNaviBar","updateNaviBarAlpha","updateNaviBarBackgroundColor","updateNaviBarTintColor","back","jumpWeb","updateTitle","startLoad","LoadingComplete","savePhoto","startCamera","photoFromPhotoLibrary","startShare","updateBottomViewForegroundColor","customNaviActions","openAlert","openPrompt","openConfirm","openBeforeUnload","setKeyboardOverlay","updateBottomViewHeight","setForegroundColor"]
         for name in array {
             config.userContentController.add(LeadScriptHandle(messageHandle: self), name: name)
         }
     }
     
     private func addScriptMessageHandlerWithReply(config: WKWebViewConfiguration) {
-        let array = ["calendar","naviHeight","bottomHeight","getNaviEnabled","hasNaviTitle","getNaviOverlay","getNaviBackgroundColor","getNaviForegroundColor","getBottomBarEnabled","getBottomBarOverlay","getBottomActions","getBottomBarBackgroundColor","getKeyboardOverlay"]
+        let array = ["calendar","naviHeight","bottomHeight","getNaviEnabled","hasNaviTitle","getNaviOverlay","getNaviBackgroundColor","getNaviForegroundColor","getBottomBarEnabled","getBottomBarOverlay","getBottomActions","getBottomBarBackgroundColor","getKeyboardOverlay","getForegroundColor"]
         for name in array {
             config.userContentController.addScriptMessageHandler(self, contentWorld: .page, name: name)
         }
@@ -237,7 +237,15 @@ extension CustomWebView:  WKScriptMessageHandler {
             guard let bodyString = message.body as? String else { return }
             let controller = currentViewController() as? WebViewViewController
             controller?.hiddenBottomViewButton(hiddenString: bodyString)
-        } else if message.name == "customBottomActions" {
+        } else if message.name == "setForegroundColor" {
+            guard let bodyString = message.body as? String else { return }
+            let controller = currentViewController() as? WebViewViewController
+            controller?.updateBottomViewforegroundColor(colorString: bodyString)
+        } else if message.name == "updateBottomViewHeight" {
+            guard let body = message.body as? Float else { return }
+            let controller = currentViewController() as? WebViewViewController
+            controller?.updateBottomViewHeight(height: CGFloat(body))
+        }else if message.name == "customBottomActions" {
             guard let body = message.body as? [[String:Any]] else { return }
             let controller = currentViewController() as? WebViewViewController
             let list = JSON(body)
@@ -389,6 +397,10 @@ extension CustomWebView: WKScriptMessageHandlerWithReply {
         } else if message.name == "getBottomActions" {
             let controller = currentViewController() as? WebViewViewController
             let dict = controller?.bottomActions()
+            replyHandler(dict,nil)
+        } else if message.name == "getForegroundColor" {
+            let controller = currentViewController() as? WebViewViewController
+            let dict = controller?.bottomBarForegroundColor()
             replyHandler(dict,nil)
         } else if message.name == "getKeyboardOverlay" {
             replyHandler(isKeyboardOverlay,nil)

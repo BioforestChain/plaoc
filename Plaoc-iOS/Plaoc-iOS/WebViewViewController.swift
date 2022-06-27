@@ -301,6 +301,16 @@ extension WebViewViewController {
         bottomView.backgroundColor = UIColor(hexString: colorString)
     }
     
+    func updateBottomViewforegroundColor(colorString: String) {
+        //TODO
+    }
+    
+    func updateBottomViewHeight(height: CGFloat) {
+        var frame = bottomView.frame
+        frame.size.height = height
+        bottomView.frame = frame
+    }
+    
     func hiddenBottomViewButton(hiddenString: String) {
         bottomView.hiddenBtn = hiddenString == "1" ? false : true
     }
@@ -315,6 +325,10 @@ extension WebViewViewController {
     
     func bottomBarBackgroundColor() -> UIColor {
         return bottomView.backgroundColor ?? .white
+    }
+    
+    func bottomBarForegroundColor() -> UIColor {
+        return .white  //TODO
     }
     
     func fetchBottomButtons(buttons: [BottomBarModel]) {
