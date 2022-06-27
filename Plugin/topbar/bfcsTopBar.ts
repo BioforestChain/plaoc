@@ -2,23 +2,20 @@ import { TopBarFFI } from "./ffi";
 
 export class BfcsTopBar extends HTMLElement {
   private _ffi: TopBarFFI;
+  private _observer: MutationObserver;
   private _actionList: Plaoc.TopBarItem[] = [];
 
   constructor() {
     super();
+
     this._ffi = new TopBarFFI();
+    this._observer = new MutationObserver((mutations) => {
+      this.collectActions();
+    });
   }
 
   connectedCallback() {
-    let observer = new MutationObserver((mutations) => {
-      // mutations.forEach((mutation) => {
-      //   // alert(mutation.oldValue);
-      // });
-      // alert("observe");
-      this.collectActions();
-    });
-
-    observer.observe(this, {
+    this._observer.observe(this, {
       subtree: true,
       childList: true,
       attributes: true,
@@ -31,11 +28,11 @@ export class BfcsTopBar extends HTMLElement {
         "source",
       ],
     });
-
-    this.collectActions();
   }
 
-  disconnectedCallback() {}
+  disconnectedCallback() {
+    this._observer.disconnect();
+  }
 
   async back(): Promise<void> {
     await this._ffi.back();

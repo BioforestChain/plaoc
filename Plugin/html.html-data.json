@@ -17,7 +17,7 @@
         { "name": "title", "description": "title" },
         { "name": "backgroundColor", "description": "backgroundColor" },
         { "name": "foregroundColor", "description": "foregroundColor" },
-        { "name": "opacity", "description": "opacity" },
+        { "name": "alpha", "description": "alpha" },
         { "name": "overlay", "description": "overlay", "valueSet": "v" },
         {
           "name": "disabled",
@@ -54,7 +54,7 @@
         { "name": "foregroundColor", "description": "foregroundColor" },
         { "name": "overlay", "description": "overlay", "valueSet": "v" },
         { "name": "height", "description": "height", "valueSet": "v" },
-        { "name": "opacity", "description": "opacity" }
+        { "name": "alpha", "description": "alpha" }
       ]
     },
     {
@@ -138,7 +138,7 @@
       "description": "dweb status bar color web components",
       "attributes": [
         { "name": "color", "description": "color" },
-        { "name": "opacity", "description": "opacity" },
+        { "name": "alpha", "description": "alpha" },
         { "name": "darkicons", "description": "darkicons" }
       ]
     },

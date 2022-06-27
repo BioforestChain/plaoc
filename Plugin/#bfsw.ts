@@ -1,21 +1,23 @@
 import { defineWorkspace } from "@bfchain/pkgm-bfsw";
 
+import typings from "./typings/#bfsp";
+import topbar from "./topbar/#bfsp";
+import icon from "./icon/#bfsp";
 import bottombar from "./bottombar/#bfsp";
 import dialogs from "./dialogs/#bfsp";
 import keyboard from "./keyboard/#bfsp";
 import statusbar from "./statusbar/#bfsp";
-import topbar from "./topbar/#bfsp";
-import icon from "./icon/#bfsp";
 
 export default defineWorkspace(() => {
   const config: Bfsw.Workspace = {
     projects: [
-      bottombar,
-      dialogs,
-      keyboard,
-      statusbar,
-      topbar,
+      typings,
       icon,
+      topbar,
+      // bottombar,
+      // dialogs,
+      // keyboard,
+      // statusbar,
       //
     ],
   };
