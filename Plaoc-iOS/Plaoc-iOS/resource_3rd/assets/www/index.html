@@ -30,18 +30,18 @@
     <div id="content">
         <p>test</p>
     </div>
-    <!-- <dweb-bottom-bar id="bottom_bar">
+    <dweb-bottom-bar id="bottom_bar">
         <dweb-bottom-bar-button id="ddd" selectable>
             <dweb-icon source="Filled.AddCircle"></dweb-icon>
         </dweb-bottom-bar-button>
-        <dweb-bottom-bar-button disabled>
+        <dweb-bottom-bar-button id="eee">
             <dweb-icon source="http://172.30.95.56:5500/Plaoc-Android/app/src/main/assets/icon/ico_bottom_tab_publisher.svg" type="AssetIcon"></dweb-icon>
         </dweb-bottom-bar-button>
         <dweb-bottom-bar-button selected selectable>
             <dweb-icon source="Filled.Add"></dweb-icon>
         </dweb-bottom-bar-button>
     </dweb-bottom-bar>
-    <dweb-keyboard for="key"></dweb-keyboard>
+    <!-- <dweb-keyboard for="key"></dweb-keyboard>
     <dweb-dialog-alert title="alert" content="content">
         <dweb-dialog-button id="ddb">ok</dweb-dialog-button>
     </dweb-dialog-alert>
@@ -102,10 +102,14 @@
         ddb.onclick = () => {
             content.innerHTML = "alert";
         };
-
-        ok.onclick = () => {
-            content.innerHTML = "ok";
+        
+        eee.onclick = () => {
+            content.textContent = "selectable";
         }
+
+        //ok.onclick = () => {
+        //    content.innerHTML = "ok";
+        //}
         // no.onclick = () => {
         //     content.innerHTML = "no";
         // }

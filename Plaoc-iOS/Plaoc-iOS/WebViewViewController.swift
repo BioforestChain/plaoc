@@ -332,6 +332,7 @@ extension WebViewViewController {
     }
     
     func fetchBottomButtons(buttons: [BottomBarModel]) {
+        bottomView.isHidden = false
         bottomView.buttons = buttons
     }
     

@@ -61,7 +61,7 @@ class CustomWebView: UIView {
     }()
     
     private func addScriptMessageHandler(config: WKWebViewConfiguration) {
-        let array = ["hiddenBottomView","updateBottomViewAlpha","updateBottomViewBackgroundColor","hiddenBottomViewButton","updateStatusAlpha","updateStatusBackgroundColor","updateStatusStyle","updateStatusHidden","hiddenNaviBar","updateNaviBarAlpha","updateNaviBarBackgroundColor","updateNaviBarTintColor","back","jumpWeb","updateTitle","startLoad","LoadingComplete","savePhoto","startCamera","photoFromPhotoLibrary","startShare","updateBottomViewForegroundColor","customNaviActions","openAlert","openPrompt","openConfirm","openBeforeUnload","setKeyboardOverlay","updateBottomViewHeight","setForegroundColor"]
+        let array = ["hiddenBottomView","updateBottomViewAlpha","updateBottomViewBackgroundColor","hiddenBottomViewButton","updateStatusAlpha","updateStatusBackgroundColor","updateStatusStyle","updateStatusHidden","hiddenNaviBar","updateNaviBarAlpha","updateNaviBarBackgroundColor","updateNaviBarTintColor","back","jumpWeb","updateTitle","startLoad","LoadingComplete","savePhoto","startCamera","photoFromPhotoLibrary","startShare","updateBottomViewForegroundColor","customNaviActions","openAlert","openPrompt","openConfirm","openBeforeUnload","setKeyboardOverlay","updateBottomViewHeight","setForegroundColor","customBottomActions"]
         for name in array {
             config.userContentController.add(LeadScriptHandle(messageHandle: self), name: name)
         }
@@ -236,10 +236,6 @@ extension CustomWebView:  WKScriptMessageHandler {
         } else if message.name == "updateBottomViewForegroundColor" {
             guard let bodyString = message.body as? String else { return }
             let controller = currentViewController() as? WebViewViewController
-            controller?.hiddenBottomViewButton(hiddenString: bodyString)
-        } else if message.name == "setForegroundColor" {
-            guard let bodyString = message.body as? String else { return }
-            let controller = currentViewController() as? WebViewViewController
             controller?.updateBottomViewforegroundColor(colorString: bodyString)
         } else if message.name == "updateBottomViewHeight" {
             guard let body = message.body as? Float else { return }
@@ -247,6 +243,7 @@ extension CustomWebView:  WKScriptMessageHandler {
             controller?.updateBottomViewHeight(height: CGFloat(body))
         }else if message.name == "customBottomActions" {
             guard let body = message.body as? [[String:Any]] else { return }
+            print(body)
             let controller = currentViewController() as? WebViewViewController
             let list = JSON(body)
             let buttons = list.arrayValue.map { BottomBarModel(dict: $0) }
@@ -398,7 +395,7 @@ extension CustomWebView: WKScriptMessageHandlerWithReply {
             let controller = currentViewController() as? WebViewViewController
             let dict = controller?.bottomActions()
             replyHandler(dict,nil)
-        } else if message.name == "getForegroundColor" {
+        } else if message.name == "getBottomViewForegroundColor" {
             let controller = currentViewController() as? WebViewViewController
             let dict = controller?.bottomBarForegroundColor()
             replyHandler(dict,nil)

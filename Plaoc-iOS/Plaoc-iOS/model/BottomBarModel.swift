@@ -15,13 +15,13 @@ struct BottomBarModel {
     var titleString: String?
     var disabled: Bool?
     var selected: Bool?
-    var selectable: Bool?
+    var selectable: Bool?   //0 不可选中,不修改其他按钮状态。1 可选中，修改其他按钮状态
     var colors: ColorModel?
     
     init(dict: JSON) {
         iconModel = IconModel(dict: dict["icon"])
         onClickCode = dict["onClickCode"].stringValue
-        titleString = dict["titleString"].stringValue
+        titleString = dict["label"].stringValue
         disabled = dict["disabled"].boolValue
         selected = dict["selected"].boolValue
         selectable = dict["selectable"].boolValue
