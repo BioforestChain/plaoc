@@ -107,14 +107,109 @@ export class BottomBarFFI {
   getActions(): Promise<Plaoc.BottomBarItem[]> {
     return new Promise<Plaoc.BottomBarItem[]>((resolve, reject) => {
       const actionList = JSON.parse(this._ffi.getActions());
+      const _actionList: Plaoc.BottomBarItem[] = [];
 
-      resolve(actionList);
+      for (const item of actionList) {
+        if (item.colors) {
+          if (
+            item.colors.indicatorColor &&
+            typeof item.colors.indicatorColor === "number"
+          ) {
+            item.colors.indicatorColor =
+              "#" + item.colors.indicatorColor.toString(16);
+          }
+          if (
+            item.colors.iconColor &&
+            typeof item.colors.iconColor === "number"
+          ) {
+            item.colors.iconColor = "#" + item.colors.iconColor.toString(16);
+          }
+          if (
+            item.colors.iconColorSelected &&
+            typeof item.colors.iconColorSelected === "number"
+          ) {
+            item.colors.iconColorSelected =
+              "#" + item.colors.iconColorSelected.toString(16);
+          }
+          if (
+            item.colors.textColor &&
+            typeof item.colors.textColor === "number"
+          ) {
+            item.colors.textColor = "#" + item.colors.textColor.toString(16);
+          }
+          if (
+            item.colors.textColorSelected &&
+            typeof item.colors.textColorSelected === "number"
+          ) {
+            item.colors.textColorSelected =
+              "#" + item.colors.textColorSelected.toString(16);
+          }
+        }
+
+        _actionList.push(item);
+      }
+
+      resolve(_actionList);
     });
   }
 
   setActions(actionList: Plaoc.BottomBarItem[]): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      this._ffi.setActions(JSON.stringify(actionList));
+      let _actionList: Plaoc.BottomBarItem[] = [];
+
+      for (const item of actionList) {
+        if (item.colors) {
+          if (
+            item.colors.indicatorColor &&
+            typeof item.colors.indicatorColor === "string" &&
+            item.colors.indicatorColor.startsWith("#")
+          ) {
+            item.colors.indicatorColor = parseInt(
+              item.colors.indicatorColor.replace("#", "0x")
+            );
+          }
+          if (
+            item.colors.iconColor &&
+            typeof item.colors.iconColor === "string" &&
+            item.colors.iconColor.startsWith("#")
+          ) {
+            item.colors.iconColor = parseInt(
+              item.colors.iconColor.replace("#", "0x")
+            );
+          }
+          if (
+            item.colors.iconColorSelected &&
+            typeof item.colors.iconColorSelected === "string" &&
+            item.colors.iconColorSelected.startsWith("#")
+          ) {
+            item.colors.iconColorSelected = parseInt(
+              item.colors.iconColorSelected.replace("#", "0x")
+            );
+          }
+          if (
+            item.colors.textColor &&
+            typeof item.colors.textColor === "string" &&
+            item.colors.textColor.startsWith("#")
+          ) {
+            item.colors.textColor = parseInt(
+              item.colors.textColor.replace("#", "0x")
+            );
+          }
+          if (
+            item.colors.textColorSelected &&
+            typeof item.colors.textColorSelected === "string" &&
+            item.colors.textColorSelected.startsWith("#")
+          ) {
+            item.colors.textColorSelected = parseInt(
+              item.colors.textColorSelected.replace("#", "0x")
+            );
+          }
+        }
+
+        _actionList.push(item);
+      }
+
+      this._ffi.setActions(JSON.stringify(_actionList));
 
       resolve();
     });
