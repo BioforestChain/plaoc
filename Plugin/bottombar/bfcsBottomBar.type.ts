@@ -53,12 +53,14 @@ declare namespace Plaoc {
     };
   }
 
-  interface Colors {
-    indicatorColor?: number;
-    iconColor?: number;
-    iconColorSelected?: number;
-    textColor?: number;
-    textColorSelected?: number;
+  type BottomBarColorType = number | Plaoc.ARGB;
+
+  interface IBottomBarColors {
+    indicatorColor?: BottomBarColorType;
+    iconColor?: BottomBarColorType;
+    iconColorSelected?: BottomBarColorType;
+    textColor?: BottomBarColorType;
+    textColorSelected?: BottomBarColorType;
   }
 
   interface BottomBarItem {
@@ -68,7 +70,7 @@ declare namespace Plaoc {
     selected?: boolean;
     selectable?: boolean;
     disabled?: boolean;
-    colors?: Colors;
+    colors?: IBottomBarColors;
   }
 }
 
