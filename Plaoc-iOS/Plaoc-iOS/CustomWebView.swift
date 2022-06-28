@@ -68,7 +68,7 @@ class CustomWebView: UIView {
     }
     
     private func addScriptMessageHandlerWithReply(config: WKWebViewConfiguration) {
-        let array = ["calendar","naviHeight","bottomHeight","getNaviEnabled","hasNaviTitle","getNaviOverlay","getNaviBackgroundColor","getNaviForegroundColor","getBottomBarEnabled","getBottomBarOverlay","getBottomActions","getBottomBarBackgroundColor","getKeyboardOverlay","getForegroundColor"]
+        let array = ["calendar","naviHeight","bottomHeight","getNaviEnabled","hasNaviTitle","getNaviOverlay","getNaviBackgroundColor","getNaviForegroundColor","getBottomBarEnabled","getBottomBarOverlay","getBottomActions","getBottomBarBackgroundColor","getKeyboardOverlay","getForegroundColor","getNaviTitle","getNaviActions"]
         for name in array {
             config.userContentController.addScriptMessageHandler(self, contentWorld: .page, name: name)
         }
@@ -98,7 +98,8 @@ extension CustomWebView {
     
     func openWebView(html: String) {
         if let url = URL(string: html) {
-            let request = URLRequest(url: url)
+//            let request = URLRequest(url: url)
+            let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData, timeoutInterval: 30)
             self.webView.load(request)
         }
     }
@@ -108,7 +109,7 @@ extension CustomWebView {
         var path = name
         path = "file://".appending(path)
         if let url = URL(string: path) {
-            self.webView.load(URLRequest(url: url))
+            self.webView.load(URLRequest(url: url, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData, timeoutInterval: 30))
         }
     }
     
@@ -340,11 +341,12 @@ extension CustomWebView: WKScriptMessageHandlerWithReply {
             let naviHeight = UIDevice.current.statusBarHeight() + 44
             replyHandler(naviHeight,nil)
         } else if message.name == "bottomHeight" {
-            let naviHeight = 49 + UIDevice.current.tabbarSpaceHeight()
+            let controller = currentViewController() as? WebViewViewController
+            let naviHeight = controller?.bottomViewHeight()
             replyHandler(naviHeight,nil)
         } else if message.name == "getNaviEnabled" {
             let controller = currentViewController() as? WebViewViewController
-            let isHidden = controller?.navigationController?.isNavigationBarHidden
+            let isHidden = controller?.naviHidden()
             replyHandler(isHidden,nil)
         } else if message.name == "getNaviTitle" {
             let controller = currentViewController() as? WebViewViewController

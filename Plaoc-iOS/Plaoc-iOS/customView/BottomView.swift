@@ -37,6 +37,9 @@ class BottomView: UIView {
                 }
                 button.isEnabled = !(model.disabled ?? false)
                 button.isSelected = model.selected ?? false
+                button.setTitleColor(UIColor(hexString: "\(model.colors?.textColor)" ), for: .normal)
+                button.setTitleColor(UIColor(hexString: "\(model.colors?.textColorSelected)" ), for: .selected)
+                
 //                button.menu = menuAction()
                 button.addTarget(self, action: #selector(clickAction(sender:)), for: .touchUpInside)
                 button.showsMenuAsPrimaryAction = true
