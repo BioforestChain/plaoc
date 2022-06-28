@@ -15,20 +15,20 @@ export class TopBarFFI {
     return !isHidden;
   }
 
-  toggleEnabled(): Promise<void> {
-    return new Promise<void>(async (resolve, reject) => {
-      const isEnabled = await this.getEnabled();
+  async toggleEnabled(): Promise<void> {
+    const isEnabled = await this.getEnabled();
 
-      this._ffi.hiddenNaviBar.postMessage(isEnabled ? "1" : "0");
+    this._ffi.hiddenNaviBar.postMessage(isEnabled ? "1" : "0");
+
+    return;
+  }
+
+  setHidden(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      this._ffi.hiddenNaviBar.postMessage("1");
 
       resolve();
     });
-  }
-
-  async setHidden(): Promise<void> {
-    await this._ffi.hiddenNaviBar.postMessage("1");
-
-    return;
   }
 
   async getOverlay(): Promise<boolean> {
@@ -37,14 +37,12 @@ export class TopBarFFI {
     return overlay;
   }
 
-  toggleOverlay(): Promise<void> {
-    return new Promise<void>(async (resolve, reject) => {
-      const overlay = await this.getOverlay();
+  async toggleOverlay(): Promise<void> {
+    const overlay = await this.getOverlay();
 
-      this._ffi.updateNaviBarAlpha.postMessage(overlay ? "0" : "1");
+    this._ffi.updateNaviBarAlpha.postMessage(overlay ? "0" : "1");
 
-      resolve();
-    });
+    return;
   }
 
   setOverlay(): Promise<void> {

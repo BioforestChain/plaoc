@@ -1,14 +1,14 @@
-import { TopBarFFI } from "./ffi";
+import { BottomBarFFI } from "./ffi";
 
-export class BfcsTopBar extends HTMLElement {
-  private _ffi: TopBarFFI;
+export class BfcsBottomBar extends HTMLElement {
+  private _ffi: BottomBarFFI;
   private _observer: MutationObserver;
-  private _actionList: Plaoc.TopBarItem[] = [];
+  private _actionList: Plaoc.BottomBarItem[] = [];
 
   constructor() {
     super();
 
-    this._ffi = new TopBarFFI();
+    this._ffi = new BottomBarFFI();
     this._observer = new MutationObserver((mutations) => {
       this.collectActions();
     });
@@ -19,25 +19,11 @@ export class BfcsTopBar extends HTMLElement {
       subtree: true,
       childList: true,
       attributes: true,
-      attributeFilter: [
-        "disabled",
-        "icon",
-        "type",
-        "description",
-        "size",
-        "source",
-      ],
     });
   }
 
   disconnectedCallback() {
     this._observer.disconnect();
-  }
-
-  async back(): Promise<void> {
-    await this._ffi.back();
-
-    return;
   }
 
   async toggleEnabled(): Promise<void> {
@@ -50,24 +36,6 @@ export class BfcsTopBar extends HTMLElement {
     const isEnabled = await this._ffi.getEnabled();
 
     return isEnabled;
-  }
-
-  async getTitle(): Promise<string> {
-    const title = await this._ffi.getTitle();
-
-    return title;
-  }
-
-  async setTitle(title: string): Promise<void> {
-    await this._ffi.setTitle(title);
-
-    return;
-  }
-
-  async hasTitle(): Promise<boolean> {
-    const has = await this._ffi.hasTitle();
-
-    return has;
   }
 
   async getOverlay(): Promise<boolean> {
@@ -86,6 +54,12 @@ export class BfcsTopBar extends HTMLElement {
     const height = await this._ffi.getHeight();
 
     return height;
+  }
+
+  async setHeight(height: number): Promise<void> {
+    await this._ffi.setHeight(height);
+
+    return;
   }
 
   async getBackgroundColor(): Promise<string> {
@@ -127,7 +101,7 @@ export class BfcsTopBar extends HTMLElement {
     return;
   }
 
-  async getActions(): Promise<Plaoc.TopBarItem[]> {
+  async getActions(): Promise<Plaoc.BottomBarItem[]> {
     this._actionList = await this._ffi.getActions();
 
     return this._actionList;
@@ -142,10 +116,9 @@ export class BfcsTopBar extends HTMLElement {
   async collectActions() {
     this._actionList = [];
 
-    this.querySelectorAll("dweb-top-bar-button").forEach((childNode) => {
+    this.querySelectorAll("dweb-bottom-bar-button").forEach((childNode) => {
       let icon: Plaoc.IPlaocIcon = {
         source: "",
-        // type: Plaoc.IconType.NamedIcon,
         type: "NamedIcon" as Plaoc.IconType.NamedIcon,
       };
 
@@ -161,14 +134,27 @@ export class BfcsTopBar extends HTMLElement {
           ? ($.getAttribute("size") as unknown as number)
           : undefined;
       }
-      // const icon = JSON.parse(
-      //   childNode.getAttribute("icon")! as Plaoc.IconType
-      // );
 
       const bid = childNode.getAttribute("bid");
-      const onClickCode = `document.querySelector('dweb-top-bar-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+      const onClickCode = `document.querySelector('dweb-bottom-bar-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
       const disabled = childNode.hasAttribute("disabled") ? true : false;
-      this._actionList.push({ icon, onClickCode, disabled });
+      const selected = childNode.hasAttribute("selected") ? true : false;
+      const selectable = childNode.hasAttribute("selectable") ? true : false;
+      const label = childNode.getAttribute("label") ?? "";
+      const colors =
+        childNode.hasAttribute("colors") && childNode.getAttribute("colors")
+          ? JSON.parse(childNode.getAttribute("colors")!)
+          : undefined;
+
+      this._actionList.push({
+        icon,
+        onClickCode,
+        disabled,
+        label,
+        selectable,
+        selected,
+        colors,
+      });
     });
 
     await this.setActions();
@@ -176,11 +162,11 @@ export class BfcsTopBar extends HTMLElement {
 
   static get observedAttributes() {
     return [
-      "title",
       "disabled",
       "backgroudColor",
       "foregroundColor",
       "overlay",
+      "height",
       "alpha",
     ];
   }
@@ -190,12 +176,12 @@ export class BfcsTopBar extends HTMLElement {
     oldVal: unknown,
     newVal: unknown
   ) {
-    if (attrName === "title") {
-      await this.setTitle(newVal as string);
-    } else if (attrName === "backgroudColor") {
+    if (attrName === "backgroudColor") {
       await this.setBackgroundColor(newVal as string);
     } else if (attrName === "foregroundColor") {
       await this.setForegroundColor(newVal as string);
+    } else if (attrName === "height") {
+      await this.setHeight(newVal as number);
     } else if (attrName === "overlay") {
       if (this.hasAttribute(attrName)) {
         await this._ffi.setOverlay();

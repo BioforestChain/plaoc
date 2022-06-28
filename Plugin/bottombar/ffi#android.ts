@@ -1,21 +1,15 @@
-export class TopBarFFI {
-  private _ffi: Plaoc.TopBarAndroidFFI = top_bar;
-
-  back(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this._ffi.back();
-      resolve();
-    });
-  }
+export class BottomBarFFI {
+  private _ffi: Plaoc.BottomBarAndroidFFI = bottom_bar;
 
   getEnabled(): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
       const isEnabled = this._ffi.getEnabled();
+
       resolve(isEnabled);
     });
   }
 
-  toggleEnabled() {
+  toggleEnabled(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       this._ffi.toggleEnabled(0);
       resolve();
@@ -32,9 +26,9 @@ export class TopBarFFI {
 
   getOverlay(): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
-      const isOverlay = this._ffi.getOverlay();
+      const overlay = this._ffi.getOverlay();
 
-      resolve(isOverlay);
+      resolve(overlay);
     });
   }
 
@@ -54,28 +48,6 @@ export class TopBarFFI {
     });
   }
 
-  getTitle(): Promise<string> {
-    return new Promise<string>((resolve, reject) => {
-      const title = this._ffi.getTitle();
-      resolve(title);
-    });
-  }
-
-  setTitle(title: string): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this._ffi.setTitle(title);
-      resolve();
-    });
-  }
-
-  hasTitle(): Promise<boolean> {
-    return new Promise<boolean>((resolve, reject) => {
-      const hasTitle = this._ffi.hasTitle();
-
-      resolve(hasTitle);
-    });
-  }
-
   getHeight(): Promise<number> {
     return new Promise<number>((resolve, reject) => {
       const height = this._ffi.getHeight();
@@ -84,17 +56,9 @@ export class TopBarFFI {
     });
   }
 
-  getActions(): Promise<Plaoc.TopBarItem[]> {
-    return new Promise<Plaoc.TopBarItem[]>((resolve, reject) => {
-      const actionList = JSON.parse(this._ffi.getActions());
-
-      resolve(actionList);
-    });
-  }
-
-  setActions(actionList: Plaoc.TopBarItem[]): Promise<void> {
+  setHeight(height: number): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      this._ffi.setActions(JSON.stringify(actionList));
+      this._ffi.setHeight(height);
 
       resolve();
     });
@@ -134,8 +98,23 @@ export class TopBarFFI {
   setForegroundColor(colorObject: Plaoc.IColor): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       const colorHex = this.getColorInt(colorObject.color, colorObject.alpha);
-
       this._ffi.setForegroundColor(colorHex);
+
+      resolve();
+    });
+  }
+
+  getActions(): Promise<Plaoc.BottomBarItem[]> {
+    return new Promise<Plaoc.BottomBarItem[]>((resolve, reject) => {
+      const actionList = JSON.parse(this._ffi.getActions());
+
+      resolve(actionList);
+    });
+  }
+
+  setActions(actionList: Plaoc.BottomBarItem[]): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      this._ffi.setActions(JSON.stringify(actionList));
 
       resolve();
     });
