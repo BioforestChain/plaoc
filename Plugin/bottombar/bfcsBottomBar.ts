@@ -163,8 +163,8 @@ export class BfcsBottomBar extends HTMLElement {
   static get observedAttributes() {
     return [
       "disabled",
-      "backgroudColor",
-      "foregroundColor",
+      "background-color",
+      "foreground-color",
       "overlay",
       "height",
       "alpha",
@@ -176,9 +176,9 @@ export class BfcsBottomBar extends HTMLElement {
     oldVal: unknown,
     newVal: unknown
   ) {
-    if (attrName === "backgroudColor") {
+    if (attrName === "background-color") {
       await this.setBackgroundColor(newVal as string);
-    } else if (attrName === "foregroundColor") {
+    } else if (attrName === "foreground-color") {
       await this.setForegroundColor(newVal as string);
     } else if (attrName === "height") {
       await this.setHeight(newVal as number);

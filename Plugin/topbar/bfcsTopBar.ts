@@ -178,8 +178,8 @@ export class BfcsTopBar extends HTMLElement {
     return [
       "title",
       "disabled",
-      "backgroudColor",
-      "foregroundColor",
+      "background-color",
+      "foreground-color",
       "overlay",
       "alpha",
     ];
@@ -192,9 +192,9 @@ export class BfcsTopBar extends HTMLElement {
   ) {
     if (attrName === "title") {
       await this.setTitle(newVal as string);
-    } else if (attrName === "backgroudColor") {
+    } else if (attrName === "background-color") {
       await this.setBackgroundColor(newVal as string);
-    } else if (attrName === "foregroundColor") {
+    } else if (attrName === "foreground-color") {
       await this.setForegroundColor(newVal as string);
     } else if (attrName === "overlay") {
       if (this.hasAttribute(attrName)) {
