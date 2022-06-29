@@ -180,10 +180,9 @@ extension CustomWebView:  WKScriptMessageHandler {
             let isHidden = hidden == "1" ? true : false
             controller?.hiddenNavigationBar(isHidden: isHidden)
         } else if message.name == "updateNaviBarAlpha" {
-            guard let alpha = message.body as? String else { return }
+            guard let alpha = message.body as? Float else { return }
             let controller = currentViewController() as? WebViewViewController
-            let isAlpha = alpha == "1" ? true : false
-            controller?.updateNavigationBarAlpha(isAlpha: isAlpha)
+            controller?.updateNavigationBarAlpha(alpha: alpha)
         } else if message.name == "customNaviActions" {
             print(message.body)
             guard let body = message.body as? [[String:Any]] else { return }
@@ -204,28 +203,27 @@ extension CustomWebView:  WKScriptMessageHandler {
             let controller = currentViewController() as? WebViewViewController
             controller?.updateStatusBackgroundColor(dict: colorDict)
         } else if message.name == "updateStatusStyle" {
+            guard let style = message.body as? String else { return }
             let controller = currentViewController() as? WebViewViewController
-            controller?.updateStatusStyle()
+            controller?.updateStatusStyle(style: style)
         } else if message.name == "updateStatusHidden" {
             guard let hidden = message.body as? String else { return }
             let controller = currentViewController() as? WebViewViewController
             let isHidden = hidden == "1" ? true : false
             controller?.updateStatusHidden(isHidden: isHidden)
         } else if message.name == "updateStatusAlpha" {
-            guard let overlay = message.body as? String else { return }
+            guard let overlay = message.body as? Float else { return }
             let controller = currentViewController() as? WebViewViewController
-            let isOverlay = overlay == "1" ? true : false
-            controller?.updateStatusBarAlpha(isOverlay: isOverlay)
+            controller?.updateStatusBarAlpha(overlay: overlay)
         } else if message.name == "hiddenBottomView" {
             guard let hidden = message.body as? String else { return }
             let controller = currentViewController() as? WebViewViewController
             let isHidden = hidden == "1" ? true : false
             controller?.hiddenBottomView(isHidden: isHidden)
         } else if message.name == "updateBottomViewAlpha" {
-            guard let alpha = message.body as? String else { return }
+            guard let alpha = message.body as? Float else { return }
             let controller = currentViewController() as? WebViewViewController
-            let isAlpha = alpha == "1" ? true : false
-            controller?.updateBottomViewAlpha(isAlpha: isAlpha)
+            controller?.updateBottomViewAlpha(alpha: alpha)
         } else if message.name == "updateBottomViewBackgroundColor" {
             guard let colorDict = message.body as? [String:Any] else { return }
             let controller = currentViewController() as? WebViewViewController

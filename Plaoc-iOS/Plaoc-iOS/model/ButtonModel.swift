@@ -41,7 +41,7 @@ struct IconModel {
         size = dict["size"].stringValue
     }
     
-    var iconDict: [String:Any] {
+    var iconDict: [String:String?] {
         return ["source":source,
                 "type":type,
                 "description":description,

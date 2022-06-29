@@ -13,10 +13,10 @@
     </style>
 </head>
 <body>
-    <!-- <dweb-status-bar overlay>
-        <dweb-status-bar-color id="sss" darkicons="0" colorhex="#ff0000" alpha="0.5"></dweb-status-bar-color>
-    </dweb-status-bar> -->
-    <dweb-top-bar id="topbar" title="test">
+    <dweb-status-bar overlay>
+        <dweb-status-bar-color id="sss" darkicons="0" colorhex="#ff0000" opacity="0.5"></dweb-status-bar-color>
+    </dweb-status-bar>
+    <dweb-top-bar id="topbar" title="test" background-color="#ff0000" foreground-color="#00ff00">
         <dweb-top-bar-button id="aaa">
             <dweb-icon source="Filled.AddCircle"></dweb-icon>
         </dweb-top-bar-button>
@@ -30,33 +30,33 @@
     <div id="content">
         <p>test</p>
     </div>
-    <dweb-bottom-bar id="bottom_bar">
+    <dweb-bottom-bar id="bottom_bar" background-color="#ff0000" foreground-color="#00ff00">
         <dweb-bottom-bar-button id="ddd" selectable>
             <dweb-icon source="Filled.AddCircle"></dweb-icon>
         </dweb-bottom-bar-button>
-        <dweb-bottom-bar-button id="eee">
+        <dweb-bottom-bar-button disabled>
             <dweb-icon source="http://172.30.95.56:5500/Plaoc-Android/app/src/main/assets/icon/ico_bottom_tab_publisher.svg" type="AssetIcon"></dweb-icon>
         </dweb-bottom-bar-button>
         <dweb-bottom-bar-button selected selectable>
             <dweb-icon source="Filled.Add"></dweb-icon>
         </dweb-bottom-bar-button>
     </dweb-bottom-bar>
-    <!-- <dweb-keyboard for="key"></dweb-keyboard>
-    <dweb-dialog-alert title="alert" content="content">
-        <dweb-dialog-button id="ddb">ok</dweb-dialog-button>
-    </dweb-dialog-alert>
-    <dweb-dialog-prompt title="prompt" label="label" defaultValue="default">
-        <dweb-dialog-button>ok</dweb-dialog-button>
-        <dweb-dialog-button>No</dweb-dialog-button>
-    </dweb-dialog-prompt>
-    <dweb-dialog-confirm title="confirm" message="message" visible>
-        <dweb-dialog-button id="ok">ok</dweb-dialog-button>
-        <dweb-dialog-button id="no">No</dweb-dialog-button>
-    </dweb-dialog-confirm>
-    <dweb-dialog-before-unload id="before_unload" title="test" message="before-unload">
-        <dweb-dialog-button>ok</dweb-dialog-button>
-        <dweb-dialog-button>No</dweb-dialog-button>
-    </dweb-dialog-before-unload> -->
+<!--    <dweb-keyboard for="key"></dweb-keyboard>-->
+<!--    <dweb-dialog-alert title="alert" content="content">-->
+<!--        <dweb-dialog-button id="ddb">ok</dweb-dialog-button>-->
+<!--    </dweb-dialog-alert>-->
+<!--    <dweb-dialog-prompt title="prompt" label="label" defaultValue="default">-->
+<!--        <dweb-dialog-button>ok</dweb-dialog-button>-->
+<!--        <dweb-dialog-button>No</dweb-dialog-button>-->
+<!--    </dweb-dialog-prompt>-->
+<!--    <dweb-dialog-confirm title="confirm" message="message" visible>-->
+<!--        <dweb-dialog-button id="ok">ok</dweb-dialog-button>-->
+<!--        <dweb-dialog-button id="no">No</dweb-dialog-button>-->
+<!--    </dweb-dialog-confirm>-->
+<!--    <dweb-dialog-before-unload id="before_unload" title="test" message="before-unload">-->
+<!--        <dweb-dialog-button>ok</dweb-dialog-button>-->
+<!--        <dweb-dialog-button>No</dweb-dialog-button>-->
+<!--    </dweb-dialog-before-unload>-->
     <p>test</p>
     <p>test</p>
     <p>test</p>
@@ -77,39 +77,53 @@
 
     <script>
         aaa.onclick = async () => {
-            content.innerHTML = "content";
-            alert(1);
-            await topbar.setTitle("title");
+            //content.innerHTML = "content";
+            //alert(1);
+            //await topbar.setTitle("title");
+            //await topbar.back();
+            //await topbar.toggleEnabled();
+            //alert(await topbar.getOverlay());
+            //await topbar.toggleOverlay();
+            //alert(await topbar.getOverlay());
+            //await topbar.setTitle("title");
+            //alert(await topbar.hasTitle());
+            //alert(await topbar.getTitle());
+            //alert("height: " + await topbar.getHeight());
+            //alert(JSON.stringify(await topbar.getActions()));
+            //alert(await bottom_bar.getEnabled());
+            //await bottom_bar.toggleEnabled();
+            //alert(await bottom_bar.getHeight());
+            //await bottom_bar.setHeight(100);
+            //alert(JSON.stringify(await bottom_bar.getActions()));
+            alert(await bottom_bar.getOverlay());
+            await bottom_bar.toggleOverlay();
         }
 
         let colors = {
-            textColor: 0xffaa0000,
-            textColorSelected: 0xaa00ff00,
-            iconColor: 0xffaa0000,
-            iconColorSelected: 0xaa00ff00,
+            textColor: "#ffaa0000",
+            textColorSelected: "#aa00ff00",
+            iconColor: "#ffaa0000",
+            iconColorSelected: "#aa00ff00",
         };
 
         ddd.setAttribute("colors", JSON.stringify(colors));
 
         ddd.onclick = async () => {
-            content.innerHTML = "bottom";
-            alert(2);
-            await topbar.setBackgroundColor("#ff0000");
-            alert(await topbar.getBackgroundColor());
-            before_unload.setAttribute("visible", "");
+            //content.innerHTML = "bottom";
+            //alert(2);
+            //await topbar.setBackgroundColor("#ff0000");
+            //alert(await topbar.getBackgroundColor());
+            //before_unload.setAttribute("visible", "");
+            //await topbar.toggleEnabled();
         }
 
         ddb.onclick = () => {
             content.innerHTML = "alert";
         };
-        
-        eee.onclick = () => {
-            content.textContent = "selectable";
-        }
 
-        //ok.onclick = () => {
-        //    content.innerHTML = "ok";
-        //}
+        ok.onclick = () => {
+            content.innerHTML = "ok";
+        }
         // no.onclick = () => {
         //     content.innerHTML = "no";
         // }

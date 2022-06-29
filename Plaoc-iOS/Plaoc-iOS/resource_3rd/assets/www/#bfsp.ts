@@ -6,10 +6,9 @@ export default defineConfig((info) => {
       ".": "./index.ts",
     },
     deps: [
-      "@plaoc/plugin-typings",
       "@plaoc/plugin-icon",
-      "@plaoc/plugin-top-bar-android",
-      // "@plaoc/plugin-bottom-bar",
+      "@plaoc/plugin-top-bar-ios",
+      "@plaoc/plugin-bottom-bar-ios",
       // "@plaoc/plugin-status-bar",
       // "@plaoc/plugin-dialogs",
       // "@plaoc/plugin-keyboard",

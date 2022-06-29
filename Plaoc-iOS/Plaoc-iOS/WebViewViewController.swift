@@ -14,9 +14,9 @@ class WebViewViewController: UIViewController {
     private var isNaviHidden: Bool = false
     private var isBottomHidden: Bool = false
     private var isStatusHidden: Bool = false
-    private var isNaviAlpha: Bool = false
-    private var isStatusAlpha: Bool = false
-    private var isBottomAlpha: Bool = false
+    private var naviAlpha: Float = 1.0
+    private var statusAlpha: Float = 1.0
+    private var bottomAlpha: Float = 1.0
     private var naviBackgroundColorDict: [String:Any] = [:]
     private var bottomViewBackgroundColorDict: [String:Any] = [:]
     private var bottomViewForegroundColorDict: [String:Any] = [:]
@@ -96,13 +96,13 @@ class WebViewViewController: UIViewController {
 
 // naviBar和js的交互
 extension WebViewViewController {
-    
+    //更新naviView的是否隐藏
     func hiddenNavigationBar(isHidden: Bool) {
         guard isNaviHidden != isHidden else { return }
         isNaviHidden = isHidden
         naviView.isHidden = isHidden
         
-        guard !isNaviAlpha else { return }
+        guard naviAlpha >= 1.0 else { return }
         var frame = webView.frame
         
         if isNaviHidden {
@@ -118,14 +118,14 @@ extension WebViewViewController {
             self.webView.updateFrame(frame: frame)
         }
     }
-    
-    func updateNavigationBarAlpha(isAlpha: Bool) {
-        guard isNaviAlpha != isAlpha else { return }
-        isNaviAlpha = isAlpha
-        naviView.alpha = isAlpha ? 0.5 : 1.0
+    //更新naviView的透明度
+    func updateNavigationBarAlpha(alpha: Float) {
+        guard naviAlpha != alpha else { return }
+        naviAlpha = alpha
+        naviView.alpha = CGFloat(alpha)
         guard !isNaviHidden else { return }
         var frame = webView.frame
-        if isNaviAlpha {
+        if alpha < 1.0 {
             frame.origin.y = UIDevice.current.statusBarHeight()
             frame.size.height += 44
         } else {
@@ -137,7 +137,7 @@ extension WebViewViewController {
             self.webView.updateFrame(frame: frame)
         }
     }
-    
+    //更新naviView的背景色
     func updateNavigationBarBackgroundColor(colorDict: [String:Any]) {
         naviBackgroundColorDict = colorDict
         if let color = colorDict["color"] as? String {
@@ -172,7 +172,7 @@ extension WebViewViewController {
         UIGraphicsEndImageContext()
         return image
     }
-    
+    //更新naviView的前景色
     func updateNavigationBarTintColor(colorDict: [String:Any]) {
         if let alpha = colorDict["alpha"] as? Float {
             naviView.tineAlpha = CGFloat(alpha)
@@ -181,27 +181,27 @@ extension WebViewViewController {
             naviView.tineColor = color
         }
     }
-    
+    //设置naviView的按钮
     func fetchCustomButtons(buttons: [ButtonModel]) {
         naviView.buttons = buttons.reversed()
     }
-    
+    //返回naviView的标题
     func titleString() -> String {
         return naviView.titleString ?? ""
     }
-    
-    func overlay() -> Bool {
-        return isNaviAlpha
+    //返回naviView是否透明
+    func overlay() -> Float {
+        return naviAlpha
     }
-    
+    //返回naviView的背景色
     func naviViewBackgroundColor() -> [String:Any] {
         return naviBackgroundColorDict
     }
-    
+    //返回naviView是否隐藏
     func naviHidden() -> Bool {
         return naviView.isHidden
     }
-    
+    //返回naviView的前景色
     func naviViewForegroundColor() -> [String:Any] {
         var dict: [String:Any] = [:]
         if let alpha = naviView.tineAlpha {
@@ -212,7 +212,7 @@ extension WebViewViewController {
         }
         return dict
     }
-    
+    //返回naviView的按钮
     func naviActions() -> [[String:Any]] {
         guard let buttons = naviView.buttons else { return [] }
         var array: [[String:Any]] = []
@@ -225,7 +225,7 @@ extension WebViewViewController {
 
 // statusBar和js的交互
 extension WebViewViewController {
-    
+    //更新状态栏背景色
     func updateStatusBackgroundColor(dict: [String:Any]) {
         if let color = dict["colorHex"] as? String {
             statusView.backgroundColor = UIColor(hexString: color)
@@ -234,42 +234,50 @@ extension WebViewViewController {
             statusView.alpha = alpha
         }
     }
-    
-    func updateStatusStyle() {
-        if self.style == .default {
-            self.style = .lightContent
-        } else {
+    //更新状态栏状态
+    func updateStatusStyle(style: String) {
+        if style == "default" {
             self.style = .default
+        } else {
+            self.style = .lightContent
         }
         setNeedsStatusBarAppearanceUpdate()
     }
-    
+    //状态栏是否隐藏
     func updateStatusHidden(isHidden: Bool) {
         isStatusHidden = isHidden
         setNeedsStatusBarAppearanceUpdate()
     }
-    
-    func updateStatusBarAlpha(isOverlay: Bool) {
-        isStatusAlpha = isOverlay
-        statusView.alpha = isStatusAlpha ? 0.5 : 1.0
+    //更新状态栏透明度
+    func updateStatusBarAlpha(overlay: Float) {
+        statusAlpha = overlay
+        statusView.alpha = CGFloat(statusAlpha)
     }
-    
+    //返回状态栏是否隐藏
     func statusBarVisible() -> Bool {
         return isStatusHidden
     }
-    
-    func statusBarOverlay() -> Bool {
-        return isStatusAlpha
+    //返回状态栏透明度
+    func statusBarOverlay() -> Float {
+        return statusAlpha
+    }
+    //返回状态栏状态
+    func statusBarStyle() -> String {
+        if style == .default {
+            return "default"
+        } else {
+            return "lightContent"
+        }
     }
 }
 // bottomBar和js的交互
 extension WebViewViewController {
-    
+    //隐藏底部
     func hiddenBottomView(isHidden: Bool) {
         guard isBottomHidden != isHidden else { return }
         isBottomHidden = isHidden
         bottomView.isHidden = isHidden
-        guard !isBottomAlpha else { return }
+        guard bottomAlpha >= 1.0 else { return }
         var frame = webView.frame
         
         if isBottomHidden {
@@ -283,16 +291,16 @@ extension WebViewViewController {
             self.webView.updateFrame(frame: frame)
         }
     }
-    
-    func updateBottomViewAlpha(isAlpha: Bool) {
-        guard isBottomAlpha != isAlpha else { return }
-        isBottomAlpha = isAlpha
-        bottomView.alpha = isAlpha ? 0.5 : 1.0
+    //更新底部透明度
+    func updateBottomViewAlpha(alpha: Float) {
+        guard bottomAlpha != alpha else { return }
+        bottomAlpha = alpha
+        bottomView.alpha = CGFloat(alpha)
         
         guard !isBottomHidden else { return }
         var frame = webView.frame
         
-        if isBottomAlpha {
+        if alpha < 1.0 {
             frame.size.height += 49 + UIDevice.current.tabbarSpaceHeight()
         } else {
             frame.size.height -= 49 + UIDevice.current.tabbarSpaceHeight()
@@ -303,7 +311,7 @@ extension WebViewViewController {
             self.webView.updateFrame(frame: frame)
         }
     }
-    
+    //更新底部背景色
     func updateBottomViewBackgroundColor(dict: [String:Any]) {
         bottomViewBackgroundColorDict = dict
         if let color = dict["color"] as? String {
@@ -313,12 +321,12 @@ extension WebViewViewController {
             }
         }
     }
-    
+    //更新底部颜色
     func updateBottomViewforegroundColor(dict: [String:Any]) {
         //TODO
         bottomViewForegroundColorDict = dict
     }
-    
+    //更新底部高度
     func updateBottomViewHeight(height: CGFloat) {
         var frame = bottomView.frame
         frame.size.height = height
@@ -328,37 +336,37 @@ extension WebViewViewController {
             self.bottomView.frame = frame
         }
     }
-    
+    //隐藏底部按钮
     func hiddenBottomViewButton(hiddenString: String) {
         bottomView.hiddenBtn = hiddenString == "1" ? false : true
     }
-    
+    //返回底部是否隐藏
     func bottombarEnabled() -> Bool{
         return isBottomHidden
     }
-    
-    func bottombarOverlay() -> Bool {
-        return isBottomAlpha
+    //返回底部是否有透明度
+    func bottombarOverlay() -> Float {
+        return bottomAlpha
     }
-    
+    //返回底部背景颜色
     func bottomBarBackgroundColor() -> [String:Any] {
         return bottomViewBackgroundColorDict
     }
-    
+    //返回底部高度
     func bottomViewHeight() -> CGFloat {
         return bottomView.frame.height
     }
-    
+    //返回底部颜色
     func bottomBarForegroundColor() -> [String:Any] {
         //TODO
         return bottomViewForegroundColorDict
     }
-    
+    //获取底部按钮
     func fetchBottomButtons(buttons: [BottomBarModel]) {
         bottomView.isHidden = false
         bottomView.buttons = buttons
     }
-    
+    //返回底部按钮数组
     func bottomActions() -> [[String:Any]] {
         guard let buttons = bottomView.buttons else { return [] }
         var array: [[String:Any]] = []

@@ -56,7 +56,7 @@ struct ColorModel {
         textColorSelected = dict["textColorSelected"].intValue
     }
     
-    var colorDict: [String:Any] {
+    var colorDict: [String:Int?] {
         return ["indicatorColor":indicatorColor,
                 "iconColor":iconColor,
                 "iconColorSelected":iconColorSelected,

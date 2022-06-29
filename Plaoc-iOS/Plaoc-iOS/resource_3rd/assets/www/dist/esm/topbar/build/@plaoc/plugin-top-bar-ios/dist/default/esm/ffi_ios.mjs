@@ -32,7 +32,7 @@ class e {
     });
   }
   async getTitle() {
-    return this._ffi.getNaviTitle.postMessage(null);
+    return await this._ffi.getNaviTitle.postMessage(null);
   }
   setTitle(e2) {
     return new Promise((s, t) => {

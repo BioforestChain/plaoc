@@ -6,7 +6,7 @@ class e extends HTMLElement {
     });
   }
   connectedCallback() {
-    this._observer.observe(this, { subtree: true, childList: true, attributes: true, attributeFilter: ["disabled", "icon", "type", "description", "size", "source"] });
+    this._observer.observe(this, { subtree: true, childList: true, attributes: true });
   }
   disconnectedCallback() {
     this._observer.disconnect();
@@ -43,6 +43,7 @@ class e extends HTMLElement {
   }
   async setBackgroundColor(t = "#ffffff") {
     const e2 = { color: t, alpha: this.getAttribute("alpha") && this.getAttribute("alpha").length > 0 ? parseFloat(this.getAttribute("alpha")) : 0.5 };
+      alert(JSON.stringify(e2));
     await this._ffi.setBackgroundColor(e2);
   }
   async getForegroundColor() {
@@ -70,10 +71,10 @@ class e extends HTMLElement {
     }), await this.setActions();
   }
   static get observedAttributes() {
-    return ["title", "disabled", "backgroudColor", "foregroundColor", "overlay", "alpha"];
+    return ["title", "disabled", "background-color", "foreground-color", "overlay", "alpha"];
   }
   async attributeChangedCallback(t, e2, i) {
-    t === "title" ? await this.setTitle(i) : t === "backgroudColor" ? await this.setBackgroundColor(i) : t === "foregroundColor" ? await this.setForegroundColor(i) : t === "overlay" ? this.hasAttribute(t) && await this._ffi.setOverlay() : t === "disabled" && this.hasAttribute(t) && await this._ffi.setHidden();
+    t === "title" ? await this.setTitle(i) : t === "background-color" ? await this.setBackgroundColor(i) : t === "foreground-color" ? await this.setForegroundColor(i) : t === "overlay" ? this.hasAttribute(t) && await this._ffi.setOverlay() : t === "disabled" && this.hasAttribute(t) && await this._ffi.setHidden();
   }
 }
 export { e as BfcsTopBar };
