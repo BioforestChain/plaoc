@@ -15,8 +15,8 @@
       ],
       "attributes": [
         { "name": "title", "description": "title" },
-        { "name": "backgroundColor", "description": "backgroundColor" },
-        { "name": "foregroundColor", "description": "foregroundColor" },
+        { "name": "background-color", "description": "backgroundColor" },
+        { "name": "foreground-color", "description": "foregroundColor" },
         { "name": "alpha", "description": "alpha" },
         { "name": "overlay", "description": "overlay", "valueSet": "v" },
         {
@@ -50,8 +50,8 @@
       "name": "dweb-bottom-bar",
       "description": "dweb bottom bar web components",
       "attributes": [
-        { "name": "backgroundColor", "description": "backgroundColor" },
-        { "name": "foregroundColor", "description": "foregroundColor" },
+        { "name": "background-color", "description": "backgroundColor" },
+        { "name": "foreground-color", "description": "foregroundColor" },
         { "name": "overlay", "description": "overlay", "valueSet": "v" },
         { "name": "height", "description": "height", "valueSet": "v" },
         { "name": "alpha", "description": "alpha" }
