@@ -23,8 +23,14 @@ class NaviView: UIView {
             guard tineColor != nil else { return }
             titleLabel.textColor = UIColor(hexString: tineColor!)
             backButton.setTitleColor(UIColor(hexString: tineColor!), for: .normal)
+            if tineAlpha != nil {
+                titleLabel.textColor = UIColor(hexString: tineColor!).withAlphaComponent(tineAlpha!)
+                backButton.setTitleColor(UIColor(hexString: tineColor!).withAlphaComponent(tineAlpha!), for: .normal)
+            }
         }
     }
+    
+    var tineAlpha: CGFloat?
     
     var buttons: [ButtonModel]? {
         didSet {

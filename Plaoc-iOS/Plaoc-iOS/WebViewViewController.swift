@@ -17,6 +17,9 @@ class WebViewViewController: UIViewController {
     private var isNaviAlpha: Bool = false
     private var isStatusAlpha: Bool = false
     private var isBottomAlpha: Bool = false
+    private var naviBackgroundColorDict: [String:Any] = [:]
+    private var bottomViewBackgroundColorDict: [String:Any] = [:]
+    private var bottomViewForegroundColorDict: [String:Any] = [:]
     
     private var style: UIStatusBarStyle = .default
     
@@ -135,8 +138,14 @@ extension WebViewViewController {
         }
     }
     
-    func updateNavigationBarBackgroundColor(colorString: String) {
-        naviView.backgroundColor = UIColor(hexString: colorString)
+    func updateNavigationBarBackgroundColor(colorDict: [String:Any]) {
+        naviBackgroundColorDict = colorDict
+        if let color = colorDict["color"] as? String {
+            naviView.backgroundColor = UIColor(hexString: color)
+            if let alpha = colorDict["alpha"] as? Float {
+                naviView.backgroundColor = UIColor(hexString: color).withAlphaComponent(CGFloat(alpha))
+            }
+        }
         
 //        self.navigationController?.navigationBar.backgroundColor = .orange
 //        let image = createImageWithColor(.orange, frame: CGRect(x: 0, y: 0.5, width: 1, height: 0.5))
@@ -164,8 +173,13 @@ extension WebViewViewController {
         return image
     }
     
-    func updateNavigationBarTintColor(colorString: String) {
-        naviView.tineColor = colorString
+    func updateNavigationBarTintColor(colorDict: [String:Any]) {
+        if let alpha = colorDict["alpha"] as? Float {
+            naviView.tineAlpha = CGFloat(alpha)
+        }
+        if let color = colorDict["color"] as? String {
+            naviView.tineColor = color
+        }
     }
     
     func fetchCustomButtons(buttons: [ButtonModel]) {
@@ -180,16 +194,23 @@ extension WebViewViewController {
         return isNaviAlpha
     }
     
-    func naviViewBackgroundColor() -> UIColor {
-        return naviView.backgroundColor ?? .white
+    func naviViewBackgroundColor() -> [String:Any] {
+        return naviBackgroundColorDict
     }
     
     func naviHidden() -> Bool {
         return naviView.isHidden
     }
     
-    func naviViewForegroundColor() -> String {
-        return naviView.tineColor ?? ""
+    func naviViewForegroundColor() -> [String:Any] {
+        var dict: [String:Any] = [:]
+        if let alpha = naviView.tineAlpha {
+            dict["alpha"] = alpha
+        }
+        if let color = naviView.tineColor {
+            dict["color"] = color
+        }
+        return dict
     }
     
     func naviActions() -> [[String:Any]] {
@@ -209,7 +230,7 @@ extension WebViewViewController {
         if let color = dict["colorHex"] as? String {
             statusView.backgroundColor = UIColor(hexString: color)
         }
-        if let alpha = dict["darkIcons"] as? CGFloat {
+        if let alpha = dict["alpha"] as? CGFloat {
             statusView.alpha = alpha
         }
     }
@@ -283,12 +304,19 @@ extension WebViewViewController {
         }
     }
     
-    func updateBottomViewBackgroundColor(colorString: String) {
-        bottomView.backgroundColor = UIColor(hexString: colorString)
+    func updateBottomViewBackgroundColor(dict: [String:Any]) {
+        bottomViewBackgroundColorDict = dict
+        if let color = dict["color"] as? String {
+            bottomView.backgroundColor = UIColor(hexString: color)
+            if let alpha = dict["alpha"] as? Float {
+                bottomView.backgroundColor = UIColor(hexString: color).withAlphaComponent(CGFloat(alpha))
+            }
+        }
     }
     
-    func updateBottomViewforegroundColor(colorString: String) {
+    func updateBottomViewforegroundColor(dict: [String:Any]) {
         //TODO
+        bottomViewForegroundColorDict = dict
     }
     
     func updateBottomViewHeight(height: CGFloat) {
@@ -313,16 +341,17 @@ extension WebViewViewController {
         return isBottomAlpha
     }
     
-    func bottomBarBackgroundColor() -> UIColor {
-        return bottomView.backgroundColor ?? .white
+    func bottomBarBackgroundColor() -> [String:Any] {
+        return bottomViewBackgroundColorDict
     }
     
     func bottomViewHeight() -> CGFloat {
         return bottomView.frame.height
     }
     
-    func bottomBarForegroundColor() -> UIColor {
-        return .white  //TODO
+    func bottomBarForegroundColor() -> [String:Any] {
+        //TODO
+        return bottomViewForegroundColorDict
     }
     
     func fetchBottomButtons(buttons: [BottomBarModel]) {

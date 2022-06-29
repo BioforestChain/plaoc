@@ -192,13 +192,13 @@ extension CustomWebView:  WKScriptMessageHandler {
             let buttons = list.arrayValue.map { ButtonModel(dict: $0) }
             controller?.fetchCustomButtons(buttons: buttons)
         } else if message.name == "updateNaviBarBackgroundColor" {
-            guard let colorString = message.body as? String else { return }
+            guard let colorDict = message.body as? [String:Any] else { return }
             let controller = currentViewController() as? WebViewViewController
-            controller?.updateNavigationBarBackgroundColor(colorString: colorString)
+            controller?.updateNavigationBarBackgroundColor(colorDict: colorDict)
         } else if message.name == "updateNaviBarTintColor" {
-            guard let colorString = message.body as? String else { return }
+            guard let colorDict = message.body as? [String:Any] else { return }
             let controller = currentViewController() as? WebViewViewController
-            controller?.updateNavigationBarTintColor(colorString: colorString)
+            controller?.updateNavigationBarTintColor(colorDict: colorDict)
         } else if message.name == "updateStatusBackgroundColor" {
             guard let colorDict = message.body as? [String: String] else { return }
             let controller = currentViewController() as? WebViewViewController
@@ -227,17 +227,17 @@ extension CustomWebView:  WKScriptMessageHandler {
             let isAlpha = alpha == "1" ? true : false
             controller?.updateBottomViewAlpha(isAlpha: isAlpha)
         } else if message.name == "updateBottomViewBackgroundColor" {
-            guard let colorString = message.body as? String else { return }
+            guard let colorDict = message.body as? [String:Any] else { return }
             let controller = currentViewController() as? WebViewViewController
-            controller?.updateBottomViewBackgroundColor(colorString: colorString)
+            controller?.updateBottomViewBackgroundColor(dict: colorDict)
         } else if message.name == "hiddenBottomViewButton" {
             guard let bodyString = message.body as? String else { return }
             let controller = currentViewController() as? WebViewViewController
             controller?.hiddenBottomViewButton(hiddenString: bodyString)
         } else if message.name == "updateBottomViewForegroundColor" {
-            guard let bodyString = message.body as? String else { return }
+            guard let bodyDict = message.body as? [String:Any] else { return }
             let controller = currentViewController() as? WebViewViewController
-            controller?.updateBottomViewforegroundColor(colorString: bodyString)
+            controller?.updateBottomViewforegroundColor(dict: bodyDict)
         } else if message.name == "updateBottomViewHeight" {
             guard let body = message.body as? Float else { return }
             let controller = currentViewController() as? WebViewViewController
@@ -342,8 +342,8 @@ extension CustomWebView: WKScriptMessageHandlerWithReply {
             replyHandler(naviHeight,nil)
         } else if message.name == "bottomHeight" {
             let controller = currentViewController() as? WebViewViewController
-            let naviHeight = controller?.bottomViewHeight()
-            replyHandler(naviHeight,nil)
+            let bottomHeight = controller?.bottomViewHeight()
+            replyHandler(bottomHeight,nil)
         } else if message.name == "getNaviEnabled" {
             let controller = currentViewController() as? WebViewViewController
             let isHidden = controller?.naviHidden()
@@ -399,8 +399,8 @@ extension CustomWebView: WKScriptMessageHandlerWithReply {
             replyHandler(dict,nil)
         } else if message.name == "getBottomViewForegroundColor" {
             let controller = currentViewController() as? WebViewViewController
-            let dict = controller?.bottomBarForegroundColor()
-            replyHandler(dict,nil)
+            let color = controller?.bottomBarForegroundColor()
+            replyHandler(color,nil)
         } else if message.name == "getKeyboardOverlay" {
             replyHandler(isKeyboardOverlay,nil)
         }
