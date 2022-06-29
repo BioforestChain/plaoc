@@ -61,14 +61,14 @@ class CustomWebView: UIView {
     }()
     
     private func addScriptMessageHandler(config: WKWebViewConfiguration) {
-        let array = ["hiddenBottomView","updateBottomViewAlpha","updateBottomViewBackgroundColor","hiddenBottomViewButton","updateStatusAlpha","updateStatusBackgroundColor","updateStatusStyle","updateStatusHidden","hiddenNaviBar","updateNaviBarAlpha","updateNaviBarBackgroundColor","updateNaviBarTintColor","back","jumpWeb","updateTitle","startLoad","LoadingComplete","savePhoto","startCamera","photoFromPhotoLibrary","startShare","updateBottomViewForegroundColor","customNaviActions","openAlert","openPrompt","openConfirm","openBeforeUnload","setKeyboardOverlay","updateBottomViewHeight","setForegroundColor"]
+        let array = ["hiddenBottomView","updateBottomViewAlpha","updateBottomViewBackgroundColor","hiddenBottomViewButton","updateStatusAlpha","updateStatusBackgroundColor","updateStatusStyle","updateStatusHidden","hiddenNaviBar","updateNaviBarAlpha","updateNaviBarBackgroundColor","updateNaviBarTintColor","back","jumpWeb","updateTitle","startLoad","LoadingComplete","savePhoto","startCamera","photoFromPhotoLibrary","startShare","updateBottomViewForegroundColor","customNaviActions","openAlert","openPrompt","openConfirm","openBeforeUnload","setKeyboardOverlay","updateBottomViewHeight","setForegroundColor","customBottomActions"]
         for name in array {
             config.userContentController.add(LeadScriptHandle(messageHandle: self), name: name)
         }
     }
     
     private func addScriptMessageHandlerWithReply(config: WKWebViewConfiguration) {
-        let array = ["calendar","naviHeight","bottomHeight","getNaviEnabled","hasNaviTitle","getNaviOverlay","getNaviBackgroundColor","getNaviForegroundColor","getBottomBarEnabled","getBottomBarOverlay","getBottomActions","getBottomBarBackgroundColor","getKeyboardOverlay","getForegroundColor"]
+        let array = ["calendar","naviHeight","bottomHeight","getNaviEnabled","hasNaviTitle","getNaviOverlay","getNaviBackgroundColor","getNaviForegroundColor","getBottomBarEnabled","getBottomBarOverlay","getBottomActions","getBottomBarBackgroundColor","getKeyboardOverlay","getForegroundColor","getNaviTitle","getNaviActions"]
         for name in array {
             config.userContentController.addScriptMessageHandler(self, contentWorld: .page, name: name)
         }
@@ -98,7 +98,8 @@ extension CustomWebView {
     
     func openWebView(html: String) {
         if let url = URL(string: html) {
-            let request = URLRequest(url: url)
+//            let request = URLRequest(url: url)
+            let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData, timeoutInterval: 30)
             self.webView.load(request)
         }
     }
@@ -108,7 +109,7 @@ extension CustomWebView {
         var path = name
         path = "file://".appending(path)
         if let url = URL(string: path) {
-            self.webView.load(URLRequest(url: url))
+            self.webView.load(URLRequest(url: url, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData, timeoutInterval: 30))
         }
     }
     
@@ -236,10 +237,6 @@ extension CustomWebView:  WKScriptMessageHandler {
         } else if message.name == "updateBottomViewForegroundColor" {
             guard let bodyString = message.body as? String else { return }
             let controller = currentViewController() as? WebViewViewController
-            controller?.hiddenBottomViewButton(hiddenString: bodyString)
-        } else if message.name == "setForegroundColor" {
-            guard let bodyString = message.body as? String else { return }
-            let controller = currentViewController() as? WebViewViewController
             controller?.updateBottomViewforegroundColor(colorString: bodyString)
         } else if message.name == "updateBottomViewHeight" {
             guard let body = message.body as? Float else { return }
@@ -247,6 +244,7 @@ extension CustomWebView:  WKScriptMessageHandler {
             controller?.updateBottomViewHeight(height: CGFloat(body))
         }else if message.name == "customBottomActions" {
             guard let body = message.body as? [[String:Any]] else { return }
+            print(body)
             let controller = currentViewController() as? WebViewViewController
             let list = JSON(body)
             let buttons = list.arrayValue.map { BottomBarModel(dict: $0) }
@@ -343,11 +341,12 @@ extension CustomWebView: WKScriptMessageHandlerWithReply {
             let naviHeight = UIDevice.current.statusBarHeight() + 44
             replyHandler(naviHeight,nil)
         } else if message.name == "bottomHeight" {
-            let naviHeight = 49 + UIDevice.current.tabbarSpaceHeight()
+            let controller = currentViewController() as? WebViewViewController
+            let naviHeight = controller?.bottomViewHeight()
             replyHandler(naviHeight,nil)
         } else if message.name == "getNaviEnabled" {
             let controller = currentViewController() as? WebViewViewController
-            let isHidden = controller?.navigationController?.isNavigationBarHidden
+            let isHidden = controller?.naviHidden()
             replyHandler(isHidden,nil)
         } else if message.name == "getNaviTitle" {
             let controller = currentViewController() as? WebViewViewController
@@ -398,7 +397,7 @@ extension CustomWebView: WKScriptMessageHandlerWithReply {
             let controller = currentViewController() as? WebViewViewController
             let dict = controller?.bottomActions()
             replyHandler(dict,nil)
-        } else if message.name == "getForegroundColor" {
+        } else if message.name == "getBottomViewForegroundColor" {
             let controller = currentViewController() as? WebViewViewController
             let dict = controller?.bottomBarForegroundColor()
             replyHandler(dict,nil)

@@ -6,12 +6,13 @@
 //
 
 import UIKit
+import WebKit
 
 class WebViewViewController: UIViewController {
 
     var urlString: String = ""
     private var isNaviHidden: Bool = false
-    private var isBottomHidden: Bool = true
+    private var isBottomHidden: Bool = false
     private var isStatusHidden: Bool = false
     private var isNaviAlpha: Bool = false
     private var isStatusAlpha: Bool = false
@@ -52,6 +53,18 @@ class WebViewViewController: UIViewController {
 //        } else {
 //            webView.openLocalWebView(name: urlString)
 //        }
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        
+        let types = WKWebsiteDataStore.allWebsiteDataTypes()
+        let date = Date.init(timeIntervalSince1970: 0)
+        WKWebsiteDataStore.default().removeData(ofTypes: types, modifiedSince: date) {
+            print("delete")
+            
+        }
+  
     }
     
 
@@ -184,6 +197,10 @@ extension WebViewViewController {
         return naviView.backgroundColor ?? .white
     }
     
+    func naviHidden() -> Bool {
+        return naviView.isHidden
+    }
+    
     func naviViewForegroundColor() -> String {
         return naviView.tineColor ?? ""
     }
@@ -308,6 +325,7 @@ extension WebViewViewController {
     func updateBottomViewHeight(height: CGFloat) {
         var frame = bottomView.frame
         frame.size.height = height
+        frame.origin.y = UIScreen.main.bounds.height - height
         bottomView.frame = frame
     }
     
@@ -327,11 +345,16 @@ extension WebViewViewController {
         return bottomView.backgroundColor ?? .white
     }
     
+    func bottomViewHeight() -> CGFloat {
+        return bottomView.frame.height
+    }
+    
     func bottomBarForegroundColor() -> UIColor {
         return .white  //TODO
     }
     
     func fetchBottomButtons(buttons: [BottomBarModel]) {
+        bottomView.isHidden = false
         bottomView.buttons = buttons
     }
     

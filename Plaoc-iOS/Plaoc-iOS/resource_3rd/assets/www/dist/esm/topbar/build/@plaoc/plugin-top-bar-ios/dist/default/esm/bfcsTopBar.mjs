@@ -1,14 +1,15 @@
 import { TopBarFFI as e$1 } from "./ffi_ios.mjs";
 class e extends HTMLElement {
   constructor() {
-    super(), this._actionList = [], this._ffi = new e$1();
+    super(), this._actionList = [], this._ffi = new e$1(), this._observer = new MutationObserver((t) => {
+      this.collectActions();
+    });
   }
   connectedCallback() {
-    new MutationObserver((t) => {
-      this.collectActions();
-    }).observe(this, { subtree: true, childList: true, attributes: true, attributeFilter: ["disabled", "icon", "type", "description", "size", "source"] })
+    this._observer.observe(this, { subtree: true, childList: true, attributes: true, attributeFilter: ["disabled", "icon", "type", "description", "size", "source"] });
   }
   disconnectedCallback() {
+    this._observer.disconnect();
   }
   async back() {
     await this._ffi.back();
@@ -64,15 +65,15 @@ class e extends HTMLElement {
         let i2 = t.querySelector("dweb-icon");
         e2.source = i2?.getAttribute("source") ?? "", e2.type = i2?.hasAttribute("type") ? i2.getAttribute("type") : "NamedIcon", e2.description = i2?.getAttribute("description") ?? "", e2.size = i2?.hasAttribute("size") ? i2.getAttribute("size") : void 0;
       }
-      const i = `document.querySelector('dweb-top-bar-button[bid="${t.getAttribute("bid")}"]').dispatchEvent(new CustomEvent('click'))`, s = !!t.hasAttribute("disabled");
-      this._actionList.push({ icon: e2, onClickCode: i, disabled: s });
+      const i = `document.querySelector('dweb-top-bar-button[bid="${t.getAttribute("bid")}"]').dispatchEvent(new CustomEvent('click'))`, a = !!t.hasAttribute("disabled");
+      this._actionList.push({ icon: e2, onClickCode: i, disabled: a });
     }), await this.setActions();
   }
   static get observedAttributes() {
     return ["title", "disabled", "backgroudColor", "foregroundColor", "overlay", "alpha"];
   }
-  attributeChangedCallback(t, e2, i) {
-    t === "title" ? this.setTitle(i) : t === "backgroudColor" ? this.setBackgroundColor(i) : t === "foregroundColor" ? this.setForegroundColor(i) : t === "overlay" ? this.hasAttribute(t) && this._ffi.setOverlay() : t === "disabled" && this.hasAttribute(t) && this._ffi.setHidden();
+  async attributeChangedCallback(t, e2, i) {
+    t === "title" ? await this.setTitle(i) : t === "backgroudColor" ? await this.setBackgroundColor(i) : t === "foregroundColor" ? await this.setForegroundColor(i) : t === "overlay" ? this.hasAttribute(t) && await this._ffi.setOverlay() : t === "disabled" && this.hasAttribute(t) && await this._ffi.setHidden();
   }
 }
 export { e as BfcsTopBar };

@@ -102,6 +102,8 @@ class Schemehandler: NSObject, WKURLSchemeHandler {
     }
     
     static func setupHTMLCache(fromPath: String) {
+        
+        clearHTMLCache()
         let manager = FileManager.default
         let markString = Schemehandler.fileName()
         let toPath = Schemehandler.filePath() + "/" + markString

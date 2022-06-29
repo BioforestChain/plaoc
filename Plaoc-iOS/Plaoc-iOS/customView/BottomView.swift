@@ -20,7 +20,6 @@ class BottomView: UIView {
     var buttons: [BottomBarModel]? {
         didSet {
             guard buttons != nil else { return }
-            let space: CGFloat = 16
             let width: CGFloat = 44
             for i in stride(from: 0, to: buttons!.count, by: 1) {
                 let model = buttons![i]
@@ -33,14 +32,18 @@ class BottomView: UIView {
                     if imageName.hasSuffix("svg") {
                         button.setImage(UIImage.svgImageNamed(imageName, size: CGSize(width: width, height: width)), for: .normal)
                     } else {
-                        button.setImage(UIImage(named: imageName), for: .normal)
+//                        button.setImage(UIImage(named: imageName), for: .normal)
                     }
                 }
-                button.isEnabled = model.disabled ?? true
+                button.isEnabled = !(model.disabled ?? false)
+                button.isSelected = model.selected ?? false
+                button.setTitleColor(UIColor(hexString: "\(model.colors?.textColor)" ), for: .normal)
+                button.setTitleColor(UIColor(hexString: "\(model.colors?.textColorSelected)" ), for: .selected)
+                
 //                button.menu = menuAction()
                 button.addTarget(self, action: #selector(clickAction(sender:)), for: .touchUpInside)
                 button.showsMenuAsPrimaryAction = true
-                button.frame = CGRect(x: self.frame.width - CGFloat((i + 1)) * (width + space), y: 0, width: 44, height: 44)
+                button.frame = CGRect(x: CGFloat(i) * self.frame.width / CGFloat(buttons!.count), y: 0, width: self.frame.width / CGFloat(buttons!.count), height: self.frame.height)
                 self.addSubview(button)
                 buttonList.append(button)
             }

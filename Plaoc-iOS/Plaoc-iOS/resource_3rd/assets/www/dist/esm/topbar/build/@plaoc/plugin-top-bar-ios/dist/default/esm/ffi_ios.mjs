@@ -10,23 +10,21 @@ class e {
   async getEnabled() {
     return !await this._ffi.getNaviEnabled.postMessage(null);
   }
-  toggleEnabled() {
-    return new Promise(async (e2, s) => {
-      const t = await this.getEnabled();
-      this._ffi.hiddenNaviBar.postMessage(t ? "1" : "0"), e2();
-    });
+  async toggleEnabled() {
+    const e2 = await this.getEnabled();
+    this._ffi.hiddenNaviBar.postMessage(e2 ? "1" : "0");
   }
-  async setHidden() {
-    await this._ffi.hiddenNaviBar.postMessage("1");
+  setHidden() {
+    return new Promise((e2, s) => {
+      this._ffi.hiddenNaviBar.postMessage("1"), e2();
+    });
   }
   async getOverlay() {
     return this._ffi.getNaviOverlay.postMessage(null);
   }
-  toggleOverlay() {
-    return new Promise(async (e2, s) => {
-      const t = await this.getOverlay();
-      this._ffi.updateNaviBarAlpha.postMessage(t ? "0" : "1"), e2();
-    });
+  async toggleOverlay() {
+    const e2 = await this.getOverlay();
+    this._ffi.updateNaviBarAlpha.postMessage(e2 ? "0" : "1");
   }
   setOverlay() {
     return new Promise((e2, s) => {
