@@ -54,19 +54,6 @@ class WebViewViewController: UIViewController {
 //            webView.openLocalWebView(name: urlString)
 //        }
     }
-    
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        
-        let types = WKWebsiteDataStore.allWebsiteDataTypes()
-        let date = Date.init(timeIntervalSince1970: 0)
-        WKWebsiteDataStore.default().removeData(ofTypes: types, modifiedSince: date) {
-            print("delete")
-            
-        }
-  
-    }
-    
 
     lazy var statusView: StatusView = {
         let statusView = StatusView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIDevice.current.statusBarHeight()))
@@ -219,7 +206,6 @@ extension WebViewViewController {
 extension WebViewViewController {
     
     func updateStatusBackgroundColor(dict: [String:Any]) {
-//        UIApplication.statusBarBackgroundColor = .orange
         if let color = dict["colorHex"] as? String {
             statusView.backgroundColor = UIColor(hexString: color)
         }
@@ -245,23 +231,6 @@ extension WebViewViewController {
     func updateStatusBarAlpha(isOverlay: Bool) {
         isStatusAlpha = isOverlay
         statusView.alpha = isStatusAlpha ? 0.5 : 1.0
-//        var frame = webView.frame
-//        if isStatusAlpha {
-//            frame.origin.y = 0
-//            frame.size.height = UIScreen.main.bounds.height
-//        } else {
-//            if isNaviAlpha || isNaviHidden {
-//                frame.origin.y = UIDevice.current.statusBarHeight()
-//                frame.size.height -= UIDevice.current.statusBarHeight()
-//            } else {
-//                frame.origin.y = UIDevice.current.statusBarHeight() + 44
-//                frame.size.height -= UIDevice.current.statusBarHeight() + 44
-//            }
-//        }
-//        UIView.animate(withDuration: 0.25) {
-//            self.webView.frame = frame
-//            self.webView.updateFrame(frame: frame)
-//        }
     }
     
     func statusBarVisible() -> Bool {
@@ -327,6 +296,9 @@ extension WebViewViewController {
         frame.size.height = height
         frame.origin.y = UIScreen.main.bounds.height - height
         bottomView.frame = frame
+        UIView.animate(withDuration: 0.25) {
+            self.bottomView.frame = frame
+        }
     }
     
     func hiddenBottomViewButton(hiddenString: String) {
