@@ -1,4 +1,10 @@
 declare namespace Plaoc {
+  interface TopBarItem {
+    icon: Plaoc.IPlaocIcon;
+    onClickCode: string;
+    disabled?: boolean;
+  }
+
   interface TopBarAndroidFFI {
     back(): void;
     getEnabled(): boolean;
@@ -28,10 +34,10 @@ declare namespace Plaoc {
       postMessage(hidden: string): void;
     };
     getNaviOverlay: {
-      postMessage(noValue: null): Promise<boolean>;
+      postMessage(noValue: null): Promise<number>;
     };
-    updateNaviBarAlpha: {
-      postMessage(alpha: string): void;
+    updateNaviBarOverlay: {
+      postMessage(isOverlay: number): void;
     };
     getNaviTitle: {
       postMessage(noValue: null): Promise<string>;
@@ -52,23 +58,43 @@ declare namespace Plaoc {
       postMessage(actionList: TopBarItem[]): void;
     };
     getNaviBackgroundColor: {
-      postMessage(noValue: null): Promise<Plaoc.IColor>;
+      postMessage(noValue: null): Promise<Plaoc.RGBA>;
     };
     updateNaviBarBackgroundColor: {
-      postMessage(colorObject: Plaoc.IColor): void;
+      postMessage(colorHex: Plaoc.RGBA): void;
     };
     getNaviForegroundColor: {
-      postMessage(noValue: null): Promise<Plaoc.IColor>;
+      postMessage(noValue: null): Promise<Plaoc.RGBA>;
     };
     updateNaviBarTintColor: {
-      postMessage(colorObject: Plaoc.IColor): void;
+      postMessage(colorHex: Plaoc.RGBA): void;
     };
   }
 
-  interface TopBarItem {
-    icon: Plaoc.IPlaocIcon;
-    onClickCode: string;
-    disabled?: boolean;
+  interface ITopBarFFI {
+    back(): Promise<void>;
+    getEnabled(): Promise<boolean>;
+    toggleEnabled(): Promise<void>;
+    setHidden(): Promise<void>;
+    getOverlay(): Promise<boolean>;
+    toggleOverlay(): Promise<void>;
+    setOverlay(): Promise<void>;
+    getTitle(): Promise<string>;
+    setTitle(title: string): Promise<void>;
+    hasTitle(): Promise<boolean>;
+    getHeight(): Promise<number>;
+    getActions(): Promise<TopBarItem[]>;
+    setActions(actionList: TopBarItem[]): Promise<void>;
+    getBackgroundColor(alpha: Plaoc.AlphaValueHex): Promise<Plaoc.RGB>;
+    setBackgroundColor(
+      color: Plaoc.RGB,
+      alpha: Plaoc.AlphaValueHex
+    ): Promise<void>;
+    getForegroundColor(alpha: Plaoc.AlphaValueHex): Promise<Plaoc.RGB>;
+    setForegroundColor(
+      color: Plaoc.RGB,
+      alpha: Plaoc.AlphaValueHex
+    ): Promise<void>;
   }
 }
 

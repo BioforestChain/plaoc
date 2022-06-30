@@ -1,4 +1,4 @@
-export class TopBarFFI {
+export class TopBarFFI implements Plaoc.ITopBarFFI {
   private _ffi = (window as any).webkit.messageHandlers as Plaoc.TopBarIosFFI;
 
   back() {
@@ -32,29 +32,29 @@ export class TopBarFFI {
   }
 
   async getOverlay(): Promise<boolean> {
-    const overlay = this._ffi.getNaviOverlay.postMessage(null);
+    const overlay = await this._ffi.getNaviOverlay.postMessage(null);
 
-    return overlay;
+    return overlay === 1;
   }
 
   async toggleOverlay(): Promise<void> {
     const overlay = await this.getOverlay();
 
-    this._ffi.updateNaviBarAlpha.postMessage(overlay ? "0" : "1");
+    this._ffi.updateNaviBarOverlay.postMessage(overlay ? 0 : 1);
 
     return;
   }
 
   setOverlay(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      this._ffi.updateNaviBarAlpha.postMessage("1");
+      this._ffi.updateNaviBarOverlay.postMessage(1);
 
       resolve();
     });
   }
 
   async getTitle(): Promise<string> {
-    const title = this._ffi.getNaviTitle.postMessage(null);
+    const title = await this._ffi.getNaviTitle.postMessage(null);
 
     return title;
   }
@@ -93,29 +93,39 @@ export class TopBarFFI {
     });
   }
 
-  async getBackgroundColor(): Promise<string> {
-    const colorObject: Plaoc.IColor =
+  async getBackgroundColor(alpha: Plaoc.AlphaValueHex): Promise<Plaoc.RGB> {
+    const colorHex: Plaoc.RGBA =
       await this._ffi.getNaviBackgroundColor.postMessage(null);
 
     // 返回值：#ffffff
-    return colorObject.color;
+    return colorHex.slice(0, -2);
   }
 
-  async setBackgroundColor(colorObject: Plaoc.IColor): Promise<void> {
-    this._ffi.updateNaviBarBackgroundColor.postMessage(colorObject);
+  async setBackgroundColor(
+    color: Plaoc.RGB,
+    alpha: Plaoc.AlphaValueHex
+  ): Promise<void> {
+    const colorHex: Plaoc.RGBA = color + alpha;
+
+    this._ffi.updateNaviBarBackgroundColor.postMessage(colorHex);
 
     return;
   }
 
-  async getForegroundColor(): Promise<string> {
-    const colorObject: Plaoc.IColor =
+  async getForegroundColor(alpha: Plaoc.AlphaValueHex): Promise<Plaoc.RGBA> {
+    const colorHex: Plaoc.RGBA =
       await this._ffi.getNaviForegroundColor.postMessage(null);
 
-    return colorObject.color;
+    return colorHex.slice(0, -2);
   }
 
-  async setForegroundColor(colorObject: Plaoc.IColor): Promise<void> {
-    this._ffi.updateNaviBarTintColor.postMessage(colorObject);
+  async setForegroundColor(
+    color: Plaoc.RGB,
+    alpha: Plaoc.AlphaValueHex
+  ): Promise<void> {
+    const colorHex: Plaoc.RGBA = color + alpha;
+
+    this._ffi.updateNaviBarTintColor.postMessage(colorHex);
 
     return;
   }

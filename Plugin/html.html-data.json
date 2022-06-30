@@ -20,10 +20,10 @@
         { "name": "alpha", "description": "alpha" },
         { "name": "overlay", "description": "overlay", "valueSet": "v" },
         {
-          "name": "disabled",
+          "name": "hidden",
           "description": {
             "kind": "markdown",
-            "value": "a boolean value that reflects the disabled HTML attribute, which indicates whether the control is disabled."
+            "value": "topbar hidden"
           },
           "valueSet": "v"
         }

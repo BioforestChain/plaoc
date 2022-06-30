@@ -1,5 +1,6 @@
-export class TopBarFFI {
+export class TopBarFFI implements Plaoc.ITopBarFFI {
   private _ffi: Plaoc.TopBarAndroidFFI = top_bar;
+  private _alpha: number = 1;
 
   back(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
@@ -22,12 +23,14 @@ export class TopBarFFI {
     });
   }
 
-  setHidden(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this._ffi.toggleEnabled(1);
+  async setHidden(): Promise<void> {
+    const isEnabled = await this.getEnabled();
 
-      resolve();
-    });
+    if (isEnabled) {
+      this.toggleEnabled();
+    }
+
+    return;
   }
 
   getOverlay(): Promise<boolean> {
@@ -100,40 +103,67 @@ export class TopBarFFI {
     });
   }
 
-  private getColorInt(color: string = "#ffffff", alpha: number = 0.5) {
-    return parseInt(color.slice(1), 16) + ((alpha * 255) << (8 * 3));
+  // private getColorInt(color: Plaoc.RGB = "#ffffff", alpha: number): number {
+  //   alert("alpha: " + alpha);
+  //   return parseInt(color.slice(1), 16) + ((alpha * 255) << (8 * 3));
+  // }
+
+  // private getColorInt(color: Plaoc.RGBA): number {
+  //   return parseInt(color.replace("#", "0x"));
+  // }
+
+  private getColorInt(color: Plaoc.RGB, alpha: Plaoc.AlphaValueHex): number {
+    return (
+      parseInt(color.replace("#", "0x"), 16) + (parseInt("0x" + alpha) << 24)
+    );
   }
 
-  getBackgroundColor(): Promise<string> {
-    return new Promise<string>((resolve, reject) => {
+  // private getColorHex(color: number): Plaoc.RGB {
+  //   return "#" + (color - ((this._alpha * 255) << (8 * 3))).toString(16);
+  // }
+
+  private getColorHex(color: number, alpha: Plaoc.AlphaValueHex): Plaoc.RGB {
+    return "#" + (color - (parseInt("0x" + alpha) << 24)).toString(16);
+  }
+
+  getBackgroundColor(alpha: Plaoc.AlphaValueHex): Promise<Plaoc.RGB> {
+    return new Promise<Plaoc.RGB>((resolve, reject) => {
       const color = this._ffi.getBackgroundColor();
-      const colorHex = "#" + color.toString(16).slice(2);
+      alert("color: " + color);
+      const colorHex = this.getColorHex(color, alpha);
 
       resolve(colorHex);
     });
   }
 
-  setBackgroundColor(colorObject: Plaoc.IColor): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      const colorHex = this.getColorInt(colorObject.color, colorObject.alpha);
+  setBackgroundColor(
+    color: Plaoc.RGB,
+    alpha: Plaoc.AlphaValueHex
+  ): Promise<void> {
+    return new Promise<void>(async (resolve, reject) => {
+      const colorHex = this.getColorInt(color, alpha);
+
       this._ffi.setBackgroundColor(colorHex);
 
       resolve();
     });
   }
 
-  getForegroundColor(): Promise<string> {
-    return new Promise<string>((resolve, reject) => {
+  getForegroundColor(alpha: Plaoc.AlphaValueHex): Promise<Plaoc.RGB> {
+    return new Promise<Plaoc.RGB>((resolve, reject) => {
       const color = this._ffi.getForegroundColor();
-      const colorHex = "#" + color.toString(16).slice(2);
+      const colorHex = this.getColorHex(color, alpha);
 
       resolve(colorHex);
     });
   }
 
-  setForegroundColor(colorObject: Plaoc.IColor): Promise<void> {
+  setForegroundColor(
+    color: Plaoc.RGB,
+    alpha: Plaoc.AlphaValueHex
+  ): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      const colorHex = this.getColorInt(colorObject.color, colorObject.alpha);
+      const colorHex = this.getColorInt(color, alpha);
 
       this._ffi.setForegroundColor(colorHex);
 

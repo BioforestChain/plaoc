@@ -1,9 +1,10 @@
 import { TopBarFFI } from "./ffi";
 
 export class BfcsTopBar extends HTMLElement {
-  private _ffi: TopBarFFI;
+  private _ffi: Plaoc.ITopBarFFI;
   private _observer: MutationObserver;
   private _actionList: Plaoc.TopBarItem[] = [];
+  private _alpha: Plaoc.AlphaValueHex = "ff";
 
   constructor() {
     super();
@@ -12,6 +13,9 @@ export class BfcsTopBar extends HTMLElement {
     this._observer = new MutationObserver((mutations) => {
       this.collectActions();
     });
+
+    // this.setAlpha();
+    this._init();
   }
 
   connectedCallback() {
@@ -19,19 +23,45 @@ export class BfcsTopBar extends HTMLElement {
       subtree: true,
       childList: true,
       attributes: true,
-      attributeFilter: [
-        "disabled",
-        "icon",
-        "type",
-        "description",
-        "size",
-        "source",
-      ],
+      // attributeFilter: [
+      //   "disabled",
+      //   "icon",
+      //   "type",
+      //   "description",
+      //   "size",
+      //   "source",
+      // ],
     });
   }
 
   disconnectedCallback() {
     this._observer.disconnect();
+  }
+
+  private async _init() {
+    this._setAlpha();
+
+    const height = await this.getHeight();
+    this.setAttribute("height", `${height}`);
+  }
+
+  private _setAlpha() {
+    if (
+      this.hasAttribute("alpha") &&
+      this.getAttribute("alpha") &&
+      this.getAttribute("alpha")!.length > 0
+    ) {
+      try {
+        const alphaFloat = parseFloat(this.getAttribute("alpha")!);
+        const alpha = Math.round(alphaFloat * 255).toString(16);
+
+        if (alpha.length > 1) {
+          this._alpha = alpha as Plaoc.AlphaValueHex;
+        } else {
+          this._alpha = ("0" + alpha) as Plaoc.AlphaValueHex;
+        }
+      } catch {}
+    }
   }
 
   async back(): Promise<void> {
@@ -89,40 +119,25 @@ export class BfcsTopBar extends HTMLElement {
   }
 
   async getBackgroundColor(): Promise<string> {
-    const color = await this._ffi.getBackgroundColor();
+    const color = await this._ffi.getBackgroundColor(this._alpha);
 
     return color;
   }
 
-  async setBackgroundColor(colorHex: string = "#ffffff"): Promise<void> {
-    const colorObject: Plaoc.IColor = {
-      color: colorHex,
-      alpha:
-        this.getAttribute("alpha") && this.getAttribute("alpha")!.length > 0
-          ? parseFloat(this.getAttribute("alpha")!)
-          : 0.5,
-    };
-    await this._ffi.setBackgroundColor(colorObject);
+  async setBackgroundColor(color: Plaoc.RGB): Promise<void> {
+    await this._ffi.setBackgroundColor(color, this._alpha);
 
     return;
   }
 
   async getForegroundColor(): Promise<string> {
-    const color = await this._ffi.getForegroundColor();
+    const color = await this._ffi.getForegroundColor(this._alpha);
 
     return color;
   }
 
-  async setForegroundColor(colorHex: string = "#ffffff"): Promise<void> {
-    const colorObject: Plaoc.IColor = {
-      color: colorHex,
-      alpha:
-        this.getAttribute("alpha") && this.getAttribute("alpha")!.length > 0
-          ? parseFloat(this.getAttribute("alpha")!)
-          : 0.5,
-    };
-
-    await this._ffi.setForegroundColor(colorObject);
+  async setForegroundColor(color: Plaoc.RGB): Promise<void> {
+    await this._ffi.setForegroundColor(color, this._alpha);
 
     return;
   }
@@ -177,11 +192,10 @@ export class BfcsTopBar extends HTMLElement {
   static get observedAttributes() {
     return [
       "title",
-      "disabled",
+      "hidden",
       "background-color",
       "foreground-color",
       "overlay",
-      "alpha",
     ];
   }
 
@@ -200,7 +214,7 @@ export class BfcsTopBar extends HTMLElement {
       if (this.hasAttribute(attrName)) {
         await this._ffi.setOverlay();
       }
-    } else if (attrName === "disabled") {
+    } else if (attrName === "hidden") {
       if (this.hasAttribute(attrName)) {
         await this._ffi.setHidden();
       }

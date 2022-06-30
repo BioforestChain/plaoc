@@ -14,7 +14,7 @@ export default defineWorkspace(() => {
       typings,
       icon,
       topbar,
-      bottombar,
+      // bottombar,
       // dialogs,
       // keyboard,
       // statusbar,
