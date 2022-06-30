@@ -91,7 +91,7 @@ class CustomBasePopView: UIView {
     
     lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.textColor = UIColor(hexString: "#0C0A2B")
+        label.textColor = UIColor("#0C0A2B")
         label.textAlignment = .center
         label.font = UIFont.systemFont(ofSize: 15, weight: .medium)
         return label
@@ -99,7 +99,7 @@ class CustomBasePopView: UIView {
     
     lazy var contentLabel: UILabel = {
         let label = UILabel()
-        label.textColor = UIColor(hexString: "#0C0A2B")
+        label.textColor = UIColor("#0C0A2B")
         label.textAlignment = .center
         label.font = UIFont.systemFont(ofSize: 15, weight: .regular)
         return label
@@ -107,7 +107,7 @@ class CustomBasePopView: UIView {
     
     lazy var lineView: UIView = {
         let lineView = UIView()
-        lineView.backgroundColor = UIColor(hexString: "#DDDDDD")
+        lineView.backgroundColor = UIColor("#DDDDDD")
         return lineView
     }()
     

@@ -9,6 +9,7 @@ target 'Plaoc-iOS' do
   pod 'SVGKit'
   pod 'SDWebImage'
   pod 'SnapKit'
+  pod 'UIColor_Hex_Swift'
 
   # Pods for Plaoc-iOS
 

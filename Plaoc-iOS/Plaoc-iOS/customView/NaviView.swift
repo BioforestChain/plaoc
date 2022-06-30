@@ -21,12 +21,8 @@ class NaviView: UIView {
     var tineColor: String? {
         didSet {
             guard tineColor != nil else { return }
-            titleLabel.textColor = UIColor(hexString: tineColor!)
-            backButton.setTitleColor(UIColor(hexString: tineColor!), for: .normal)
-            if tineAlpha != nil {
-                titleLabel.textColor = UIColor(hexString: tineColor!).withAlphaComponent(tineAlpha!)
-                backButton.setTitleColor(UIColor(hexString: tineColor!).withAlphaComponent(tineAlpha!), for: .normal)
-            }
+            titleLabel.textColor = UIColor(tineColor!)
+            backButton.setTitleColor(UIColor(tineColor!), for: .normal)
         }
     }
     
@@ -65,8 +61,10 @@ class NaviView: UIView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        self.backgroundColor = .white
         self.addSubview(backButton)
         self.addSubview(titleLabel)
+        
     }
     
     required init?(coder: NSCoder) {

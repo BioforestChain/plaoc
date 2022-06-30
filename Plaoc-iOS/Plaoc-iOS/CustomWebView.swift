@@ -192,17 +192,17 @@ extension CustomWebView:  WKScriptMessageHandler {
             let buttons = list.arrayValue.map { ButtonModel(dict: $0) }
             controller?.fetchCustomButtons(buttons: buttons)
         } else if message.name == "updateNaviBarBackgroundColor" {
-            guard let colorDict = message.body as? [String:Any] else { return }
+            guard let color = message.body as? String else { return }
             let controller = currentViewController() as? WebViewViewController
-            controller?.updateNavigationBarBackgroundColor(colorDict: colorDict)
+            controller?.updateNavigationBarBackgroundColor(colorString: color)
         } else if message.name == "updateNaviBarTintColor" {
-            guard let colorDict = message.body as? [String:Any] else { return }
+            guard let color = message.body as? String else { return }
             let controller = currentViewController() as? WebViewViewController
-            controller?.updateNavigationBarTintColor(colorDict: colorDict)
+            controller?.updateNavigationBarTintColor(colorString: color)
         } else if message.name == "updateStatusBackgroundColor" {
-            guard let colorDict = message.body as? [String: String] else { return }
+            guard let color = message.body as? String else { return }
             let controller = currentViewController() as? WebViewViewController
-            controller?.updateStatusBackgroundColor(dict: colorDict)
+            controller?.updateStatusBackgroundColor(colorString: color)
         } else if message.name == "updateStatusStyle" {
             guard let style = message.body as? String else { return }
             let controller = currentViewController() as? WebViewViewController
@@ -226,17 +226,17 @@ extension CustomWebView:  WKScriptMessageHandler {
             let controller = currentViewController() as? WebViewViewController
             controller?.updateBottomViewOverlay(overlay: alpha)
         } else if message.name == "updateBottomViewBackgroundColor" {
-            guard let colorDict = message.body as? [String:Any] else { return }
+            guard let color = message.body as? String else { return }
             let controller = currentViewController() as? WebViewViewController
-            controller?.updateBottomViewBackgroundColor(dict: colorDict)
+            controller?.updateBottomViewBackgroundColor(colorString: color)
         } else if message.name == "hiddenBottomViewButton" {
             guard let bodyString = message.body as? String else { return }
             let controller = currentViewController() as? WebViewViewController
             controller?.hiddenBottomViewButton(hiddenString: bodyString)
         } else if message.name == "updateBottomViewForegroundColor" {
-            guard let bodyDict = message.body as? [String:Any] else { return }
+            guard let body = message.body as? String else { return }
             let controller = currentViewController() as? WebViewViewController
-            controller?.updateBottomViewforegroundColor(dict: bodyDict)
+            controller?.updateBottomViewforegroundColor(colorString: body)
         } else if message.name == "updateBottomViewHeight" {
             guard let body = message.body as? Float else { return }
             let controller = currentViewController() as? WebViewViewController

@@ -14,7 +14,6 @@
 		0419F1092860560400EF8DC2 /* CustomNaviViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0419F1082860560400EF8DC2 /* CustomNaviViewController.swift */; };
 		0419F10F2861BFED00EF8DC2 /* CaptureViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0419F10E2861BFED00EF8DC2 /* CaptureViewController.swift */; };
 		0419F1112861C01500EF8DC2 /* RecordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0419F1102861C01500EF8DC2 /* RecordView.swift */; };
-		041D10022862AEF500AEFE7D /* UIColor+Hex.m in Sources */ = {isa = PBXBuildFile; fileRef = 041D10012862AEF500AEFE7D /* UIColor+Hex.m */; };
 		041D100528630B7800AEFE7D /* ButtonModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 041D100428630B7800AEFE7D /* ButtonModel.swift */; };
 		043586652865559F004A83BB /* CustomConfirmPopView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 043586642865559F004A83BB /* CustomConfirmPopView.swift */; };
 		0435866728655794004A83BB /* CustomPromptPopView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0435866628655794004A83BB /* CustomPromptPopView.swift */; };
@@ -73,8 +72,6 @@
 		0419F10E2861BFED00EF8DC2 /* CaptureViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CaptureViewController.swift; sourceTree = "<group>"; };
 		0419F1102861C01500EF8DC2 /* RecordView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordView.swift; sourceTree = "<group>"; };
 		041D0FFC2862AEE500AEFE7D /* Plaoc-iOS-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Plaoc-iOS-Bridging-Header.h"; sourceTree = "<group>"; };
-		041D10002862AEF500AEFE7D /* UIColor+Hex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor+Hex.h"; sourceTree = "<group>"; };
-		041D10012862AEF500AEFE7D /* UIColor+Hex.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+Hex.m"; sourceTree = "<group>"; };
 		041D100428630B7800AEFE7D /* ButtonModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonModel.swift; sourceTree = "<group>"; };
 		043586642865559F004A83BB /* CustomConfirmPopView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomConfirmPopView.swift; sourceTree = "<group>"; };
 		0435866628655794004A83BB /* CustomPromptPopView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomPromptPopView.swift; sourceTree = "<group>"; };
@@ -160,8 +157,6 @@
 			children = (
 				0443FCE02864422E003425CD /* UIImage+SVG.h */,
 				0443FCDF2864422E003425CD /* UIImage+SVG.m */,
-				041D10002862AEF500AEFE7D /* UIColor+Hex.h */,
-				041D10012862AEF500AEFE7D /* UIColor+Hex.m */,
 			);
 			path = ocFile;
 			sourceTree = "<group>";
@@ -537,7 +532,6 @@
 				0443FCE12864422E003425CD /* UIImage+SVG.m in Sources */,
 				0443FCE928646E6A003425CD /* ConfirmConfiguration.swift in Sources */,
 				0419F106286051F500EF8DC2 /* UIView_extension.swift in Sources */,
-				041D10022862AEF500AEFE7D /* UIColor+Hex.m in Sources */,
 				04BC49CD2858768E003FE6D9 /* LeadScriptHandle.swift in Sources */,
 				0406F5062865B3F9006F4F6F /* Schemehandler.swift in Sources */,
 				04D022662860514C0018716E /* StatusView.swift in Sources */,

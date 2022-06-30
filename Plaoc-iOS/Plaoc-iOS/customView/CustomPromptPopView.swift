@@ -75,7 +75,7 @@ class CustomPromptPopView: CustomBasePopView {
     
     lazy var textField: UITextField = {
         let  textField  = UITextField()
-        textField.textColor = UIColor(hexString: "#0C0A2B")
+        textField.textColor = UIColor("#0C0A2B")
         textField.font = UIFont.systemFont(ofSize: 15, weight: .regular)
 //        textField.addTarget(self, action: #selector(valueChange(textField:)), for: .editingChanged)
         return textField
@@ -90,7 +90,7 @@ class CustomPromptPopView: CustomBasePopView {
     
     lazy var verlineView: UIView = {
         let lineView = UIView()
-        lineView.backgroundColor = UIColor(hexString: "#DDDDDD")
+        lineView.backgroundColor = UIColor("#DDDDDD")
         return lineView
     }()
 

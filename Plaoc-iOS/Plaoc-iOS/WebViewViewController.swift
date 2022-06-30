@@ -7,6 +7,7 @@
 
 import UIKit
 import WebKit
+import UIColor_Hex_Swift
 
 class WebViewViewController: UIViewController {
 
@@ -137,15 +138,9 @@ extension WebViewViewController {
         }
     }
     //更新naviView的背景色
-    func updateNavigationBarBackgroundColor(colorDict: [String:Any]) {
-        naviBackgroundColorDict = colorDict
-        if let color = colorDict["color"] as? String {
-            naviView.backgroundColor = UIColor(hexString: color)
-            if let alpha = colorDict["alpha"] as? Float {
-                naviView.backgroundColor = UIColor(hexString: color).withAlphaComponent(CGFloat(alpha))
-            }
-        }
-        
+    func updateNavigationBarBackgroundColor(colorString: String) {
+        naviView.backgroundColor = UIColor(colorString)
+ 
 //        self.navigationController?.navigationBar.backgroundColor = .orange
 //        let image = createImageWithColor(.orange, frame: CGRect(x: 0, y: 0.5, width: 1, height: 0.5))
 //        self.navigationController?.navigationBar.setBackgroundImage(image, for: .default)
@@ -172,13 +167,8 @@ extension WebViewViewController {
         return image
     }
     //更新naviView的前景色
-    func updateNavigationBarTintColor(colorDict: [String:Any]) {
-        if let alpha = colorDict["alpha"] as? Float {
-            naviView.tineAlpha = CGFloat(alpha)
-        }
-        if let color = colorDict["color"] as? String {
-            naviView.tineColor = color
-        }
+    func updateNavigationBarTintColor(colorString: String) {
+        naviView.tineColor = colorString
     }
     //设置naviView的按钮
     func fetchCustomButtons(buttons: [ButtonModel]) {
@@ -193,23 +183,16 @@ extension WebViewViewController {
         return naviOverlay
     }
     //返回naviView的背景色
-    func naviViewBackgroundColor() -> [String:Any] {
-        return naviBackgroundColorDict
+    func naviViewBackgroundColor() -> String {
+        return naviView.backgroundColor?.hexString() ?? "#FFFFFFFF"
     }
     //返回naviView是否隐藏
     func naviHidden() -> Bool {
         return naviView.isHidden
     }
     //返回naviView的前景色
-    func naviViewForegroundColor() -> [String:Any] {
-        var dict: [String:Any] = [:]
-        if let alpha = naviView.tineAlpha {
-            dict["alpha"] = alpha
-        }
-        if let color = naviView.tineColor {
-            dict["color"] = color
-        }
-        return dict
+    func naviViewForegroundColor() -> String {
+        return naviView.tineColor ?? ""
     }
     //返回naviView的按钮
     func naviActions() -> [[String:Any]] {
@@ -225,13 +208,8 @@ extension WebViewViewController {
 // statusBar和js的交互
 extension WebViewViewController {
     //更新状态栏背景色
-    func updateStatusBackgroundColor(dict: [String:Any]) {
-        if let color = dict["colorHex"] as? String {
-            statusView.backgroundColor = UIColor(hexString: color)
-        }
-        if let alpha = dict["alpha"] as? CGFloat {
-            statusView.alpha = alpha
-        }
+    func updateStatusBackgroundColor(colorString: String) {
+        statusView.backgroundColor = UIColor(colorString)
     }
     //更新状态栏状态
     func updateStatusStyle(style: String) {
@@ -309,19 +287,12 @@ extension WebViewViewController {
         }
     }
     //更新底部背景色
-    func updateBottomViewBackgroundColor(dict: [String:Any]) {
-        bottomViewBackgroundColorDict = dict
-        if let color = dict["color"] as? String {
-            bottomView.backgroundColor = UIColor(hexString: color)
-            if let alpha = dict["alpha"] as? Float {
-                bottomView.backgroundColor = UIColor(hexString: color).withAlphaComponent(CGFloat(alpha))
-            }
-        }
+    func updateBottomViewBackgroundColor(colorString: String) {
+        bottomView.backgroundColor = UIColor(colorString)
     }
     //更新底部颜色
-    func updateBottomViewforegroundColor(dict: [String:Any]) {
+    func updateBottomViewforegroundColor(colorString: String) {
         //TODO
-        bottomViewForegroundColorDict = dict
     }
     //更新底部高度
     func updateBottomViewHeight(height: CGFloat) {
@@ -346,17 +317,17 @@ extension WebViewViewController {
         return bottomOverlay
     }
     //返回底部背景颜色
-    func bottomBarBackgroundColor() -> [String:Any] {
-        return bottomViewBackgroundColorDict
+    func bottomBarBackgroundColor() -> String {
+        return bottomView.backgroundColor?.hexString() ?? "#FFFFFFFF"
     }
     //返回底部高度
     func bottomViewHeight() -> CGFloat {
         return bottomView.frame.height
     }
     //返回底部颜色
-    func bottomBarForegroundColor() -> [String:Any] {
+    func bottomBarForegroundColor() -> String {
         //TODO
-        return bottomViewForegroundColorDict
+        return ""
     }
     //获取底部按钮
     func fetchBottomButtons(buttons: [BottomBarModel]) {

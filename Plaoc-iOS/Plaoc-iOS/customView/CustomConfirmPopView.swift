@@ -65,7 +65,7 @@ class CustomConfirmPopView: CustomBasePopView {
     
     lazy var verlineView: UIView = {
         let lineView = UIView()
-        lineView.backgroundColor = UIColor(hexString: "#DDDDDD")
+        lineView.backgroundColor = UIColor("#DDDDDD")
         return lineView
     }()
     
