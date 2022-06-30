@@ -14,9 +14,9 @@ class WebViewViewController: UIViewController {
     private var isNaviHidden: Bool = false
     private var isBottomHidden: Bool = false
     private var isStatusHidden: Bool = false
-    private var naviAlpha: Float = 1.0
-    private var statusAlpha: Float = 1.0
-    private var bottomAlpha: Float = 1.0
+    private var naviOverlay: Int = 0
+    private var statusOverlay: Int = 0
+    private var bottomOverlay: Int = 0
     private var naviBackgroundColorDict: [String:Any] = [:]
     private var bottomViewBackgroundColorDict: [String:Any] = [:]
     private var bottomViewForegroundColorDict: [String:Any] = [:]
@@ -102,7 +102,7 @@ extension WebViewViewController {
         isNaviHidden = isHidden
         naviView.isHidden = isHidden
         
-        guard naviAlpha >= 1.0 else { return }
+        guard naviOverlay == 0 else { return }
         var frame = webView.frame
         
         if isNaviHidden {
@@ -118,14 +118,13 @@ extension WebViewViewController {
             self.webView.updateFrame(frame: frame)
         }
     }
-    //更新naviView的透明度
-    func updateNavigationBarAlpha(alpha: Float) {
-        guard naviAlpha != alpha else { return }
-        naviAlpha = alpha
-        naviView.alpha = CGFloat(alpha)
+    //更新naviView的Overlay
+    func updateNavigationBarOverlay(overlay: Int) {
+        guard naviOverlay != overlay else { return }
+        naviOverlay = overlay
         guard !isNaviHidden else { return }
         var frame = webView.frame
-        if alpha < 1.0 {
+        if overlay == 1 {
             frame.origin.y = UIDevice.current.statusBarHeight()
             frame.size.height += 44
         } else {
@@ -189,9 +188,9 @@ extension WebViewViewController {
     func titleString() -> String {
         return naviView.titleString ?? ""
     }
-    //返回naviView是否透明
-    func overlay() -> Float {
-        return naviAlpha
+    //返回naviViewOverlay
+    func getNaviOverlay() -> Int {
+        return naviOverlay
     }
     //返回naviView的背景色
     func naviViewBackgroundColor() -> [String:Any] {
@@ -248,18 +247,17 @@ extension WebViewViewController {
         isStatusHidden = isHidden
         setNeedsStatusBarAppearanceUpdate()
     }
-    //更新状态栏透明度
-    func updateStatusBarAlpha(overlay: Float) {
-        statusAlpha = overlay
-        statusView.alpha = CGFloat(statusAlpha)
+    //更新状态栏Overlay
+    func updateStatusBarOverlay(overlay: Int) {
+        statusOverlay = overlay
     }
     //返回状态栏是否隐藏
     func statusBarVisible() -> Bool {
         return isStatusHidden
     }
-    //返回状态栏透明度
-    func statusBarOverlay() -> Float {
-        return statusAlpha
+    //返回状态栏Overlay
+    func statusBarOverlay() -> Int {
+        return statusOverlay
     }
     //返回状态栏状态
     func statusBarStyle() -> String {
@@ -277,7 +275,7 @@ extension WebViewViewController {
         guard isBottomHidden != isHidden else { return }
         isBottomHidden = isHidden
         bottomView.isHidden = isHidden
-        guard bottomAlpha >= 1.0 else { return }
+        guard bottomOverlay == 0 else { return }
         var frame = webView.frame
         
         if isBottomHidden {
@@ -291,16 +289,15 @@ extension WebViewViewController {
             self.webView.updateFrame(frame: frame)
         }
     }
-    //更新底部透明度
-    func updateBottomViewAlpha(alpha: Float) {
-        guard bottomAlpha != alpha else { return }
-        bottomAlpha = alpha
-        bottomView.alpha = CGFloat(alpha)
+    //更新底部overlay
+    func updateBottomViewOverlay(overlay: Int) {
+        guard bottomOverlay != overlay else { return }
+        bottomOverlay = overlay
         
         guard !isBottomHidden else { return }
         var frame = webView.frame
         
-        if alpha < 1.0 {
+        if overlay == 1 {
             frame.size.height += 49 + UIDevice.current.tabbarSpaceHeight()
         } else {
             frame.size.height -= 49 + UIDevice.current.tabbarSpaceHeight()
@@ -344,9 +341,9 @@ extension WebViewViewController {
     func bottombarEnabled() -> Bool{
         return isBottomHidden
     }
-    //返回底部是否有透明度
-    func bottombarOverlay() -> Float {
-        return bottomAlpha
+    //返回底部overlay
+    func bottombarOverlay() -> Int {
+        return bottomOverlay
     }
     //返回底部背景颜色
     func bottomBarBackgroundColor() -> [String:Any] {

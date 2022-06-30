@@ -61,7 +61,7 @@ class CustomWebView: UIView {
     }()
     
     private func addScriptMessageHandler(config: WKWebViewConfiguration) {
-        let array = ["hiddenBottomView","updateBottomViewAlpha","updateBottomViewBackgroundColor","hiddenBottomViewButton","updateStatusAlpha","updateStatusBackgroundColor","updateStatusStyle","updateStatusHidden","hiddenNaviBar","updateNaviBarAlpha","updateNaviBarBackgroundColor","updateNaviBarTintColor","back","jumpWeb","updateTitle","startLoad","LoadingComplete","savePhoto","startCamera","photoFromPhotoLibrary","startShare","updateBottomViewForegroundColor","customNaviActions","openAlert","openPrompt","openConfirm","openBeforeUnload","setKeyboardOverlay","updateBottomViewHeight","setForegroundColor","customBottomActions"]
+        let array = ["hiddenBottomView","updateBottomViewOverlay","updateBottomViewBackgroundColor","hiddenBottomViewButton","updateStatusBarOverlay","updateStatusBackgroundColor","updateStatusStyle","updateStatusHidden","hiddenNaviBar","updateNaviBarOverlay","updateNaviBarBackgroundColor","updateNaviBarTintColor","back","jumpWeb","updateTitle","startLoad","LoadingComplete","savePhoto","startCamera","photoFromPhotoLibrary","startShare","updateBottomViewForegroundColor","customNaviActions","openAlert","openPrompt","openConfirm","openBeforeUnload","setKeyboardOverlay","updateBottomViewHeight","setForegroundColor","customBottomActions"]
         for name in array {
             config.userContentController.add(LeadScriptHandle(messageHandle: self), name: name)
         }
@@ -160,6 +160,7 @@ extension CustomWebView {
 extension CustomWebView:  WKScriptMessageHandler {
     //通过js调取原生操作
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+        
         if message.name == "startLoad" {
             //点击网页按钮 开始加载
         } else if message.name == "jumpWeb" {
@@ -179,10 +180,10 @@ extension CustomWebView:  WKScriptMessageHandler {
             let controller = currentViewController() as? WebViewViewController
             let isHidden = hidden == "1" ? true : false
             controller?.hiddenNavigationBar(isHidden: isHidden)
-        } else if message.name == "updateNaviBarAlpha" {
-            guard let alpha = message.body as? Float else { return }
+        } else if message.name == "updateNaviBarOverlay" {
+            guard let alpha = message.body as? Int else { return }
             let controller = currentViewController() as? WebViewViewController
-            controller?.updateNavigationBarAlpha(alpha: alpha)
+            controller?.updateNavigationBarOverlay(overlay: alpha)
         } else if message.name == "customNaviActions" {
             print(message.body)
             guard let body = message.body as? [[String:Any]] else { return }
@@ -211,19 +212,19 @@ extension CustomWebView:  WKScriptMessageHandler {
             let controller = currentViewController() as? WebViewViewController
             let isHidden = hidden == "1" ? true : false
             controller?.updateStatusHidden(isHidden: isHidden)
-        } else if message.name == "updateStatusAlpha" {
-            guard let overlay = message.body as? Float else { return }
+        } else if message.name == "updateStatusBarOverlay" {
+            guard let overlay = message.body as? Int else { return }
             let controller = currentViewController() as? WebViewViewController
-            controller?.updateStatusBarAlpha(overlay: overlay)
+            controller?.updateStatusBarOverlay(overlay: overlay)
         } else if message.name == "hiddenBottomView" {
             guard let hidden = message.body as? String else { return }
             let controller = currentViewController() as? WebViewViewController
             let isHidden = hidden == "1" ? true : false
             controller?.hiddenBottomView(isHidden: isHidden)
-        } else if message.name == "updateBottomViewAlpha" {
-            guard let alpha = message.body as? Float else { return }
+        } else if message.name == "updateBottomViewOverlay" {
+            guard let alpha = message.body as? Int else { return }
             let controller = currentViewController() as? WebViewViewController
-            controller?.updateBottomViewAlpha(alpha: alpha)
+            controller?.updateBottomViewOverlay(overlay: alpha)
         } else if message.name == "updateBottomViewBackgroundColor" {
             guard let colorDict = message.body as? [String:Any] else { return }
             let controller = currentViewController() as? WebViewViewController
@@ -357,7 +358,7 @@ extension CustomWebView: WKScriptMessageHandlerWithReply {
             replyHandler(hasTitle,nil)
         } else if message.name == "getNaviOverlay" {
             let controller = currentViewController() as? WebViewViewController
-            let overlay = controller?.overlay()
+            let overlay = controller?.getNaviOverlay()
             replyHandler(overlay,nil)
         } else if message.name == "getNaviBackgroundColor" {
             let controller = currentViewController() as? WebViewViewController
