@@ -34,7 +34,7 @@ declare namespace Plaoc {
         : never
       : never;
 
-  type RGBA = string;
+  type RGBAHex = string;
   type ARGB = string;
   type RGB = string; // #ff0000
   type AlphaValueHex = `${HexDigit}${HexDigit}`;

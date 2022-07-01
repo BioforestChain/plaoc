@@ -58,16 +58,16 @@ declare namespace Plaoc {
       postMessage(actionList: TopBarItem[]): void;
     };
     getNaviBackgroundColor: {
-      postMessage(noValue: null): Promise<Plaoc.RGBA>;
+      postMessage(noValue: null): Promise<Plaoc.RGBAHex>;
     };
     updateNaviBarBackgroundColor: {
-      postMessage(colorHex: Plaoc.RGBA): void;
+      postMessage(colorHex: Plaoc.RGBAHex): void;
     };
     getNaviForegroundColor: {
-      postMessage(noValue: null): Promise<Plaoc.RGBA>;
+      postMessage(noValue: null): Promise<Plaoc.RGBAHex>;
     };
     updateNaviBarTintColor: {
-      postMessage(colorHex: Plaoc.RGBA): void;
+      postMessage(colorHex: Plaoc.RGBAHex): void;
     };
   }
 
@@ -85,16 +85,10 @@ declare namespace Plaoc {
     getHeight(): Promise<number>;
     getActions(): Promise<TopBarItem[]>;
     setActions(actionList: TopBarItem[]): Promise<void>;
-    getBackgroundColor(alpha: Plaoc.AlphaValueHex): Promise<Plaoc.RGB>;
-    setBackgroundColor(
-      color: Plaoc.RGB,
-      alpha: Plaoc.AlphaValueHex
-    ): Promise<void>;
-    getForegroundColor(alpha: Plaoc.AlphaValueHex): Promise<Plaoc.RGB>;
-    setForegroundColor(
-      color: Plaoc.RGB,
-      alpha: Plaoc.AlphaValueHex
-    ): Promise<void>;
+    getBackgroundColor(): Promise<Plaoc.RGBAHex>;
+    setBackgroundColor(color: Plaoc.RGBAHex): Promise<void>;
+    getForegroundColor(): Promise<Plaoc.RGBAHex>;
+    setForegroundColor(color: Plaoc.RGBAHex): Promise<void>;
   }
 }
 

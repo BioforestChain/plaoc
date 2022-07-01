@@ -93,40 +93,34 @@ export class TopBarFFI implements Plaoc.ITopBarFFI {
     });
   }
 
-  async getBackgroundColor(alpha: Plaoc.AlphaValueHex): Promise<Plaoc.RGB> {
-    const colorHex: Plaoc.RGBA =
+  async getBackgroundColor(): Promise<Plaoc.RGBAHex> {
+    const colorHex: Plaoc.RGBAHex =
       await this._ffi.getNaviBackgroundColor.postMessage(null);
 
-    // 返回值：#ffffff
-    return colorHex.slice(0, -2);
+    // 返回值：#ffffff00
+    return colorHex;
   }
 
-  async setBackgroundColor(
-    color: Plaoc.RGB,
-    alpha: Plaoc.AlphaValueHex
-  ): Promise<void> {
-    const colorHex: Plaoc.RGBA = color + alpha;
+  async setBackgroundColor(color: Plaoc.RGBAHex): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      this._ffi.updateNaviBarBackgroundColor.postMessage(color);
 
-    this._ffi.updateNaviBarBackgroundColor.postMessage(colorHex);
-
-    return;
+      resolve();
+    });
   }
 
-  async getForegroundColor(alpha: Plaoc.AlphaValueHex): Promise<Plaoc.RGBA> {
-    const colorHex: Plaoc.RGBA =
+  async getForegroundColor(): Promise<Plaoc.RGBAHex> {
+    const colorHex: Plaoc.RGBAHex =
       await this._ffi.getNaviForegroundColor.postMessage(null);
 
-    return colorHex.slice(0, -2);
+    return colorHex;
   }
 
-  async setForegroundColor(
-    color: Plaoc.RGB,
-    alpha: Plaoc.AlphaValueHex
-  ): Promise<void> {
-    const colorHex: Plaoc.RGBA = color + alpha;
+  async setForegroundColor(color: Plaoc.RGBAHex): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      this._ffi.updateNaviBarTintColor.postMessage(color);
 
-    this._ffi.updateNaviBarTintColor.postMessage(colorHex);
-
-    return;
+      resolve();
+    });
   }
 }
