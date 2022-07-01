@@ -20,15 +20,15 @@ class e {
     });
   }
   async getOverlay() {
-    return this._ffi.getNaviOverlay.postMessage(null);
+    return await this._ffi.getNaviOverlay.postMessage(null) === 1;
   }
   async toggleOverlay() {
     const e2 = await this.getOverlay();
-    this._ffi.updateNaviBarAlpha.postMessage(e2 ? "0" : "1");
+    this._ffi.updateNaviBarOverlay.postMessage(e2 ? 0 : 1);
   }
   setOverlay() {
     return new Promise((e2, s) => {
-      this._ffi.updateNaviBarAlpha.postMessage("1"), e2();
+      this._ffi.updateNaviBarOverlay.postMessage(1), e2();
     });
   }
   async getTitle() {
@@ -53,17 +53,19 @@ class e {
       this._ffi.customNaviActions.postMessage(e2), s();
     });
   }
-  async getBackgroundColor() {
-    return (await this._ffi.getNaviBackgroundColor.postMessage(null)).color;
+  async getBackgroundColor(e2) {
+    return (await this._ffi.getNaviBackgroundColor.postMessage(null)).slice(0, -2);
   }
-  async setBackgroundColor(e2) {
-    this._ffi.updateNaviBarBackgroundColor.postMessage(e2);
+  async setBackgroundColor(e2, s) {
+    const t = e2 + s;
+    this._ffi.updateNaviBarBackgroundColor.postMessage(t);
   }
-  async getForegroundColor() {
-    return (await this._ffi.getNaviForegroundColor.postMessage(null)).color;
+  async getForegroundColor(e2) {
+    return (await this._ffi.getNaviForegroundColor.postMessage(null)).slice(0, -2);
   }
-  async setForegroundColor(e2) {
-    this._ffi.updateNaviBarTintColor.postMessage(e2);
+  async setForegroundColor(e2, s) {
+    const t = e2 + s;
+    this._ffi.updateNaviBarTintColor.postMessage(t);
   }
 }
 export { e as TopBarFFI };

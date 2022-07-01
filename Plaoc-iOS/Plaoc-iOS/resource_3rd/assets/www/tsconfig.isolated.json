@@ -10,7 +10,7 @@
     "types": [
       "tsc"
     ],
-    "outDir": ".bfsp\\tsc"
+    "outDir": ".bfsp/tsc"
   },
   "files": [
     "./index.ts"

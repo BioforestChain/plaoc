@@ -58,6 +58,13 @@ class WebViewViewController: UIViewController {
 //            webView.openLocalWebView(name: urlString)
 //        }
     }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        let str = NSString(string: Bundle.main.bundlePath)
+        let path = str.appendingPathComponent("resource_3rd/assets/www")
+        Schemehandler.setupHTMLCache(fromPath: path)
+    }
 
     lazy var statusView: StatusView = {
         let statusView = StatusView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIDevice.current.statusBarHeight()))
