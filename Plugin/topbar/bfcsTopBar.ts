@@ -4,7 +4,6 @@ export class BfcsTopBar extends HTMLElement {
   private _ffi: Plaoc.ITopBarFFI;
   private _observer: MutationObserver;
   private _actionList: Plaoc.TopBarItem[] = [];
-  private _alpha: Plaoc.AlphaValueHex = "ff";
 
   constructor() {
     super();
@@ -14,7 +13,6 @@ export class BfcsTopBar extends HTMLElement {
       this.collectActions();
     });
 
-    // this.setAlpha();
     this._init();
   }
 
@@ -39,29 +37,8 @@ export class BfcsTopBar extends HTMLElement {
   }
 
   private async _init() {
-    this._setAlpha();
-
     const height = await this.getHeight();
     this.setAttribute("height", `${height}`);
-  }
-
-  private _setAlpha() {
-    if (
-      this.hasAttribute("alpha") &&
-      this.getAttribute("alpha") &&
-      this.getAttribute("alpha")!.length > 0
-    ) {
-      try {
-        const alphaFloat = parseFloat(this.getAttribute("alpha")!);
-        const alpha = Math.round(alphaFloat * 255).toString(16);
-
-        if (alpha.length > 1) {
-          this._alpha = alpha as Plaoc.AlphaValueHex;
-        } else {
-          this._alpha = ("0" + alpha) as Plaoc.AlphaValueHex;
-        }
-      } catch {}
-    }
   }
 
   async back(): Promise<void> {
@@ -118,26 +95,53 @@ export class BfcsTopBar extends HTMLElement {
     return height;
   }
 
-  async getBackgroundColor(): Promise<string> {
-    const color = await this._ffi.getBackgroundColor(this._alpha);
+  private _convertToRGBAHex(color: string): Plaoc.RGBAHex {
+    let colorHex = "#";
+
+    if (color.startsWith("rgba(")) {
+      let colorArr = color.replace("rgba(", "").replace(")", "").split(",");
+
+      for (let [index, item] of colorArr.entries()) {
+        if (index === 3) {
+          item = `${parseFloat(item) * 255}`;
+        }
+        let itemHex = Math.round(parseFloat(item)).toString(16);
+
+        if (itemHex.length === 1) {
+          itemHex = "0" + itemHex;
+        }
+
+        colorHex += itemHex;
+      }
+    } else if (color.startsWith("#")) {
+      colorHex = color;
+    }
+
+    return colorHex.length === 9 ? colorHex : color;
+  }
+
+  async getBackgroundColor(): Promise<Plaoc.RGBAHex> {
+    const color = await this._ffi.getBackgroundColor();
 
     return color;
   }
 
-  async setBackgroundColor(color: Plaoc.RGB): Promise<void> {
-    await this._ffi.setBackgroundColor(color, this._alpha);
+  async setBackgroundColor(color: string): Promise<void> {
+    const colorHex = this._convertToRGBAHex(color);
+    await this._ffi.setBackgroundColor(colorHex);
 
     return;
   }
 
-  async getForegroundColor(): Promise<string> {
-    const color = await this._ffi.getForegroundColor(this._alpha);
+  async getForegroundColor(): Promise<Plaoc.RGBAHex> {
+    const color = await this._ffi.getForegroundColor();
 
     return color;
   }
 
-  async setForegroundColor(color: Plaoc.RGB): Promise<void> {
-    await this._ffi.setForegroundColor(color, this._alpha);
+  async setForegroundColor(color: string): Promise<void> {
+    const colorHex = this._convertToRGBAHex(color);
+    await this._ffi.setForegroundColor(colorHex);
 
     return;
   }
@@ -176,9 +180,6 @@ export class BfcsTopBar extends HTMLElement {
           ? ($.getAttribute("size") as unknown as number)
           : undefined;
       }
-      // const icon = JSON.parse(
-      //   childNode.getAttribute("icon")! as Plaoc.IconType
-      // );
 
       const bid = childNode.getAttribute("bid");
       const onClickCode = `document.querySelector('dweb-top-bar-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
