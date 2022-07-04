@@ -65,7 +65,7 @@ export class BottomBarFFI implements Plaoc.IBottomBarFFI {
   async getActions(): Promise<Plaoc.BottomBarItem[]> {
     const actionList = await this._ffi.getBottomActions.postMessage(null);
 
-    return actionList;
+    return JSON.parse(actionList);
   }
 
   setActions(actionList: Plaoc.BottomBarItem[]): Promise<void> {
@@ -88,7 +88,7 @@ export class BottomBarFFI implements Plaoc.IBottomBarFFI {
         _actionList.push(item);
       }
 
-      this._ffi.customBottomActions.postMessage(_actionList);
+      this._ffi.customBottomActions.postMessage(JSON.stringify(_actionList));
 
       resolve();
     });

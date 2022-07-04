@@ -34,10 +34,10 @@ declare namespace Plaoc {
       postMessage(height: number): void;
     };
     getBottomActions: {
-      postMessage(noValue: null): Promise<BottomBarItem[]>;
+      postMessage(noValue: null): Promise<Plaoc.DataString<BottomBarItem[]>>;
     };
     customBottomActions: {
-      postMessage(actionList: BottomBarItem[]): void;
+      postMessage(actionList: Plaoc.DataString<BottomBarItem[]>): void;
     };
     getBottomBarBackgroundColor: {
       postMessage(noValue: null): Promise<Plaoc.RGBAHex>;
