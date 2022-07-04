@@ -88,7 +88,7 @@ export class BottomBarFFI implements Plaoc.IBottomBarFFI {
         _actionList.push(item);
       }
 
-      this._ffi.customBottomActions.postMessage(actionList);
+      this._ffi.customBottomActions.postMessage(_actionList);
 
       resolve();
     });
