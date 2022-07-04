@@ -22,10 +22,10 @@ declare namespace Plaoc {
       postMessage(hidden: string): void;
     };
     getBottomBarOverlay: {
-      postMessage(noValue: null): Promise<boolean>;
+      postMessage(noValue: null): Promise<number>;
     };
-    updateBottomViewAlpha: {
-      postMessage(alpha: string): void;
+    updateBottomViewOverlay: {
+      postMessage(overlay: number): void;
     };
     bottomHeight: {
       postMessage(noValue: null): Promise<number>;
@@ -40,20 +40,37 @@ declare namespace Plaoc {
       postMessage(actionList: BottomBarItem[]): void;
     };
     getBottomBarBackgroundColor: {
-      postMessage(noValue: null): Promise<Plaoc.IColor>;
+      postMessage(noValue: null): Promise<Plaoc.RGBAHex>;
     };
     updateBottomViewBackgroundColor: {
-      postMessage(colorObject: Plaoc.IColor): void;
+      postMessage(colorHex: Plaoc.RGBAHex): void;
     };
     getBottomViewForegroundColor: {
-      postMessage(noValue: null): Promise<Plaoc.IColor>;
+      postMessage(noValue: null): Promise<Plaoc.RGBAHex>;
     };
     updateBottomViewForegroundColor: {
-      postMessage(colorObject: Plaoc.IColor): void;
+      postMessage(colorHex: Plaoc.RGBAHex): void;
     };
   }
 
-  type BottomBarColorType = number | Plaoc.ARGB;
+  interface IBottomBarFFI {
+    getEnabled(): Promise<boolean>;
+    toggleEnabled(isEnabled: number): Promise<void>;
+    setHidden(): Promise<void>;
+    getOverlay(): Promise<boolean>;
+    toggleOverlay(isOverlay: number): Promise<void>;
+    setOverlay(): Promise<void>;
+    getHeight(): Promise<number>;
+    setHeight(heightDp: number): Promise<void>;
+    getActions(): Promise<BottomBarItem[]>;
+    setActions(actionList: BottomBarItem[]): Promise<void>;
+    getBackgroundColor(): Promise<Plaoc.RGBAHex>;
+    setBackgroundColor(color: Plaoc.RGBAHex): Promise<void>;
+    getForegroundColor(): Promise<Plaoc.RGBAHex>;
+    setForegroundColor(color: Plaoc.RGBAHex): Promise<void>;
+  }
+
+  type BottomBarColorType = number | Plaoc.RGBAHex;
 
   interface IBottomBarColors {
     indicatorColor?: BottomBarColorType;

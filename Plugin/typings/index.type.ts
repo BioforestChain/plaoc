@@ -34,13 +34,8 @@ declare namespace Plaoc {
         : never
       : never;
 
-  type RGBAHex = string;
-  type ARGB = string;
-  type RGB = string; // #ff0000
+  type RGBAHex = `#${string}`; // #ff000000
+  type RGBA = `rgba(${number}, ${number}, ${number}, ${number})`; // rgba(255, 0, 0, 1)
+  type RGBHex = `#${string}`; // #ff0000
   type AlphaValueHex = `${HexDigit}${HexDigit}`;
-
-  interface IColor {
-    color: RGB;
-    alpha: number;
-  }
 }

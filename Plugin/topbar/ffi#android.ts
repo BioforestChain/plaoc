@@ -1,3 +1,5 @@
+import { getColorInt, getColorHex } from "@plaoc/plugin-util";
+
 export class TopBarFFI implements Plaoc.ITopBarFFI {
   private _ffi: Plaoc.TopBarAndroidFFI = top_bar;
 
@@ -102,28 +104,10 @@ export class TopBarFFI implements Plaoc.ITopBarFFI {
     });
   }
 
-  // 将RGB 和 Alpha 转化为 ARGB color int
-  private getColorInt(color: Plaoc.RGB, alpha: Plaoc.AlphaValueHex): number {
-    return (
-      parseInt(color.replace("#", "0x"), 16) + (parseInt("0x" + alpha) << 24)
-    );
-  }
-
-  // 将ARGB color int 转化为RGBA 十六进制
-  private getColorHex(color: number): Plaoc.RGBAHex {
-    let colorHex = new Uint32Array([color])[0].toString(16);
-
-    if (colorHex.length < 8) {
-      colorHex = "0".repeat(8 - colorHex.length) + colorHex;
-    }
-
-    return "#" + colorHex.slice(2) + colorHex.slice(0, 2);
-  }
-
   getBackgroundColor(): Promise<Plaoc.RGBAHex> {
     return new Promise<Plaoc.RGBAHex>((resolve, reject) => {
       const color = this._ffi.getBackgroundColor();
-      const colorHex = this.getColorHex(color);
+      const colorHex = getColorHex(color);
 
       resolve(colorHex);
     });
@@ -131,8 +115,8 @@ export class TopBarFFI implements Plaoc.ITopBarFFI {
 
   setBackgroundColor(color: Plaoc.RGBAHex): Promise<void> {
     return new Promise<void>(async (resolve, reject) => {
-      const colorHex = this.getColorInt(
-        color.slice(0, -2),
+      const colorHex = getColorInt(
+        color.slice(0, -2) as Plaoc.RGBHex,
         color.slice(-2) as Plaoc.AlphaValueHex
       );
       this._ffi.setBackgroundColor(colorHex);
@@ -144,7 +128,7 @@ export class TopBarFFI implements Plaoc.ITopBarFFI {
   getForegroundColor(): Promise<Plaoc.RGBAHex> {
     return new Promise<Plaoc.RGBAHex>((resolve, reject) => {
       const color = this._ffi.getForegroundColor();
-      const colorHex = this.getColorHex(color);
+      const colorHex = getColorHex(color);
 
       resolve(colorHex);
     });
@@ -152,8 +136,8 @@ export class TopBarFFI implements Plaoc.ITopBarFFI {
 
   setForegroundColor(color: Plaoc.RGBAHex): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      const colorHex = this.getColorInt(
-        color.slice(0, -2),
+      const colorHex = getColorInt(
+        color.slice(0, -2) as Plaoc.RGBHex,
         color.slice(-2) as Plaoc.AlphaValueHex
       );
 

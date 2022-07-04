@@ -94,6 +94,13 @@
             "kind": "markdown",
             "value": "colors"
           }
+        },
+        {
+          "name": "label",
+          "description": {
+            "kind": "markdown",
+            "value": "label"
+          }
         }
       ]
     },

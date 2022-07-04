@@ -13,10 +13,10 @@
     </style>
 </head>
 <body>
-    <dweb-status-bar overlay>
-        <dweb-status-bar-color id="sss" darkicons="0" colorhex="#ff0000" opacity="0.5"></dweb-status-bar-color>
-    </dweb-status-bar>
-    <dweb-top-bar id="topbar" title="test">
+    <!-- <dweb-status-bar overlay>
+        <dweb-status-bar-color id="sss" darkicons="0" colorhex="#ff0000" alpha="0.5"></dweb-status-bar-color>
+    </dweb-status-bar> -->
+    <dweb-top-bar id="topbar" title="test" background-color="rgba(253, 255, 0, 0.5)" foreground-color="#0000ffff">
         <dweb-top-bar-button id="aaa">
             <dweb-icon source="Filled.AddCircle"></dweb-icon>
         </dweb-top-bar-button>
@@ -31,18 +31,18 @@
         <p>test</p>
     </div>
     <dweb-bottom-bar id="bottom_bar">
-        <dweb-bottom-bar-button id="ddd" selectable>
+        <dweb-bottom-bar-button id="ddd" selectable label="add">
             <dweb-icon source="Filled.AddCircle"></dweb-icon>
         </dweb-bottom-bar-button>
-        <dweb-bottom-bar-button disabled>
-            <dweb-icon source="http://172.30.95.56:5500/Plaoc-Android/app/src/main/assets/icon/ico_bottom_tab_publisher.svg" type="AssetIcon"></dweb-icon>
+        <dweb-bottom-bar-button id="eee">
+            <dweb-icon source="http://172.30.95.56:5500/Plaoc-Android/app/src/main/assets/icon/ico_bottom_tab_publisher.svg" type="AssetIcon" size="50"></dweb-icon>
         </dweb-bottom-bar-button>
-        <dweb-bottom-bar-button selected selectable>
+        <dweb-bottom-bar-button selected selectable label="test">
             <dweb-icon source="Filled.Add"></dweb-icon>
         </dweb-bottom-bar-button>
     </dweb-bottom-bar>
-    <dweb-keyboard for="key"></dweb-keyboard>
-    <dweb-dialog-alert title="alert" content="content">
+    <!-- <dweb-keyboard for="key"></dweb-keyboard> -->
+    <!-- <dweb-dialog-alert title="alert" content="content">
         <dweb-dialog-button id="ddb">ok</dweb-dialog-button>
     </dweb-dialog-alert>
     <dweb-dialog-prompt title="prompt" label="label" defaultValue="default">
@@ -56,7 +56,7 @@
     <dweb-dialog-before-unload id="before_unload" title="test" message="before-unload">
         <dweb-dialog-button>ok</dweb-dialog-button>
         <dweb-dialog-button>No</dweb-dialog-button>
-    </dweb-dialog-before-unload>
+    </dweb-dialog-before-unload> -->
     <p>test</p>
     <p>test</p>
     <p>test</p>
@@ -73,42 +73,61 @@
     <p>test</p>
     <p>test</p>
     <p>test</p>
+    <button id="bt" type="button" onclick="btclick()">control</button>
     <input id="key" type="text" value="test input" />
 
     <script>
         aaa.onclick = async () => {
-            content.innerHTML = "content";
-            alert(1);
-            await topbar.setTitle("title");
+            // content.innerHTML = "content";
+            // alert(1);
+            // await topbar.setTitle("title");
+            // alert("background-color: " + await topbar.getBackgroundColor());
+            ddd.setAttribute("colors", JSON.stringify(colors));
+            
         }
 
         let colors = {
-            textColor: 0xffaa0000,
-            textColorSelected: 0xaa00ff00,
-            iconColor: 0xffaa0000,
-            iconColorSelected: 0xaa00ff00,
+            textColor: "#0000ffff",
+            textColorSelected: "rgba(255, 0, 0, 1)",
+            // textColorSelected: "#aa00ff00",
+            iconColor: "#ff00aaff",
+            iconColorSelected: "rgba(0, 255, 0, 1)",
         };
 
-        ddd.setAttribute("colors", JSON.stringify(colors));
+        // ddd.setAttribute("colors", JSON.stringify(colors));
 
-        ddd.onclick = async () => {
-            content.innerHTML = "bottom";
-            alert(2);
-            await topbar.setBackgroundColor("#ff0000");
-            alert(await topbar.getBackgroundColor());
-            before_unload.setAttribute("visible", "");
+        eee.onclick = async () => {
+            content.textContent = "selectable";
         }
 
-        ddb.onclick = () => {
-            content.innerHTML = "alert";
-        };
+        async function btclick () {
+            await topbar.toggleEnabled();
+            content.textContent = await topbar.height;
+        }
+
+        // ddd.onclick = async () => {
+        //     content.innerHTML = "bottom";
+        //     alert(2);
+        //     await topbar.setBackgroundColor("#ff0000");
+        //     alert(await topbar.getBackgroundColor());
+        //     before_unload.setAttribute("visible", "");
+        // }
+
+        ddd.onclick = async () => {
+            // alert(JSON.stringify(await bottom_bar.getActions()));
+            // ddd.setAttribute("colors", JSON.stringify(colors));
+        }
+
+        // ddb.onclick = () => {
+        //     content.innerHTML = "alert";
+        // };
 
         ok.onclick = () => {
             content.innerHTML = "ok";
         }
-        // no.onclick = () => {
-        //     content.innerHTML = "no";
-        // }
+        no.onclick = () => {
+            content.innerHTML = "no";
+        }
     </script>
 </body>
 </html>

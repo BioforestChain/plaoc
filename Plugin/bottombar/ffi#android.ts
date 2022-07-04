@@ -1,4 +1,6 @@
-export class BottomBarFFI {
+import { getColorInt, getColorHex, convertToRGBAHex } from "@plaoc/plugin-util";
+
+export class BottomBarFFI implements Plaoc.IBottomBarFFI {
   private _ffi: Plaoc.BottomBarAndroidFFI = bottom_bar;
 
   getEnabled(): Promise<boolean> {
@@ -64,40 +66,43 @@ export class BottomBarFFI {
     });
   }
 
-  private getColorInt(color: string = "#ffffff", alpha: number = 0.5) {
-    return parseInt(color.slice(1), 16) + ((alpha * 255) << (8 * 3));
-  }
-
-  getBackgroundColor(): Promise<string> {
-    return new Promise<string>((resolve, reject) => {
+  getBackgroundColor(): Promise<Plaoc.RGBAHex> {
+    return new Promise<Plaoc.RGBAHex>((resolve, reject) => {
       const color = this._ffi.getBackgroundColor();
-      const colorHex = "#" + color.toString(16).slice(2);
+      const colorHex = getColorHex(color);
 
       resolve(colorHex);
     });
   }
 
-  setBackgroundColor(colorObject: Plaoc.IColor): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      const colorHex = this.getColorInt(colorObject.color, colorObject.alpha);
+  setBackgroundColor(color: Plaoc.RGBAHex): Promise<void> {
+    return new Promise<void>(async (resolve, reject) => {
+      const colorHex = getColorInt(
+        color.slice(0, -2) as Plaoc.RGBHex,
+        color.slice(-2) as Plaoc.AlphaValueHex
+      );
       this._ffi.setBackgroundColor(colorHex);
 
       resolve();
     });
   }
 
-  getForegroundColor(): Promise<string> {
-    return new Promise<string>((resolve, reject) => {
+  getForegroundColor(): Promise<Plaoc.RGBAHex> {
+    return new Promise<Plaoc.RGBAHex>((resolve, reject) => {
       const color = this._ffi.getForegroundColor();
-      const colorHex = "#" + color.toString(16).slice(2);
+      const colorHex = getColorHex(color);
 
       resolve(colorHex);
     });
   }
 
-  setForegroundColor(colorObject: Plaoc.IColor): Promise<void> {
+  setForegroundColor(color: Plaoc.RGBAHex): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      const colorHex = this.getColorInt(colorObject.color, colorObject.alpha);
+      const colorHex = getColorInt(
+        color.slice(0, -2) as Plaoc.RGBHex,
+        color.slice(-2) as Plaoc.AlphaValueHex
+      );
+
       this._ffi.setForegroundColor(colorHex);
 
       resolve();
@@ -111,38 +116,17 @@ export class BottomBarFFI {
 
       for (const item of actionList) {
         if (item.colors) {
-          if (
-            item.colors.indicatorColor &&
-            typeof item.colors.indicatorColor === "number"
-          ) {
-            item.colors.indicatorColor =
-              "#" + item.colors.indicatorColor.toString(16);
-          }
-          if (
-            item.colors.iconColor &&
-            typeof item.colors.iconColor === "number"
-          ) {
-            item.colors.iconColor = "#" + item.colors.iconColor.toString(16);
-          }
-          if (
-            item.colors.iconColorSelected &&
-            typeof item.colors.iconColorSelected === "number"
-          ) {
-            item.colors.iconColorSelected =
-              "#" + item.colors.iconColorSelected.toString(16);
-          }
-          if (
-            item.colors.textColor &&
-            typeof item.colors.textColor === "number"
-          ) {
-            item.colors.textColor = "#" + item.colors.textColor.toString(16);
-          }
-          if (
-            item.colors.textColorSelected &&
-            typeof item.colors.textColorSelected === "number"
-          ) {
-            item.colors.textColorSelected =
-              "#" + item.colors.textColorSelected.toString(16);
+          for (let key of Object.keys(item.colors)) {
+            let color = item.colors[key as keyof Plaoc.IBottomBarColors];
+
+            if (typeof color === "number") {
+              let colorARGB = "#" + color.toString(16);
+
+              item.colors[key as keyof Plaoc.IBottomBarColors] =
+                (colorARGB.slice(0, 1) +
+                  colorARGB.slice(3) +
+                  colorARGB.slice(1, 3)) as Plaoc.BottomBarColorType;
+            }
           }
         }
 
@@ -159,50 +143,18 @@ export class BottomBarFFI {
 
       for (const item of actionList) {
         if (item.colors) {
-          if (
-            item.colors.indicatorColor &&
-            typeof item.colors.indicatorColor === "string" &&
-            item.colors.indicatorColor.startsWith("#")
-          ) {
-            item.colors.indicatorColor = parseInt(
-              item.colors.indicatorColor.replace("#", "0x")
-            );
-          }
-          if (
-            item.colors.iconColor &&
-            typeof item.colors.iconColor === "string" &&
-            item.colors.iconColor.startsWith("#")
-          ) {
-            item.colors.iconColor = parseInt(
-              item.colors.iconColor.replace("#", "0x")
-            );
-          }
-          if (
-            item.colors.iconColorSelected &&
-            typeof item.colors.iconColorSelected === "string" &&
-            item.colors.iconColorSelected.startsWith("#")
-          ) {
-            item.colors.iconColorSelected = parseInt(
-              item.colors.iconColorSelected.replace("#", "0x")
-            );
-          }
-          if (
-            item.colors.textColor &&
-            typeof item.colors.textColor === "string" &&
-            item.colors.textColor.startsWith("#")
-          ) {
-            item.colors.textColor = parseInt(
-              item.colors.textColor.replace("#", "0x")
-            );
-          }
-          if (
-            item.colors.textColorSelected &&
-            typeof item.colors.textColorSelected === "string" &&
-            item.colors.textColorSelected.startsWith("#")
-          ) {
-            item.colors.textColorSelected = parseInt(
-              item.colors.textColorSelected.replace("#", "0x")
-            );
+          for (const key of Object.keys(item.colors)) {
+            let color = item.colors[key as keyof Plaoc.IBottomBarColors];
+
+            if (typeof color === "string") {
+              let colorRGBA = convertToRGBAHex(color).replace("#", "0x");
+              let colorARGB =
+                colorRGBA.slice(0, 2) +
+                colorRGBA.slice(-2) +
+                colorRGBA.slice(2, -2);
+              item.colors[key as keyof Plaoc.IBottomBarColors] =
+                parseInt(colorARGB);
+            }
           }
         }
 

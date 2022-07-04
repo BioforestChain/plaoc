@@ -1,3 +1,5 @@
+import { convertToRGBAHex } from "@plaoc/plugin-util";
+
 import { TopBarFFI } from "./ffi";
 
 export class BfcsTopBar extends HTMLElement {
@@ -95,31 +97,6 @@ export class BfcsTopBar extends HTMLElement {
     return height;
   }
 
-  private _convertToRGBAHex(color: string): Plaoc.RGBAHex {
-    let colorHex = "#";
-
-    if (color.startsWith("rgba(")) {
-      let colorArr = color.replace("rgba(", "").replace(")", "").split(",");
-
-      for (let [index, item] of colorArr.entries()) {
-        if (index === 3) {
-          item = `${parseFloat(item) * 255}`;
-        }
-        let itemHex = Math.round(parseFloat(item)).toString(16);
-
-        if (itemHex.length === 1) {
-          itemHex = "0" + itemHex;
-        }
-
-        colorHex += itemHex;
-      }
-    } else if (color.startsWith("#")) {
-      colorHex = color;
-    }
-
-    return colorHex.length === 9 ? colorHex : color;
-  }
-
   async getBackgroundColor(): Promise<Plaoc.RGBAHex> {
     const color = await this._ffi.getBackgroundColor();
 
@@ -127,7 +104,7 @@ export class BfcsTopBar extends HTMLElement {
   }
 
   async setBackgroundColor(color: string): Promise<void> {
-    const colorHex = this._convertToRGBAHex(color);
+    const colorHex = convertToRGBAHex(color);
     await this._ffi.setBackgroundColor(colorHex);
 
     return;
@@ -140,7 +117,7 @@ export class BfcsTopBar extends HTMLElement {
   }
 
   async setForegroundColor(color: string): Promise<void> {
-    const colorHex = this._convertToRGBAHex(color);
+    const colorHex = convertToRGBAHex(color);
     await this._ffi.setForegroundColor(colorHex);
 
     return;

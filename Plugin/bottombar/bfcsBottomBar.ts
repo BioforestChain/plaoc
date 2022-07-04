@@ -1,3 +1,5 @@
+import { convertToRGBAHex } from "@plaoc/plugin-util";
+
 import { BottomBarFFI } from "./ffi";
 
 export class BfcsBottomBar extends HTMLElement {
@@ -62,41 +64,28 @@ export class BfcsBottomBar extends HTMLElement {
     return;
   }
 
-  async getBackgroundColor(): Promise<string> {
+  async getBackgroundColor(): Promise<Plaoc.RGBAHex> {
     const color = await this._ffi.getBackgroundColor();
 
     return color;
   }
 
-  async setBackgroundColor(colorHex: string = "#ffffff"): Promise<void> {
-    const colorObject: Plaoc.IColor = {
-      color: colorHex,
-      alpha:
-        this.getAttribute("alpha") && this.getAttribute("alpha")!.length > 0
-          ? parseFloat(this.getAttribute("alpha")!)
-          : 0.5,
-    };
-    await this._ffi.setBackgroundColor(colorObject);
+  async setBackgroundColor(color: string): Promise<void> {
+    const colorHex = convertToRGBAHex(color);
+    await this._ffi.setBackgroundColor(colorHex);
 
     return;
   }
 
-  async getForegroundColor(): Promise<string> {
+  async getForegroundColor(): Promise<Plaoc.RGBAHex> {
     const color = await this._ffi.getForegroundColor();
 
     return color;
   }
 
-  async setForegroundColor(colorHex: string = "#ffffff"): Promise<void> {
-    const colorObject: Plaoc.IColor = {
-      color: colorHex,
-      alpha:
-        this.getAttribute("alpha") && this.getAttribute("alpha")!.length > 0
-          ? parseFloat(this.getAttribute("alpha")!)
-          : 0.5,
-    };
-
-    await this._ffi.setForegroundColor(colorObject);
+  async setForegroundColor(color: string): Promise<void> {
+    const colorHex = convertToRGBAHex(color);
+    await this._ffi.setForegroundColor(colorHex);
 
     return;
   }
