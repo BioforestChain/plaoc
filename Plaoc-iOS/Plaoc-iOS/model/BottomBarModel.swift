@@ -41,22 +41,22 @@ struct BottomBarModel {
 
 struct ColorModel {
     
-    var indicatorColor: Int?
-    var iconColor: Int?
-    var iconColorSelected: Int?
-    var textColor: Int?
-    var textColorSelected: Int?
+    var indicatorColor: String?
+    var iconColor: String?
+    var iconColorSelected: String?
+    var textColor: String?
+    var textColorSelected: String?
     
     init(dict: JSON) {
         
-        indicatorColor = dict["indicatorColor"].intValue
-        iconColor = dict["iconColor"].intValue
-        iconColorSelected = dict["iconColorSelected"].intValue
-        textColor = dict["textColor"].intValue
-        textColorSelected = dict["textColorSelected"].intValue
+        indicatorColor = dict["indicatorColor"].stringValue
+        iconColor = dict["iconColor"].stringValue
+        iconColorSelected = dict["iconColorSelected"].stringValue
+        textColor = dict["textColor"].stringValue
+        textColorSelected = dict["textColorSelected"].stringValue
     }
     
-    var colorDict: [String:Int?] {
+    var colorDict: [String:String?] {
         return ["indicatorColor":indicatorColor,
                 "iconColor":iconColor,
                 "iconColorSelected":iconColorSelected,

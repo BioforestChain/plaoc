@@ -8,7 +8,7 @@ export default defineConfig((info) => {
     deps: [
       "@plaoc/plugin-icon",
       "@plaoc/plugin-top-bar-ios",
-      "@plaoc/plugin-bottom-bar-ios",
+      // "@plaoc/plugin-bottom-bar",
       // "@plaoc/plugin-status-bar",
       // "@plaoc/plugin-dialogs",
       // "@plaoc/plugin-keyboard",
