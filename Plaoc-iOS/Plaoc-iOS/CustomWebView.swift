@@ -18,6 +18,7 @@ class CustomWebView: UIView {
     private var scripts: [WKUserScript]?
     private let imageUrl_key: String = "imageUrl"
     private var isKeyboardOverlay: Bool = true
+    private var keyHeight:CGFloat = 0
     
     init(frame: CGRect, jsNames: [String]) {
         super.init(frame: frame)
@@ -26,10 +27,17 @@ class CustomWebView: UIView {
         
         NotificationCenter.default.addObserver(self, selector: #selector(observerShowKeyboard(noti:)), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(observerHiddenKeyboard(noti:)), name: UIResponder.keyboardWillHideNotification, object: nil)
+        
+        
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    func removeUserScripts() {
+        webView.configuration.userContentController.removeAllUserScripts()
+        webView.configuration.userContentController.removeAllScriptMessageHandlers()
     }
     
     private lazy var webView: WKWebView = {
@@ -55,20 +63,25 @@ class CustomWebView: UIView {
         if #available(iOS 11.0, *) {
             webView.scrollView.contentInsetAdjustmentBehavior = .never
         } else {
-            
+
         }
+        
+//        let webView = WebViewPool.shared.getReusedWebView(forHolder: self)
+//        webView.frame = self.bounds
+//        addScriptMessageHandler(config: webView.configuration)
+//        addScriptMessageHandlerWithReply(config: webView.configuration)
         return webView
     }()
     
     private func addScriptMessageHandler(config: WKWebViewConfiguration) {
-        let array = ["hiddenBottomView","updateBottomViewOverlay","updateBottomViewBackgroundColor","hiddenBottomViewButton","updateStatusBarOverlay","updateStatusBackgroundColor","updateStatusStyle","updateStatusHidden","hiddenNaviBar","updateNaviBarOverlay","updateNaviBarBackgroundColor","updateNaviBarTintColor","back","jumpWeb","updateTitle","startLoad","LoadingComplete","savePhoto","startCamera","photoFromPhotoLibrary","startShare","updateBottomViewForegroundColor","customNaviActions","openAlert","openPrompt","openConfirm","openBeforeUnload","setKeyboardOverlay","updateBottomViewHeight","setForegroundColor","customBottomActions"]
+        let array = ["hiddenBottomView","updateBottomViewOverlay","updateBottomViewBackgroundColor","hiddenBottomViewButton","updateStatusBarOverlay","updateStatusBackgroundColor","updateStatusStyle","updateStatusHidden","hiddenNaviBar","updateNaviBarOverlay","updateNaviBarBackgroundColor","updateNaviBarTintColor","back","jumpWeb","updateTitle","startLoad","LoadingComplete","savePhoto","startCamera","photoFromPhotoLibrary","startShare","updateBottomViewForegroundColor","customNaviActions","openAlert","openPrompt","openConfirm","openBeforeUnload","setKeyboardOverlay","updateBottomViewHeight","setForegroundColor","customBottomActions","hideKeyboard"]
         for name in array {
             config.userContentController.add(LeadScriptHandle(messageHandle: self), name: name)
         }
     }
     
     private func addScriptMessageHandlerWithReply(config: WKWebViewConfiguration) {
-        let array = ["calendar","naviHeight","bottomHeight","getNaviEnabled","hasNaviTitle","getNaviOverlay","getNaviBackgroundColor","getNaviForegroundColor","getBottomBarEnabled","getBottomBarOverlay","getBottomActions","getBottomBarBackgroundColor","getKeyboardOverlay","getForegroundColor","getNaviTitle","getNaviActions"]
+        let array = ["calendar","naviHeight","bottomHeight","getNaviEnabled","hasNaviTitle","getNaviOverlay","getNaviBackgroundColor","getNaviForegroundColor","getBottomBarEnabled","getBottomBarOverlay","getBottomActions","getBottomBarBackgroundColor","getKeyboardOverlay","getForegroundColor","getNaviTitle","getNaviActions","keyHeight","keyboardSafeArea"]
         for name in array {
             config.userContentController.addScriptMessageHandler(self, contentWorld: .page, name: name)
         }
@@ -136,6 +149,7 @@ extension CustomWebView {
     @objc private func observerShowKeyboard(noti: Notification) {
         
         guard let keyboardBound = noti.userInfo?["UIKeyboardFrameEndUserInfoKey"] as? CGRect else { return }
+        keyHeight = keyboardBound.height
         let keyboardString = "getKeyboardFrame('\(keyboardBound)')"
         handleJavascriptString(inputJS: keyboardString)
         
@@ -242,15 +256,18 @@ extension CustomWebView:  WKScriptMessageHandler {
             let controller = currentViewController() as? WebViewViewController
             controller?.updateBottomViewHeight(height: CGFloat(body))
         }else if message.name == "customBottomActions" {
-            guard let body = message.body as? [[String:Any]] else { return }
-            print(body)
+            guard let body = message.body as? String else { return }
+            guard let data = body.data(using: .utf8) else { return }
+            guard let array = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers) else { return }
             let controller = currentViewController() as? WebViewViewController
-            let list = JSON(body)
+            let list = JSON(array)
             let buttons = list.arrayValue.map { BottomBarModel(dict: $0) }
             controller?.fetchBottomButtons(buttons: buttons)
         } else if message.name == "openAlert" {
-            guard let body = message.body as? [String:Any] else { return }
-            let alertModel = AlertConfiguration(dict: JSON(body))
+            guard let body = message.body as? String else { return }
+            guard let data = body.data(using: .utf8) else { return }
+            guard let bodyDict = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [String:Any] else { return }
+            let alertModel = AlertConfiguration(dict: JSON(bodyDict))
             let alertView = CustomAlertPopView(frame: CGRect(x: 0, y: 0, width: screen_width, height: screen_height))
             alertView.alertModel = alertModel
             alertView.callback = { [weak self] type in
@@ -261,8 +278,10 @@ extension CustomWebView:  WKScriptMessageHandler {
             }
             alertView.show()
         } else if message.name == "openPrompt" {
-            guard let body = message.body as? [String:Any] else { return }
-            let promptModel = PromptConfiguration(dict: JSON(body))
+            guard let body = message.body as? String else { return }
+            guard let data = body.data(using: .utf8) else { return }
+            guard let bodyDict = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [String:Any] else { return }
+            let promptModel = PromptConfiguration(dict: JSON(bodyDict))
             let alertView = CustomPromptPopView(frame: CGRect(x: 0, y: 0, width: screen_width, height: screen_height))
             alertView.promptModel = promptModel
             alertView.callback = { [weak self] type in
@@ -278,8 +297,10 @@ extension CustomWebView:  WKScriptMessageHandler {
             }
             alertView.show()
         } else if message.name == "openConfirm" {
-            guard let body = message.body as? [String:Any] else { return }
-            let confirmModel = ConfirmConfiguration(dict: JSON(body))
+            guard let body = message.body as? String else { return }
+            guard let data = body.data(using: .utf8) else { return }
+            guard let bodyDict = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [String:Any] else { return }
+            let confirmModel = ConfirmConfiguration(dict: JSON(bodyDict))
             let alertView = CustomConfirmPopView(frame: CGRect(x: 0, y: 0, width: screen_width, height: screen_height))
             alertView.confirmModel = confirmModel
             alertView.callback = { [weak self] type in
@@ -295,8 +316,10 @@ extension CustomWebView:  WKScriptMessageHandler {
             }
             alertView.show()
         } else if message.name == "openBeforeUnload" {
-            guard let body = message.body as? [String:Any] else { return }
-            let confirmModel = ConfirmConfiguration(dict: JSON(body))
+            guard let body = message.body as? String else { return }
+            guard let data = body.data(using: .utf8) else { return }
+            guard let bodyDict = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [String:Any] else { return }
+            let confirmModel = ConfirmConfiguration(dict: JSON(bodyDict))
             let alertView = CustomConfirmPopView(frame: CGRect(x: 0, y: 0, width: screen_width, height: screen_height))
             alertView.confirmModel = confirmModel
             alertView.callback = { [weak self] type in
@@ -314,6 +337,8 @@ extension CustomWebView:  WKScriptMessageHandler {
         } else if message.name == "setKeyboardOverlay" {
             guard let body = message.body as? String else { return }
             isKeyboardOverlay = body == "1" ? true : false
+        } else if message.name == "hideKeyboard" {
+            self.endEditing(true)
         }
     }
     
@@ -392,7 +417,11 @@ extension CustomWebView: WKScriptMessageHandlerWithReply {
             let controller = currentViewController() as? WebViewViewController
             let overlay = controller?.statusBarOverlay()
             replyHandler(overlay,nil)
-        } else if message.name == "getBottomActions" {
+        } else if message.name == "statusBackgroundColor" {
+            let controller = currentViewController() as? WebViewViewController
+            let color = controller?.statusBackgroundColor()
+            replyHandler(color,nil)
+        }else if message.name == "getBottomActions" {
             let controller = currentViewController() as? WebViewViewController
             let dict = controller?.bottomActions()
             replyHandler(dict,nil)
@@ -402,6 +431,11 @@ extension CustomWebView: WKScriptMessageHandlerWithReply {
             replyHandler(color,nil)
         } else if message.name == "getKeyboardOverlay" {
             replyHandler(isKeyboardOverlay,nil)
+        } else if message.name == "keyHeight" {
+            replyHandler(keyHeight,nil)
+        } else if message.name == "keyboardSafeArea" {
+            let safeArea = UIEdgeInsets(top: 0, left: 0, bottom: screen_height - keyHeight, right: 0)
+            replyHandler(safeArea,nil)
         }
     }
 }

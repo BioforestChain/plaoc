@@ -12,7 +12,7 @@ let screen_height = UIScreen.main.bounds.height
 
 class ViewController: UIViewController, UIGestureRecognizerDelegate {
 
-    private let dataSource: [String] = ["example","statusbar","http://127.0.0.1:5500/Plaoc-iOS/Plaoc-iOS/jsFile/test/index.html"]
+    private let dataSource: [String] = ["example","statusbar","https://www.qq.com"]
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = .white
@@ -20,6 +20,11 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         self.view.addSubview(tableView)
         
         self.navigationController?.interactivePopGestureRecognizer?.delegate = self
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "mainInit"), object: nil)
     }
 
     lazy private var tableView: UITableView = {

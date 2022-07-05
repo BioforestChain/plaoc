@@ -20,30 +20,32 @@ class BottomView: UIView {
     var buttons: [BottomBarModel]? {
         didSet {
             guard buttons != nil else { return }
-            let width: CGFloat = 44
+            let width: CGFloat = 50
             for i in stride(from: 0, to: buttons!.count, by: 1) {
                 let model = buttons![i]
-                let button = UIButton(type: .contactAdd)
+                let button = UIButton(type: .custom)
+                button.frame = CGRect(x: CGFloat(i) * self.frame.width / CGFloat(buttons!.count), y: 0, width: self.frame.width / CGFloat(buttons!.count), height: self.frame.height)
                 button.tag = i
                 let imageName = model.iconModel?.source ?? ""
                 if model.iconModel?.type == "AssetIcon" {
                     button.sd_setImage(with: URL(string: imageName), for: .normal)
                 } else {
                     if imageName.hasSuffix("svg") {
-                        button.setImage(UIImage.svgImageNamed(imageName, size: CGSize(width: width, height: width)), for: .normal)
+                        let name = imageName.replacingOccurrences(of: ".svg", with: "")
+                        button.setImage(UIImage.svgImageNamed(name, size: CGSize(width: width, height: width)), for: .normal)
                     } else {
-//                        button.setImage(UIImage(named: imageName), for: .normal)
+                        button.setImage(UIImage(named: imageName), for: .normal)
                     }
                 }
                 button.isEnabled = !(model.disabled ?? false)
                 button.isSelected = model.selected ?? false
-                button.setTitleColor(UIColor("\(model.colors?.textColor)" ), for: .normal)
-                button.setTitleColor(UIColor("\(model.colors?.textColorSelected)" ), for: .selected)
-                
+                button.setTitle(model.titleString, for: .normal)
+                button.setTitleColor(UIColor(model.colors?.textColor ?? ""), for: .normal)
+                button.imagePosition(style: .top, spacing: 8)
 //                button.menu = menuAction()
                 button.addTarget(self, action: #selector(clickAction(sender:)), for: .touchUpInside)
-                button.showsMenuAsPrimaryAction = true
-                button.frame = CGRect(x: CGFloat(i) * self.frame.width / CGFloat(buttons!.count), y: 0, width: self.frame.width / CGFloat(buttons!.count), height: self.frame.height)
+//                button.showsMenuAsPrimaryAction = true
+                
                 self.addSubview(button)
                 buttonList.append(button)
             }
@@ -86,6 +88,11 @@ class BottomView: UIView {
         guard buttons != nil, sender.tag < buttons!.count else { return }
         let model = buttons![sender.tag]
         let code = model.onClickCode ?? ""
+        if sender.isHighlighted {
+            sender.setTitleColor(UIColor(model.colors?.textColorSelected ?? ""), for: .normal)
+        } else {
+            sender.setTitleColor(UIColor(model.colors?.textColor ?? ""), for: .normal)
+        }
         guard code.count > 0 else { return }
         callback?(code)
     }

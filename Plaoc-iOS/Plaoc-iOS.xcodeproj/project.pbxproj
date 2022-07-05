@@ -7,7 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0404B0002873CAA6000BABE8 /* method_photo.svg in Resources */ = {isa = PBXBuildFile; fileRef = 0404AFFF2873CAA6000BABE8 /* method_photo.svg */; };
+		0404B058287414F5000BABE8 /* XXWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0404B057287414F5000BABE8 /* XXWebView.swift */; };
 		0406F5062865B3F9006F4F6F /* Schemehandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0406F5052865B3F9006F4F6F /* Schemehandler.swift */; };
+		040E4D0228727E0C003569F1 /* WebViewPool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 040E4D0128727E0C003569F1 /* WebViewPool.swift */; };
+		040E4D0C2872D9CF003569F1 /* coil_logo_colored.svg in Resources */ = {isa = PBXBuildFile; fileRef = 040E4D092872D9CF003569F1 /* coil_logo_colored.svg */; };
+		040E4D0D2872D9CF003569F1 /* angle_nft.png in Resources */ = {isa = PBXBuildFile; fileRef = 040E4D0A2872D9CF003569F1 /* angle_nft.png */; };
+		040E4D0E2872D9CF003569F1 /* ico_bottom_tab_publisher.svg in Resources */ = {isa = PBXBuildFile; fileRef = 040E4D0B2872D9CF003569F1 /* ico_bottom_tab_publisher.svg */; };
+		040E4D102872DAEC003569F1 /* UIButton_extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 040E4D0F2872DAEC003569F1 /* UIButton_extension.swift */; };
 		0419F102286051B200EF8DC2 /* WebViewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0419F101286051B200EF8DC2 /* WebViewViewController.swift */; };
 		0419F106286051F500EF8DC2 /* UIView_extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0419F104286051F500EF8DC2 /* UIView_extension.swift */; };
 		0419F107286051F500EF8DC2 /* UIDevice_extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0419F105286051F500EF8DC2 /* UIDevice_extension.swift */; };
@@ -64,7 +71,14 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0404AFFF2873CAA6000BABE8 /* method_photo.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = method_photo.svg; sourceTree = "<group>"; };
+		0404B057287414F5000BABE8 /* XXWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XXWebView.swift; sourceTree = "<group>"; };
 		0406F5052865B3F9006F4F6F /* Schemehandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Schemehandler.swift; sourceTree = "<group>"; };
+		040E4D0128727E0C003569F1 /* WebViewPool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewPool.swift; sourceTree = "<group>"; };
+		040E4D092872D9CF003569F1 /* coil_logo_colored.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = coil_logo_colored.svg; sourceTree = "<group>"; };
+		040E4D0A2872D9CF003569F1 /* angle_nft.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = angle_nft.png; sourceTree = "<group>"; };
+		040E4D0B2872D9CF003569F1 /* ico_bottom_tab_publisher.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = ico_bottom_tab_publisher.svg; sourceTree = "<group>"; };
+		040E4D0F2872DAEC003569F1 /* UIButton_extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIButton_extension.swift; sourceTree = "<group>"; };
 		0419F101286051B200EF8DC2 /* WebViewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewViewController.swift; sourceTree = "<group>"; };
 		0419F104286051F500EF8DC2 /* UIView_extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIView_extension.swift; sourceTree = "<group>"; };
 		0419F105286051F500EF8DC2 /* UIDevice_extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIDevice_extension.swift; sourceTree = "<group>"; };
@@ -143,11 +157,21 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		040E4D0028727DF4003569F1 /* Tools */ = {
+			isa = PBXGroup;
+			children = (
+				040E4D0128727E0C003569F1 /* WebViewPool.swift */,
+				0404B057287414F5000BABE8 /* XXWebView.swift */,
+			);
+			path = Tools;
+			sourceTree = "<group>";
+		};
 		0419F103286051D700EF8DC2 /* extension */ = {
 			isa = PBXGroup;
 			children = (
 				0419F105286051F500EF8DC2 /* UIDevice_extension.swift */,
 				0419F104286051F500EF8DC2 /* UIView_extension.swift */,
+				040E4D0F2872DAEC003569F1 /* UIButton_extension.swift */,
 			);
 			path = extension;
 			sourceTree = "<group>";
@@ -176,6 +200,10 @@
 		04376B56286C36500007B444 /* jsFile */ = {
 			isa = PBXGroup;
 			children = (
+				0404AFFF2873CAA6000BABE8 /* method_photo.svg */,
+				040E4D0A2872D9CF003569F1 /* angle_nft.png */,
+				040E4D092872D9CF003569F1 /* coil_logo_colored.svg */,
+				040E4D0B2872D9CF003569F1 /* ico_bottom_tab_publisher.svg */,
 				04376B57286C36730007B444 /* example.html */,
 				04376B58286C36730007B444 /* statusbar.html */,
 			);
@@ -207,6 +235,7 @@
 		04BC49982858758E003FE6D9 /* Plaoc-iOS */ = {
 			isa = PBXGroup;
 			children = (
+				040E4D0028727DF4003569F1 /* Tools */,
 				04376B56286C36500007B444 /* jsFile */,
 				045E369C286AF4B500A62263 /* resource_3rd */,
 				041D100328630B4E00AEFE7D /* model */,
@@ -396,11 +425,15 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0404B0002873CAA6000BABE8 /* method_photo.svg in Resources */,
+				040E4D0E2872D9CF003569F1 /* ico_bottom_tab_publisher.svg in Resources */,
 				04376B5A286C36730007B444 /* statusbar.html in Resources */,
 				04376B59286C36730007B444 /* example.html in Resources */,
 				04BC49A628587590003FE6D9 /* LaunchScreen.storyboard in Resources */,
+				040E4D0C2872D9CF003569F1 /* coil_logo_colored.svg in Resources */,
 				045E369D286AF4B500A62263 /* resource_3rd in Resources */,
 				04BC49A328587590003FE6D9 /* Assets.xcassets in Resources */,
+				040E4D0D2872D9CF003569F1 /* angle_nft.png in Resources */,
 				04BC49A12858758E003FE6D9 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -536,12 +569,15 @@
 				0406F5062865B3F9006F4F6F /* Schemehandler.swift in Sources */,
 				04D022662860514C0018716E /* StatusView.swift in Sources */,
 				0419F1112861C01500EF8DC2 /* RecordView.swift in Sources */,
+				040E4D0228727E0C003569F1 /* WebViewPool.swift in Sources */,
 				04BC499E2858758E003FE6D9 /* ViewController.swift in Sources */,
 				043586652865559F004A83BB /* CustomConfirmPopView.swift in Sources */,
 				04D022682860514C0018716E /* NaviView.swift in Sources */,
 				0443FCE728646DB3003425CD /* PromptConfiguration.swift in Sources */,
 				0443FCE528646A7B003425CD /* AlertConfiguration.swift in Sources */,
+				040E4D102872DAEC003569F1 /* UIButton_extension.swift in Sources */,
 				0419F1092860560400EF8DC2 /* CustomNaviViewController.swift in Sources */,
+				0404B058287414F5000BABE8 /* XXWebView.swift in Sources */,
 				04BC499A2858758E003FE6D9 /* AppDelegate.swift in Sources */,
 				04398601286593520081A9F7 /* CustomAlertPopView.swift in Sources */,
 				041D100528630B7800AEFE7D /* ButtonModel.swift in Sources */,

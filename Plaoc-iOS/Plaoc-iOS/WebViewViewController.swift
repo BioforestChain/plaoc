@@ -64,6 +64,7 @@ class WebViewViewController: UIViewController {
         let str = NSString(string: Bundle.main.bundlePath)
         let path = str.appendingPathComponent("resource_3rd/assets/www")
         Schemehandler.setupHTMLCache(fromPath: path)
+        webView.removeUserScripts()
     }
 
     lazy var statusView: StatusView = {
@@ -251,6 +252,10 @@ extension WebViewViewController {
         } else {
             return "lightContent"
         }
+    }
+    
+    func statusBackgroundColor() -> String {
+        return statusView.backgroundColor?.hexString() ?? "#FFFFFFFF"
     }
 }
 // bottomBar和js的交互
