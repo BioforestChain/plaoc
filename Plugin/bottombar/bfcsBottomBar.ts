@@ -14,6 +14,8 @@ export class BfcsBottomBar extends HTMLElement {
     this._observer = new MutationObserver((mutations) => {
       this.collectActions();
     });
+
+    this._init();
   }
 
   connectedCallback() {
@@ -26,6 +28,11 @@ export class BfcsBottomBar extends HTMLElement {
 
   disconnectedCallback() {
     this._observer.disconnect();
+  }
+
+  private async _init() {
+    const height = await this.getHeight();
+    this.setAttribute("height", `${height}`);
   }
 
   async toggleEnabled(): Promise<void> {
@@ -59,6 +66,8 @@ export class BfcsBottomBar extends HTMLElement {
   }
 
   async setHeight(height: number): Promise<void> {
+    this.setAttribute("height", `${height}`);
+
     await this._ffi.setHeight(height);
 
     return;
@@ -165,6 +174,10 @@ export class BfcsBottomBar extends HTMLElement {
     oldVal: unknown,
     newVal: unknown
   ) {
+    if (oldVal === newVal) {
+      return;
+    }
+
     if (attrName === "background-color") {
       await this.setBackgroundColor(newVal as string);
     } else if (attrName === "foreground-color") {

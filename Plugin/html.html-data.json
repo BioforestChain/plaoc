@@ -222,15 +222,22 @@
     {
       "name": "dweb-dialog-button",
       "description": "dweb dialog button web components",
-      "attributes": []
+      "attributes": [
+        {
+          "name": "aria-label",
+          "description": {
+            "kind": "markdown",
+            "value": "role confirm or cancel"
+          }
+        }
+      ]
     },
     {
       "name": "dweb-keyboard",
       "description": "dweb keyboard web components",
       "attributes": [
-        { "name": "for", "description": "for" },
-        { "name": "hidden", "description": "hidden" },
-        { "name": "sync", "description": "sync", "valueSet": "v" }
+        { "name": "overlay", "description": "overlay", "valueSet": "v" },
+        { "name": "hidden", "description": "hidden", "valueSet": "v" }
       ]
     }
   ],

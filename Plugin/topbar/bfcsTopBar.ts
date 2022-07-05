@@ -14,8 +14,6 @@ export class BfcsTopBar extends HTMLElement {
     this._observer = new MutationObserver((mutations) => {
       this.collectActions();
     });
-
-    this._init();
   }
 
   connectedCallback() {
@@ -32,6 +30,8 @@ export class BfcsTopBar extends HTMLElement {
       //   "source",
       // ],
     });
+
+    this._init();
   }
 
   disconnectedCallback() {
@@ -41,6 +41,12 @@ export class BfcsTopBar extends HTMLElement {
   private async _init() {
     const height = await this.getHeight();
     this.setAttribute("height", `${height}`);
+
+    // const backgroundColor = await this.getBackgroundColor();
+    // this.setAttribute("background-color", backgroundColor);
+
+    // const foregroundColor = await this.getForegroundColor();
+    // this.setAttribute("foreground-color", foregroundColor);
   }
 
   async back(): Promise<void> {
@@ -182,6 +188,10 @@ export class BfcsTopBar extends HTMLElement {
     oldVal: unknown,
     newVal: unknown
   ) {
+    if (oldVal === newVal) {
+      return;
+    }
+
     if (attrName === "title") {
       await this.setTitle(newVal as string);
     } else if (attrName === "background-color") {

@@ -14,8 +14,10 @@ export default defineConfig((info) => {
       // "@plaoc/plugin-bottom-bar-ios",
       "@plaoc/plugin-status-bar-android",
       // "@plaoc/plugin-status-bar-ios",
-      // "@plaoc/plugin-dialogs",
-      // "@plaoc/plugin-keyboard",
+      "@plaoc/plugin-dialogs-android",
+      // "@plaoc/plugin-dialogs-ios",
+      "@plaoc/plugin-keyboard-android",
+      // "@plaoc/plugin-keyboard-ios",
     ],
     packageJson: {
       license: "MIT",

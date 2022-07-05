@@ -2,7 +2,6 @@ import { defineConfig } from "@bfchain/pkgm-bfsp";
 export default defineConfig((info) => {
   const config: Bfsp.UserConfig = {
     name: "@plaoc/plugin-icon",
-    profiles: ["android"],
     exports: {
       ".": "./index.ts",
     },

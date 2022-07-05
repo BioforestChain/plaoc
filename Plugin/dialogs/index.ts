@@ -1,12 +1,14 @@
 /// <reference lib="dom" />
 
+import "@plaoc/plugin-typings";
+
 import {
   BfcsDialogAlert,
   BfcsDialogPrompt,
   BfcsDialogConfirm,
   BfcsDialogBeforeUnload,
-} from "#bfcsDialogs";
-import { BfcsDialogButton } from "#bfcsDialogButton";
+} from "./bfcsDialogs";
+import { BfcsDialogButton } from "./bfcsDialogButton";
 
 customElements.define("dweb-dialog-alert", BfcsDialogAlert);
 customElements.define("dweb-dialog-prompt", BfcsDialogPrompt);

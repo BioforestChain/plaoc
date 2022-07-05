@@ -2,7 +2,7 @@ import { defineConfig } from "@bfchain/pkgm-bfsp";
 export default defineConfig((info) => {
   const config: Bfsp.UserConfig = {
     name: "@plaoc/plugin-top-bar",
-    profiles: ["ios"],
+    profiles: ["android", "ios", "default"],
     exports: {
       ".": "./index.ts",
     },

@@ -1,29 +1,12 @@
-// export class BfcsDialogs extends HTMLElement {
-//   private _ffi: Plaoc.DialogsFFI = native_dialog;
-
-//   constructor() {
-//     super();
-//   }
-
-//   openAlert(config: Plaoc.AlertConfig, cb: string): void {
-//     this._ffi.openAlert(JSON.stringify(config), cb);
-//   }
-//   openPrompt(config: Plaoc.PromptConfig, cb: string): void {
-//     this._ffi.openPrompt(JSON.stringify(config), cb);
-//   }
-//   openConfirm(config: Plaoc.ConfirmConfig, cb: string): void {
-//     this._ffi.openConfirm(JSON.stringify(config), cb);
-//   }
-//   openBeforeUnload(config: Plaoc.ConfirmConfig, cb: string): void {
-//     this._ffi.openBeforeUnload(JSON.stringify(config), cb);
-//   }
-// }
+import { DialogsFFI } from "./ffi";
 
 class BfcsDialogs extends HTMLElement {
-  protected _ffi: Plaoc.DialogsFFI = native_dialog;
+  protected _ffi: Plaoc.IDialogsFFI;
 
   constructor() {
     super();
+
+    this._ffi = new DialogsFFI();
     this.setAttribute("did", (Math.random() * Date.now()).toFixed(0));
   }
 
@@ -43,22 +26,28 @@ class BfcsDialogs extends HTMLElement {
 }
 
 export class BfcsDialogAlert extends BfcsDialogs {
+  private _observer: MutationObserver;
+
   constructor() {
     super();
-  }
 
-  connectedCallback() {
-    let observer = new MutationObserver(async (mutations) => {
+    this._observer = new MutationObserver(async (mutations) => {
       if (this.hasAttribute("visible")) {
         await this.openAlert();
       }
     });
+  }
 
-    observer.observe(this, {
+  connectedCallback() {
+    this._observer.observe(this, {
       subtree: true,
       childList: true,
       attributes: true,
     });
+  }
+
+  disconnectedCallback() {
+    this._observer.disconnect();
   }
 
   openAlert(): Promise<void> {
@@ -93,7 +82,7 @@ export class BfcsDialogAlert extends BfcsDialogs {
 
       const cb = `document.querySelector('dweb-dialog-alert[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
 
-      this._ffi.openAlert(JSON.stringify(alertConfig), cb);
+      this._ffi.openAlert(alertConfig, cb);
 
       resolve();
     });
@@ -115,22 +104,28 @@ export class BfcsDialogAlert extends BfcsDialogs {
 }
 
 export class BfcsDialogPrompt extends BfcsDialogs {
+  private _observer: MutationObserver;
+
   constructor() {
     super();
-  }
 
-  connectedCallback() {
-    let observer = new MutationObserver(async (mutations) => {
+    this._observer = new MutationObserver(async (mutations) => {
       if (this.hasAttribute("visible")) {
         await this.openPrompt();
       }
     });
+  }
 
-    observer.observe(this, {
+  connectedCallback() {
+    this._observer.observe(this, {
       subtree: true,
       childList: true,
       attributes: true,
     });
+  }
+
+  disconnectedCallback() {
+    this._observer.disconnect();
   }
 
   openPrompt(): Promise<void> {
@@ -158,22 +153,34 @@ export class BfcsDialogPrompt extends BfcsDialogs {
         : false;
 
       const did = this.getAttribute("did");
-      let cb: string = "";
+      let confirmFunc = "";
+      let cancelFunc = "";
 
       this.querySelectorAll("dweb-dialog-button").forEach(
         (childNode, index) => {
           const bid = childNode.getAttribute("bid") ?? "";
-          if (index === 0) {
-            promptConfig.confirmText = childNode.getAttribute("label") ?? "";
-            cb += `document.querySelector('dweb-dialog-prompt[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+
+          if (childNode.hasAttribute("aria-label")) {
+            if (childNode.getAttribute("aria-label") === "confirm") {
+              promptConfig.confirmText = childNode.getAttribute("label") ?? "";
+              confirmFunc = `document.querySelector('dweb-dialog-prompt[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+            } else {
+              promptConfig.cancelText = childNode.getAttribute("label") ?? "";
+              cancelFunc = `document.querySelector('dweb-dialog-prompt[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+            }
           } else {
-            promptConfig.cancelText = childNode.getAttribute("label") ?? "";
-            cb += `;document.querySelector('dweb-dialog-prompt[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+            if (index === 0) {
+              promptConfig.confirmText = childNode.getAttribute("label") ?? "";
+              confirmFunc = `document.querySelector('dweb-dialog-prompt[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+            } else {
+              promptConfig.cancelText = childNode.getAttribute("label") ?? "";
+              cancelFunc = `document.querySelector('dweb-dialog-prompt[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+            }
           }
         }
       );
 
-      this._ffi.openPrompt(JSON.stringify(promptConfig), cb);
+      this._ffi.openPrompt(promptConfig, confirmFunc, cancelFunc);
 
       resolve();
     });
@@ -195,22 +202,28 @@ export class BfcsDialogPrompt extends BfcsDialogs {
 }
 
 export class BfcsDialogConfirm extends BfcsDialogs {
+  private _observer: MutationObserver;
+
   constructor() {
     super();
-  }
 
-  connectedCallback() {
-    let observer = new MutationObserver(async (mutations) => {
+    this._observer = new MutationObserver(async (mutations) => {
       if (this.hasAttribute("visible")) {
         await this.openConfirm();
       }
     });
+  }
 
-    observer.observe(this, {
+  connectedCallback() {
+    this._observer.observe(this, {
       subtree: true,
       childList: true,
       attributes: true,
     });
+  }
+
+  disconnectedCallback() {
+    this._observer.disconnect();
   }
 
   openConfirm(): Promise<void> {
@@ -236,23 +249,34 @@ export class BfcsDialogConfirm extends BfcsDialogs {
         : false;
 
       const did = this.getAttribute("did");
-      let cb: string = "";
+      let confirmFunc = "";
+      let cancelFunc = "";
 
       this.querySelectorAll("dweb-dialog-button").forEach(
         (childNode, index) => {
           const bid = childNode.getAttribute("bid") ?? "";
 
-          if (index === 0) {
-            confirmConfig.confirmText = childNode.getAttribute("label") ?? "";
-            cb += `document.querySelector('dweb-dialog-confirm[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+          if (childNode.hasAttribute("aria-label")) {
+            if (childNode.getAttribute("aria-label") === "confirm") {
+              confirmConfig.confirmText = childNode.getAttribute("label") ?? "";
+              confirmFunc = `document.querySelector('dweb-dialog-confirm[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+            } else {
+              confirmConfig.cancelText = childNode.getAttribute("label") ?? "";
+              cancelFunc = `document.querySelector('dweb-dialog-confirm[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+            }
           } else {
-            confirmConfig.cancelText = childNode.getAttribute("label") ?? "";
-            cb += `;document.querySelector('dweb-dialog-confirm[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+            if (index === 0) {
+              confirmConfig.confirmText = childNode.getAttribute("label") ?? "";
+              confirmFunc = `document.querySelector('dweb-dialog-confirm[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+            } else {
+              confirmConfig.cancelText = childNode.getAttribute("label") ?? "";
+              cancelFunc = `document.querySelector('dweb-dialog-confirm[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+            }
           }
         }
       );
 
-      this._ffi.openConfirm(JSON.stringify(confirmConfig), cb);
+      this._ffi.openConfirm(confirmConfig, confirmFunc, cancelFunc);
 
       resolve();
     });
@@ -274,22 +298,28 @@ export class BfcsDialogConfirm extends BfcsDialogs {
 }
 
 export class BfcsDialogBeforeUnload extends BfcsDialogs {
+  private _observer: MutationObserver;
+
   constructor() {
     super();
-  }
 
-  connectedCallback() {
-    let observer = new MutationObserver(async (mutations) => {
+    this._observer = new MutationObserver(async (mutations) => {
       if (this.hasAttribute("visible")) {
         await this.openBeforeUnload();
       }
     });
+  }
 
-    observer.observe(this, {
+  connectedCallback() {
+    this._observer.observe(this, {
       subtree: true,
       childList: true,
       attributes: true,
     });
+  }
+
+  disconnectedCallback() {
+    this._observer.disconnect();
   }
 
   openBeforeUnload(): Promise<void> {
@@ -315,23 +345,34 @@ export class BfcsDialogBeforeUnload extends BfcsDialogs {
         : false;
 
       const did = this.getAttribute("did");
-      let cb: string = "";
+      let confirmFunc = "";
+      let cancelFunc = "";
 
       this.querySelectorAll("dweb-dialog-button").forEach(
         (childNode, index) => {
           const bid = childNode.getAttribute("bid") ?? "";
 
-          if (index === 0) {
-            confirmConfig.confirmText = childNode.getAttribute("label") ?? "";
-            cb += `document.querySelector('dweb-dialog-confirm[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+          if (childNode.hasAttribute("aria-label")) {
+            if (childNode.getAttribute("aria-label") === "confirm") {
+              confirmConfig.confirmText = childNode.getAttribute("label") ?? "";
+              confirmFunc = `document.querySelector('dweb-dialog-before-unload[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+            } else {
+              confirmConfig.cancelText = childNode.getAttribute("label") ?? "";
+              cancelFunc = `document.querySelector('dweb-dialog-before-unload[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+            }
           } else {
-            confirmConfig.cancelText = childNode.getAttribute("label") ?? "";
-            cb += `;document.querySelector('dweb-dialog-confirm[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+            if (index === 0) {
+              confirmConfig.confirmText = childNode.getAttribute("label") ?? "";
+              confirmFunc = `document.querySelector('dweb-dialog-before-unload[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+            } else {
+              confirmConfig.cancelText = childNode.getAttribute("label") ?? "";
+              cancelFunc = `document.querySelector('dweb-dialog-before-unload[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+            }
           }
         }
       );
 
-      this._ffi.openBeforeUnload(JSON.stringify(confirmConfig), cb);
+      this._ffi.openBeforeUnload(confirmConfig, confirmFunc, cancelFunc);
 
       resolve();
     });

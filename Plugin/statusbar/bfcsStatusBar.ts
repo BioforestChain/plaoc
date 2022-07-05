@@ -11,9 +11,18 @@ export class BfcsStatusBar extends HTMLElement {
     this._ffi = new StatusBarFFI();
   }
 
-  connectedCallback() {}
+  connectedCallback() {
+    this._init();
+  }
 
   disconnectedCallback() {}
+
+  private async _init() {
+    // const colorHex = await this.getStatusBarColor();
+    // this.setAttribute("background-color", colorHex);
+    const barStyle = await this.getStatusBarStyle();
+    this.setAttribute("bar-style", barStyle);
+  }
 
   async setStatusBarColor(
     color?: string,

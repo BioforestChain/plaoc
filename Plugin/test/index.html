@@ -39,22 +39,22 @@
             <dweb-icon source="Filled.Add"></dweb-icon>
         </dweb-bottom-bar-button>
     </dweb-bottom-bar>
-    <!-- <dweb-keyboard for="key"></dweb-keyboard> -->
-    <!-- <dweb-dialog-alert title="alert" content="content">
+    <dweb-keyboard id="key_board" overlay></dweb-keyboard>
+    <dweb-dialog-alert id="dda" title="alert" content="content">
         <dweb-dialog-button id="ddb">ok</dweb-dialog-button>
     </dweb-dialog-alert>
-    <dweb-dialog-prompt title="prompt" label="label" defaultValue="default">
-        <dweb-dialog-button>ok</dweb-dialog-button>
-        <dweb-dialog-button>No</dweb-dialog-button>
+    <dweb-dialog-prompt id="ddp" title="prompt" label="label" defaultValue="default">
+        <dweb-dialog-button id="ddpo" aria-label="cancel">ok</dweb-dialog-button>
+        <dweb-dialog-button id="ddpn" aria-label="confirm">No</dweb-dialog-button>
     </dweb-dialog-prompt>
-    <dweb-dialog-confirm title="confirm" message="message" visible>
-        <dweb-dialog-button id="ok">ok</dweb-dialog-button>
-        <dweb-dialog-button id="no">No</dweb-dialog-button>
+    <dweb-dialog-confirm id="ddc" title="confirm" message="message">
+        <dweb-dialog-button id="ok" aria-label="confirm">ok</dweb-dialog-button>
+        <dweb-dialog-button id="no" aria-label="cancel">No</dweb-dialog-button>
     </dweb-dialog-confirm>
     <dweb-dialog-before-unload id="before_unload" title="test" message="before-unload">
-        <dweb-dialog-button>ok</dweb-dialog-button>
-        <dweb-dialog-button>No</dweb-dialog-button>
-    </dweb-dialog-before-unload> -->
+        <dweb-dialog-button id="buo">ok</dweb-dialog-button>
+        <dweb-dialog-button id="bun">No</dweb-dialog-button>
+    </dweb-dialog-before-unload>
     <p>test</p>
     <p>test</p>
     <p>test</p>
@@ -87,7 +87,32 @@
             // await status_bar.setStatusBarColor("#ff0000ff", "dark-content");
             // alert("barStyle: " + await status_bar.getStatusBarStyle());
             
-            
+            // dda.setAttribute("visible", "");
+            key_board.toggleKeyboardOverlay();
+        }
+
+        ccc.onclick = () => {
+            before_unload.setAttribute("visible", "");
+        }
+
+        buo.onclick = () => {
+            content.textContent = "buo";
+        }
+        bun.onclick = () => {
+            content.textContent = "bun";
+        }
+
+        ddb.onclick = () => {
+            content.textContent = "alert";
+            ddp.setAttribute("visible", "");
+        }
+
+        ddpo.onclick = () => {
+            content.textContent = "ddpo";
+        }
+
+        ddpn.onclick = () => {
+            content.textContent = "ddpn";
         }
 
         let colors = {
@@ -105,8 +130,13 @@
         }
 
         async function btclick () {
-            await topbar.toggleEnabled();
-            content.textContent = await topbar.height;
+            // await topbar.toggleEnabled();
+            // content.textContent = await topbar.height;
+            // setTimeout(async () => {
+            //     await key_board.showKeyboard();
+            // }, 500);
+            // await topbar.setTitle("title");
+            alert("area: " + JSON.stringify(await key_board.getKeyboardSafeArea()));
         }
 
         // ddd.onclick = async () => {
@@ -134,6 +164,8 @@
         no.onclick = () => {
             content.innerHTML = "no";
         }
+
+        
     </script>
 </body>
 </html>
