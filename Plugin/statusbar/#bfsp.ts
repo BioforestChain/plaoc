@@ -6,10 +6,21 @@ export default defineConfig((info) => {
     exports: {
       ".": "./index.ts",
     },
+    deps: ["@plaoc/plugin-util", "@plaoc/plugin-typings"],
     packageJson: {
       license: "MIT",
       author: "bnqkl",
     },
+    build: [
+      {
+        name: "@plaoc/plugin-status-bar-android",
+        profiles: ["android"],
+      },
+      {
+        name: "@plaoc/plugin-status-bar-ios",
+        profiles: ["ios"],
+      },
+    ],
   };
   return config;
 });

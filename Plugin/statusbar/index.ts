@@ -1,7 +1,5 @@
 /// <reference lib="dom" />
 
-import { BfcsStatusBar } from "#bfcsStatusBar";
-import { BfcsStatusBarColor } from "#bfcsStatusBarColor";
+import { BfcsStatusBar } from "./bfcsStatusBar";
 
 customElements.define("dweb-status-bar", BfcsStatusBar);
-customElements.define("dweb-status-bar-color", BfcsStatusBarColor);

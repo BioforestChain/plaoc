@@ -137,16 +137,9 @@
       "description": "dweb status bar web components",
       "attributes": [
         { "name": "overlay", "description": "overlay", "valueSet": "v" },
-        { "name": "hidden", "description": "hidden", "valueSet": "v" }
-      ]
-    },
-    {
-      "name": "dweb-status-bar-color",
-      "description": "dweb status bar color web components",
-      "attributes": [
-        { "name": "color", "description": "color" },
-        { "name": "alpha", "description": "alpha" },
-        { "name": "darkicons", "description": "darkicons" }
+        { "name": "hidden", "description": "hidden", "valueSet": "v" },
+        { "name": "background-color", "description": "background-color" },
+        { "name": "bar-style", "description": "bar-style" }
       ]
     },
     {
