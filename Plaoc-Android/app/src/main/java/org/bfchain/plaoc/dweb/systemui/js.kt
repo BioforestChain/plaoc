@@ -6,6 +6,7 @@ import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.core.graphics.Insets
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -44,6 +45,16 @@ class SystemUiFFI(
             color.value = Color(colorHex)
             isDarkIcons.value = darkIcons.toBooleanOrNull()
         }
+    }
+
+    @JavascriptInterface
+    fun getStatusBarColor(): ColorInt {
+        return systemUIState.statusBar.color.value.toArgb()
+    }
+
+    @JavascriptInterface
+    fun getStatusBarStyle(): Boolean {
+        return systemUIState.statusBar.isDarkIcons.value ?: false
     }
 
     @JavascriptInterface
