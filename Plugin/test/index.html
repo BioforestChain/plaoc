@@ -13,9 +13,7 @@
     </style>
 </head>
 <body>
-    <!-- <dweb-status-bar overlay>
-        <dweb-status-bar-color id="sss" darkicons="0" colorhex="#ff0000" alpha="0.5"></dweb-status-bar-color>
-    </dweb-status-bar> -->
+    <dweb-status-bar id="status_bar" background-color="#ff0000ff" bar-style="dark-content"></dweb-status-bar>
     <dweb-top-bar id="topbar" title="test" background-color="rgba(253, 255, 0, 0.5)" foreground-color="#0000ffff">
         <dweb-top-bar-button id="aaa">
             <dweb-icon source="Filled.AddCircle"></dweb-icon>
@@ -82,7 +80,13 @@
             // alert(1);
             // await topbar.setTitle("title");
             // alert("background-color: " + await topbar.getBackgroundColor());
-            ddd.setAttribute("colors", JSON.stringify(colors));
+            // ddd.setAttribute("colors", JSON.stringify(colors));
+            // await status_bar.toggleStatusBarVisible();
+            // await status_bar.toggleStatusBarOverlay();
+            // await status_bar.setStatusBarColor("rgba(0, 0, 255, 1)", "dark-content");
+            // await status_bar.setStatusBarColor("#ff0000ff", "dark-content");
+            // alert("barStyle: " + await status_bar.getStatusBarStyle());
+            
             
         }
 
@@ -116,6 +120,8 @@
         ddd.onclick = async () => {
             // alert(JSON.stringify(await bottom_bar.getActions()));
             // ddd.setAttribute("colors", JSON.stringify(colors));
+            // alert("visible: " + await status_bar.getStatusBarVisible());
+            // alert("overlay: " + await status_bar.getStatusBarOverlay());
         }
 
         // ddb.onclick = () => {
