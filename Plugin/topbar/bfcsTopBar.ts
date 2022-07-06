@@ -21,14 +21,7 @@ export class BfcsTopBar extends HTMLElement {
       subtree: true,
       childList: true,
       attributes: true,
-      // attributeFilter: [
-      //   "disabled",
-      //   "icon",
-      //   "type",
-      //   "description",
-      //   "size",
-      //   "source",
-      // ],
+      attributeFilter: ["disabled", "type", "description", "size", "source"],
     });
 
     this._init();

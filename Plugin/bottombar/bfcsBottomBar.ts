@@ -21,6 +21,17 @@ export class BfcsBottomBar extends HTMLElement {
       subtree: true,
       childList: true,
       attributes: true,
+      attributeFilter: [
+        "disabled",
+        "selected",
+        "selectable",
+        "label",
+        "colors",
+        "type",
+        "description",
+        "size",
+        "source",
+      ],
     });
 
     this._init();
@@ -163,7 +174,7 @@ export class BfcsBottomBar extends HTMLElement {
 
   static get observedAttributes() {
     return [
-      "disabled",
+      "hidden",
       "background-color",
       "foreground-color",
       "overlay",
@@ -190,7 +201,7 @@ export class BfcsBottomBar extends HTMLElement {
       if (this.hasAttribute(attrName)) {
         await this._ffi.setOverlay();
       }
-    } else if (attrName === "disabled") {
+    } else if (attrName === "hidden") {
       if (this.hasAttribute(attrName)) {
         await this._ffi.setHidden();
       }
