@@ -28,7 +28,7 @@
     <div id="content">
         <p>test</p>
     </div>
-    <dweb-bottom-bar id="bottom_bar">
+    <dweb-bottom-bar id="bottom_bar" background-color="#ff00ffff">
         <dweb-bottom-bar-button id="ddd" selectable label="add">
             <dweb-icon source="Filled.AddCircle"></dweb-icon>
         </dweb-bottom-bar-button>
@@ -123,7 +123,7 @@
             iconColorSelected: "rgba(0, 255, 0, 1)",
         };
 
-        // ddd.setAttribute("colors", JSON.stringify(colors));
+        ddd.setAttribute("colors", JSON.stringify(colors));
 
         eee.onclick = async () => {
             content.textContent = "selectable";

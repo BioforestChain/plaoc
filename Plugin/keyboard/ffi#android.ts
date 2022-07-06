@@ -45,7 +45,9 @@ export class VirtualKeyboardFFI implements Plaoc.IVirtualKeyboardFFI {
 
   showKeyboard(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      this._ffi.show();
+      setTimeout(() => {
+        this._ffi.show();
+      }, 500);
 
       resolve();
     });

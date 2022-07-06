@@ -11,8 +11,8 @@ export class BfcsTopBar extends HTMLElement {
     super();
 
     this._ffi = new TopBarFFI();
-    this._observer = new MutationObserver((mutations) => {
-      this.collectActions();
+    this._observer = new MutationObserver(async (mutations) => {
+      await this.collectActions();
     });
   }
 
