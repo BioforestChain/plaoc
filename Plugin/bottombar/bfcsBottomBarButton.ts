@@ -12,7 +12,7 @@ export class BfcsBottomBarButton extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return ["disabled", "selected", "selectable", "label", "colors"];
+    return ["disabled", "selected", "selectable", "indicator-color"];
   }
 
   attributeChangedCallback(attrName: string, oldVal: unknown, newVal: unknown) {

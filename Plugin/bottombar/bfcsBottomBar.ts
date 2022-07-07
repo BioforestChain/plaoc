@@ -26,11 +26,14 @@ export class BfcsBottomBar extends HTMLElement {
         "selected",
         "selectable",
         "label",
-        "colors",
+        // "colors",
         "type",
         "description",
         "size",
         "source",
+        "color",
+        "selected-color",
+        "indicator-color",
       ],
     });
 
@@ -134,8 +137,11 @@ export class BfcsBottomBar extends HTMLElement {
         type: "NamedIcon" as Plaoc.IconType.NamedIcon,
       };
 
-      if (childNode.querySelector("dweb-icon")) {
-        let $ = childNode.querySelector("dweb-icon");
+      let colors: Plaoc.IBottomBarColors = {};
+      let label: string = "";
+
+      if (childNode.querySelector("dweb-bottom-bar-icon")) {
+        let $ = childNode.querySelector("dweb-bottom-bar-icon");
 
         icon.source = $?.getAttribute("source") ?? "";
         icon.type = $?.hasAttribute("type")
@@ -145,6 +151,29 @@ export class BfcsBottomBar extends HTMLElement {
         icon.size = $?.hasAttribute("size")
           ? ($.getAttribute("size") as unknown as number)
           : undefined;
+
+        if ($?.hasAttribute("color")) {
+          colors.iconColor = convertToRGBAHex($?.getAttribute("color")!);
+        }
+        if ($?.hasAttribute("selected-color")) {
+          colors.iconColorSelected = convertToRGBAHex(
+            $?.getAttribute("selected-color")!
+          );
+        }
+      }
+
+      if (childNode.querySelector("dweb-bottom-bar-text")) {
+        let $ = childNode.querySelector("dweb-bottom-bar-text");
+
+        label = $?.textContent ?? "";
+        if ($?.hasAttribute("color")) {
+          colors.textColor = convertToRGBAHex($?.getAttribute("color")!);
+        }
+        if ($?.hasAttribute("selected-color")) {
+          colors.textColorSelected = convertToRGBAHex(
+            $?.getAttribute("selected-color")!
+          );
+        }
       }
 
       const bid = childNode.getAttribute("bid");
@@ -152,11 +181,12 @@ export class BfcsBottomBar extends HTMLElement {
       const disabled = childNode.hasAttribute("disabled") ? true : false;
       const selected = childNode.hasAttribute("selected") ? true : false;
       const selectable = childNode.hasAttribute("selectable") ? true : false;
-      const label = childNode.getAttribute("label") ?? "";
-      const colors =
-        childNode.hasAttribute("colors") && childNode.getAttribute("colors")
-          ? JSON.parse(childNode.getAttribute("colors")!)
-          : undefined;
+
+      if (childNode.hasAttribute("indicator-color")) {
+        colors.indicatorColor = convertToRGBAHex(
+          childNode.getAttribute("indicator-color")!
+        );
+      }
 
       this._actionList.push({
         icon,
@@ -165,7 +195,7 @@ export class BfcsBottomBar extends HTMLElement {
         label,
         selectable,
         selected,
-        colors,
+        colors: JSON.stringify(colors) === "{}" ? undefined : colors,
       });
     });
 

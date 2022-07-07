@@ -28,15 +28,28 @@
     <div id="content">
         <p>test</p>
     </div>
-    <dweb-bottom-bar id="bottom_bar" background-color="#ff00ffff">
+    <!-- <dweb-bottom-bar id="bottom_bar" background-color="#ff00ffff">
         <dweb-bottom-bar-button id="ddd" selectable label="add">
             <dweb-icon source="Filled.AddCircle"></dweb-icon>
         </dweb-bottom-bar-button>
         <dweb-bottom-bar-button id="eee">
             <dweb-icon source="http://172.30.95.56:5500/Plaoc-Android/app/src/main/assets/icon/ico_bottom_tab_publisher.svg" type="AssetIcon" size="50"></dweb-icon>
         </dweb-bottom-bar-button>
-        <dweb-bottom-bar-button selected selectable label="test">
+        <dweb-bottom-bar-button id="fff" selected selectable label="test">
             <dweb-icon source="Filled.Add"></dweb-icon>
+        </dweb-bottom-bar-button>
+    </dweb-bottom-bar> -->
+    <dweb-bottom-bar id="bottom_bar" background-color="#ff00ffff">
+        <dweb-bottom-bar-button id="ddd" selectable indicator-color="#00ff00ff">
+            <dweb-bottom-bar-icon source="Filled.AddCircle" color="#ff00aaff" selected-color="rgba(255, 0, 0, 1)"></dweb-bottom-bar-icon>
+            <dweb-bottom-bar-text color="#0000ffff" selected-color="rgba(255, 0, 0, 1)">add</dweb-bottom-bar-text>
+        </dweb-bottom-bar-button>
+        <dweb-bottom-bar-button id="eee">
+            <dweb-bottom-bar-icon source="http://172.30.95.56:5500/Plaoc-Android/app/src/main/assets/icon/ico_bottom_tab_publisher.svg" type="AssetIcon" size="50"></dweb-icon>
+        </dweb-bottom-bar-button>
+        <dweb-bottom-bar-button id="fff" selected selectable>
+            <dweb-bottom-bar-icon source="Filled.Add"></dweb-bottom-bar-icon>
+            <dweb-bottom-bar-text>title</dweb-bottom-bar-text>
         </dweb-bottom-bar-button>
     </dweb-bottom-bar>
     <dweb-keyboard id="key_board" overlay></dweb-keyboard>
@@ -88,11 +101,14 @@
             // alert("barStyle: " + await status_bar.getStatusBarStyle());
             
             // dda.setAttribute("visible", "");
-            key_board.toggleKeyboardOverlay();
+            // key_board.toggleKeyboardOverlay();
+            alert(await topbar.getActions());
         }
 
-        ccc.onclick = () => {
-            before_unload.setAttribute("visible", "");
+        ccc.onclick = async () => {
+            // before_unload.setAttribute("visible", "");
+            alert("height: " + await bottom_bar.getHeight());
+            // await topbar.toggleEnabled();
         }
 
         buo.onclick = () => {
@@ -116,6 +132,7 @@
         }
 
         let colors = {
+            indicatorColor: "#00ff00ff",
             textColor: "#0000ffff",
             textColorSelected: "rgba(255, 0, 0, 1)",
             // textColorSelected: "#aa00ff00",
@@ -126,7 +143,7 @@
         ddd.setAttribute("colors", JSON.stringify(colors));
 
         eee.onclick = async () => {
-            content.textContent = "selectable";
+            // content.textContent = "selectable";
         }
 
         async function btclick () {
@@ -151,7 +168,11 @@
             // alert(JSON.stringify(await bottom_bar.getActions()));
             // ddd.setAttribute("colors", JSON.stringify(colors));
             // alert("visible: " + await status_bar.getStatusBarVisible());
-            // alert("overlay: " + await status_bar.getStatusBarOverlay());
+            //alert("overlay: " + await status_bar.getStatusBarOverlay());
+        }
+
+        fff.onclick = async () => {
+            //alert("visible: " + await status_bar.getStatusBarVisible());
         }
 
         // ddb.onclick = () => {

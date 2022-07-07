@@ -22,7 +22,7 @@ declare namespace Plaoc {
       postMessage(hidden: string): void;
     };
     getBottomBarOverlay: {
-      postMessage(noValue: null): Promise<number>;
+      postMessage(noValue: null): Promise<boolean>;
     };
     updateBottomViewOverlay: {
       postMessage(overlay: number): void;

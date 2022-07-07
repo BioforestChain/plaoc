@@ -29,7 +29,7 @@ export class BottomBarFFI implements Plaoc.IBottomBarFFI {
   async getOverlay(): Promise<boolean> {
     const overlay = await this._ffi.getBottomBarOverlay.postMessage(null);
 
-    return overlay === 1;
+    return overlay;
   }
 
   async toggleOverlay(): Promise<void> {

@@ -47,6 +47,34 @@
       ]
     },
     {
+      "name": "dweb-icon",
+      "description": "dweb icon web components",
+      "attributes": [
+        {
+          "name": "source",
+          "description": {
+            "kind": "markdown",
+            "value": ""
+          }
+        },
+        {
+          "name": "type",
+          "description": {
+            "kind": "markdown",
+            "value": "NamedIcon or AssetIcon"
+          }
+        },
+        {
+          "name": "description",
+          "description": "description"
+        },
+        {
+          "name": "size",
+          "description": "set icon size"
+        }
+      ]
+    },
+    {
       "name": "dweb-bottom-bar",
       "description": "dweb bottom bar web components",
       "attributes": [
@@ -87,26 +115,12 @@
             "value": "selectable"
           },
           "valueSet": "v"
-        },
-        {
-          "name": "colors",
-          "description": {
-            "kind": "markdown",
-            "value": "colors"
-          }
-        },
-        {
-          "name": "label",
-          "description": {
-            "kind": "markdown",
-            "value": "label"
-          }
         }
       ]
     },
     {
-      "name": "dweb-icon",
-      "description": "dweb icon web components",
+      "name": "dweb-bottom-bar-icon",
+      "description": "dweb bottom bar icon web components",
       "attributes": [
         {
           "name": "source",
@@ -128,6 +142,28 @@
         },
         {
           "name": "size",
+          "description": "set icon size"
+        },
+        {
+          "name": "color",
+          "description": "set icon size"
+        },
+        {
+          "name": "selected-color",
+          "description": "set icon size"
+        }
+      ]
+    },
+    {
+      "name": "dweb-bottom-bar-text",
+      "description": "dweb bottom bar text web components",
+      "attributes": [
+        {
+          "name": "color",
+          "description": "set icon size"
+        },
+        {
+          "name": "selected-color",
           "description": "set icon size"
         }
       ]
