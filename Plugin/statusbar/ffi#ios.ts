@@ -1,4 +1,4 @@
-export class StatusBarFFI {
+export class StatusBarFFI implements Plaoc.IStatusBarFFI {
   private _ffi = (window as any).webkit
     .messageHandlers as Plaoc.StatusBarIosFFI;
 
