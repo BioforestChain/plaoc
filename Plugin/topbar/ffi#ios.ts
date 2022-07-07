@@ -82,12 +82,12 @@ export class TopBarFFI implements Plaoc.ITopBarFFI {
   async getActions(): Promise<Plaoc.TopBarItem[]> {
     const actionList = await this._ffi.getNaviActions.postMessage(null);
 
-    return actionList;
+    return JSON.parse(actionList);
   }
 
   setActions(actionList: Plaoc.TopBarItem[]): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      this._ffi.customNaviActions.postMessage(actionList);
+      this._ffi.customNaviActions.postMessage(JSON.stringify(actionList));
 
       resolve();
     });

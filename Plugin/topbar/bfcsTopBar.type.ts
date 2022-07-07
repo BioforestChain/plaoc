@@ -52,10 +52,10 @@ declare namespace Plaoc {
       postMessage(noValue: null): Promise<number>;
     };
     getNaviActions: {
-      postMessage(noValue: null): Promise<TopBarItem[]>;
+      postMessage(noValue: null): Promise<Plaoc.DataString<TopBarItem[]>>;
     };
     customNaviActions: {
-      postMessage(actionList: TopBarItem[]): void;
+      postMessage(actionList: Plaoc.DataString<TopBarItem[]>): void;
     };
     getNaviBackgroundColor: {
       postMessage(noValue: null): Promise<Plaoc.RGBAHex>;
@@ -93,4 +93,3 @@ declare namespace Plaoc {
 }
 
 declare const top_bar: Plaoc.TopBarAndroidFFI;
-// declare const top_bar_ios:
