@@ -19,7 +19,7 @@ export function getColorHex(color: number): Plaoc.RGBAHex {
   return ("#" + colorHex.slice(2) + colorHex.slice(0, 2)) as Plaoc.RGBAHex;
 }
 
-// 将rgba(r, b, g, a)转为#rrbbggaa 十六进制
+// 将rgba(r, b, g, a)或#rrbbggaa或#rgba转为#rrbbggaa 十六进制
 export function convertToRGBAHex(color: string): Plaoc.RGBAHex {
   let colorHex = "#";
 
@@ -39,7 +39,16 @@ export function convertToRGBAHex(color: string): Plaoc.RGBAHex {
       colorHex += itemHex;
     }
   } else if (color.startsWith("#")) {
-    colorHex = color;
+    if (color.length === 5) {
+      colorHex =
+        color.slice(0, 1) +
+        color.slice(1, 2).repeat(2) +
+        color.slice(2, 3).repeat(2) +
+        color.slice(3, 4).repeat(2) +
+        color.slice(4, 5).repeat(2);
+    } else if (color.length === 9) {
+      colorHex = color;
+    }
   }
 
   return (colorHex.length === 9 ? colorHex : color) as Plaoc.RGBAHex;
