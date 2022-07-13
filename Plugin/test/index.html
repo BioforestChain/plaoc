@@ -13,7 +13,7 @@
     </style>
 </head>
 <body>
-    <dweb-status-bar id="status_bar" background-color="#ff0000ff" bar-style="dark-content"></dweb-status-bar>
+    <dweb-status-bar id="status_bar" background-color="#f00f" bar-style="dark-content"></dweb-status-bar>
     <dweb-top-bar id="topbar" title="test" background-color="rgba(253, 255, 0, 0.5)" foreground-color="#0000ffff">
         <dweb-top-bar-button id="aaa">
             <dweb-icon source="Filled.AddCircle"></dweb-icon>
@@ -39,7 +39,7 @@
             <dweb-icon source="Filled.Add"></dweb-icon>
         </dweb-bottom-bar-button>
     </dweb-bottom-bar> -->
-    <dweb-bottom-bar id="bottom_bar" background-color="#ff00ffff">
+    <dweb-bottom-bar id="bottom_bar" background-color="#ff00ffff" foreground-color="#000000ff">
         <dweb-bottom-bar-button id="ddd" selectable indicator-color="#00ff00ff">
             <dweb-bottom-bar-icon source="Filled.AddCircle" color="#ff00aaff" selected-color="rgba(255, 0, 0, 1)"></dweb-bottom-bar-icon>
             <dweb-bottom-bar-text color="#0000ffff" selected-color="rgba(255, 0, 0, 1)">add</dweb-bottom-bar-text>
@@ -102,7 +102,10 @@
             
             // dda.setAttribute("visible", "");
             // key_board.toggleKeyboardOverlay();
-            alert(await topbar.getActions());
+            // alert(await topbar.getActions());
+            // before_unload.setAttribute("visible", "");
+
+            // await status_bar.toggleStatusBarVisible();
         }
 
         ccc.onclick = async () => {

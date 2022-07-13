@@ -2,7 +2,7 @@ import { defineConfig } from "@bfchain/pkgm-bfsp";
 export default defineConfig((info) => {
   const config: Bfsp.UserConfig = {
     name: "@plaoc/plugin-status-bar",
-    profiles: ["android", "ios", "default"],
+    profiles: ["android", "ios", "desktop", "default"],
     exports: {
       ".": "./index.ts",
     },
@@ -19,6 +19,10 @@ export default defineConfig((info) => {
       {
         name: "@plaoc/plugin-status-bar-ios",
         profiles: ["ios"],
+      },
+      {
+        name: "@plaoc/plugin-status-bar-desktop",
+        profiles: ["desktop"],
       },
     ],
   };

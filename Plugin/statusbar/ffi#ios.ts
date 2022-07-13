@@ -76,7 +76,7 @@ export class StatusBarFFI implements Plaoc.IStatusBarFFI {
   async setStatusBarOverlay(): Promise<void> {
     const overlay = await this.getStatusBarOverlay();
 
-    if (overlay) {
+    if (!overlay) {
       await this.toggleStatusBarOverlay();
     }
 
