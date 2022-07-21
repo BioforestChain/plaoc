@@ -1,22 +1,19 @@
-import { getColorInt, getColorHex } from "@plaoc/plugin-util";
+import { convertToRGBAHex } from "@plaoc/plugin-util";
 
 export class StatusBarFFI implements Plaoc.IStatusBarFFI {
-  private _ffi: Plaoc.StatusBarAndroidFFI = system_ui;
+  private _ffi = (globalThis as any).StatusBar as Plaoc.StatusBarDesktopFFI;
 
   async setStatusBarColor(
     color?: Plaoc.RGBAHex,
     barStyle?: Plaoc.StatusBarStyle
   ): Promise<void> {
-    let colorHex: number;
+    let colorHex: string;
     let darkIcons: Plaoc.StatusBarAndroidStyle;
 
     if (!color) {
       colorHex = this._ffi.getStatusBarColor();
     } else {
-      colorHex = getColorInt(
-        color.slice(0, -2) as Plaoc.RGBHex,
-        color.slice(-2) as Plaoc.AlphaValueHex
-      );
+      colorHex = color;
     }
 
     if (!barStyle) {
@@ -43,7 +40,7 @@ export class StatusBarFFI implements Plaoc.IStatusBarFFI {
   getStatusBarColor(): Promise<Plaoc.RGBAHex> {
     return new Promise<Plaoc.RGBAHex>((resolve, reject) => {
       const color = this._ffi.getStatusBarColor();
-      const colorHex = getColorHex(color);
+      const colorHex = convertToRGBAHex(color);
 
       resolve(colorHex);
     });
@@ -57,12 +54,12 @@ export class StatusBarFFI implements Plaoc.IStatusBarFFI {
     });
   }
 
-  toggleStatusBarVisible(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this._ffi.toggleStatusBarVisible(0);
+  async toggleStatusBarVisible(): Promise<void> {
+    const isVisible = await this.getStatusBarVisible();
 
-      resolve();
-    });
+    this._ffi.toggleStatusBarVisible(!isVisible);
+
+    return;
   }
 
   async setStatusBarHidden(): Promise<void> {
@@ -83,20 +80,22 @@ export class StatusBarFFI implements Plaoc.IStatusBarFFI {
     });
   }
 
-  toggleStatusBarOverlay(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this._ffi.toggleStatusBarOverlay(0);
+  async toggleStatusBarOverlay(): Promise<void> {
+    const overlay = await this.getStatusBarOverlay();
 
-      resolve();
-    });
+    this._ffi.toggleStatusBarOverlay(!overlay);
+
+    return;
   }
 
-  setStatusBarOverlay(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this._ffi.toggleStatusBarOverlay(1);
+  async setStatusBarOverlay(): Promise<void> {
+    const overlay = await this.getStatusBarOverlay();
 
-      resolve();
-    });
+    if (!overlay) {
+      await this.toggleStatusBarOverlay();
+    }
+
+    return;
   }
 
   getStatusBarStyle(): Promise<Plaoc.StatusBarStyle> {

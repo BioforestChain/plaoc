@@ -1,6 +1,4 @@
 declare namespace Plaoc {
-  type DataString<T> = string;
-
   type HexDigit =
     | "0"
     | "1"
@@ -34,8 +32,11 @@ declare namespace Plaoc {
         : never
       : never;
 
-  type RGBAHex = `#${string}`; // #ff000000
-  type RGBA = `rgba(${number}, ${number}, ${number}, ${number})`; // rgba(255, 0, 0, 1)
   type RGBHex = `#${string}`; // #ff0000
   type AlphaValueHex = `${HexDigit}${HexDigit}`;
+
+  type RGBAHex = `#${string}`; // #ff000000 | #e0fa
+  type RGBA = `rgba(${number}, ${number}, ${number}, ${number})`; // rgba(255, 0, 0, 1)
+
+  type ColorFormatType = RGBAHex | RGBA; // #ff0000ff | #fe0f | rgba(253, 24, 16, 0.2)
 }
