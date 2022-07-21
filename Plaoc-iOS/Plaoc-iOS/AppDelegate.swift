@@ -22,6 +22,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         Schemehandler.setupHTMLCache(fromPath: path)
         
         window?.makeKeyAndVisible()
+        
+        notiManager.registerNotificationCategory()
+        UNUserNotificationCenter.current().delegate = notiManager
+        permissionManager.startPermissionAuthenticate(type: .bluetooth, isSet: true) { result in
+//            if result {
+//                notiManager.sendLocalNotification()
+//            }
+        }
+        
+        
         return true
     }
 

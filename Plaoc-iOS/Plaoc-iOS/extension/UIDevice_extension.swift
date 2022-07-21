@@ -63,7 +63,7 @@ extension UIDevice {
             return "iPhone 5s"
         case "iPhone7,1", "iPhone7,2", "iPhone8,1", "iPhone8,2":
             return "iPhone 6"
-        case "iPhone8,4", "iPhone12,8":
+        case "iPhone8,4", "iPhone12,8", "iPhone14,6":
             return "iPhone SE"
         case "iPhone9,1", "iPhone9,2", "iPhone9,3", "iPhone9,4":
             return "iPhone 7"
@@ -99,9 +99,38 @@ extension UIDevice {
             return "iPhone 13 Pro"
         case "iPhone14,3":
             return "iPhone 13 Pro Max"
-
         default:
             return platform
         }
     }
+    
+    public var deviceIP: String {
+        var addresses = [String]()
+        var ifaddr : UnsafeMutablePointer<ifaddrs>? = nil
+        if getifaddrs(&ifaddr) == 0 {
+            var ptr = ifaddr
+            while (ptr != nil) {
+                let flags = Int32(ptr!.pointee.ifa_flags)
+                var addr = ptr!.pointee.ifa_addr.pointee
+                if (flags & (IFF_UP|IFF_RUNNING|IFF_LOOPBACK)) == (IFF_UP|IFF_RUNNING) {
+                    if addr.sa_family == UInt8(AF_INET) || addr.sa_family == UInt8(AF_INET6) {
+                        var hostname = [CChar](repeating: 0, count: Int(NI_MAXHOST))
+                        if (getnameinfo(&addr, socklen_t(addr.sa_len), &hostname, socklen_t(hostname.count),nil, socklen_t(0), NI_NUMERICHOST) == 0) {
+                            if let address = String(validatingUTF8:hostname) {
+                                addresses.append(address)
+                            }
+                        }
+                    }
+                }
+                ptr = ptr!.pointee.ifa_next
+            }
+            freeifaddrs(ifaddr)
+        }
+        return addresses.first ?? ""
+    }
+    //总内存大小
+    public var totalMemorySize: UInt64 {
+        return ProcessInfo.processInfo.physicalMemory
+    }
+    
 }

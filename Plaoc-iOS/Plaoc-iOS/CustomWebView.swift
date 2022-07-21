@@ -11,13 +11,23 @@ import SwiftyJSON
 
 typealias UpdateTitleCallback = (String) -> Void
 
+enum KeyboardType {
+    case show
+    case hidden
+}
+
+protocol KeyboardProtocol {
+    func keyboardOverlay(overlay: Bool, keyboardType: KeyboardType, height: CGFloat)
+}
+
 class CustomWebView: UIView {
 
     var callback: UpdateTitleCallback?
+    var delegate: KeyboardProtocol?
     var superVC: UIViewController?
     private var scripts: [WKUserScript]?
     private let imageUrl_key: String = "imageUrl"
-    private var isKeyboardOverlay: Bool = true
+    private var isKeyboardOverlay: Bool = false
     private var keyHeight:CGFloat = 0
     
     init(frame: CGRect, jsNames: [String]) {
@@ -37,39 +47,45 @@ class CustomWebView: UIView {
     
     func removeUserScripts() {
         webView.configuration.userContentController.removeAllUserScripts()
-        webView.configuration.userContentController.removeAllScriptMessageHandlers()
+        if #available(iOS 14.0, *) {
+            webView.configuration.userContentController.removeAllScriptMessageHandlers()
+        } else {
+            // Fallback on earlier versions
+        }
     }
     
-    private lazy var webView: WKWebView = {
+    private lazy var webView: XXWebView = {
         
-        let config = WKWebViewConfiguration()
-        config.userContentController = WKUserContentController()
-        addScriptMessageHandler(config: config)
-        addScriptMessageHandlerWithReply(config: config)
-        if self.scripts != nil {
-            for script in self.scripts! {
-                config.userContentController.addUserScript(script)
-            }
-        }
-        let prefreen = WKPreferences()
-        prefreen.javaScriptCanOpenWindowsAutomatically = true
-        config.preferences = prefreen
-        config.setValue(true, forKey: "allowUniversalAccessFromFileURLs")
-        config.setURLSchemeHandler(Schemehandler(), forURLScheme: schemeString)
-        let webView = WKWebView(frame: self.bounds, configuration: config)
-        webView.navigationDelegate = self
+//        let config = WKWebViewConfiguration()
+//        config.userContentController = WKUserContentController()
+//        addScriptMessageHandler(config: config)
+//        addScriptMessageHandlerWithReply(config: config)
+//        if self.scripts != nil {
+//            for script in self.scripts! {
+//                config.userContentController.addUserScript(script)
+//            }
+//        }
+//        let prefreen = WKPreferences()
+//        prefreen.javaScriptCanOpenWindowsAutomatically = true
+//        config.preferences = prefreen
+//        config.setValue(true, forKey: "allowUniversalAccessFromFileURLs")
+//        config.setURLSchemeHandler(Schemehandler(), forURLScheme: schemeString)
+//        let webView = WKWebView(frame: self.bounds, configuration: config)
+//        webView.navigationDelegate = self
+//        webView.uiDelegate = self
+//        webView.allowsBackForwardNavigationGestures = true
+//        if #available(iOS 11.0, *) {
+//            webView.scrollView.contentInsetAdjustmentBehavior = .never
+//        } else {
+//
+//        }
+        
+        let webView = WebViewPool.shared.getReusedWebView(forHolder: self)
+        webView.frame = self.bounds
         webView.uiDelegate = self
-        webView.allowsBackForwardNavigationGestures = true
-        if #available(iOS 11.0, *) {
-            webView.scrollView.contentInsetAdjustmentBehavior = .never
-        } else {
-
-        }
-        
-//        let webView = WebViewPool.shared.getReusedWebView(forHolder: self)
-//        webView.frame = self.bounds
-//        addScriptMessageHandler(config: webView.configuration)
-//        addScriptMessageHandlerWithReply(config: webView.configuration)
+        webView.navigationDelegate = self
+        addScriptMessageHandler(config: webView.configuration)
+        addScriptMessageHandlerWithReply(config: webView.configuration)
         return webView
     }()
     
@@ -81,7 +97,7 @@ class CustomWebView: UIView {
     }
     
     private func addScriptMessageHandlerWithReply(config: WKWebViewConfiguration) {
-        let array = ["calendar","naviHeight","bottomHeight","getNaviEnabled","hasNaviTitle","getNaviOverlay","getNaviBackgroundColor","getNaviForegroundColor","getBottomBarEnabled","getBottomBarOverlay","getBottomActions","getBottomBarBackgroundColor","getKeyboardOverlay","getForegroundColor","getNaviTitle","getNaviActions","keyHeight","keyboardSafeArea"]
+        let array = ["calendar","naviHeight","bottomHeight","getNaviEnabled","hasNaviTitle","getNaviOverlay","getNaviBackgroundColor","getNaviForegroundColor","getBottomBarEnabled","getBottomBarOverlay","getBottomActions","getBottomBarBackgroundColor","getKeyboardOverlay","getForegroundColor","getNaviTitle","getNaviActions","keyHeight","keyboardSafeArea","getBottomViewForegroundColor","statusBackgroundColor","getStatusBarVisible","getStatusBarOverlay","statusBarStyle"]
         for name in array {
             config.userContentController.addScriptMessageHandler(self, contentWorld: .page, name: name)
         }
@@ -150,8 +166,9 @@ extension CustomWebView {
         
         guard let keyboardBound = noti.userInfo?["UIKeyboardFrameEndUserInfoKey"] as? CGRect else { return }
         keyHeight = keyboardBound.height
-        let keyboardString = "getKeyboardFrame('\(keyboardBound)')"
-        handleJavascriptString(inputJS: keyboardString)
+        
+        guard !isKeyboardOverlay else { return }
+        delegate?.keyboardOverlay(overlay: isKeyboardOverlay, keyboardType: .show, height: keyHeight)
         
         let safeArea = UIEdgeInsets(top: 0, left: 0, bottom: keyboardBound.height, right: 0)
         
@@ -168,6 +185,13 @@ extension CustomWebView {
     }
     @objc private func observerHiddenKeyboard(noti: Notification) {
         let safeArea = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+        
+        guard !isKeyboardOverlay else { return }
+        delegate?.keyboardOverlay(overlay: isKeyboardOverlay, keyboardType: .hidden, height: keyHeight)
+    }
+    
+    func recycleWebView() {
+        WebViewPool.shared.recycleReusedWebView(webView: webView)
     }
 }
 
@@ -199,10 +223,11 @@ extension CustomWebView:  WKScriptMessageHandler {
             let controller = currentViewController() as? WebViewViewController
             controller?.updateNavigationBarOverlay(overlay: alpha)
         } else if message.name == "customNaviActions" {
-            print(message.body)
-            guard let body = message.body as? [[String:Any]] else { return }
+            guard let body = message.body as? String else { return }
+            guard let array = ChangeTools.stringValueArray(body) else { return }
             let controller = currentViewController() as? WebViewViewController
-            let list = JSON(body)
+            let list = JSON(array)
+            print(list)
             let buttons = list.arrayValue.map { ButtonModel(dict: $0) }
             controller?.fetchCustomButtons(buttons: buttons)
         } else if message.name == "updateNaviBarBackgroundColor" {
@@ -221,6 +246,7 @@ extension CustomWebView:  WKScriptMessageHandler {
             guard let style = message.body as? String else { return }
             let controller = currentViewController() as? WebViewViewController
             controller?.updateStatusStyle(style: style)
+            
         } else if message.name == "updateStatusHidden" {
             guard let hidden = message.body as? String else { return }
             let controller = currentViewController() as? WebViewViewController
@@ -257,16 +283,14 @@ extension CustomWebView:  WKScriptMessageHandler {
             controller?.updateBottomViewHeight(height: CGFloat(body))
         }else if message.name == "customBottomActions" {
             guard let body = message.body as? String else { return }
-            guard let data = body.data(using: .utf8) else { return }
-            guard let array = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers) else { return }
+            guard let array = ChangeTools.stringValueArray(body) else { return }
             let controller = currentViewController() as? WebViewViewController
             let list = JSON(array)
             let buttons = list.arrayValue.map { BottomBarModel(dict: $0) }
             controller?.fetchBottomButtons(buttons: buttons)
         } else if message.name == "openAlert" {
             guard let body = message.body as? String else { return }
-            guard let data = body.data(using: .utf8) else { return }
-            guard let bodyDict = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [String:Any] else { return }
+            guard let bodyDict = ChangeTools.stringValueDic(body) else { return }
             let alertModel = AlertConfiguration(dict: JSON(bodyDict))
             let alertView = CustomAlertPopView(frame: CGRect(x: 0, y: 0, width: screen_width, height: screen_height))
             alertView.alertModel = alertModel
@@ -279,8 +303,7 @@ extension CustomWebView:  WKScriptMessageHandler {
             alertView.show()
         } else if message.name == "openPrompt" {
             guard let body = message.body as? String else { return }
-            guard let data = body.data(using: .utf8) else { return }
-            guard let bodyDict = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [String:Any] else { return }
+            guard let bodyDict = ChangeTools.stringValueDic(body) else { return }
             let promptModel = PromptConfiguration(dict: JSON(bodyDict))
             let alertView = CustomPromptPopView(frame: CGRect(x: 0, y: 0, width: screen_width, height: screen_height))
             alertView.promptModel = promptModel
@@ -298,8 +321,7 @@ extension CustomWebView:  WKScriptMessageHandler {
             alertView.show()
         } else if message.name == "openConfirm" {
             guard let body = message.body as? String else { return }
-            guard let data = body.data(using: .utf8) else { return }
-            guard let bodyDict = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [String:Any] else { return }
+            guard let bodyDict = ChangeTools.stringValueDic(body) else { return }
             let confirmModel = ConfirmConfiguration(dict: JSON(bodyDict))
             let alertView = CustomConfirmPopView(frame: CGRect(x: 0, y: 0, width: screen_width, height: screen_height))
             alertView.confirmModel = confirmModel
@@ -317,8 +339,7 @@ extension CustomWebView:  WKScriptMessageHandler {
             alertView.show()
         } else if message.name == "openBeforeUnload" {
             guard let body = message.body as? String else { return }
-            guard let data = body.data(using: .utf8) else { return }
-            guard let bodyDict = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [String:Any] else { return }
+            guard let bodyDict = ChangeTools.stringValueDic(body) else { return }
             let confirmModel = ConfirmConfiguration(dict: JSON(bodyDict))
             let alertView = CustomConfirmPopView(frame: CGRect(x: 0, y: 0, width: screen_width, height: screen_height))
             alertView.confirmModel = confirmModel
@@ -395,8 +416,8 @@ extension CustomWebView: WKScriptMessageHandlerWithReply {
             replyHandler(color,nil)
         } else if message.name == "getNaviActions" {
             let controller = currentViewController() as? WebViewViewController
-            let dict = controller?.naviActions()
-            replyHandler(dict,nil)
+            let actionString = controller?.naviActions()
+            replyHandler(actionString,nil)
         } else if message.name == "getBottomBarEnabled" {
             let controller = currentViewController() as? WebViewViewController
             let isEnabled = controller?.bottombarEnabled()
@@ -413,6 +434,10 @@ extension CustomWebView: WKScriptMessageHandlerWithReply {
             let controller = currentViewController() as? WebViewViewController
             let visible = controller?.statusBarVisible()
             replyHandler(visible,nil)
+        } else if message.name == "statusBarStyle" {
+            let controller = currentViewController() as? WebViewViewController
+            let style = controller?.statusBarStyle()
+            replyHandler(style,nil)
         } else if message.name == "getStatusBarOverlay" {
             let controller = currentViewController() as? WebViewViewController
             let overlay = controller?.statusBarOverlay()
@@ -423,8 +448,8 @@ extension CustomWebView: WKScriptMessageHandlerWithReply {
             replyHandler(color,nil)
         }else if message.name == "getBottomActions" {
             let controller = currentViewController() as? WebViewViewController
-            let dict = controller?.bottomActions()
-            replyHandler(dict,nil)
+            let actionString = controller?.bottomActions()
+            replyHandler(actionString,nil)
         } else if message.name == "getBottomViewForegroundColor" {
             let controller = currentViewController() as? WebViewViewController
             let color = controller?.bottomBarForegroundColor()

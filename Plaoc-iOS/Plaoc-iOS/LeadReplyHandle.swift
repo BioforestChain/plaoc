@@ -13,7 +13,11 @@ class LeadReplyHandle: NSObject, WKScriptMessageHandlerWithReply {
     var scriptDelegate: WKScriptMessageHandlerWithReply?
 
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {
-        self.scriptDelegate?.userContentController(userContentController, didReceive: message, replyHandler: replyHandler)
+        if #available(iOS 14.0, *) {
+            self.scriptDelegate?.userContentController(userContentController, didReceive: message, replyHandler: replyHandler)
+        } else {
+            // Fallback on earlier versions
+        }
     }
 
     init(messageHandle: WKScriptMessageHandlerWithReply) {

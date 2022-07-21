@@ -9,6 +9,7 @@ import UIKit
 
 class BottomView: UIView {
 
+    private let image_width: CGFloat = 50
     var hiddenBtn: Bool = false {
         didSet {
             for button in buttonList {
@@ -20,7 +21,11 @@ class BottomView: UIView {
     var buttons: [BottomBarModel]? {
         didSet {
             guard buttons != nil else { return }
-            let width: CGFloat = 50
+            for button in buttonList {
+                button.removeFromSuperview()
+            }
+            buttonList.removeAll()
+            
             for i in stride(from: 0, to: buttons!.count, by: 1) {
                 let model = buttons![i]
                 let button = UIButton(type: .custom)
@@ -32,7 +37,11 @@ class BottomView: UIView {
                 } else {
                     if imageName.hasSuffix("svg") {
                         let name = imageName.replacingOccurrences(of: ".svg", with: "")
-                        button.setImage(UIImage.svgImageNamed(name, size: CGSize(width: width, height: width)), for: .normal)
+                        if model.colors?.iconColor != nil {
+                            button.setImage(UIImage.svgImageNamed(name, size: CGSize(width: image_width, height: image_width), tintColor: UIColor((model.colors?.iconColor)!)), for: .normal)
+                        } else {
+                            button.setImage(UIImage.svgImageNamed(name, size: CGSize(width: image_width, height: image_width)), for: .normal)
+                        }
                     } else {
                         button.setImage(UIImage(named: imageName), for: .normal)
                     }
@@ -40,7 +49,12 @@ class BottomView: UIView {
                 button.isEnabled = !(model.disabled ?? false)
                 button.isSelected = model.selected ?? false
                 button.setTitle(model.titleString, for: .normal)
-                button.setTitleColor(UIColor(model.colors?.textColor ?? ""), for: .normal)
+                
+                var color = model.colors?.textColor ?? ""
+                if color.isEmpty {
+                    color = "#000000FF"
+                }
+                button.setTitleColor(UIColor(color), for: .normal)
                 button.imagePosition(style: .top, spacing: 8)
 //                button.menu = menuAction()
                 button.addTarget(self, action: #selector(clickAction(sender:)), for: .touchUpInside)
@@ -88,12 +102,52 @@ class BottomView: UIView {
         guard buttons != nil, sender.tag < buttons!.count else { return }
         let model = buttons![sender.tag]
         let code = model.onClickCode ?? ""
+        for i in stride(from: 0, to: buttonList.count, by: 1) {
+            let button = buttonList[i]
+            let model = buttons![i]
+            var color = model.colors?.textColor ?? ""
+            if color.isEmpty {
+                color = "#000000FF"
+            }
+            button.setTitleColor(UIColor(color), for: .normal)
+            
+            let imageName = model.iconModel?.source ?? ""
+            if model.iconModel?.type == "AssetIcon" {
+                
+            } else {
+                if imageName.hasSuffix("svg") {
+                    let name = imageName.replacingOccurrences(of: ".svg", with: "")
+                    if model.colors?.iconColor != nil {
+                        button.setImage(UIImage.svgImageNamed(name, size: CGSize(width: image_width, height: image_width), tintColor: UIColor((model.colors?.iconColor)!)), for: .normal)
+                    }
+                }
+            }
+        }
+        
         if sender.isHighlighted {
-            sender.setTitleColor(UIColor(model.colors?.textColorSelected ?? ""), for: .normal)
-        } else {
-            sender.setTitleColor(UIColor(model.colors?.textColor ?? ""), for: .normal)
+            var color = model.colors?.textColorSelected ?? ""
+            if color.isEmpty {
+                color = "#000000FF"
+            }
+            sender.setTitleColor(UIColor(color), for: .normal)
+            
+            let imageName = model.iconModel?.source ?? ""
+            if model.iconModel?.type == "AssetIcon" {
+                
+            } else {
+                if imageName.hasSuffix("svg") {
+                    let name = imageName.replacingOccurrences(of: ".svg", with: "")
+                    if model.colors?.iconColorSelected != nil {
+                        sender.setImage(UIImage.svgImageNamed(name, size: CGSize(width: image_width, height: image_width), tintColor: UIColor((model.colors?.iconColorSelected)!)), for: .normal)
+                    }
+                }
+            }
+            
         }
         guard code.count > 0 else { return }
         callback?(code)
     }
 }
+
+
+

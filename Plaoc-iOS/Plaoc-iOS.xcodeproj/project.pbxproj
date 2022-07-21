@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		0404B0002873CAA6000BABE8 /* method_photo.svg in Resources */ = {isa = PBXBuildFile; fileRef = 0404AFFF2873CAA6000BABE8 /* method_photo.svg */; };
 		0404B058287414F5000BABE8 /* XXWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0404B057287414F5000BABE8 /* XXWebView.swift */; };
+		0404B05A28742BFF000BABE8 /* HPKWebViewPool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0404B05928742BFF000BABE8 /* HPKWebViewPool.swift */; };
 		0406F5062865B3F9006F4F6F /* Schemehandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0406F5052865B3F9006F4F6F /* Schemehandler.swift */; };
 		040E4D0228727E0C003569F1 /* WebViewPool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 040E4D0128727E0C003569F1 /* WebViewPool.swift */; };
 		040E4D0C2872D9CF003569F1 /* coil_logo_colored.svg in Resources */ = {isa = PBXBuildFile; fileRef = 040E4D092872D9CF003569F1 /* coil_logo_colored.svg */; };
@@ -33,7 +34,11 @@
 		0443FCE528646A7B003425CD /* AlertConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0443FCE428646A7B003425CD /* AlertConfiguration.swift */; };
 		0443FCE728646DB3003425CD /* PromptConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0443FCE628646DB3003425CD /* PromptConfiguration.swift */; };
 		0443FCE928646E6A003425CD /* ConfirmConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0443FCE828646E6A003425CD /* ConfirmConfiguration.swift */; };
+		04560C872876E78E00638E2A /* CustomTabbarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04560C862876E78E00638E2A /* CustomTabbarViewController.swift */; };
 		045E369D286AF4B500A62263 /* resource_3rd in Resources */ = {isa = PBXBuildFile; fileRef = 045E369C286AF4B500A62263 /* resource_3rd */; };
+		04B2B7D6287E5B8100172109 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04B2B7D5287E5B8100172109 /* NotificationManager.swift */; };
+		04B555E4287594C600314C9F /* ChangeTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04B555E3287594C600314C9F /* ChangeTools.swift */; };
+		04BA30EC287D122C00F8F703 /* PermissionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04BA30EB287D122C00F8F703 /* PermissionManager.swift */; };
 		04BC499A2858758E003FE6D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04BC49992858758E003FE6D9 /* AppDelegate.swift */; };
 		04BC499E2858758E003FE6D9 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04BC499D2858758E003FE6D9 /* ViewController.swift */; };
 		04BC49A12858758E003FE6D9 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 04BC499F2858758E003FE6D9 /* Main.storyboard */; };
@@ -45,9 +50,16 @@
 		04BC49CA285875B6003FE6D9 /* CustomWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04BC49C9285875B6003FE6D9 /* CustomWebView.swift */; };
 		04BC49CD2858768E003FE6D9 /* LeadScriptHandle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04BC49CB2858768E003FE6D9 /* LeadScriptHandle.swift */; };
 		04BC49CE2858768E003FE6D9 /* LeadReplyHandle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04BC49CC2858768E003FE6D9 /* LeadReplyHandle.swift */; };
+		04C02432287FF3EA008E32C8 /* BluetoothManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04C02431287FF3EA008E32C8 /* BluetoothManager.swift */; };
+		04C0243528801027008E32C8 /* String_extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04C0243428801027008E32C8 /* String_extension.swift */; };
+		04C02437288011C4008E32C8 /* Data_extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04C02436288011C4008E32C8 /* Data_extension.swift */; };
+		04C9414C2877BB2D002FDF31 /* OperateMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04C9414B2877BB2D002FDF31 /* OperateMonitor.swift */; };
 		04D022662860514C0018716E /* StatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D022632860514C0018716E /* StatusView.swift */; };
 		04D022672860514C0018716E /* BottomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D022642860514C0018716E /* BottomView.swift */; };
 		04D022682860514C0018716E /* NaviView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D022652860514C0018716E /* NaviView.swift */; };
+		04DCE25328869859001BE6B1 /* SecondViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04DCE25228869859001BE6B1 /* SecondViewController.swift */; };
+		04DCE25528869A5E001BE6B1 /* ThirdViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04DCE25428869A5E001BE6B1 /* ThirdViewController.swift */; };
+		04E6D8602884F269006ECB69 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E6D85F2884F269006ECB69 /* LocationManager.swift */; };
 		11D0AFEBD7D391AB6EB76F76 /* Pods_Plaoc_iOSTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F406C3D95E45CC0D87A9E05A /* Pods_Plaoc_iOSTests.framework */; };
 		916114F6F07B73B1656582A6 /* Pods_Plaoc_iOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD041E040D0D8A928C80D363 /* Pods_Plaoc_iOS.framework */; };
 		C07EB6E924312BC190082CB9 /* Pods_Plaoc_iOS_Plaoc_iOSUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B7CEF629DD9186D033A817F3 /* Pods_Plaoc_iOS_Plaoc_iOSUITests.framework */; };
@@ -73,6 +85,7 @@
 /* Begin PBXFileReference section */
 		0404AFFF2873CAA6000BABE8 /* method_photo.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = method_photo.svg; sourceTree = "<group>"; };
 		0404B057287414F5000BABE8 /* XXWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XXWebView.swift; sourceTree = "<group>"; };
+		0404B05928742BFF000BABE8 /* HPKWebViewPool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HPKWebViewPool.swift; sourceTree = "<group>"; };
 		0406F5052865B3F9006F4F6F /* Schemehandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Schemehandler.swift; sourceTree = "<group>"; };
 		040E4D0128727E0C003569F1 /* WebViewPool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewPool.swift; sourceTree = "<group>"; };
 		040E4D092872D9CF003569F1 /* coil_logo_colored.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = coil_logo_colored.svg; sourceTree = "<group>"; };
@@ -99,7 +112,11 @@
 		0443FCE428646A7B003425CD /* AlertConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertConfiguration.swift; sourceTree = "<group>"; };
 		0443FCE628646DB3003425CD /* PromptConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptConfiguration.swift; sourceTree = "<group>"; };
 		0443FCE828646E6A003425CD /* ConfirmConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmConfiguration.swift; sourceTree = "<group>"; };
+		04560C862876E78E00638E2A /* CustomTabbarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTabbarViewController.swift; sourceTree = "<group>"; };
 		045E369C286AF4B500A62263 /* resource_3rd */ = {isa = PBXFileReference; lastKnownFileType = folder; path = resource_3rd; sourceTree = "<group>"; };
+		04B2B7D5287E5B8100172109 /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
+		04B555E3287594C600314C9F /* ChangeTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeTools.swift; sourceTree = "<group>"; };
+		04BA30EB287D122C00F8F703 /* PermissionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionManager.swift; sourceTree = "<group>"; };
 		04BC49962858758E003FE6D9 /* Plaoc-iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Plaoc-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		04BC49992858758E003FE6D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		04BC499D2858758E003FE6D9 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -115,9 +132,16 @@
 		04BC49C9285875B6003FE6D9 /* CustomWebView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomWebView.swift; sourceTree = "<group>"; };
 		04BC49CB2858768E003FE6D9 /* LeadScriptHandle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LeadScriptHandle.swift; sourceTree = "<group>"; };
 		04BC49CC2858768E003FE6D9 /* LeadReplyHandle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LeadReplyHandle.swift; sourceTree = "<group>"; };
+		04C02431287FF3EA008E32C8 /* BluetoothManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothManager.swift; sourceTree = "<group>"; };
+		04C0243428801027008E32C8 /* String_extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = String_extension.swift; sourceTree = "<group>"; };
+		04C02436288011C4008E32C8 /* Data_extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data_extension.swift; sourceTree = "<group>"; };
+		04C9414B2877BB2D002FDF31 /* OperateMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperateMonitor.swift; sourceTree = "<group>"; };
 		04D022632860514C0018716E /* StatusView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatusView.swift; sourceTree = "<group>"; };
 		04D022642860514C0018716E /* BottomView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BottomView.swift; sourceTree = "<group>"; };
 		04D022652860514C0018716E /* NaviView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NaviView.swift; sourceTree = "<group>"; };
+		04DCE25228869859001BE6B1 /* SecondViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondViewController.swift; sourceTree = "<group>"; };
+		04DCE25428869A5E001BE6B1 /* ThirdViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThirdViewController.swift; sourceTree = "<group>"; };
+		04E6D85F2884F269006ECB69 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		0C33E220005C4F02F76A22CA /* Pods-Plaoc-iOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Plaoc-iOSTests.release.xcconfig"; path = "Target Support Files/Pods-Plaoc-iOSTests/Pods-Plaoc-iOSTests.release.xcconfig"; sourceTree = "<group>"; };
 		313AB853F7F2C1801E784DEE /* Pods-Plaoc-iOS-Plaoc-iOSUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Plaoc-iOS-Plaoc-iOSUITests.debug.xcconfig"; path = "Target Support Files/Pods-Plaoc-iOS-Plaoc-iOSUITests/Pods-Plaoc-iOS-Plaoc-iOSUITests.debug.xcconfig"; sourceTree = "<group>"; };
 		705FA159B7FAAE859B2A8489 /* Pods-Plaoc-iOS-Plaoc-iOSUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Plaoc-iOS-Plaoc-iOSUITests.release.xcconfig"; path = "Target Support Files/Pods-Plaoc-iOS-Plaoc-iOSUITests/Pods-Plaoc-iOS-Plaoc-iOSUITests.release.xcconfig"; sourceTree = "<group>"; };
@@ -162,6 +186,13 @@
 			children = (
 				040E4D0128727E0C003569F1 /* WebViewPool.swift */,
 				0404B057287414F5000BABE8 /* XXWebView.swift */,
+				0404B05928742BFF000BABE8 /* HPKWebViewPool.swift */,
+				04B555E3287594C600314C9F /* ChangeTools.swift */,
+				04C9414B2877BB2D002FDF31 /* OperateMonitor.swift */,
+				04BA30EB287D122C00F8F703 /* PermissionManager.swift */,
+				04B2B7D5287E5B8100172109 /* NotificationManager.swift */,
+				04C02431287FF3EA008E32C8 /* BluetoothManager.swift */,
+				04E6D85F2884F269006ECB69 /* LocationManager.swift */,
 			);
 			path = Tools;
 			sourceTree = "<group>";
@@ -172,6 +203,8 @@
 				0419F105286051F500EF8DC2 /* UIDevice_extension.swift */,
 				0419F104286051F500EF8DC2 /* UIView_extension.swift */,
 				040E4D0F2872DAEC003569F1 /* UIButton_extension.swift */,
+				04C0243428801027008E32C8 /* String_extension.swift */,
+				04C02436288011C4008E32C8 /* Data_extension.swift */,
 			);
 			path = extension;
 			sourceTree = "<group>";
@@ -251,6 +284,9 @@
 				0419F10E2861BFED00EF8DC2 /* CaptureViewController.swift */,
 				0419F101286051B200EF8DC2 /* WebViewViewController.swift */,
 				0419F1082860560400EF8DC2 /* CustomNaviViewController.swift */,
+				04560C862876E78E00638E2A /* CustomTabbarViewController.swift */,
+				04DCE25228869859001BE6B1 /* SecondViewController.swift */,
+				04DCE25428869A5E001BE6B1 /* ThirdViewController.swift */,
 				04BC499F2858758E003FE6D9 /* Main.storyboard */,
 				04BC49A228587590003FE6D9 /* Assets.xcassets */,
 				04BC49A428587590003FE6D9 /* LaunchScreen.storyboard */,
@@ -566,8 +602,12 @@
 				0443FCE928646E6A003425CD /* ConfirmConfiguration.swift in Sources */,
 				0419F106286051F500EF8DC2 /* UIView_extension.swift in Sources */,
 				04BC49CD2858768E003FE6D9 /* LeadScriptHandle.swift in Sources */,
+				04C0243528801027008E32C8 /* String_extension.swift in Sources */,
 				0406F5062865B3F9006F4F6F /* Schemehandler.swift in Sources */,
+				04DCE25328869859001BE6B1 /* SecondViewController.swift in Sources */,
 				04D022662860514C0018716E /* StatusView.swift in Sources */,
+				0404B05A28742BFF000BABE8 /* HPKWebViewPool.swift in Sources */,
+				04C9414C2877BB2D002FDF31 /* OperateMonitor.swift in Sources */,
 				0419F1112861C01500EF8DC2 /* RecordView.swift in Sources */,
 				040E4D0228727E0C003569F1 /* WebViewPool.swift in Sources */,
 				04BC499E2858758E003FE6D9 /* ViewController.swift in Sources */,
@@ -578,18 +618,26 @@
 				040E4D102872DAEC003569F1 /* UIButton_extension.swift in Sources */,
 				0419F1092860560400EF8DC2 /* CustomNaviViewController.swift in Sources */,
 				0404B058287414F5000BABE8 /* XXWebView.swift in Sources */,
+				04B2B7D6287E5B8100172109 /* NotificationManager.swift in Sources */,
 				04BC499A2858758E003FE6D9 /* AppDelegate.swift in Sources */,
+				04DCE25528869A5E001BE6B1 /* ThirdViewController.swift in Sources */,
 				04398601286593520081A9F7 /* CustomAlertPopView.swift in Sources */,
 				041D100528630B7800AEFE7D /* ButtonModel.swift in Sources */,
 				0443FCDE28640B70003425CD /* BottomBarModel.swift in Sources */,
 				0419F107286051F500EF8DC2 /* UIDevice_extension.swift in Sources */,
+				04C02432287FF3EA008E32C8 /* BluetoothManager.swift in Sources */,
 				0443FCE32864615D003425CD /* CustomBasePopView.swift in Sources */,
 				0419F10F2861BFED00EF8DC2 /* CaptureViewController.swift in Sources */,
 				0435866728655794004A83BB /* CustomPromptPopView.swift in Sources */,
 				04BC49CE2858768E003FE6D9 /* LeadReplyHandle.swift in Sources */,
 				04BC49CA285875B6003FE6D9 /* CustomWebView.swift in Sources */,
+				04C02437288011C4008E32C8 /* Data_extension.swift in Sources */,
 				0419F102286051B200EF8DC2 /* WebViewViewController.swift in Sources */,
+				04BA30EC287D122C00F8F703 /* PermissionManager.swift in Sources */,
 				04D022672860514C0018716E /* BottomView.swift in Sources */,
+				04560C872876E78E00638E2A /* CustomTabbarViewController.swift in Sources */,
+				04E6D8602884F269006ECB69 /* LocationManager.swift in Sources */,
+				04B555E4287594C600314C9F /* ChangeTools.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -695,7 +743,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -749,7 +797,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -768,13 +816,24 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = CKJR5CRD9Z;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Plaoc-iOS/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Plaoc-iOS";
+				INFOPLIST_KEY_NSAppleMusicUsageDescription = "App需要您的同意,才能访问媒体资料库";
+				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "App需要您的同意,才能访问蓝牙";
+				INFOPLIST_KEY_NSCameraUsageDescription = "App需要您的同意,才能访问相机";
+				INFOPLIST_KEY_NSContactsUsageDescription = "App需要您的同意,才能访问通讯录";
+				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "App需要您的同意,才能访问定位";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "App需要您的同意,才能访问定位";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "App需要您的同意,才能访问麦克风";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "App需要您的同意,才能访问相册";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -799,13 +858,24 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = CKJR5CRD9Z;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Plaoc-iOS/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Plaoc-iOS";
+				INFOPLIST_KEY_NSAppleMusicUsageDescription = "App需要您的同意,才能访问媒体资料库";
+				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "App需要您的同意,才能访问蓝牙";
+				INFOPLIST_KEY_NSCameraUsageDescription = "App需要您的同意,才能访问相机";
+				INFOPLIST_KEY_NSContactsUsageDescription = "App需要您的同意,才能访问通讯录";
+				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "App需要您的同意,才能访问定位";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "App需要您的同意,才能访问定位";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "App需要您的同意,才能访问麦克风";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "App需要您的同意,才能访问相册";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

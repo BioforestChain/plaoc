@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Contacts
 
 let screen_width = UIScreen.main.bounds.width
 let screen_height = UIScreen.main.bounds.height
@@ -20,6 +21,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         self.view.addSubview(tableView)
         
         self.navigationController?.interactivePopGestureRecognizer?.delegate = self
+        
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -66,12 +68,20 @@ extension ViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
-        let controller = WebViewViewController()
+        var urlString = ""
         if let path = Bundle.main.path(forResource: dataSource[indexPath.row], ofType: "html") {
-            controller.urlString = "iosqmkkx:/index.html"//path
+            urlString = "iosqmkkx:/index.html"//path
         } else {
-            controller.urlString = dataSource[indexPath.row];
+            urlString = dataSource[indexPath.row];
         }
+        let controller = CustomTabbarViewController()
+//        controller.modalPresentationStyle = .fullScreen
+        controller.urlString = urlString
+//        self.present(controller, animated: true)
         self.navigationController?.pushViewController(controller, animated: true)
+        
+//        permissionManager.startPermissionAuthenticate(type: .contact, isSet: true) { result in
+//            print(result)
+//        }
     }
 }

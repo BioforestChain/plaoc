@@ -26,13 +26,21 @@ class NaviView: UIView {
         }
     }
     
-    var tineAlpha: CGFloat?
+    private var buttonList: [UIButton] = []
     
     var buttons: [ButtonModel]? {
         didSet {
             guard buttons != nil else { return }
+            for button in buttonList {
+                button.removeFromSuperview()
+            }
+            buttonList.removeAll()
+            
             let space: CGFloat = 16
             let width: CGFloat = 44
+            
+            let originX = self.frame.width - CGFloat(buttons!.count) * (width + space)
+            
             for i in stride(from: 0, to: buttons!.count, by: 1) {
                 let model = buttons![i]
                 let button = UIButton(type: .contactAdd)
@@ -50,9 +58,15 @@ class NaviView: UIView {
                 button.isEnabled = !(model.disabled ?? false)
 //                button.menu = menuAction()
                 button.addTarget(self, action: #selector(clickAction(sender:)), for: .touchUpInside)
-                button.showsMenuAsPrimaryAction = true
-                button.frame = CGRect(x: self.frame.width - CGFloat((i + 1)) * (width + space), y: 0, width: 44, height: 44)
+                if #available(iOS 14.0, *) {
+                    button.showsMenuAsPrimaryAction = true
+                } else {
+                    // Fallback on earlier versions
+                }
+                button.showsTouchWhenHighlighted = true
+                button.frame = CGRect(x: originX + CGFloat(i) * (width + space), y: 0, width: width, height: width)
                 self.addSubview(button)
+                buttonList.append(button)
             }
         }
     }
@@ -97,7 +111,7 @@ extension NaviView {
     }
     
     private func menuAction() -> UIMenu {
-        
+
         let destruct = UIAction(title: "Destruct", attributes: .destructive) { _ in }
 
         let items = UIMenu(title: "More", options: .displayInline, children: [
@@ -114,7 +128,7 @@ extension NaviView {
 //        sender.showsMenuAsPrimaryAction = true
         //itemの追加
         return UIMenu(title: "菜单", children: [items,photo,destruct])
-    
+
     }
     
     @objc private func clickAction(sender: UIButton) {

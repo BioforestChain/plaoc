@@ -35,13 +35,13 @@ class WebViewViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
+      
         self.navigationController?.isNavigationBarHidden = true
         
         self.view.addSubview(webView)
-        self.view.addSubview(statusView)
         self.view.addSubview(naviView)
-        self.view.addSubview(bottomView)
+        self.view.addSubview(statusView)
+//        self.view.addSubview(bottomView)
         
         
     }
@@ -51,7 +51,7 @@ class WebViewViewController: UIViewController {
 
         self.view.backgroundColor = .white
         
-        webView.openWebView(html: urlString)
+        webView.openWebView(html: "iosqmkkx:/index.html")
 //        if urlString.hasPrefix("http") || urlString.hasPrefix("https") {
 //            webView.openWebView(html: urlString)
 //        } else {
@@ -59,12 +59,20 @@ class WebViewViewController: UIViewController {
 //        }
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+//        webView.openWebView(html: "iosqmkkx:/index.html")
+    }
+    
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         let str = NSString(string: Bundle.main.bundlePath)
         let path = str.appendingPathComponent("resource_3rd/assets/www")
-        Schemehandler.setupHTMLCache(fromPath: path)
-        webView.removeUserScripts()
+//        Schemehandler.setupHTMLCache(fromPath: path)
+        
+//        webView.recycleWebView()
+        
+//        webView.removeUserScripts()
     }
 
     lazy var statusView: StatusView = {
@@ -82,8 +90,9 @@ class WebViewViewController: UIViewController {
     }()
     
     lazy var webView: CustomWebView = {
-        let webView = CustomWebView(frame: CGRect(x: 0, y: self.naviView.frame.maxY, width: self.view.bounds.width, height: self.view.bounds.height - self.naviView.frame.maxY), jsNames: ["Photo","DWebViewJS"])
+        let webView = CustomWebView(frame: CGRect(x: 0, y: self.naviView.frame.maxY, width: self.view.bounds.width, height: UIScreen.main.bounds.height - self.naviView.frame.maxY - 49 - UIDevice.current.tabbarSpaceHeight()), jsNames: ["Photo","DWebViewJS"])
         webView.superVC = self
+        webView.delegate = self
         webView.callback = { [weak self] title in
             guard let strongSelf = self else { return }
             strongSelf.naviView.titleString = title
@@ -180,15 +189,15 @@ extension WebViewViewController {
     }
     //设置naviView的按钮
     func fetchCustomButtons(buttons: [ButtonModel]) {
-        naviView.buttons = buttons.reversed()
+        naviView.buttons = buttons
     }
     //返回naviView的标题
     func titleString() -> String {
         return naviView.titleString ?? ""
     }
     //返回naviViewOverlay
-    func getNaviOverlay() -> Int {
-        return naviOverlay
+    func getNaviOverlay() -> Bool {
+        return naviOverlay == 0 ? false : true
     }
     //返回naviView的背景色
     func naviViewBackgroundColor() -> String {
@@ -203,13 +212,14 @@ extension WebViewViewController {
         return naviView.tineColor ?? ""
     }
     //返回naviView的按钮
-    func naviActions() -> [[String:Any]] {
-        guard let buttons = naviView.buttons else { return [] }
+    func naviActions() -> String {
+        guard let buttons = naviView.buttons else { return "" }
         var array: [[String:Any]] = []
         for button in buttons {
             array.append(button.buttonDict)
         }
-        return array
+        let actionString = ChangeTools.arrayValueString(array) ?? ""
+        return actionString
     }
 }
 
@@ -236,14 +246,29 @@ extension WebViewViewController {
     //更新状态栏Overlay
     func updateStatusBarOverlay(overlay: Int) {
         statusOverlay = overlay
+        var naviFrame = naviView.frame
+        var webFrame = webView.frame
+        if overlay == 1 {
+            naviFrame.origin.y -= UIDevice.current.statusBarHeight()
+            webFrame.size.height += UIDevice.current.statusBarHeight()
+        } else {
+            naviFrame.origin.y = UIDevice.current.statusBarHeight()
+            webFrame.size.height -= UIDevice.current.statusBarHeight()
+        }
+        webFrame.origin.y = naviFrame.maxY
+        UIView.animate(withDuration: 0.25) {
+            self.naviView.frame = naviFrame
+            self.webView.frame = webFrame
+            self.webView.updateFrame(frame: webFrame)
+        }
     }
     //返回状态栏是否隐藏
     func statusBarVisible() -> Bool {
-        return isStatusHidden
+        return !isStatusHidden
     }
     //返回状态栏Overlay
-    func statusBarOverlay() -> Int {
-        return statusOverlay
+    func statusBarOverlay() -> Bool {
+        return statusOverlay == 0 ? false : true
     }
     //返回状态栏状态
     func statusBarStyle() -> String {
@@ -293,6 +318,7 @@ extension WebViewViewController {
             frame.size.height -= 49 + UIDevice.current.tabbarSpaceHeight()
         }
        
+        frame = CGRect(x: 0, y: self.naviView.frame.maxY, width: self.view.bounds.width, height: UIScreen.main.bounds.height - self.naviView.frame.maxY - 49 - UIDevice.current.tabbarSpaceHeight() + 100)
         UIView.animate(withDuration: 0.25) {
             self.webView.frame = frame
             self.webView.updateFrame(frame: frame)
@@ -325,8 +351,8 @@ extension WebViewViewController {
         return isBottomHidden
     }
     //返回底部overlay
-    func bottombarOverlay() -> Int {
-        return bottomOverlay
+    func bottombarOverlay() -> Bool {
+        return bottomOverlay == 0 ? false : true
     }
     //返回底部背景颜色
     func bottomBarBackgroundColor() -> String {
@@ -339,21 +365,50 @@ extension WebViewViewController {
     //返回底部颜色
     func bottomBarForegroundColor() -> String {
         //TODO
-        return ""
+        return "#FFFFFFFF"
     }
     //获取底部按钮
     func fetchBottomButtons(buttons: [BottomBarModel]) {
-        bottomView.isHidden = false
-        bottomView.buttons = buttons
+        
+        operateMonitor.tabBarMonitor.onNext(())
+//        bottomView.isHidden = false
+//        bottomView.buttons = buttons
     }
     //返回底部按钮数组
-    func bottomActions() -> [[String:Any]] {
-        guard let buttons = bottomView.buttons else { return [] }
+    func bottomActions() -> String {
+        guard let buttons = bottomView.buttons else { return "" }
         var array: [[String:Any]] = []
         for button in buttons {
             array.append(button.buttonDict)
         }
-        return array
+        let actionString = ChangeTools.arrayValueString(array) ?? ""
+        return actionString
     }
     
+}
+
+extension WebViewViewController: KeyboardProtocol {
+    
+    //overlay: false 上移， true 不动
+    func keyboardOverlay(overlay: Bool, keyboardType: KeyboardType, height: CGFloat) {
+        
+        guard !isNaviHidden else { return }
+        var naviFrame = naviView.frame
+        var webFrame = webView.frame
+        var bottomFrame = bottomView.frame
+        if keyboardType == .show {
+            naviFrame.origin.y -= height
+            webFrame.origin.y -= height
+            bottomFrame.origin.y -= height
+        } else if keyboardType == .hidden {
+            naviFrame.origin.y = self.statusView.frame.maxY
+            webFrame.origin.y = naviFrame.maxY
+            bottomFrame.origin.y = UIScreen.main.bounds.height - 49 - UIDevice.current.tabbarSpaceHeight()
+        }
+        UIView.animate(withDuration: 0.25) {
+            self.naviView.frame = naviFrame
+            self.webView.frame = webFrame
+            self.bottomView.frame = bottomFrame
+        }
+    }
 }

@@ -37,7 +37,11 @@ class XXWebView: WKWebView {
     
     deinit {
         configuration.userContentController.removeAllUserScripts()
-        configuration.userContentController.removeAllScriptMessageHandlers()
+        if #available(iOS 14.0, *) {
+            configuration.userContentController.removeAllScriptMessageHandlers()
+        } else {
+            // Fallback on earlier versions
+        }
         stopLoading()
         uiDelegate = nil
         navigationDelegate = nil
@@ -73,7 +77,11 @@ extension XXWebView: WebViewPoolProtocol{
     func webViewWillEnterPool() {
         
         configuration.userContentController.removeAllUserScripts()
-        configuration.userContentController.removeAllScriptMessageHandlers()
+        if #available(iOS 14.0, *) {
+            configuration.userContentController.removeAllScriptMessageHandlers()
+        } else {
+            // Fallback on earlier versions
+        }
         stopLoading()
         NSObject.cancelPreviousPerformRequests(withTarget: self)
         scrollView.delegate = nil
