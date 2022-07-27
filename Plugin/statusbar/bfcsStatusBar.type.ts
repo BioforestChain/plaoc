@@ -40,13 +40,26 @@ declare namespace Plaoc {
 
   // desktop-dev端ffi
   interface StatusBarDesktopFFI {
-    setStatusBarColor(colorHex: string, darkIcons: StatusBarAndroidStyle): void;
-    getStatusBarColor(): string;
-    getStatusBarVisible(): boolean;
-    toggleStatusBarVisible(visible: boolean): void;
-    getStatusBarOverlay(): boolean;
-    toggleStatusBarOverlay(isOverlay: boolean): void;
-    getStatusBarStyle(): boolean;
+    setStatusbarBackgroundColor(
+      scopedValue: Plaoc.ColorFormatType | undefined,
+      globalValue?: Plaoc.ColorFormatType
+    ): Promise<void>;
+    getStatusbarBackgroundColor(): Promise<Plaoc.ColorFormatType>;
+    setStatusbarOverlay(
+      scopedValue: boolean | undefined,
+      globalValue?: boolean
+    ): Promise<void>;
+    getStatusbarOverlay(): Promise<boolean>;
+    setStatusbarHidden(
+      scopedValue: boolean | undefined,
+      globalValue?: boolean
+    ): Promise<void>;
+    getStatusbarHidden(): Promise<boolean>;
+    setStatusbarStyle(
+      scopedValue: StatusBarStyle | undefined,
+      globalValue?: StatusBarStyle
+    ): Promise<void>;
+    getStatusbarStyle(): Promise<StatusBarStyle>;
   }
 
   // 三端最后统一封装ffi
@@ -65,7 +78,7 @@ declare namespace Plaoc {
     getStatusBarStyle(): Promise<StatusBarStyle>;
   }
 
-  // default:	默认的样式（IOS 为白底黑字、Android 为黑底白字、Desktop-dev同Android）
+  // default:	默认的样式（IOS 为白底黑字、Android 为黑底白字、Desktop-dev同IOS）
   // light-content:	黑底白字
   // dark-content:	白底黑字（需要 Android API>=23）
   enum StatusBarStyle {

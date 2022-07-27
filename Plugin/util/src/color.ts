@@ -53,3 +53,7 @@ export function convertToRGBAHex(color: string): Plaoc.RGBAHex {
 
   return (colorHex.length === 9 ? colorHex : color) as Plaoc.RGBAHex;
 }
+
+export function hex<T extends string>(s: Plaoc.HexColor<T>): T {
+  return s;
+}

@@ -49,7 +49,13 @@ export class BfcsTopBar extends HTMLElement {
   }
 
   async toggleEnabled(): Promise<void> {
-    await this._ffi.toggleEnabled();
+    if (this.hasAttribute("hidden")) {
+      this.removeAttribute("hidden");
+
+      await this._ffi.toggleEnabled();
+    } else {
+      this.setAttribute("hidden", "");
+    }
 
     return;
   }
@@ -85,7 +91,13 @@ export class BfcsTopBar extends HTMLElement {
   }
 
   async toggleOverlay(): Promise<void> {
-    await this._ffi.toggleOverlay();
+    if (this.hasAttribute("overlay")) {
+      this.removeAttribute("overlay");
+
+      await this._ffi.toggleOverlay();
+    } else {
+      this.setAttribute("overlay", "");
+    }
 
     return;
   }

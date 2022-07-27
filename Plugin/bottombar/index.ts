@@ -1,6 +1,5 @@
 /// <reference lib="dom" />
 
-import "@plaoc/plugin-icon";
 import "@plaoc/plugin-typings";
 
 import { BfcsBottomBar } from "./bfcsBottomBar";

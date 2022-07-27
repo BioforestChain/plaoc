@@ -53,6 +53,29 @@ declare namespace Plaoc {
     };
   }
 
+  interface BottomBarDesktopFFI {
+    setBottombarHidden(
+      scopedValue: boolean | undefined,
+      globalValue?: boolean
+    ): Promise<void>;
+    getBottombarHidden(): Promise<boolean>;
+    setBottombarOverlay(
+      scopedValue: boolean | undefined,
+      globalValue?: boolean
+    ): Promise<void>;
+    getBottombarOverlay(): Promise<boolean>;
+    setBottombarHeight(
+      scopedValue: string | undefined,
+      globalValue?: string
+    ): Promise<void>;
+    getBottombarHeight(): Promise<string>;
+    setBottombarBackgroundColor(
+      scopedValue: string | undefined,
+      globalValue?: string
+    ): Promise<void>;
+    getBottombarBackgroundColor(): Promise<Plaoc.ColorFormatType>;
+  }
+
   interface IBottomBarFFI {
     getEnabled(): Promise<boolean>;
     toggleEnabled(isEnabled: number): Promise<void>;

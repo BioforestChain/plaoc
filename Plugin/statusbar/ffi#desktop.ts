@@ -1,115 +1,83 @@
 import { convertToRGBAHex } from "@plaoc/plugin-util";
 
+// 等到dweb-communication组件注册成功，再执行StatusBarFFI代码
+await customElements.whenDefined("dweb-communication");
+
 export class StatusBarFFI implements Plaoc.IStatusBarFFI {
-  private _ffi = (globalThis as any).StatusBar as Plaoc.StatusBarDesktopFFI;
+  private _ffi!: Plaoc.StatusBarDesktopFFI;
+
+  constructor() {
+    this._ffi = document.querySelector(
+      "dweb-communication"
+    ) as unknown as Plaoc.StatusBarDesktopFFI;
+  }
 
   async setStatusBarColor(
     color?: Plaoc.RGBAHex,
     barStyle?: Plaoc.StatusBarStyle
   ): Promise<void> {
-    let colorHex: string;
-    let darkIcons: Plaoc.StatusBarAndroidStyle;
-
-    if (!color) {
-      colorHex = this._ffi.getStatusBarColor();
-    } else {
-      colorHex = color;
+    if (color) {
+      await this._ffi.setStatusbarBackgroundColor(color);
     }
 
-    if (!barStyle) {
-      let isDarkIcons = await this.getStatusBarStyle();
-      darkIcons = isDarkIcons ? 1 : 0;
-    } else {
-      switch (barStyle) {
-        case "light-content":
-          darkIcons = -1;
-          break;
-        case "dark-content":
-          darkIcons = 1;
-          break;
-        default:
-          darkIcons = 0;
-      }
+    if (barStyle) {
+      await this._ffi.setStatusbarStyle(barStyle);
     }
-
-    this._ffi.setStatusBarColor(colorHex, darkIcons);
 
     return;
   }
 
-  getStatusBarColor(): Promise<Plaoc.RGBAHex> {
-    return new Promise<Plaoc.RGBAHex>((resolve, reject) => {
-      const color = this._ffi.getStatusBarColor();
-      const colorHex = convertToRGBAHex(color);
+  async getStatusBarColor(): Promise<Plaoc.RGBAHex> {
+    const color = await this._ffi.getStatusbarBackgroundColor();
 
-      resolve(colorHex);
-    });
+    const colorHex = convertToRGBAHex(color);
+
+    return colorHex;
   }
 
-  getStatusBarVisible(): Promise<boolean> {
-    return new Promise<boolean>((resolve, reject) => {
-      const isVisible = this._ffi.getStatusBarVisible();
+  async getStatusBarVisible(): Promise<boolean> {
+    const isHidden = await this._ffi.getStatusbarHidden();
 
-      resolve(isVisible);
-    });
+    return !isHidden;
   }
 
   async toggleStatusBarVisible(): Promise<void> {
     const isVisible = await this.getStatusBarVisible();
 
-    this._ffi.toggleStatusBarVisible(!isVisible);
+    await this._ffi.setStatusbarHidden(isVisible);
 
     return;
   }
 
   async setStatusBarHidden(): Promise<void> {
-    const isVisible = await this.getStatusBarVisible();
-
-    if (isVisible) {
-      await this.toggleStatusBarVisible();
-    }
+    await this._ffi.setStatusbarHidden(true);
 
     return;
   }
 
-  getStatusBarOverlay(): Promise<boolean> {
-    return new Promise<boolean>((resolve, reject) => {
-      const overlay = this._ffi.getStatusBarOverlay();
+  async getStatusBarOverlay(): Promise<boolean> {
+    const isOverlay = await this._ffi.getStatusbarOverlay();
 
-      resolve(overlay);
-    });
+    return isOverlay;
   }
 
   async toggleStatusBarOverlay(): Promise<void> {
-    const overlay = await this.getStatusBarOverlay();
+    const isOverlay = await this.getStatusBarOverlay();
 
-    this._ffi.toggleStatusBarOverlay(!overlay);
+    await this._ffi.setStatusbarOverlay(!isOverlay);
 
     return;
   }
 
   async setStatusBarOverlay(): Promise<void> {
-    const overlay = await this.getStatusBarOverlay();
-
-    if (!overlay) {
-      await this.toggleStatusBarOverlay();
-    }
+    await this._ffi.setStatusbarOverlay(true);
 
     return;
   }
 
-  getStatusBarStyle(): Promise<Plaoc.StatusBarStyle> {
-    return new Promise<Plaoc.StatusBarStyle>((resolve, reject) => {
-      const isDarkIcons = this._ffi.getStatusBarStyle();
-      let barStyle: Plaoc.StatusBarStyle;
+  async getStatusBarStyle(): Promise<Plaoc.StatusBarStyle> {
+    const barStyle = await this._ffi.getStatusbarStyle();
 
-      if (isDarkIcons) {
-        barStyle = "dark-content" as Plaoc.StatusBarStyle.DARK_CONTENT;
-      } else {
-        barStyle = "light-content" as Plaoc.StatusBarStyle.LIGHT_CONTENT;
-      }
-
-      resolve(barStyle);
-    });
+    return barStyle;
   }
 }

@@ -71,6 +71,39 @@ declare namespace Plaoc {
     };
   }
 
+  interface TopBarDesktopFFI {
+    setTopbarHidden(
+      scopedValue: boolean | undefined,
+      globalValue?: boolean
+    ): Promise<void>;
+    getTopbarHidden(): Promise<boolean>;
+    setTopbarOverlay(
+      scopedValue: boolean | undefined,
+      globalValue?: boolean
+    ): Promise<void>;
+    getTopbarOverlay(): Promise<boolean>;
+    setTopbarTitle(
+      scopedValue: string | undefined,
+      globalValue?: string
+    ): Promise<void>;
+    getTopbarTitle(): Promise<string>;
+    setTopbarHeight(
+      scopedValue: string | undefined,
+      globalValue?: string
+    ): Promise<string>;
+    getTopbarHeight(): Promise<string>;
+    setTopbarBackgroundColor(
+      scopedValue: string | undefined,
+      globalValue?: string
+    ): Promise<void>;
+    getTopbarBackgroundColor(): Promise<Plaoc.ColorFormatType>;
+    setTopbarForegroundColor(
+      scopedValue: string | undefined,
+      globalValue?: string
+    ): Promise<void>;
+    getTopbarForegroundColor(): Promise<Plaoc.ColorFormatType>;
+  }
+
   interface ITopBarFFI {
     back(): Promise<void>;
     getEnabled(): Promise<boolean>;

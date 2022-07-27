@@ -18,8 +18,8 @@ export default defineWorkspace(() => {
       topbar,
       bottombar,
       statusbar,
-      dialogs,
-      keyboard,
+      // dialogs,
+      // keyboard,
       //
     ],
   };

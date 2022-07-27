@@ -2,7 +2,7 @@ import { defineConfig } from "@bfchain/pkgm-bfsp";
 export default defineConfig((info) => {
   const config: Bfsp.UserConfig = {
     name: "@plaoc/plugin-bottom-bar",
-    profiles: ["android", "ios", "default"],
+    profiles: ["android", "ios", "desktop", "default"],
     exports: {
       ".": "./index.ts",
     },
@@ -19,6 +19,16 @@ export default defineConfig((info) => {
       {
         name: "@plaoc/plugin-bottom-bar-ios",
         profiles: ["ios"],
+      },
+      {
+        name: "@plaoc/plugin-bottom-bar-desktop",
+        profiles: ["desktop"],
+        tsConfig: {
+          compilerOptions: {
+            module: "ES2022",
+            target: "ES2022",
+          },
+        },
       },
     ],
   };

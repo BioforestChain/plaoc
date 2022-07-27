@@ -23,6 +23,12 @@ export default defineConfig((info) => {
       {
         name: "@plaoc/plugin-status-bar-desktop",
         profiles: ["desktop"],
+        tsConfig: {
+          compilerOptions: {
+            module: "ES2022",
+            target: "ES2022",
+          },
+        },
       },
     ],
   };
