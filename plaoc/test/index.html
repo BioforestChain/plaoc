@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nav Demo</title>
+
+</head>
+
+<body>
+    <h1>Plaoc Nav Demo</h1>
+    <img width="200" height="200" src="./code.png">
+    <img width="200" height="200" src="./code.png">
+    <img width="200" height="200" src="./code.png">
+    <!-- <dweb-navigator></dweb-navigator> -->
+    <script type="module" src="./dist/esm/index.mjs"></script>
+    <script>
+    </script>
+
+    <script type="text/javascript">
+        const add = (a, b) => {
+            return a + b
+        }
+    </script>
+    <fieldset>
+        <h2>拦截dweb://请求测试</h2>
+        <div id="response"></div>
+        <button id="request" onclick="testUrl()">建立连接</button>
+        <script src="https://unpkg.com/ajax-hook@2.1.3/dist/ajaxhook.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+        <script type="text/javascript">
+            // ah.proxy(
+            //     {
+            //         onRequest: (config, handler) => {
+            //             console.log("https://aa/; 伪造返回，请求会成功");
+            //             if (config.url === "https://aa/") {
+            //                 handler.resolve({
+            //                     config: config,
+            //                     status: 200,
+            //                     headers: { "content-type": "text/text" },
+            //                     response: "hi world",
+            //                 });
+            //             } else {
+            //                 handler.next(config);
+            //             }
+            //         },
+            //         onError: (err, handler) => {
+            //             if (err.config.url === "https://aa/") {
+            //                 handler.resolve({
+            //                     config: err.config,
+            //                     status: 200,
+            //                     headers: { "content-type": "text/text" },
+            //                     response: "hi world",
+            //                 });
+            //             } else {
+            //                 handler.next(err);
+            //             }
+            //         },
+            //         onResponse: (response, handler) => {
+            //             if (response.config.url === location.href) {
+            //                 handler.reject({
+            //                     config: response.config,
+            //                     type: "error",
+            //                     error: undefined,
+            //                 });
+            //             } else {
+            //                 handler.next(response);
+            //             }
+            //         },
+            //     },
+            //     window
+            // );
+
+            async function testUrl() {
+                let msg = await getResponse('https://aa/');
+                document.getElementById('response').innerHTML += `拦截结果：${msg}`
+            }
+            function getResponse(url = "http://127.0.0.1:8000/register") {
+                fetch(url, {
+                    method: 'get',
+                })
+                    .then(response => {
+                        console.log(response.text())
+                        return response.text()
+                    })
+                    .then(function (responseData) {
+                        console.log("html JSON.stringify(responseData):", JSON.stringify(responseData));
+                        return responseData;
+                    });
+            }
+            // / 使用jQuery发起网络请求
+            function testJquery(url) {
+                $.get(url).done(function (d) {
+                    console.log("testJquery:", d)
+                }).fail(function (e) {
+                    console.log('hi world')
+                })
+            }
+            function test(url) {
+                var events = [
+                    "load",
+                    "loadend",
+                    "timeout",
+                    "error",
+                    "readystatechange",
+                    "abort",
+                ];
+
+                const xhr = new XMLHttpRequest();
+
+                //setTimeout(()=>xhr.abort(),100)
+                xhr.open("get", url, true);
+                xhr.send();
+                events.forEach(function (e) {
+                    xhr["on" + e] = function (event) {
+                        // console.log("on" + e, xhr.readyState, event);
+                    };
+                    xhr.addEventListener(e, function (event) {
+                        // console.log(e, xhr.readyState, event);
+                    });
+                });
+                xhr.addEventListener("load", function (event) {
+                    console.log("response", xhr.response);
+                });
+            }
+
+            //测试
+            // testJquery('http://aa/');
+            // setTimeout(() => {
+            //     testJquery('dweb://aa/');
+            //     test("dweb://aa/");
+            // }, 200);
+        </script>
+    </fieldset>
+</body>
+
+</html>

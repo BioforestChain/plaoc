@@ -1,3 +1,9 @@
 {
-  "html.customData": ["./Plugin/html.html-data.json"]
+  "files.exclude": {
+    "**/*.json": true,
+    "**/.*": true,
+    "**/*.log": true,
+    "**/*.lock": true,
+    "**/tsconfig*": true
+  }
 }

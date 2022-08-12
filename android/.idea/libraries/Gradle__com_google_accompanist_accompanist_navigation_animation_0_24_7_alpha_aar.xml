@@ -1,0 +1,18 @@
+<component name="libraryTable">
+  <library name="Gradle: com.google.accompanist:accompanist-navigation-animation:0.24.7-alpha@aar">
+    <CLASSES>
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/fcb578f99c275892be0e6e5ca41f97ac/transformed/accompanist-navigation-animation-0.24.7-alpha/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/4d129533d71154227fdf76da485ce71d/transformed/accompanist-navigation-animation-0.24.7-alpha/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/3037933341c26d1c35998a920ff6dbc2/transformed/accompanist-navigation-animation-0.24.7-alpha/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-3/fee317ba4ae32dd44ada9a5c2e7a09ad/transformed/accompanist-navigation-animation-0.24.7-alpha/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/fee317ba4ae32dd44ada9a5c2e7a09ad/transformed/accompanist-navigation-animation-0.24.7-alpha/AndroidManifest.xml" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/fee317ba4ae32dd44ada9a5c2e7a09ad/transformed/accompanist-navigation-animation-0.24.7-alpha/res" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.accompanist/accompanist-navigation-animation/0.24.7-alpha/c11a8da33af7576d36119eabf783f547323dffa9/accompanist-navigation-animation-0.24.7-alpha-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.accompanist/accompanist-navigation-animation/0.24.7-alpha/191e3f66c1eb0690e9e357f28057318239310641/accompanist-navigation-animation-0.24.7-alpha-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

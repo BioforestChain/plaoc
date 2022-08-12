@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta content="IE=edge" http-equiv="X-UA-Compatible" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>BFS DEV App</title>
+    <link href="./css/main.css" rel="stylesheet" />
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+
+<body>
+    <h1>Hello BFS Custom Scheme</h1>
+    <h2 id="app_href"></h2>
+    <a href="./page2.html">Page2</a>
+    <script src="./js/main.js"></script>
+    <fieldset>
+        <h2>拦截https://appName.Address.dweb请求测试</h2>
+        <div id="response"></div>
+        <button id="request" onclick="testUrl('https://bMr9vohVtvBvWRS3p4bwgzSMoLHTPHSvVj.dweb/getBlockInfo')">
+            getBlockInfo
+        </button>
+        <button id="request" onclick="testUrl('https://bMr9vohVtvBvWRS3p4bwgzSMoLHTPHSvVj.dweb/getBlockHigh')">
+            getBlockHigh
+        </button>
+        <script type="text/javascript">
+            async function testUrl(url) {
+                let msg = await onClick(url);
+                document.getElementById('response').innerHTML += `拦截结果：${msg}`
+            }
+            function onClick(url) {
+                return axios.get(url)
+                    .then((response) => {
+                        // handle success
+                        console.log('sucess onClick', JSON.stringify(response));
+                        return response.data;
+                    }).catch((e) => {
+                        console.log('error onClick', JSON.stringify(e));
+                        return e
+                    })
+            }
+
+        </script>
+    </fieldset>
+</body>
+
+</html>

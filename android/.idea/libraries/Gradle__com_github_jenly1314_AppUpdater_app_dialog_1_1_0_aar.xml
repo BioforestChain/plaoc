@@ -1,0 +1,15 @@
+<component name="libraryTable">
+  <library name="Gradle: com.github.jenly1314.AppUpdater:app-dialog:1.1.0@aar">
+    <CLASSES>
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/a57ce6397db5730d6d59c8f364efae51/transformed/app-dialog-1.1.0/AndroidManifest.xml" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/a57ce6397db5730d6d59c8f364efae51/transformed/app-dialog-1.1.0/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-3/a57ce6397db5730d6d59c8f364efae51/transformed/app-dialog-1.1.0/jars/classes.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.github.jenly1314.AppUpdater/app-dialog/1.1.0/4001114ff9622d8ffe52c052613a2c25a1ea1d4a/app-dialog-1.1.0-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.github.jenly1314.AppUpdater/app-dialog/1.1.0/7b3557a7a5db823409736a211b94529cc4eddd58/app-dialog-1.1.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

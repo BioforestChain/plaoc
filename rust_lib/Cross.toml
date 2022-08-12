@@ -1,0 +1,19 @@
+#Cross 交叉编译容器构建工具：https://github.com/cross-rs/cross/wiki/Configuration
+[target.aarch64-linux-android]
+image = "ghcr.io/cross-rs/aarch64-linux-android:edge"
+
+[build.env]
+passthrough = [
+  "V8_FROM_SOURCE",
+  "SCCACHE_ERROR_LOG",
+  "SCCACHE_LOG",
+  "SCCACHE_DIR",
+  "SCCACHE_IDLE_TIMEOUT",
+]
+
+[target.aarch64-linux-android.env]
+passthrough = ["RUSTY_V8_MIRROR=VALUE", "RUSTY_V8_ARCHIVE=VALUE"]
+volumes = [
+  "RUSTY_V8_MIRROR=/Users/mac/Desktop/waterbang/project/android-deno-runtime-example/rust_lib/assets/rusty_v8_mirror/",
+  "RUSTY_V8_ARCHIVE=/Users/mac/Desktop/waterbang/project/android-deno-runtime-example/rust_lib/assets/rusty_v8_mirror/v0.42.0/librusty_v8_release_aarch64-linux-android.a",
+]

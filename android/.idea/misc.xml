@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/dev/AndroidStudioProjects/RustEample/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.1575" />
+        <entry key="..\:/dev/AndroidStudioProjects/RustEample/app/src/main/res/layout/activity_main.xml" value="0.1125" />
+        <entry key="app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.2785" />
+        <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.2785" />
+        <entry key="app/src/main/res/layout/activity_barcode_scanning.xml" value="0.2321504916631039" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/barcode_result_dialog.xml" value="0.21333903377511756" />
+        <entry key="app/src/main/res/layout/multiple_qrcode_scan_activity.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/qrcode_scan_activity.xml" value="0.22" />
+        <entry key="app/src/main/res/layout/result_dialog.xml" value="0.21333903377511756" />
+        <entry key="app/src/main/res/layout/text_result_dialog.xml" value="0.21333903377511756" />
+        <entry key="app/src/main/res/layout/webview.xml" value="0.2821718683197948" />
+        <entry key="mlkit-barcode-scanning/src/main/res/drawable/ml_flashlight_selector.xml" value="0.1655" />
+        <entry key="mlkit-barcode-scanning/src/main/res/layout/ml_qrcode_camera_scan.xml" value="0.25" />
+        <entry key="mlkit-camera-core/src/main/res/layout/ml_camera_scan.xml" value="0.21333903377511756" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="11" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+</project>

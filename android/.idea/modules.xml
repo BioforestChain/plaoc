@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/plaoc.iml" filepath="$PROJECT_DIR$/.idea/modules/plaoc.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/plaoc.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/plaoc.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/plaoc.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/plaoc.app.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/plaoc.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/plaoc.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/plaoc.app.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/plaoc.app.unitTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/mlkit-barcode-scanning/plaoc.mlkit-barcode-scanning.iml" filepath="$PROJECT_DIR$/.idea/modules/mlkit-barcode-scanning/plaoc.mlkit-barcode-scanning.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/mlkit-barcode-scanning/plaoc.mlkit-barcode-scanning.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/mlkit-barcode-scanning/plaoc.mlkit-barcode-scanning.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/mlkit-barcode-scanning/plaoc.mlkit-barcode-scanning.main.iml" filepath="$PROJECT_DIR$/.idea/modules/mlkit-barcode-scanning/plaoc.mlkit-barcode-scanning.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/mlkit-barcode-scanning/plaoc.mlkit-barcode-scanning.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/mlkit-barcode-scanning/plaoc.mlkit-barcode-scanning.unitTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/mlkit-camera-core/plaoc.mlkit-camera-core.iml" filepath="$PROJECT_DIR$/.idea/modules/mlkit-camera-core/plaoc.mlkit-camera-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/mlkit-camera-core/plaoc.mlkit-camera-core.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/mlkit-camera-core/plaoc.mlkit-camera-core.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/mlkit-camera-core/plaoc.mlkit-camera-core.main.iml" filepath="$PROJECT_DIR$/.idea/modules/mlkit-camera-core/plaoc.mlkit-camera-core.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/mlkit-camera-core/plaoc.mlkit-camera-core.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/mlkit-camera-core/plaoc.mlkit-camera-core.unitTest.iml" />
+    </modules>
+  </component>
+</project>

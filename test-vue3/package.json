@@ -1,0 +1,22 @@
+{
+  "name": "plaoc-ts",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build && node ./copy.cjs",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "ajax-hook": "^2.1.3",
+    "vue": "^3.2.37"
+  },
+  "devDependencies": {
+    "@bfsx/plugin": "file:/Users/mac/Desktop/waterbang/project/android-deno-runtime-example/plaoc/plugin",
+    "@vitejs/plugin-vue": "^3.0.0",
+    "typescript": "^4.6.4",
+    "vite": "^3.0.0",
+    "vue-tsc": "^0.38.4"
+  }
+}

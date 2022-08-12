@@ -1,0 +1,18 @@
+<component name="libraryTable">
+  <library name="Gradle: com.google.android.gms:play-services-mlkit-barcode-scanning:16.2.1@aar">
+    <CLASSES>
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/2e5e5680c4f26bc7e3533a624d818150/transformed/play-services-mlkit-barcode-scanning-16.2.1/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/95b12fcd2fbdc4fcc8f1ab7e2d5d29da/transformed/play-services-mlkit-barcode-scanning-16.2.1/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/3e7a256298dd0d3f2a4e5adb7b9dc932/transformed/play-services-mlkit-barcode-scanning-16.2.1/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/13338c5bf7bdcf0056f2139ff8289330/transformed/play-services-mlkit-barcode-scanning-16.2.1/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/705bf31002b5c8628d94879fc86e0fc7/transformed/play-services-mlkit-barcode-scanning-16.2.1/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/3527e4ec550324ee3b0dd0d1daa6629a/transformed/play-services-mlkit-barcode-scanning-16.2.1/AndroidManifest.xml" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-3/3527e4ec550324ee3b0dd0d1daa6629a/transformed/play-services-mlkit-barcode-scanning-16.2.1/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/3527e4ec550324ee3b0dd0d1daa6629a/transformed/play-services-mlkit-barcode-scanning-16.2.1/res" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.android.gms/play-services-mlkit-barcode-scanning/16.2.1/5b2cf270e472fdbc054a930dfb4790208f56e92e/play-services-mlkit-barcode-scanning-16.2.1-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES />
+  </library>
+</component>

@@ -1,0 +1,18 @@
+<component name="libraryTable">
+  <library name="Gradle: com.google.mlkit:common:17.3.0@aar">
+    <CLASSES>
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/92fd92f21cec34a07b7da54c73fad68d/transformed/common-17.3.0/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/372c6575da162567026c77b5ab63b5db/transformed/common-17.3.0/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/535ed1bc6dd749738679e649011bbc54/transformed/common-17.3.0/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/bed645f8c7cb427568130bee7eabb12d/transformed/common-17.3.0/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/0ab7fa52818487c3e6a2632186f4faf7/transformed/common-17.3.0/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/5dbb50d3dad4f6e375557edd2e52756d/transformed/common-17.3.0/AndroidManifest.xml" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/5dbb50d3dad4f6e375557edd2e52756d/transformed/common-17.3.0/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-3/5dbb50d3dad4f6e375557edd2e52756d/transformed/common-17.3.0/jars/classes.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.mlkit/common/17.3.0/4145b70d9d45d67877b42953178aa94a1659733f/common-17.3.0-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES />
+  </library>
+</component>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="org.bfchain.rust.plaoc">
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:name="org.bfchain.rust.plaoc.App"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.plaoc"
+        android:usesCleartextTraffic="true">
+        <activity
+            android:name="org.bfchain.rust.plaoc.webView.DWebViewActivity"
+            android:exported="true"
+            android:launchMode="standard"
+            android:theme="@style/Theme.plaoc">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <action android:name="org.bfchain.dweb" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="dweb" />
+                <!--                android:host="@string/web_host"-->
+                <data android:scheme="https" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="org.bfchain.rust.plaoc.MainActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.plaoc">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="org.bfchain.rust.plaoc.barcode.MultipleQRCodeScanningActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/CameraScanTheme" />
+        <activity
+            android:name="org.bfchain.rust.plaoc.barcode.QRCodeScanningActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/CameraScanTheme" />
+        <activity
+            android:name="org.bfchain.rust.plaoc.barcode.BarcodeScanningActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/CameraScanTheme" />
+
+        <service
+            android:name="org.bfchain.rust.plaoc.DenoService"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="org.bfchain.rust.example.DenoService" />
+            </intent-filter>
+        </service>
+
+        <meta-data
+            android:name="com.google.firebase.ml.vision.DEPENDENCIES"
+            android:value="barcode" />
+    </application>
+
+</manifest>

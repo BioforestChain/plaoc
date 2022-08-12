@@ -1,0 +1,18 @@
+<component name="libraryTable">
+  <library name="Gradle: com.google.accompanist:accompanist-webview:0.24.7-alpha@aar">
+    <CLASSES>
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/f499062047f5efbb51515310b7565568/transformed/accompanist-webview-0.24.7-alpha/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/f9264e6fa0d7d716c5da335f797ec92e/transformed/accompanist-webview-0.24.7-alpha/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/a59ecd1bbe669e59c1bdc982b5e82fe2/transformed/accompanist-webview-0.24.7-alpha/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/ec664edc60db1245ac11be13b725c7a4/transformed/accompanist-webview-0.24.7-alpha/AndroidManifest.xml" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/ec664edc60db1245ac11be13b725c7a4/transformed/accompanist-webview-0.24.7-alpha/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-3/ec664edc60db1245ac11be13b725c7a4/transformed/accompanist-webview-0.24.7-alpha/jars/classes.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.accompanist/accompanist-webview/0.24.7-alpha/52dcd449b3fecd62f8bb7765aa88a4c6bfbc6cc2/accompanist-webview-0.24.7-alpha-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.accompanist/accompanist-webview/0.24.7-alpha/f754b52af2ca31c68ceee3166c9804cbe861bee0/accompanist-webview-0.24.7-alpha-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
