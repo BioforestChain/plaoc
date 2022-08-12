@@ -1,4 +1,3 @@
-import BfcsIcon from "./../icon";
 import { DwebPlugin } from "../native/dweb-plugin";
 export class BfcsBottomBarIcon extends DwebPlugin {
   constructor() {

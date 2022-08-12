@@ -1,5 +1,8 @@
-export class TopBarFFI implements Plaoc.ITopBarFFI {
-  private _ffi = (window as any).webkit.messageHandlers as Plaoc.TopBarIosFFI;
+import "../typings";
+import { TopBar } from "./bfcsTopBar.type";
+
+export class TopBarFFI implements TopBar.ITopBarFFI {
+  private _ffi = (window as any).webkit.messageHandlers as TopBar.TopBarIosFFI;
 
   back() {
     return new Promise<void>((resolve, reject) => {
@@ -79,13 +82,13 @@ export class TopBarFFI implements Plaoc.ITopBarFFI {
     return height;
   }
 
-  async getActions(): Promise<Plaoc.TopBarItem[]> {
+  async getActions(): Promise<TopBar.TopBarItem[]> {
     const actionList = await this._ffi.getNaviActions.postMessage(null);
 
     return JSON.parse(actionList);
   }
 
-  setActions(actionList: Plaoc.TopBarItem[]): Promise<void> {
+  setActions(actionList: TopBar.TopBarItem[]): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       this._ffi.customNaviActions.postMessage(JSON.stringify(actionList));
 
@@ -93,15 +96,16 @@ export class TopBarFFI implements Plaoc.ITopBarFFI {
     });
   }
 
-  async getBackgroundColor(): Promise<Plaoc.RGBAHex> {
-    const colorHex: Plaoc.RGBAHex =
-      await this._ffi.getNaviBackgroundColor.postMessage(null);
+  async getBackgroundColor(): Promise<Color.RGBAHex> {
+    const colorHex: Color.RGBAHex = await this._ffi.getNaviBackgroundColor.postMessage(
+      null
+    );
 
     // 返回值：#ffffff00
     return colorHex;
   }
 
-  async setBackgroundColor(color: Plaoc.RGBAHex): Promise<void> {
+  async setBackgroundColor(color: Color.RGBAHex): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       this._ffi.updateNaviBarBackgroundColor.postMessage(color);
 
@@ -109,14 +113,15 @@ export class TopBarFFI implements Plaoc.ITopBarFFI {
     });
   }
 
-  async getForegroundColor(): Promise<Plaoc.RGBAHex> {
-    const colorHex: Plaoc.RGBAHex =
-      await this._ffi.getNaviForegroundColor.postMessage(null);
+  async getForegroundColor(): Promise<Color.RGBAHex> {
+    const colorHex: Color.RGBAHex = await this._ffi.getNaviForegroundColor.postMessage(
+      null
+    );
 
     return colorHex;
   }
 
-  async setForegroundColor(color: Plaoc.RGBAHex): Promise<void> {
+  async setForegroundColor(color: Color.RGBAHex): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       this._ffi.updateNaviBarTintColor.postMessage(color);
 

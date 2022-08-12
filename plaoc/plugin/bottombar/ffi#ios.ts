@@ -1,8 +1,10 @@
+import "../typings";
 import { convertToRGBAHex } from "./../util";
+import { BottomBar } from "./bfcsBottomBar.type";
 
-export class BottomBarFFI implements Plaoc.IBottomBarFFI {
+export class BottomBarFFI implements BottomBar.IBottomBarFFI {
   private _ffi = (window as any).webkit
-    .messageHandlers as Plaoc.BottomBarIosFFI;
+    .messageHandlers as BottomBar.BottomBarIosFFI;
 
   async getEnabled(): Promise<boolean> {
     const isHidden = await this._ffi.getBottomBarEnabled.postMessage(null);
@@ -62,26 +64,28 @@ export class BottomBarFFI implements Plaoc.IBottomBarFFI {
     });
   }
 
-  async getActions(): Promise<Plaoc.BottomBarItem[]> {
+  async getActions(): Promise<BottomBar.BottomBarItem[]> {
     const actionList = await this._ffi.getBottomActions.postMessage(null);
 
     return JSON.parse(actionList);
   }
 
-  setActions(actionList: Plaoc.BottomBarItem[]): Promise<void> {
+  setActions(actionList: BottomBar.BottomBarItem[]): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      let _actionList: Plaoc.BottomBarItem[] = [];
+      let _actionList: BottomBar.BottomBarItem[] = [];
 
       // 如果color值设置的是rgba()形式，转化为#开头的十六进制
       for (const item of actionList) {
         if (item.colors) {
           for (const key of Object.keys(item.colors)) {
-            let color = item.colors[key as keyof Plaoc.IBottomBarColors];
+            let color = item.colors[key as keyof BottomBar.IBottomBarColors];
 
             if (typeof color === "string") {
               item.colors[
-                key as keyof Plaoc.IBottomBarColors
-              ] = convertToRGBAHex(color as string) as Plaoc.BottomBarColorType;
+                key as keyof BottomBar.IBottomBarColors
+              ] = convertToRGBAHex(
+                color as string
+              ) as BottomBar.BottomBarColorType;
             }
           }
         }
@@ -95,15 +99,15 @@ export class BottomBarFFI implements Plaoc.IBottomBarFFI {
     });
   }
 
-  async getBackgroundColor(): Promise<Plaoc.RGBAHex> {
-    const colorHex: Plaoc.RGBAHex = await this._ffi.getBottomBarBackgroundColor.postMessage(
+  async getBackgroundColor(): Promise<Color.RGBAHex> {
+    const colorHex: Color.RGBAHex = await this._ffi.getBottomBarBackgroundColor.postMessage(
       null
     );
 
     return colorHex;
   }
 
-  async setBackgroundColor(color: Plaoc.RGBAHex): Promise<void> {
+  async setBackgroundColor(color: Color.RGBAHex): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       this._ffi.updateBottomViewBackgroundColor.postMessage(color);
 
@@ -111,15 +115,15 @@ export class BottomBarFFI implements Plaoc.IBottomBarFFI {
     });
   }
 
-  async getForegroundColor(): Promise<Plaoc.RGBAHex> {
-    const colorHex: Plaoc.RGBAHex = await this._ffi.getBottomViewForegroundColor.postMessage(
+  async getForegroundColor(): Promise<Color.RGBAHex> {
+    const colorHex: Color.RGBAHex = await this._ffi.getBottomViewForegroundColor.postMessage(
       null
     );
 
     return colorHex;
   }
 
-  async setForegroundColor(color: Plaoc.RGBAHex): Promise<void> {
+  async setForegroundColor(color: Color.RGBAHex): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       this._ffi.updateBottomViewForegroundColor.postMessage(color);
 

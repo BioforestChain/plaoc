@@ -1,21 +1,24 @@
+import "../typings";
 import { getColorInt, getColorHex } from "./../util";
+import { StatusBar } from "./bfcsStatusBar.d";
+export const system_ui: any = "";
 
-export class StatusBarFFI implements Plaoc.IStatusBarFFI {
-  private _ffi: Plaoc.StatusBarAndroidFFI = system_ui;
+export class StatusBarFFI implements StatusBar.IStatusBarFFI {
+  private _ffi: StatusBar.StatusBarAndroidFFI = system_ui;
 
   async setStatusBarColor(
-    color?: Plaoc.RGBAHex,
-    barStyle?: Plaoc.StatusBarStyle
+    color?: Color.RGBAHex,
+    barStyle?: StatusBar.StatusBarStyle
   ): Promise<void> {
     let colorHex: number;
-    let darkIcons: Plaoc.StatusBarAndroidStyle;
+    let darkIcons: StatusBar.StatusBarAndroidStyle;
 
     if (!color) {
       colorHex = this._ffi.getStatusBarColor();
     } else {
       colorHex = getColorInt(
-        color.slice(0, -2) as Plaoc.RGBHex,
-        color.slice(-2) as Plaoc.AlphaValueHex
+        color.slice(0, -2) as Color.RGBHex,
+        color.slice(-2) as Color.AlphaValueHex
       );
     }
 
@@ -40,8 +43,8 @@ export class StatusBarFFI implements Plaoc.IStatusBarFFI {
     return;
   }
 
-  getStatusBarColor(): Promise<Plaoc.RGBAHex> {
-    return new Promise<Plaoc.RGBAHex>((resolve, reject) => {
+  getStatusBarColor(): Promise<Color.RGBAHex> {
+    return new Promise<Color.RGBAHex>((resolve, reject) => {
       const color = this._ffi.getStatusBarColor();
       const colorHex = getColorHex(color);
 
@@ -99,15 +102,15 @@ export class StatusBarFFI implements Plaoc.IStatusBarFFI {
     });
   }
 
-  getStatusBarStyle(): Promise<Plaoc.StatusBarStyle> {
-    return new Promise<Plaoc.StatusBarStyle>((resolve, reject) => {
+  getStatusBarStyle(): Promise<StatusBar.StatusBarStyle> {
+    return new Promise<StatusBar.StatusBarStyle>((resolve, reject) => {
       const isDarkIcons = this._ffi.getStatusBarStyle();
-      let barStyle: Plaoc.StatusBarStyle;
+      let barStyle: StatusBar.StatusBarStyle;
 
       if (isDarkIcons) {
-        barStyle = "dark-content" as Plaoc.StatusBarStyle.DARK_CONTENT;
+        barStyle = "dark-content" as StatusBar.StatusBarStyle.DARK_CONTENT;
       } else {
-        barStyle = "light-content" as Plaoc.StatusBarStyle.LIGHT_CONTENT;
+        barStyle = "light-content" as StatusBar.StatusBarStyle.LIGHT_CONTENT;
       }
 
       resolve(barStyle);

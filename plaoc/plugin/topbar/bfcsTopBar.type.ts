@@ -1,11 +1,13 @@
-declare namespace Plaoc {
-  interface TopBarItem {
-    icon: Plaoc.IPlaocIcon;
+import { Icon } from "../icon/bfspIcon.type";
+
+export namespace TopBar {
+  export interface TopBarItem {
+    icon: Icon.IPlaocIcon;
     onClickCode: string;
     disabled?: boolean;
   }
 
-  interface TopBarAndroidFFI {
+  export interface TopBarAndroidFFI {
     back(): void;
     getEnabled(): boolean;
     toggleEnabled(isEnabled: number): void;
@@ -15,15 +17,15 @@ declare namespace Plaoc {
     setTitle(title: string): void;
     hasTitle(): boolean;
     getHeight(): number;
-    getActions(): Plaoc.DataString<TopBarItem[]>;
-    setActions(actionList: Plaoc.DataString<TopBarItem[]>): void;
+    getActions(): Data.DataString<TopBarItem[]>;
+    setActions(actionList: Data.DataString<TopBarItem[]>): void;
     getBackgroundColor(): number;
     setBackgroundColor(color: number): void;
     getForegroundColor(): number;
     setForegroundColor(color: number): void;
   }
 
-  interface TopBarIosFFI {
+  export interface TopBarIosFFI {
     back: {
       postMessage(noValue: null): void;
     };
@@ -52,26 +54,26 @@ declare namespace Plaoc {
       postMessage(noValue: null): Promise<number>;
     };
     getNaviActions: {
-      postMessage(noValue: null): Promise<Plaoc.DataString<TopBarItem[]>>;
+      postMessage(noValue: null): Promise<Data.DataString<TopBarItem[]>>;
     };
     customNaviActions: {
-      postMessage(actionList: Plaoc.DataString<TopBarItem[]>): void;
+      postMessage(actionList: Data.DataString<TopBarItem[]>): void;
     };
     getNaviBackgroundColor: {
-      postMessage(noValue: null): Promise<Plaoc.RGBAHex>;
+      postMessage(noValue: null): Promise<Color.RGBAHex>;
     };
     updateNaviBarBackgroundColor: {
-      postMessage(colorHex: Plaoc.RGBAHex): void;
+      postMessage(colorHex: Color.RGBAHex): void;
     };
     getNaviForegroundColor: {
-      postMessage(noValue: null): Promise<Plaoc.RGBAHex>;
+      postMessage(noValue: null): Promise<Color.RGBAHex>;
     };
     updateNaviBarTintColor: {
-      postMessage(colorHex: Plaoc.RGBAHex): void;
+      postMessage(colorHex: Color.RGBAHex): void;
     };
   }
 
-  interface ITopBarFFI {
+  export interface ITopBarFFI {
     back(): Promise<void>;
     getEnabled(): Promise<boolean>;
     toggleEnabled(): Promise<void>;
@@ -85,11 +87,9 @@ declare namespace Plaoc {
     getHeight(): Promise<number>;
     getActions(): Promise<TopBarItem[]>;
     setActions(actionList: TopBarItem[]): Promise<void>;
-    getBackgroundColor(): Promise<Plaoc.RGBAHex>;
-    setBackgroundColor(color: Plaoc.RGBAHex): Promise<void>;
-    getForegroundColor(): Promise<Plaoc.RGBAHex>;
-    setForegroundColor(color: Plaoc.RGBAHex): Promise<void>;
+    getBackgroundColor(): Promise<Color.RGBAHex>;
+    setBackgroundColor(color: Color.RGBAHex): Promise<void>;
+    getForegroundColor(): Promise<Color.RGBAHex>;
+    setForegroundColor(color: Color.RGBAHex): Promise<void>;
   }
 }
-
-declare const top_bar: Plaoc.TopBarAndroidFFI;

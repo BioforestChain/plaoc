@@ -1,11 +1,14 @@
 import { convertToRGBAHex } from "./../util";
 
 import { TopBarFFI } from "./ffi#android";
+import { TopBar } from "./bfcsTopBar.type";
+import "../typings";
+import { Icon } from "../icon/bfspIcon.type";
 
 export class BfcsTopBar extends HTMLElement {
-  private _ffi: Plaoc.ITopBarFFI;
+  private _ffi: TopBar.ITopBarFFI;
   private _observer: MutationObserver;
-  private _actionList: Plaoc.TopBarItem[] = [];
+  private _actionList: TopBar.TopBarItem[] = [];
 
   constructor() {
     super();
@@ -96,7 +99,7 @@ export class BfcsTopBar extends HTMLElement {
     return height;
   }
 
-  async getBackgroundColor(): Promise<Plaoc.RGBAHex> {
+  async getBackgroundColor(): Promise<Color.RGBAHex> {
     const color = await this._ffi.getBackgroundColor();
 
     return color;
@@ -109,7 +112,7 @@ export class BfcsTopBar extends HTMLElement {
     return;
   }
 
-  async getForegroundColor(): Promise<Plaoc.RGBAHex> {
+  async getForegroundColor(): Promise<Color.RGBAHex> {
     const color = await this._ffi.getForegroundColor();
 
     return color;
@@ -122,7 +125,7 @@ export class BfcsTopBar extends HTMLElement {
     return;
   }
 
-  async getActions(): Promise<Plaoc.TopBarItem[]> {
+  async getActions(): Promise<TopBar.TopBarItem[]> {
     this._actionList = await this._ffi.getActions();
 
     return this._actionList;
@@ -138,10 +141,10 @@ export class BfcsTopBar extends HTMLElement {
     this._actionList = [];
 
     this.querySelectorAll("dweb-top-bar-button").forEach((childNode) => {
-      let icon: Plaoc.IPlaocIcon = {
+      let icon: Icon.IPlaocIcon = {
         source: "",
-        // type: Plaoc.IconType.NamedIcon,
-        type: "NamedIcon" as Plaoc.IconType.NamedIcon,
+        // type: TopBar.IconType.NamedIcon,
+        type: "NamedIcon" as Icon.IconType.NamedIcon,
       };
 
       if (childNode.querySelector("dweb-icon")) {
@@ -149,8 +152,8 @@ export class BfcsTopBar extends HTMLElement {
 
         icon.source = $?.getAttribute("source") ?? "";
         icon.type = $?.hasAttribute("type")
-          ? ($.getAttribute("type") as Plaoc.IconType)
-          : ("NamedIcon" as Plaoc.IconType.NamedIcon);
+          ? ($.getAttribute("type") as Icon.IconType)
+          : ("NamedIcon" as Icon.IconType.NamedIcon);
         icon.description = $?.getAttribute("description") ?? "";
         icon.size = $?.hasAttribute("size")
           ? (($.getAttribute("size") as unknown) as number)

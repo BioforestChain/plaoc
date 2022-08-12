@@ -1,6 +1,8 @@
-declare namespace Plaoc {
+import "../typings";
+
+export namespace StatusBar {
   // android端ffi
-  interface StatusBarAndroidFFI {
+  export interface StatusBarAndroidFFI {
     setStatusBarColor(colorHex: number, darkIcons: StatusBarAndroidStyle): void;
     getStatusBarColor(): number;
     getStatusBarVisible(): boolean;
@@ -11,12 +13,12 @@ declare namespace Plaoc {
   }
 
   // ios端ffi
-  interface StatusBarIosFFI {
+  export interface StatusBarIosFFI {
     updateStatusBackgroundColor: {
-      postMessage(colorHex: Plaoc.RGBAHex): void;
+      postMessage(colorHex: Color.RGBAHex): void;
     };
     statusBackgroundColor: {
-      postMessage(noValue: null): Promise<Plaoc.RGBAHex>;
+      postMessage(noValue: null): Promise<Color.RGBAHex>;
     };
     getStatusBarVisible: {
       postMessage(noValue: null): Promise<boolean>;
@@ -39,7 +41,7 @@ declare namespace Plaoc {
   }
 
   // desktop-dev端ffi
-  interface StatusBarDesktopFFI {
+  export interface StatusBarDesktopFFI {
     setStatusBarColor(colorHex: string, darkIcons: StatusBarAndroidStyle): void;
     getStatusBarColor(): string;
     getStatusBarVisible(): boolean;
@@ -50,12 +52,12 @@ declare namespace Plaoc {
   }
 
   // 三端最后统一封装ffi
-  interface IStatusBarFFI {
+  export interface IStatusBarFFI {
     setStatusBarColor(
       colorHex?: string,
       barStyle?: StatusBarStyle
     ): Promise<void>;
-    getStatusBarColor(): Promise<Plaoc.RGBAHex>;
+    getStatusBarColor(): Promise<Color.RGBAHex>;
     getStatusBarVisible(): Promise<boolean>;
     toggleStatusBarVisible(): Promise<void>;
     setStatusBarHidden(): Promise<void>;
@@ -68,23 +70,21 @@ declare namespace Plaoc {
   // default:	默认的样式（IOS 为白底黑字、Android 为黑底白字、Desktop-dev同Android）
   // light-content:	黑底白字
   // dark-content:	白底黑字（需要 Android API>=23）
-  enum StatusBarStyle {
+  export enum StatusBarStyle {
     DEFAULT = "default",
     LIGHT_CONTENT = "light-content",
     DARK_CONTENT = "dark-content",
   }
 
-  enum StatusBarIosStyle {
+  export enum StatusBarIosStyle {
     DEFAULT = "default",
     LIGHT_CONTENT = "lightContent",
     DARK_CONTENT = "default",
   }
 
-  enum StatusBarAndroidStyle {
+  export enum StatusBarAndroidStyle {
     DEFAULT = 0,
     LIGHT_CONTENT = -1,
     DARK_CONTENT = 1,
   }
 }
-
-declare const system_ui: Plaoc.StatusBarAndroidFFI;

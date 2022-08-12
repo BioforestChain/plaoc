@@ -1,7 +1,9 @@
+import "../typings";
 import { getColorInt, getColorHex } from "./../util";
-
-export class TopBarFFI implements Plaoc.ITopBarFFI {
-  private _ffi: Plaoc.TopBarAndroidFFI = top_bar;
+import { TopBar } from "./bfcsTopBar.type";
+const top_bar: any = "";
+export class TopBarFFI implements TopBar.ITopBarFFI {
+  private _ffi: TopBar.TopBarAndroidFFI = top_bar;
 
   back(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
@@ -88,15 +90,15 @@ export class TopBarFFI implements Plaoc.ITopBarFFI {
     });
   }
 
-  getActions(): Promise<Plaoc.TopBarItem[]> {
-    return new Promise<Plaoc.TopBarItem[]>((resolve, reject) => {
+  getActions(): Promise<TopBar.TopBarItem[]> {
+    return new Promise<TopBar.TopBarItem[]>((resolve, reject) => {
       const actionList = JSON.parse(this._ffi.getActions());
 
       resolve(actionList);
     });
   }
 
-  setActions(actionList: Plaoc.TopBarItem[]): Promise<void> {
+  setActions(actionList: TopBar.TopBarItem[]): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       this._ffi.setActions(JSON.stringify(actionList));
 
@@ -104,8 +106,8 @@ export class TopBarFFI implements Plaoc.ITopBarFFI {
     });
   }
 
-  getBackgroundColor(): Promise<Plaoc.RGBAHex> {
-    return new Promise<Plaoc.RGBAHex>((resolve, reject) => {
+  getBackgroundColor(): Promise<Color.RGBAHex> {
+    return new Promise<Color.RGBAHex>((resolve, reject) => {
       const color = this._ffi.getBackgroundColor();
       const colorHex = getColorHex(color);
 
@@ -113,11 +115,11 @@ export class TopBarFFI implements Plaoc.ITopBarFFI {
     });
   }
 
-  setBackgroundColor(color: Plaoc.RGBAHex): Promise<void> {
+  setBackgroundColor(color: Color.RGBAHex): Promise<void> {
     return new Promise<void>(async (resolve, reject) => {
       const colorHex = getColorInt(
-        color.slice(0, -2) as Plaoc.RGBHex,
-        color.slice(-2) as Plaoc.AlphaValueHex
+        color.slice(0, -2) as Color.RGBHex,
+        color.slice(-2) as Color.AlphaValueHex
       );
       this._ffi.setBackgroundColor(colorHex);
 
@@ -125,8 +127,8 @@ export class TopBarFFI implements Plaoc.ITopBarFFI {
     });
   }
 
-  getForegroundColor(): Promise<Plaoc.RGBAHex> {
-    return new Promise<Plaoc.RGBAHex>((resolve, reject) => {
+  getForegroundColor(): Promise<Color.RGBAHex> {
+    return new Promise<Color.RGBAHex>((resolve, reject) => {
       const color = this._ffi.getForegroundColor();
       const colorHex = getColorHex(color);
 
@@ -134,11 +136,11 @@ export class TopBarFFI implements Plaoc.ITopBarFFI {
     });
   }
 
-  setForegroundColor(color: Plaoc.RGBAHex): Promise<void> {
+  setForegroundColor(color: Color.RGBAHex): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       const colorHex = getColorInt(
-        color.slice(0, -2) as Plaoc.RGBHex,
-        color.slice(-2) as Plaoc.AlphaValueHex
+        color.slice(0, -2) as Color.RGBHex,
+        color.slice(-2) as Color.AlphaValueHex
       );
 
       this._ffi.setForegroundColor(colorHex);

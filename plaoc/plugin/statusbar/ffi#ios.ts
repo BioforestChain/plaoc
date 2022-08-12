@@ -1,24 +1,27 @@
-export class StatusBarFFI implements Plaoc.IStatusBarFFI {
+import "../typings";
+import { StatusBar } from "./bfcsStatusBar.d";
+
+export class StatusBarFFI implements StatusBar.IStatusBarFFI {
   private _ffi = (window as any).webkit
-    .messageHandlers as Plaoc.StatusBarIosFFI;
+    .messageHandlers as StatusBar.StatusBarIosFFI;
 
   async setStatusBarColor(
-    color?: Plaoc.RGBAHex,
-    barStyle?: Plaoc.StatusBarStyle
+    color?: Color.RGBAHex,
+    barStyle?: StatusBar.StatusBarStyle
   ): Promise<void> {
     if (color) {
       this._ffi.updateStatusBackgroundColor.postMessage(color);
     }
 
     if (barStyle) {
-      let darkIcons: Plaoc.StatusBarIosStyle;
+      let darkIcons: StatusBar.StatusBarIosStyle;
 
       switch (barStyle) {
         case "light-content":
-          darkIcons = "lightContent" as Plaoc.StatusBarIosStyle;
+          darkIcons = "lightContent" as StatusBar.StatusBarIosStyle;
           break;
         default:
-          darkIcons = "default" as Plaoc.StatusBarIosStyle;
+          darkIcons = "default" as StatusBar.StatusBarIosStyle;
       }
 
       await this.setStatusBarStyle(darkIcons);
@@ -27,7 +30,7 @@ export class StatusBarFFI implements Plaoc.IStatusBarFFI {
     return;
   }
 
-  async getStatusBarColor(): Promise<Plaoc.RGBAHex> {
+  async getStatusBarColor(): Promise<Color.RGBAHex> {
     const backgroundColor = await this._ffi.statusBackgroundColor.postMessage(
       null
     );
@@ -83,24 +86,27 @@ export class StatusBarFFI implements Plaoc.IStatusBarFFI {
     return;
   }
 
-  async getStatusBarStyle(): Promise<Plaoc.StatusBarStyle> {
-    const barStyle: Plaoc.StatusBarIosStyle =
-      await this._ffi.statusBarStyle.postMessage(null);
+  async getStatusBarStyle(): Promise<StatusBar.StatusBarStyle> {
+    const barStyle: StatusBar.StatusBarIosStyle = await this._ffi.statusBarStyle.postMessage(
+      null
+    );
 
-    let darkIcons: Plaoc.StatusBarStyle;
+    let darkIcons: StatusBar.StatusBarStyle;
 
     switch (barStyle) {
-      case "lightcontent" as Plaoc.StatusBarIosStyle:
-        darkIcons = "light-content" as Plaoc.StatusBarStyle;
+      case "lightcontent" as StatusBar.StatusBarIosStyle:
+        darkIcons = "light-content" as StatusBar.StatusBarStyle;
         break;
       default:
-        darkIcons = "dark-content" as Plaoc.StatusBarStyle;
+        darkIcons = "dark-content" as StatusBar.StatusBarStyle;
     }
 
     return darkIcons;
   }
 
-  private setStatusBarStyle(barStyle: Plaoc.StatusBarIosStyle): Promise<void> {
+  private setStatusBarStyle(
+    barStyle: StatusBar.StatusBarIosStyle
+  ): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       this._ffi.updateStatusStyle.postMessage(barStyle);
 

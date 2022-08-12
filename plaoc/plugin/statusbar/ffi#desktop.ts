@@ -1,14 +1,16 @@
+import "../typings";
 import { convertToRGBAHex } from "./../util";
+import { StatusBar } from "./bfcsStatusBar.d";
 
-export class StatusBarFFI implements Plaoc.IStatusBarFFI {
-  private _ffi = (globalThis as any).StatusBar as Plaoc.StatusBarDesktopFFI;
+export class StatusBarFFI implements StatusBar.IStatusBarFFI {
+  private _ffi = (globalThis as any).StatusBar as StatusBar.StatusBarDesktopFFI;
 
   async setStatusBarColor(
-    color?: Plaoc.RGBAHex,
-    barStyle?: Plaoc.StatusBarStyle
+    color?: Color.RGBAHex,
+    barStyle?: StatusBar.StatusBarStyle
   ): Promise<void> {
     let colorHex: string;
-    let darkIcons: Plaoc.StatusBarAndroidStyle;
+    let darkIcons: StatusBar.StatusBarAndroidStyle;
 
     if (!color) {
       colorHex = this._ffi.getStatusBarColor();
@@ -37,8 +39,8 @@ export class StatusBarFFI implements Plaoc.IStatusBarFFI {
     return;
   }
 
-  getStatusBarColor(): Promise<Plaoc.RGBAHex> {
-    return new Promise<Plaoc.RGBAHex>((resolve, reject) => {
+  getStatusBarColor(): Promise<Color.RGBAHex> {
+    return new Promise<Color.RGBAHex>((resolve, reject) => {
       const color = this._ffi.getStatusBarColor();
       const colorHex = convertToRGBAHex(color);
 
@@ -98,15 +100,15 @@ export class StatusBarFFI implements Plaoc.IStatusBarFFI {
     return;
   }
 
-  getStatusBarStyle(): Promise<Plaoc.StatusBarStyle> {
-    return new Promise<Plaoc.StatusBarStyle>((resolve, reject) => {
+  getStatusBarStyle(): Promise<StatusBar.StatusBarStyle> {
+    return new Promise<StatusBar.StatusBarStyle>((resolve, reject) => {
       const isDarkIcons = this._ffi.getStatusBarStyle();
-      let barStyle: Plaoc.StatusBarStyle;
+      let barStyle: StatusBar.StatusBarStyle;
 
       if (isDarkIcons) {
-        barStyle = "dark-content" as Plaoc.StatusBarStyle.DARK_CONTENT;
+        barStyle = "dark-content" as StatusBar.StatusBarStyle.DARK_CONTENT;
       } else {
-        barStyle = "light-content" as Plaoc.StatusBarStyle.LIGHT_CONTENT;
+        barStyle = "light-content" as StatusBar.StatusBarStyle.LIGHT_CONTENT;
       }
 
       resolve(barStyle);

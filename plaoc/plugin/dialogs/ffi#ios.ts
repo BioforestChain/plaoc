@@ -1,9 +1,12 @@
-export class DialogsFFI implements Plaoc.IDialogsFFI {
-  private _ffi = (window as any).webkit.messageHandlers as Plaoc.DialogsIosFFI;
+import { Dialogs } from "./bfcsDialogs.type";
 
-  openAlert(config: Plaoc.IAlertConfig, confirmFunc: string): Promise<void> {
+export class DialogsFFI implements Dialogs.IDialogsFFI {
+  private _ffi = (window as any).webkit
+    .messageHandlers as Dialogs.DialogsIosFFI;
+
+  openAlert(config: Dialogs.IAlertConfig, confirmFunc: string): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      const alertConfig: Plaoc.IAlertConfigIOS = {
+      const alertConfig: Dialogs.IAlertConfigIOS = {
         ...config,
         confirmFunc,
       };
@@ -15,12 +18,12 @@ export class DialogsFFI implements Plaoc.IDialogsFFI {
   }
 
   openPrompt(
-    config: Plaoc.IPromptConfig,
+    config: Dialogs.IPromptConfig,
     confirmFunc: string,
     cancelFunc?: string
   ): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      const promptConfig: Plaoc.IPromptConfigIOS = {
+      const promptConfig: Dialogs.IPromptConfigIOS = {
         ...config,
         confirmFunc,
         cancelFunc: cancelFunc ?? "",
@@ -33,12 +36,12 @@ export class DialogsFFI implements Plaoc.IDialogsFFI {
   }
 
   openConfirm(
-    config: Plaoc.IConfirmConfig,
+    config: Dialogs.IConfirmConfig,
     confirmFunc: string,
     cancelFunc: string
   ): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      const confirmConfig: Plaoc.IConfirmConfigIOS = {
+      const confirmConfig: Dialogs.IConfirmConfigIOS = {
         ...config,
         confirmFunc,
         cancelFunc: cancelFunc ?? "",
@@ -51,12 +54,12 @@ export class DialogsFFI implements Plaoc.IDialogsFFI {
   }
 
   openBeforeUnload(
-    config: Plaoc.IConfirmConfig,
+    config: Dialogs.IConfirmConfig,
     confirmFunc: string,
     cancelFunc: string
   ): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      const beforeConfig: Plaoc.IConfirmConfigIOS = {
+      const beforeConfig: Dialogs.IConfirmConfigIOS = {
         ...config,
         confirmFunc,
         cancelFunc: cancelFunc ?? "",

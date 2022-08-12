@@ -1,5 +1,6 @@
-declare namespace Plaoc {
-  type HexDigit =
+ declare namespace Color {
+
+    type HexDigit =
     | "0"
     | "1"
     | "2"
@@ -23,7 +24,7 @@ declare namespace Plaoc {
     | "E"
     | "F";
 
-  type HexColor<T extends string> =
+    type HexColor<T extends string> =
     T extends `#${HexDigit}${HexDigit}${HexDigit}${infer Rest1}`
       ? Rest1 extends ``
         ? T // three-digit hex color
@@ -32,11 +33,12 @@ declare namespace Plaoc {
         : never
       : never;
 
-  type RGBHex = `#${string}`; // #ff0000
-  type AlphaValueHex = `${HexDigit}${HexDigit}`;
+    type RGBHex = `#${string}`; // #ff0000
+    type AlphaValueHex = `${HexDigit}${HexDigit}`;
 
-  type RGBAHex = `#${string}`; // #ff000000 | #e0fa
-  type RGBA = `rgba(${number}, ${number}, ${number}, ${number})`; // rgba(255, 0, 0, 1)
+    type RGBAHex = `#${string}`; // #ff000000 | #e0fa
+    type RGBA = `rgba(${number}, ${number}, ${number}, ${number})`; // rgba(255, 0, 0, 1)
 
-  type ColorFormatType = RGBAHex | RGBA; // #ff0000ff | #fe0f | rgba(253, 24, 16, 0.2)
+    type ColorFormatType = RGBAHex | RGBA; // #ff0000ff | #fe0f | rgba(253, 24, 16, 0.2)
 }
+

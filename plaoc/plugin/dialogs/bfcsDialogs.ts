@@ -1,7 +1,9 @@
 import { DialogsFFI } from "./ffi#android";
 import { DwebPlugin } from "../native/dweb-plugin";
+import { Dialogs } from "./bfcsDialogs.type";
+
 class BfcsDialogs extends DwebPlugin {
-  protected _ffi: Plaoc.IDialogsFFI;
+  protected _ffi: Dialogs.IDialogsFFI;
 
   constructor() {
     super();
@@ -52,7 +54,7 @@ export class BfcsDialogAlert extends BfcsDialogs {
 
   openAlert(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      let alertConfig: Plaoc.IAlertConfig = {
+      let alertConfig: Dialogs.IAlertConfig = {
         title: "",
         content: "",
         confirmText: "",
@@ -130,7 +132,7 @@ export class BfcsDialogPrompt extends BfcsDialogs {
 
   openPrompt(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      let promptConfig: Plaoc.IPromptConfig = {
+      let promptConfig: Dialogs.IPromptConfig = {
         title: "",
         label: "",
         confirmText: "",
@@ -228,7 +230,7 @@ export class BfcsDialogConfirm extends BfcsDialogs {
 
   openConfirm(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      let confirmConfig: Plaoc.IConfirmConfig = {
+      let confirmConfig: Dialogs.IConfirmConfig = {
         title: "",
         message: "",
         confirmText: "",
@@ -324,7 +326,7 @@ export class BfcsDialogBeforeUnload extends BfcsDialogs {
 
   openBeforeUnload(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      let confirmConfig: Plaoc.IConfirmConfig = {
+      let confirmConfig: Dialogs.IConfirmConfig = {
         title: "",
         message: "",
         confirmText: "",

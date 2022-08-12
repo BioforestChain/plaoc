@@ -1,7 +1,7 @@
 // 将RGB 和 Alpha 转化为 ARGB color int
 export function getColorInt(
-  color: Plaoc.RGBHex,
-  alpha: Plaoc.AlphaValueHex
+  color: Color.RGBHex,
+  alpha: Color.AlphaValueHex
 ): number {
   return (
     parseInt(color.replace("#", "0x"), 16) + (parseInt("0x" + alpha) << 24)
@@ -9,18 +9,18 @@ export function getColorInt(
 }
 
 // 将ARGB color int 转化为RGBA 十六进制
-export function getColorHex(color: number): Plaoc.RGBAHex {
+export function getColorHex(color: number): Color.RGBAHex {
   let colorHex = new Uint32Array([color])[0].toString(16);
 
   if (colorHex.length < 8) {
     colorHex = "0".repeat(8 - colorHex.length) + colorHex;
   }
 
-  return ("#" + colorHex.slice(2) + colorHex.slice(0, 2)) as Plaoc.RGBAHex;
+  return ("#" + colorHex.slice(2) + colorHex.slice(0, 2)) as Color.RGBAHex;
 }
 
 // 将rgba(r, b, g, a)或#rrbbggaa或#rgba转为#rrbbggaa 十六进制
-export function convertToRGBAHex(color: string): Plaoc.RGBAHex {
+export function convertToRGBAHex(color: string): Color.RGBAHex {
   let colorHex = "#";
 
   if (color.startsWith("rgba(")) {
@@ -51,5 +51,5 @@ export function convertToRGBAHex(color: string): Plaoc.RGBAHex {
     }
   }
 
-  return (colorHex.length === 9 ? colorHex : color) as Plaoc.RGBAHex;
+  return (colorHex.length === 9 ? colorHex : color) as Color.RGBAHex;
 }

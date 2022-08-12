@@ -11,6 +11,7 @@ function getToastMessage(data:string) {
 let scannerData = ref("扫码返回的数据");
 let dwebPluginData = ref("dweb的数据");
 onMounted(async () => {
+  console.log("document.querySelector('dweb-status-bar')!=>", document.querySelector('dweb-status-bar'));
 })
 
 async function openScanner() {

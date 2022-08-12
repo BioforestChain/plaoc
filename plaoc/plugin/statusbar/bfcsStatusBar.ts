@@ -1,9 +1,11 @@
 import { convertToRGBAHex } from "./../util";
 import { DwebPlugin } from "../native/dweb-plugin";
 import { StatusBarFFI } from "./ffi#android";
+import { StatusBar } from "./bfcsStatusBar.d";
+import "../typings";
 
 export class BfcsStatusBar extends DwebPlugin {
-  private _ffi: Plaoc.IStatusBarFFI;
+  private _ffi: StatusBar.IStatusBarFFI;
 
   constructor() {
     super();
@@ -12,6 +14,7 @@ export class BfcsStatusBar extends DwebPlugin {
   }
   /**每次将 Web 组件附加到 DOM 时，都会调用一次该 方法 */
   connectedCallback() {
+    console.log("statusBar初始化");
     this._init();
   }
   /**移除DOM添加的方法 */
@@ -26,7 +29,7 @@ export class BfcsStatusBar extends DwebPlugin {
 
   async setStatusBarColor(
     color?: string,
-    barStyle?: Plaoc.StatusBarStyle
+    barStyle?: StatusBar.StatusBarStyle
   ): Promise<void> {
     const colorHex = convertToRGBAHex(color ?? "");
     await this._ffi.setStatusBarColor(colorHex, barStyle);
@@ -34,7 +37,7 @@ export class BfcsStatusBar extends DwebPlugin {
     return;
   }
 
-  async getStatusBarColor(): Promise<Plaoc.RGBAHex> {
+  async getStatusBarColor(): Promise<Color.RGBAHex> {
     const colorHex = await this._ffi.getStatusBarColor();
 
     return colorHex;
@@ -64,7 +67,7 @@ export class BfcsStatusBar extends DwebPlugin {
     return;
   }
 
-  async getStatusBarStyle(): Promise<Plaoc.StatusBarStyle> {
+  async getStatusBarStyle(): Promise<StatusBar.StatusBarStyle> {
     const barStyle = await this._ffi.getStatusBarStyle();
 
     return barStyle;
@@ -87,13 +90,13 @@ export class BfcsStatusBar extends DwebPlugin {
       if (this.hasAttribute(attrName)) {
         this.setStatusBarColor(
           this.getAttribute("background-color") ?? "",
-          newVal ? (newVal as Plaoc.StatusBarStyle) : undefined
+          newVal ? (newVal as StatusBar.StatusBarStyle) : undefined
         );
       }
     } else if (attrName === "background-color") {
       if (this.hasAttribute(attrName)) {
         let barStyle = this.getAttribute("bar-style")
-          ? (this.getAttribute("bar-style") as Plaoc.StatusBarStyle)
+          ? (this.getAttribute("bar-style") as StatusBar.StatusBarStyle)
           : undefined;
         this.setStatusBarColor(newVal as string, barStyle);
       }

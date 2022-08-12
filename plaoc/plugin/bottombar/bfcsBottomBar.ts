@@ -1,11 +1,14 @@
 import { convertToRGBAHex } from "./../util";
 import { DwebPlugin } from "../native/dweb-plugin";
 import { BottomBarFFI } from "./ffi#android";
+import "../typings";
+import { BottomBar } from "./bfcsBottomBar.type";
+import { Icon } from "../icon/bfspIcon.type";
 
 export class BfcsBottomBar extends DwebPlugin {
   private _ffi: BottomBarFFI;
   private _observer: MutationObserver;
-  private _actionList: Plaoc.BottomBarItem[] = [];
+  private _actionList: BottomBar.BottomBarItem[] = [];
 
   constructor() {
     super();
@@ -90,7 +93,7 @@ export class BfcsBottomBar extends DwebPlugin {
     return;
   }
 
-  async getBackgroundColor(): Promise<Plaoc.RGBAHex> {
+  async getBackgroundColor(): Promise<Color.RGBAHex> {
     const color = await this._ffi.getBackgroundColor();
 
     return color;
@@ -103,7 +106,7 @@ export class BfcsBottomBar extends DwebPlugin {
     return;
   }
 
-  async getForegroundColor(): Promise<Plaoc.RGBAHex> {
+  async getForegroundColor(): Promise<Color.RGBAHex> {
     const color = await this._ffi.getForegroundColor();
 
     return color;
@@ -116,7 +119,7 @@ export class BfcsBottomBar extends DwebPlugin {
     return;
   }
 
-  async getActions(): Promise<Plaoc.BottomBarItem[]> {
+  async getActions(): Promise<BottomBar.BottomBarItem[]> {
     this._actionList = await this._ffi.getActions();
 
     return this._actionList;
@@ -132,12 +135,12 @@ export class BfcsBottomBar extends DwebPlugin {
     this._actionList = [];
 
     this.querySelectorAll("dweb-bottom-bar-button").forEach((childNode) => {
-      let icon: Plaoc.IPlaocIcon = {
+      let icon: Icon.IPlaocIcon = {
         source: "",
-        type: "NamedIcon" as Plaoc.IconType.NamedIcon,
+        type: "NamedIcon" as Icon.IconType.NamedIcon,
       };
 
-      let colors: Plaoc.IBottomBarColors = {};
+      let colors: BottomBar.IBottomBarColors = {};
       let label: string = "";
 
       if (childNode.querySelector("dweb-bottom-bar-icon")) {
@@ -145,8 +148,8 @@ export class BfcsBottomBar extends DwebPlugin {
 
         icon.source = $?.getAttribute("source") ?? "";
         icon.type = $?.hasAttribute("type")
-          ? ($.getAttribute("type") as Plaoc.IconType)
-          : ("NamedIcon" as Plaoc.IconType.NamedIcon);
+          ? ($.getAttribute("type") as Icon.IconType)
+          : ("NamedIcon" as Icon.IconType.NamedIcon);
         icon.description = $?.getAttribute("description") ?? "";
         icon.size = $?.hasAttribute("size")
           ? (($.getAttribute("size") as unknown) as number)

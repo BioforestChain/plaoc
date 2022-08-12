@@ -1,7 +1,10 @@
-export class DialogsFFI implements Plaoc.IDialogsFFI {
-  private _ffi: Plaoc.DialogsAndroidFFI = native_dialog;
+import { Dialogs } from "./bfcsDialogs.type";
 
-  openAlert(config: Plaoc.IAlertConfig, confirmFunc: string): Promise<void> {
+export const native_dialog: any = "";
+export class DialogsFFI implements Dialogs.IDialogsFFI {
+  private _ffi: Dialogs.DialogsAndroidFFI = native_dialog;
+
+  openAlert(config: Dialogs.IAlertConfig, confirmFunc: string): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       this._ffi.openAlert(JSON.stringify(config), confirmFunc);
 
@@ -10,7 +13,7 @@ export class DialogsFFI implements Plaoc.IDialogsFFI {
   }
 
   openPrompt(
-    config: Plaoc.IPromptConfig,
+    config: Dialogs.IPromptConfig,
     confirmFunc: string,
     cancelFunc?: string
   ): Promise<void> {
@@ -30,7 +33,7 @@ export class DialogsFFI implements Plaoc.IDialogsFFI {
   }
 
   openConfirm(
-    config: Plaoc.IConfirmConfig,
+    config: Dialogs.IConfirmConfig,
     confirmFunc: string,
     cancelFunc?: string
   ): Promise<void> {
@@ -50,7 +53,7 @@ export class DialogsFFI implements Plaoc.IDialogsFFI {
   }
 
   openBeforeUnload(
-    config: Plaoc.IConfirmConfig,
+    config: Dialogs.IConfirmConfig,
     confirmFunc: string,
     cancelFunc?: string
   ): Promise<void> {

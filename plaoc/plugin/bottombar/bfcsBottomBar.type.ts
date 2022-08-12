@@ -1,20 +1,21 @@
-declare namespace Plaoc {
-  interface BottomBarAndroidFFI {
+import { Icon } from "../icon/bfspIcon.type";
+export namespace BottomBar {
+  export interface BottomBarAndroidFFI {
     getEnabled(): boolean;
     toggleEnabled(isEnabled: number): void;
     getOverlay(): boolean;
     toggleOverlay(isOverlay: number): void;
     getHeight(): number;
     setHeight(heightDp: number): void;
-    getActions(): Plaoc.DataString<BottomBarItem[]>;
-    setActions(actionList: Plaoc.DataString<BottomBarItem[]>): void;
+    getActions(): Data.DataString<BottomBarItem[]>;
+    setActions(actionList: Data.DataString<BottomBarItem[]>): void;
     getBackgroundColor(): number;
     setBackgroundColor(color: number): void;
     getForegroundColor(): number;
     setForegroundColor(color: number): void;
   }
 
-  interface BottomBarIosFFI {
+  export interface BottomBarIosFFI {
     getBottomBarEnabled: {
       postMessage(noValue: null): Promise<boolean>;
     };
@@ -34,26 +35,26 @@ declare namespace Plaoc {
       postMessage(height: number): void;
     };
     getBottomActions: {
-      postMessage(noValue: null): Promise<Plaoc.DataString<BottomBarItem[]>>;
+      postMessage(noValue: null): Promise<Data.DataString<BottomBarItem[]>>;
     };
     customBottomActions: {
-      postMessage(actionList: Plaoc.DataString<BottomBarItem[]>): void;
+      postMessage(actionList: Data.DataString<BottomBarItem[]>): void;
     };
     getBottomBarBackgroundColor: {
-      postMessage(noValue: null): Promise<Plaoc.RGBAHex>;
+      postMessage(noValue: null): Promise<Color.RGBAHex>;
     };
     updateBottomViewBackgroundColor: {
-      postMessage(colorHex: Plaoc.RGBAHex): void;
+      postMessage(colorHex: Color.RGBAHex): void;
     };
     getBottomViewForegroundColor: {
-      postMessage(noValue: null): Promise<Plaoc.RGBAHex>;
+      postMessage(noValue: null): Promise<Color.RGBAHex>;
     };
     updateBottomViewForegroundColor: {
-      postMessage(colorHex: Plaoc.RGBAHex): void;
+      postMessage(colorHex: Color.RGBAHex): void;
     };
   }
 
-  interface IBottomBarFFI {
+  export interface IBottomBarFFI {
     getEnabled(): Promise<boolean>;
     toggleEnabled(isEnabled: number): Promise<void>;
     setHidden(): Promise<void>;
@@ -64,15 +65,15 @@ declare namespace Plaoc {
     setHeight(heightDp: number): Promise<void>;
     getActions(): Promise<BottomBarItem[]>;
     setActions(actionList: BottomBarItem[]): Promise<void>;
-    getBackgroundColor(): Promise<Plaoc.RGBAHex>;
-    setBackgroundColor(color: Plaoc.RGBAHex): Promise<void>;
-    getForegroundColor(): Promise<Plaoc.RGBAHex>;
-    setForegroundColor(color: Plaoc.RGBAHex): Promise<void>;
+    getBackgroundColor(): Promise<Color.RGBAHex>;
+    setBackgroundColor(color: Color.RGBAHex): Promise<void>;
+    getForegroundColor(): Promise<Color.RGBAHex>;
+    setForegroundColor(color: Color.RGBAHex): Promise<void>;
   }
 
-  type BottomBarColorType = number | Plaoc.RGBAHex;
+  export type BottomBarColorType = number | Color.RGBAHex;
 
-  interface IBottomBarColors {
+  export interface IBottomBarColors {
     indicatorColor?: BottomBarColorType;
     iconColor?: BottomBarColorType;
     iconColorSelected?: BottomBarColorType;
@@ -80,8 +81,8 @@ declare namespace Plaoc {
     textColorSelected?: BottomBarColorType;
   }
 
-  interface BottomBarItem {
-    icon: Plaoc.IPlaocIcon;
+  export interface BottomBarItem {
+    icon: Icon.IPlaocIcon;
     onClickCode: string;
     label?: string;
     selected?: boolean;
@@ -91,4 +92,4 @@ declare namespace Plaoc {
   }
 }
 
-declare const bottom_bar: Plaoc.BottomBarAndroidFFI;
+declare const bottom_bar: BottomBar.BottomBarAndroidFFI;

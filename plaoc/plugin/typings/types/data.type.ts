@@ -1,3 +1,3 @@
-declare namespace Plaoc {
+declare namespace Data {
   type DataString<T> = string;
 }

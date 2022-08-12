@@ -1,66 +1,65 @@
-declare namespace Plaoc {
-  interface IBaseConfig {
+import "../typings";
+
+export namespace Dialogs {
+  export interface IBaseConfig {
     title: string;
     confirmText: string;
     dismissOnBackPress?: boolean;
     dismissOnClickOutSide?: boolean;
   }
 
-  interface IAlertConfig extends IBaseConfig {
+  export interface IAlertConfig extends IBaseConfig {
     content: string;
   }
 
-  interface IPromptConfig extends IBaseConfig {
+  export interface IPromptConfig extends IBaseConfig {
     label: string;
     cancelText?: string;
     defaultValue?: string;
   }
 
-  interface IConfirmConfig extends IBaseConfig {
+  export interface IConfirmConfig extends IBaseConfig {
     message: string;
     cancelText?: string;
   }
 
-  interface IAlertConfigIOS extends IAlertConfig {
+  export interface IAlertConfigIOS extends IAlertConfig {
     confirmFunc: string;
   }
 
-  interface IPromptConfigIOS extends IPromptConfig {
-    confirmFunc: string;
-    cancelFunc?: string;
-  }
-
-  interface IConfirmConfigIOS extends IConfirmConfig {
+  export interface IPromptConfigIOS extends IPromptConfig {
     confirmFunc: string;
     cancelFunc?: string;
   }
 
-  interface DialogsAndroidFFI {
-    openAlert(config: Plaoc.DataString<IAlertConfig>, cb: string): void;
-    openPrompt(config: Plaoc.DataString<IPromptConfig>, cb: string): void;
-    openConfirm(config: Plaoc.DataString<IConfirmConfig>, cb: string): void;
-    openBeforeUnload(
-      config: Plaoc.DataString<IConfirmConfig>,
-      cb: string
-    ): void;
+  export interface IConfirmConfigIOS extends IConfirmConfig {
+    confirmFunc: string;
+    cancelFunc?: string;
   }
 
-  interface DialogsIosFFI {
+  export interface DialogsAndroidFFI {
+    openAlert(config: Data.DataString<IAlertConfig>, cb: string): void;
+    openPrompt(config: Data.DataString<IPromptConfig>, cb: string): void;
+    openConfirm(config: Data.DataString<IConfirmConfig>, cb: string): void;
+    openBeforeUnload(config: Data.DataString<IConfirmConfig>, cb: string): void;
+  }
+
+  export interface DialogsIosFFI {
     openAlert: {
-      postMessage(config: Plaoc.DataString<IAlertConfigIOS>): void;
+      postMessage(config: Data.DataString<IAlertConfigIOS>): void;
     };
     openPrompt: {
-      postMessage(config: Plaoc.DataString<IPromptConfigIOS>): void;
+      postMessage(config: Data.DataString<IPromptConfigIOS>): void;
     };
     openConfirm: {
-      postMessage(config: Plaoc.DataString<IConfirmConfigIOS>): void;
+      postMessage(config: Data.DataString<IConfirmConfigIOS>): void;
     };
     openBeforeUnload: {
-      postMessage(config: Plaoc.DataString<IConfirmConfigIOS>): void;
+      postMessage(config: Data.DataString<IConfirmConfigIOS>): void;
     };
   }
 
-  interface IDialogsFFI {
+  export interface IDialogsFFI {
     openAlert(config: IAlertConfig, confirmFunc: string): Promise<void>;
     openPrompt(
       config: IPromptConfig,
@@ -79,5 +78,3 @@ declare namespace Plaoc {
     ): Promise<void>;
   }
 }
-
-declare const native_dialog: Plaoc.DialogsAndroidFFI;
