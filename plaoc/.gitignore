@@ -7,6 +7,10 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+.bfsw
+.bfsp
+.vscode
+.delete*
 node_modules
 dist
 dist-ssr
