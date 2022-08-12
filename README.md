@@ -1,6 +1,4 @@
-# bfs base runtime app for modern os (This project is to be migrated, stop updating here)
-
->此项目已停止更新
+# bfs base runtime app for modern os
 
 ## main purpose
 
