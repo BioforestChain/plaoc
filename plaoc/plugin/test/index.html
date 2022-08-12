@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nav Demo</title>
+    <script type="module" src="./dist/esm/test/index.mjs"></script>
+    <style>
+        button {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <dweb-status-bar id="status_bar" background-color="#f00f" bar-style="dark-content"></dweb-status-bar>
+    <dweb-top-bar id="topbar" title="test" background-color="rgba(253, 255, 0, 0.5)" foreground-color="#0000ffff">
+        <dweb-top-bar-button id="aaa">
+            <dweb-icon source="Filled.AddCircle"></dweb-icon>
+        </dweb-top-bar-button>
+        <dweb-top-bar-button id="bbb" disabled>
+            <dweb-icon source="Filled.Add" size="20"></dweb-icon>
+        </dweb-top-bar-button>
+        <dweb-top-bar-button id="ccc">
+            <dweb-icon source="http://172.30.95.56:5500/Plaoc-Android/app/src/main/assets/icon/coil_logo_colored.svg" type="AssetIcon"></dweb-icon>
+        </dweb-top-bar-button>
+    </dweb-top-bar>
+    <div id="content">
+        <p>test</p>
+    </div>
+    <!-- <dweb-bottom-bar id="bottom_bar" background-color="#ff00ffff">
+        <dweb-bottom-bar-button id="ddd" selectable label="add">
+            <dweb-icon source="Filled.AddCircle"></dweb-icon>
+        </dweb-bottom-bar-button>
+        <dweb-bottom-bar-button id="eee">
+            <dweb-icon source="http://172.30.95.56:5500/Plaoc-Android/app/src/main/assets/icon/ico_bottom_tab_publisher.svg" type="AssetIcon" size="50"></dweb-icon>
+        </dweb-bottom-bar-button>
+        <dweb-bottom-bar-button id="fff" selected selectable label="test">
+            <dweb-icon source="Filled.Add"></dweb-icon>
+        </dweb-bottom-bar-button>
+    </dweb-bottom-bar> -->
+    <dweb-bottom-bar id="bottom_bar" background-color="#ff00ffff" foreground-color="#000000ff">
+        <dweb-bottom-bar-button id="ddd" selectable indicator-color="#00ff00ff">
+            <dweb-bottom-bar-icon source="Filled.AddCircle" color="#ff00aaff" selected-color="rgba(255, 0, 0, 1)"></dweb-bottom-bar-icon>
+            <dweb-bottom-bar-text color="#0000ffff" selected-color="rgba(255, 0, 0, 1)">add</dweb-bottom-bar-text>
+        </dweb-bottom-bar-button>
+        <dweb-bottom-bar-button id="eee">
+            <dweb-bottom-bar-icon source="http://172.30.95.56:5500/Plaoc-Android/app/src/main/assets/icon/ico_bottom_tab_publisher.svg" type="AssetIcon" size="50"></dweb-icon>
+        </dweb-bottom-bar-button>
+        <dweb-bottom-bar-button id="fff" selected selectable>
+            <dweb-bottom-bar-icon source="Filled.Add"></dweb-bottom-bar-icon>
+            <dweb-bottom-bar-text>title</dweb-bottom-bar-text>
+        </dweb-bottom-bar-button>
+    </dweb-bottom-bar>
+    <dweb-keyboard id="key_board" overlay></dweb-keyboard>
+    <dweb-dialog-alert id="dda" title="alert" content="content">
+        <dweb-dialog-button id="ddb">ok</dweb-dialog-button>
+    </dweb-dialog-alert>
+    <dweb-dialog-prompt id="ddp" title="prompt" label="label" defaultValue="default">
+        <dweb-dialog-button id="ddpo" aria-label="cancel">ok</dweb-dialog-button>
+        <dweb-dialog-button id="ddpn" aria-label="confirm">No</dweb-dialog-button>
+    </dweb-dialog-prompt>
+    <dweb-dialog-confirm id="ddc" title="confirm" message="message">
+        <dweb-dialog-button id="ok" aria-label="confirm">ok</dweb-dialog-button>
+        <dweb-dialog-button id="no" aria-label="cancel">No</dweb-dialog-button>
+    </dweb-dialog-confirm>
+    <dweb-dialog-before-unload id="before_unload" title="test" message="before-unload">
+        <dweb-dialog-button id="buo">ok</dweb-dialog-button>
+        <dweb-dialog-button id="bun">No</dweb-dialog-button>
+    </dweb-dialog-before-unload>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <button id="bt" type="button" onclick="btclick()">control</button>
+    <input id="key" type="text" value="test input" />
+
+    <script>
+        aaa.onclick = async () => {
+            // content.innerHTML = "content";
+            // alert(1);
+            // await topbar.setTitle("title");
+            // alert("background-color: " + await topbar.getBackgroundColor());
+            // ddd.setAttribute("colors", JSON.stringify(colors));
+            // await status_bar.toggleStatusBarVisible();
+            // await status_bar.toggleStatusBarOverlay();
+            // await status_bar.setStatusBarColor("rgba(0, 0, 255, 1)", "dark-content");
+            // await status_bar.setStatusBarColor("#ff0000ff", "dark-content");
+            // alert("barStyle: " + await status_bar.getStatusBarStyle());
+            
+            // dda.setAttribute("visible", "");
+            // key_board.toggleKeyboardOverlay();
+            // alert(await topbar.getActions());
+            // before_unload.setAttribute("visible", "");
+
+            // await status_bar.toggleStatusBarVisible();
+        }
+
+        ccc.onclick = async () => {
+            // before_unload.setAttribute("visible", "");
+            alert("height: " + await bottom_bar.getHeight());
+            // await topbar.toggleEnabled();
+        }
+
+        buo.onclick = () => {
+            content.textContent = "buo";
+        }
+        bun.onclick = () => {
+            content.textContent = "bun";
+        }
+
+        ddb.onclick = () => {
+            content.textContent = "alert";
+            ddp.setAttribute("visible", "");
+        }
+
+        ddpo.onclick = () => {
+            content.textContent = "ddpo";
+        }
+
+        ddpn.onclick = () => {
+            content.textContent = "ddpn";
+        }
+
+        let colors = {
+            indicatorColor: "#00ff00ff",
+            textColor: "#0000ffff",
+            textColorSelected: "rgba(255, 0, 0, 1)",
+            // textColorSelected: "#aa00ff00",
+            iconColor: "#ff00aaff",
+            iconColorSelected: "rgba(0, 255, 0, 1)",
+        };
+
+        ddd.setAttribute("colors", JSON.stringify(colors));
+
+        eee.onclick = async () => {
+            // content.textContent = "selectable";
+        }
+
+        async function btclick () {
+            // await topbar.toggleEnabled();
+            // content.textContent = await topbar.height;
+            // setTimeout(async () => {
+            //     await key_board.showKeyboard();
+            // }, 500);
+            // await topbar.setTitle("title");
+            alert("area: " + JSON.stringify(await key_board.getKeyboardSafeArea()));
+        }
+
+        // ddd.onclick = async () => {
+        //     content.innerHTML = "bottom";
+        //     alert(2);
+        //     await topbar.setBackgroundColor("#ff0000");
+        //     alert(await topbar.getBackgroundColor());
+        //     before_unload.setAttribute("visible", "");
+        // }
+
+        ddd.onclick = async () => {
+            // alert(JSON.stringify(await bottom_bar.getActions()));
+            // ddd.setAttribute("colors", JSON.stringify(colors));
+            // alert("visible: " + await status_bar.getStatusBarVisible());
+            //alert("overlay: " + await status_bar.getStatusBarOverlay());
+        }
+
+        fff.onclick = async () => {
+            //alert("visible: " + await status_bar.getStatusBarVisible());
+        }
+
+        // ddb.onclick = () => {
+        //     content.innerHTML = "alert";
+        // };
+
+        ok.onclick = () => {
+            content.innerHTML = "ok";
+        }
+        no.onclick = () => {
+            content.innerHTML = "no";
+        }
+
+        
+    </script>
+</body>
+</html>

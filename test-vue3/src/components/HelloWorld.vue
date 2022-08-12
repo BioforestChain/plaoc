@@ -30,7 +30,7 @@ async function onDwebPlugin() {
 <template>
 <dweb-messager id="dweb"></dweb-messager>
 <dweb-scanner channelId="helloWorld"></dweb-scanner>
-
+<dweb-status-bar id="status_bar" background-color="#f00f" bar-style="dark-content"></dweb-status-bar>
 
   <h1>{{ msg }}</h1>
 
@@ -41,7 +41,7 @@ async function onDwebPlugin() {
     </p>
   </div>
     <div class="card">
-    <button type="button" @click="onDwebPlugin">webPlugin消息</button>
+    <button type="button" @click="onDwebPlugin">webMessage消息</button>
     <p>
      {{dwebPluginData}}
     </p>

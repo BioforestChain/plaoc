@@ -144,8 +144,8 @@ archTriplets.each { arch, target ->
     // Build with cargo
     tasks.create(name: "cargo-build-${arch}", type: Exec, description: "Building core for ${arch}") {
         workingDir rustBasePath
-        commandLine 'cargo', 'build', "--target=${target}", '--release'
-        environment "RUSTY_V8_ARCHIVE", file(rustBasePath + "/assets/rusty_v8_mirror/v0.42.0/librusty_v8_release_aarch64-linux-android.a")
+        commandLine  'cargo', 'build', "--target=${target}", '--release'
+        environment "RUSTY_V8_ARCHIVE", file(rustBasePath + "/assets/rusty_v8_mirror/v0.42.1/librusty_v8_release_aarch64-linux-android.a")
     }
     // Sync shared native dependencies
     tasks.create(name: "sync-rust-deps-${arch}", type: Sync, dependsOn: "cargo-build-${arch}") {

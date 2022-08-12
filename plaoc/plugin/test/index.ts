@@ -1,0 +1,11 @@
+import "@plaoc/plugin-icon";
+import "@plaoc/plugin-top-bar-android";
+import "@plaoc/plugin-bottom-bar-android";
+import "@plaoc/plugin-status-bar-android";
+import "@plaoc/plugin-dialogs-android";
+import "@plaoc/plugin-keyboard-android";
+// import "@plaoc/plugin-top-bar-ios";
+// import "@plaoc/plugin-bottom-bar-ios";
+// import "@plaoc/plugin-status-bar-ios";
+// import "@plaoc/plugin-dialogs-ios";
+// import "@plaoc/plugin-keyboard-ios";
