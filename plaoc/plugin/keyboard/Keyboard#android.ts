@@ -1,8 +1,10 @@
 import { DwebPlugin } from "../native/dweb-plugin";
-import { Plaoc, virtual_keyboard } from "./keyboard.d";
+import { KeyBoard } from "./keyboard.type";
+
+const virtual_keyboard: any = "";
 
 export class BfcsKeyboard extends DwebPlugin {
-  private _ffi: Plaoc.VirtualKeyboardFFI = virtual_keyboard;
+  private _ffi: KeyBoard.VirtualKeyboardFFI = virtual_keyboard;
   private $element!: HTMLElement;
 
   constructor() {
@@ -29,8 +31,8 @@ export class BfcsKeyboard extends DwebPlugin {
     this.$element.removeEventListener("blur", () => {});
   }
 
-  getSafeArea(): Promise<Plaoc.KeyboardSafeArea> {
-    return new Promise<Plaoc.KeyboardSafeArea>((resolve, reject) => {
+  getSafeArea(): Promise<KeyBoard.KeyboardSafeArea> {
+    return new Promise<KeyBoard.KeyboardSafeArea>((resolve, reject) => {
       const safeArea = JSON.parse(this._ffi.getSafeArea());
 
       resolve(safeArea);

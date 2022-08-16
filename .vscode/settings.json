@@ -1,9 +1,0 @@
-{
-  "files.exclude": {
-    "**/*.json": true,
-    "**/.*": true,
-    "**/*.log": true,
-    "**/*.lock": true,
-    "**/tsconfig*": true
-  }
-}

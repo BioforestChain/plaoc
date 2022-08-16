@@ -1,117 +1,86 @@
-import "../typings";
-import { convertToRGBAHex } from "./../util";
-import { StatusBar } from "./bfcsStatusBar.d";
+import { convertToRGBAHex } from "../util";
+import { StatusBar } from "./bfcsStatusBar.type";
+
+async () => {
+  // 等到dweb-communication组件注册成功，再执行StatusBarFFI代码
+  await customElements.whenDefined("dweb-communication");
+};
 
 export class StatusBarFFI implements StatusBar.IStatusBarFFI {
-  private _ffi = (globalThis as any).StatusBar as StatusBar.StatusBarDesktopFFI;
+  private _ffi!: StatusBar.StatusBarDesktopFFI;
+
+  constructor() {
+    this._ffi = (document.querySelector(
+      "dweb-communication"
+    ) as unknown) as StatusBar.StatusBarDesktopFFI;
+  }
 
   async setStatusBarColor(
     color?: Color.RGBAHex,
     barStyle?: StatusBar.StatusBarStyle
   ): Promise<void> {
-    let colorHex: string;
-    let darkIcons: StatusBar.StatusBarAndroidStyle;
-
-    if (!color) {
-      colorHex = this._ffi.getStatusBarColor();
-    } else {
-      colorHex = color;
+    if (color) {
+      await this._ffi.setStatusbarBackgroundColor(color);
     }
 
-    if (!barStyle) {
-      let isDarkIcons = await this.getStatusBarStyle();
-      darkIcons = isDarkIcons ? 1 : 0;
-    } else {
-      switch (barStyle) {
-        case "light-content":
-          darkIcons = -1;
-          break;
-        case "dark-content":
-          darkIcons = 1;
-          break;
-        default:
-          darkIcons = 0;
-      }
+    if (barStyle) {
+      await this._ffi.setStatusbarStyle(barStyle);
     }
-
-    this._ffi.setStatusBarColor(colorHex, darkIcons);
 
     return;
   }
 
-  getStatusBarColor(): Promise<Color.RGBAHex> {
-    return new Promise<Color.RGBAHex>((resolve, reject) => {
-      const color = this._ffi.getStatusBarColor();
-      const colorHex = convertToRGBAHex(color);
+  async getStatusBarColor(): Promise<Color.RGBAHex> {
+    const color = await this._ffi.getStatusbarBackgroundColor();
 
-      resolve(colorHex);
-    });
+    const colorHex = convertToRGBAHex(color);
+
+    return colorHex;
   }
 
-  getStatusBarVisible(): Promise<boolean> {
-    return new Promise<boolean>((resolve, reject) => {
-      const isVisible = this._ffi.getStatusBarVisible();
+  async getStatusBarVisible(): Promise<boolean> {
+    const isHidden = await this._ffi.getStatusbarHidden();
 
-      resolve(isVisible);
-    });
+    return !isHidden;
   }
 
   async toggleStatusBarVisible(): Promise<void> {
     const isVisible = await this.getStatusBarVisible();
 
-    this._ffi.toggleStatusBarVisible(!isVisible);
+    await this._ffi.setStatusbarHidden(isVisible);
 
     return;
   }
 
   async setStatusBarHidden(): Promise<void> {
-    const isVisible = await this.getStatusBarVisible();
-
-    if (isVisible) {
-      await this.toggleStatusBarVisible();
-    }
+    await this._ffi.setStatusbarHidden(true);
 
     return;
   }
 
-  getStatusBarOverlay(): Promise<boolean> {
-    return new Promise<boolean>((resolve, reject) => {
-      const overlay = this._ffi.getStatusBarOverlay();
+  async getStatusBarOverlay(): Promise<boolean> {
+    const isOverlay = await this._ffi.getStatusbarOverlay();
 
-      resolve(overlay);
-    });
+    return isOverlay;
   }
 
   async toggleStatusBarOverlay(): Promise<void> {
-    const overlay = await this.getStatusBarOverlay();
+    const isOverlay = await this.getStatusBarOverlay();
 
-    this._ffi.toggleStatusBarOverlay(!overlay);
+    await this._ffi.setStatusbarOverlay(!isOverlay);
 
     return;
   }
 
   async setStatusBarOverlay(): Promise<void> {
-    const overlay = await this.getStatusBarOverlay();
-
-    if (!overlay) {
-      await this.toggleStatusBarOverlay();
-    }
+    await this._ffi.setStatusbarOverlay(true);
 
     return;
   }
 
-  getStatusBarStyle(): Promise<StatusBar.StatusBarStyle> {
-    return new Promise<StatusBar.StatusBarStyle>((resolve, reject) => {
-      const isDarkIcons = this._ffi.getStatusBarStyle();
-      let barStyle: StatusBar.StatusBarStyle;
+  async getStatusBarStyle(): Promise<StatusBar.StatusBarStyle> {
+    const barStyle = await this._ffi.getStatusbarStyle();
 
-      if (isDarkIcons) {
-        barStyle = "dark-content" as StatusBar.StatusBarStyle.DARK_CONTENT;
-      } else {
-        barStyle = "light-content" as StatusBar.StatusBarStyle.LIGHT_CONTENT;
-      }
-
-      resolve(barStyle);
-    });
+    return barStyle;
   }
 }

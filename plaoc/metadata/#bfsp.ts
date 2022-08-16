@@ -7,7 +7,6 @@ export default defineConfig((info) => {
     },
     profiles: ["android"],
     packageJson: {
-      // types: "./metadata.d.ts", //
       license: "MIT",
       author: "@bfchain",
       version: "0.0.2",

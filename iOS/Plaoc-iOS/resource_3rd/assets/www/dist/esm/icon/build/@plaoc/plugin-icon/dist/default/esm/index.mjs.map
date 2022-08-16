@@ -1,0 +1,1 @@
+{"version":3,"file":"index.mjs","sources":["../../../../../../../../../../icon/build/@plaoc/plugin-icon/dist/default/esm/index.mjs"],"sourcesContent":["import{BfspIcon as o}from\"./bfspIcon_android.mjs\";customElements.define(\"dweb-icon\",o);\n"],"names":["o"],"mappings":";AAAkD,eAAe,OAAO,aAAYA,CAAC;"}

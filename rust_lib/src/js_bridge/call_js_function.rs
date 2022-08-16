@@ -11,12 +11,13 @@ use log::{debug, error, info, Level};
 use std::result::Result::Ok;
 use std::str;
 
-// 添加一个全局变量来缓存信息，让js每次来拿，防止js内存爆炸
+// 添加一个全局变量来缓存信息，让js每次来拿，防止js内存爆炸,这里应该用channelId来定位每条消息，而不是用现在的队列
 lazy_static! {
     // pub(crate) static ref BUFFER_HANDLER: Mutex<Vec<Vec<u8>>> = Mutex::new(vec![]);
   pub(crate) static ref BUFFER_RESOLVE: Mutex<Vec<Vec<u8>>> = Mutex::new(vec![]);
 }
 
+/// js 消息从这里走
 #[op]
 pub fn op_js_to_rust_buffer(buffer: ZeroCopyBuf) {
     #[cfg(target_os = "android")]
@@ -29,6 +30,7 @@ pub fn op_js_to_rust_buffer(buffer: ZeroCopyBuf) {
     call_android_function::call_android(buffer.to_vec()); // 通知FFI函数
 }
 
+///
 #[op]
 pub fn op_eval_js(buffer: ZeroCopyBuf) {
     call_android_function::call_android_evaljs(buffer.to_vec()); // 通知FFI函数

@@ -1,5 +1,5 @@
 import "../typings";
-import { StatusBar } from "./bfcsStatusBar.d";
+import { StatusBar } from "./bfcsStatusBar.type";
 
 export class StatusBarFFI implements StatusBar.IStatusBarFFI {
   private _ffi = (window as any).webkit

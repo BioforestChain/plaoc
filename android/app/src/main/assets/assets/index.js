@@ -1,4 +1,4 @@
-const p$1 = function polyfill() {
+(function polyfill() {
   const relList = document.createElement("link").relList;
   if (relList && relList.supports && relList.supports("modulepreload")) {
     return;
@@ -38,8 +38,7 @@ const p$1 = function polyfill() {
     const fetchOpts = getFetchOpts(link);
     fetch(link.href, fetchOpts);
   }
-};
-p$1();
+})();
 function makeMap(str, expectsLowerCase) {
   const map = /* @__PURE__ */ Object.create(null);
   const list = str.split(",");
@@ -160,7 +159,9 @@ const toRawType = (value) => {
 };
 const isPlainObject = (val) => toTypeString(val) === "[object Object]";
 const isIntegerKey = (key) => isString(key) && key !== "NaN" && key[0] !== "-" && "" + parseInt(key, 10) === key;
-const isReservedProp = /* @__PURE__ */ makeMap(",key,ref,ref_for,ref_key,onVnodeBeforeMount,onVnodeMounted,onVnodeBeforeUpdate,onVnodeUpdated,onVnodeBeforeUnmount,onVnodeUnmounted");
+const isReservedProp = /* @__PURE__ */ makeMap(
+  ",key,ref,ref_for,ref_key,onVnodeBeforeMount,onVnodeMounted,onVnodeBeforeUpdate,onVnodeUpdated,onVnodeBeforeUnmount,onVnodeUnmounted"
+);
 const cacheStringFunction = (fn) => {
   const cache = /* @__PURE__ */ Object.create(null);
   return (str) => {
@@ -483,7 +484,9 @@ function triggerEffect(effect, debuggerEventExtraInfo) {
   }
 }
 const isNonTrackableKeys = /* @__PURE__ */ makeMap(`__proto__,__v_isRef,__isVue`);
-const builtInSymbols = new Set(/* @__PURE__ */ Object.getOwnPropertyNames(Symbol).filter((key) => key !== "arguments" && key !== "caller").map((key) => Symbol[key]).filter(isSymbol));
+const builtInSymbols = new Set(
+  /* @__PURE__ */ Object.getOwnPropertyNames(Symbol).filter((key) => key !== "arguments" && key !== "caller").map((key) => Symbol[key]).filter(isSymbol)
+);
 const get = /* @__PURE__ */ createGetter();
 const shallowGet = /* @__PURE__ */ createGetter(false, true);
 const readonlyGet = /* @__PURE__ */ createGetter(true);
@@ -3306,7 +3309,9 @@ function baseCreateRenderer(options, createHydrationFns) {
             hydrateNode(el, instance.subTree, instance, parentSuspense, null);
           };
           if (isAsyncWrapperVNode) {
-            initialVNode.type.__asyncLoader().then(() => !instance.isUnmounted && hydrateSubTree());
+            initialVNode.type.__asyncLoader().then(
+              () => !instance.isUnmounted && hydrateSubTree()
+            );
           } else {
             hydrateSubTree();
           }
@@ -3348,7 +3353,15 @@ function baseCreateRenderer(options, createHydrationFns) {
         const nextTree = renderComponentRoot(instance);
         const prevTree = instance.subTree;
         instance.subTree = nextTree;
-        patch(prevTree, nextTree, hostParentNode(prevTree.el), getNextHostNode(prevTree), instance, parentSuspense, isSVG);
+        patch(
+          prevTree,
+          nextTree,
+          hostParentNode(prevTree.el),
+          getNextHostNode(prevTree),
+          instance,
+          parentSuspense,
+          isSVG
+        );
         next.el = nextTree.el;
         if (originNext === null) {
           updateHOCHostEl(instance, nextTree.el);
@@ -3361,7 +3374,11 @@ function baseCreateRenderer(options, createHydrationFns) {
         }
       }
     };
-    const effect = instance.effect = new ReactiveEffect(componentUpdateFn, () => queueJob(update), instance.scope);
+    const effect = instance.effect = new ReactiveEffect(
+      componentUpdateFn,
+      () => queueJob(update),
+      instance.scope
+    );
     const update = instance.update = () => effect.run();
     update.id = instance.uid;
     toggleRecurse(instance, true);
@@ -3973,7 +3990,11 @@ function normalizeVNode(child) {
   if (child == null || typeof child === "boolean") {
     return createVNode(Comment);
   } else if (isArray(child)) {
-    return createVNode(Fragment, null, child.slice());
+    return createVNode(
+      Fragment,
+      null,
+      child.slice()
+    );
   } else if (typeof child === "object") {
     return cloneIfMounted(child);
   } else {
@@ -4755,9 +4776,1336 @@ const loop = (delay) => new Promise((resolve2) => setTimeout(resolve2, delay));
 customElements.define("dweb-messager", DWebMessager);
 customElements.define("dweb-view", DWebView);
 customElements.define("dweb-scanner", OpenScanner);
+const virtual_keyboard = "";
+class BfcsKeyboard extends DwebPlugin {
+  constructor() {
+    super();
+    this._ffi = virtual_keyboard;
+    this.setAttribute("hidden", "");
+  }
+  connectedCallback() {
+    var _a;
+    if (this.hasAttribute("for") && ((_a = this.getAttribute("for")) == null ? void 0 : _a.length)) {
+      this.$element = document.querySelector("#" + this.getAttribute("for"));
+      this.$element.dispatchEvent(new CustomEvent("focus"));
+      this.$element.dispatchEvent(new CustomEvent("blur"));
+      this.$element.addEventListener("focus", () => {
+        this.removeAttribute("hidden");
+      });
+      this.$element.addEventListener("blur", () => {
+        this.setAttribute("hidden", "");
+      });
+    }
+  }
+  disconnectedCallback() {
+    this.$element.removeEventListener("focus", () => {
+    });
+    this.$element.removeEventListener("blur", () => {
+    });
+  }
+  getSafeArea() {
+    return new Promise((resolve2, reject) => {
+      const safeArea = JSON.parse(this._ffi.getSafeArea());
+      resolve2(safeArea);
+    });
+  }
+  getHeight() {
+    return new Promise((resolve2, reject) => {
+      const height = this._ffi.getHeight();
+      resolve2(height);
+    });
+  }
+  getOverlay() {
+    return new Promise((resolve2, reject) => {
+      const overlay = this._ffi.getOverlay();
+      resolve2(overlay);
+    });
+  }
+  toggleOverlay() {
+    return new Promise((resolve2, reject) => {
+      this._ffi.toggleOverlay(0);
+      resolve2();
+    });
+  }
+  show() {
+    return new Promise((resolve2, reject) => {
+      this._ffi.show();
+      resolve2();
+    });
+  }
+  syncShow() {
+  }
+  hide() {
+    return new Promise((resolve2, reject) => {
+      this._ffi.hide();
+      resolve2();
+    });
+  }
+  syncHide() {
+  }
+  static get observedAttributes() {
+    return ["overlay", "hidden"];
+  }
+  attributeChangedCallback(attrName, oldVal, newVal) {
+    if (attrName === "overlay") {
+      if (this.hasAttribute(attrName)) {
+        this._ffi.toggleOverlay(1);
+      }
+    } else if (attrName === "hidden") {
+      if (this.hasAttribute(attrName)) {
+        if (this.hasAttribute("sync")) {
+          this.syncHide();
+        } else {
+          this.hide();
+        }
+      } else {
+        if (this.hasAttribute("sync")) {
+          this.syncShow();
+        } else {
+          this.show();
+        }
+      }
+    }
+  }
+}
+customElements.define("dweb-keyboard", BfcsKeyboard);
+function getColorInt(color, alpha) {
+  return parseInt(color.replace("#", "0x"), 16) + (parseInt("0x" + alpha) << 24);
+}
+function getColorHex(color) {
+  let colorHex = new Uint32Array([color])[0].toString(16);
+  if (colorHex.length < 8) {
+    colorHex = "0".repeat(8 - colorHex.length) + colorHex;
+  }
+  return "#" + colorHex.slice(2) + colorHex.slice(0, 2);
+}
+function convertToRGBAHex(color) {
+  let colorHex = "#";
+  if (color.startsWith("rgba(")) {
+    let colorArr = color.replace("rgba(", "").replace(")", "").split(",");
+    for (let [index, item] of colorArr.entries()) {
+      if (index === 3) {
+        item = `${parseFloat(item) * 255}`;
+      }
+      let itemHex = Math.round(parseFloat(item)).toString(16);
+      if (itemHex.length === 1) {
+        itemHex = "0" + itemHex;
+      }
+      colorHex += itemHex;
+    }
+  } else if (color.startsWith("#")) {
+    if (color.length === 5) {
+      colorHex = color.slice(0, 1) + color.slice(1, 2).repeat(2) + color.slice(2, 3).repeat(2) + color.slice(3, 4).repeat(2) + color.slice(4, 5).repeat(2);
+    } else if (color.length === 9) {
+      colorHex = color;
+    }
+  }
+  return colorHex.length === 9 ? colorHex : color;
+}
+const bottom_bar = "";
+class BottomBarFFI {
+  constructor() {
+    this._ffi = bottom_bar;
+  }
+  getEnabled() {
+    return new Promise((resolve2, reject) => {
+      const isEnabled = this._ffi.getEnabled();
+      resolve2(isEnabled);
+    });
+  }
+  toggleEnabled() {
+    return new Promise((resolve2, reject) => {
+      this._ffi.toggleEnabled(0);
+      resolve2();
+    });
+  }
+  setHidden() {
+    return new Promise((resolve2, reject) => {
+      this._ffi.toggleEnabled(1);
+      resolve2();
+    });
+  }
+  getOverlay() {
+    return new Promise((resolve2, reject) => {
+      const overlay = this._ffi.getOverlay();
+      resolve2(overlay);
+    });
+  }
+  toggleOverlay() {
+    return new Promise((resolve2, reject) => {
+      this._ffi.toggleOverlay(0);
+      resolve2();
+    });
+  }
+  setOverlay() {
+    return new Promise((resolve2, reject) => {
+      this._ffi.toggleOverlay(1);
+      resolve2();
+    });
+  }
+  getHeight() {
+    return new Promise((resolve2, reject) => {
+      const height = this._ffi.getHeight();
+      resolve2(height);
+    });
+  }
+  setHeight(height) {
+    return new Promise((resolve2, reject) => {
+      this._ffi.setHeight(height);
+      resolve2();
+    });
+  }
+  getBackgroundColor() {
+    return new Promise((resolve2, reject) => {
+      const color = this._ffi.getBackgroundColor();
+      const colorHex = getColorHex(color);
+      resolve2(colorHex);
+    });
+  }
+  setBackgroundColor(color) {
+    return new Promise(async (resolve2, reject) => {
+      const colorHex = getColorInt(
+        color.slice(0, -2),
+        color.slice(-2)
+      );
+      this._ffi.setBackgroundColor(colorHex);
+      resolve2();
+    });
+  }
+  getForegroundColor() {
+    return new Promise((resolve2, reject) => {
+      const color = this._ffi.getForegroundColor();
+      const colorHex = getColorHex(color);
+      resolve2(colorHex);
+    });
+  }
+  setForegroundColor(color) {
+    return new Promise((resolve2, reject) => {
+      const colorHex = getColorInt(
+        color.slice(0, -2),
+        color.slice(-2)
+      );
+      this._ffi.setForegroundColor(colorHex);
+      resolve2();
+    });
+  }
+  getActions() {
+    return new Promise((resolve2, reject) => {
+      const actionList = JSON.parse(this._ffi.getActions());
+      const _actionList = [];
+      for (const item of actionList) {
+        if (item.colors) {
+          for (let key of Object.keys(item.colors)) {
+            let color = item.colors[key];
+            if (typeof color === "number") {
+              let colorARGB = "#" + color.toString(16);
+              item.colors[key] = colorARGB.slice(0, 1) + colorARGB.slice(3) + colorARGB.slice(1, 3);
+            }
+          }
+        }
+        _actionList.push(item);
+      }
+      resolve2(_actionList);
+    });
+  }
+  setActions(actionList) {
+    return new Promise((resolve2, reject) => {
+      let _actionList = [];
+      for (const item of actionList) {
+        if (item.colors) {
+          for (const key of Object.keys(item.colors)) {
+            let color = item.colors[key];
+            if (typeof color === "string") {
+              let colorRGBA = convertToRGBAHex(color).replace("#", "0x");
+              let colorARGB = colorRGBA.slice(0, 2) + colorRGBA.slice(-2) + colorRGBA.slice(2, -2);
+              item.colors[key] = parseInt(
+                colorARGB
+              );
+            }
+          }
+        }
+        _actionList.push(item);
+      }
+      this._ffi.setActions(JSON.stringify(_actionList));
+      resolve2();
+    });
+  }
+}
+class BfcsBottomBar extends DwebPlugin {
+  constructor() {
+    super();
+    this._actionList = [];
+    this._ffi = new BottomBarFFI();
+    this._observer = new MutationObserver(async (mutations) => {
+      await this.collectActions();
+    });
+  }
+  connectedCallback() {
+    this._observer.observe(this, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+      attributeFilter: [
+        "disabled",
+        "selected",
+        "selectable",
+        "label",
+        "type",
+        "description",
+        "size",
+        "source",
+        "color",
+        "selected-color",
+        "indicator-color"
+      ]
+    });
+    this._init();
+  }
+  disconnectedCallback() {
+    this._observer.disconnect();
+  }
+  async _init() {
+    const height = await this.getHeight();
+    if (height) {
+      this.setAttribute("height", `${height}`);
+    }
+  }
+  async toggleEnabled() {
+    await this._ffi.toggleEnabled();
+    return;
+  }
+  async getEnabled() {
+    const isEnabled = await this._ffi.getEnabled();
+    return isEnabled;
+  }
+  async getOverlay() {
+    const overlay = await this._ffi.getOverlay();
+    return overlay;
+  }
+  async toggleOverlay() {
+    await this._ffi.toggleOverlay();
+    return;
+  }
+  async getHeight() {
+    const height = await this._ffi.getHeight();
+    return height;
+  }
+  async setHeight(height) {
+    this.setAttribute("height", `${height}`);
+    await this._ffi.setHeight(height);
+    return;
+  }
+  async getBackgroundColor() {
+    const color = await this._ffi.getBackgroundColor();
+    return color;
+  }
+  async setBackgroundColor(color) {
+    const colorHex = convertToRGBAHex(color);
+    await this._ffi.setBackgroundColor(colorHex);
+    return;
+  }
+  async getForegroundColor() {
+    const color = await this._ffi.getForegroundColor();
+    return color;
+  }
+  async setForegroundColor(color) {
+    const colorHex = convertToRGBAHex(color);
+    await this._ffi.setForegroundColor(colorHex);
+    return;
+  }
+  async getActions() {
+    this._actionList = await this._ffi.getActions();
+    return this._actionList;
+  }
+  async setActions() {
+    await this._ffi.setActions(this._actionList);
+    return;
+  }
+  async collectActions() {
+    this._actionList = [];
+    this.querySelectorAll("dweb-bottom-bar-button").forEach((childNode) => {
+      var _a, _b, _c;
+      let icon = {
+        source: "",
+        type: "NamedIcon"
+      };
+      let colors = {};
+      let label = "";
+      if (childNode.querySelector("dweb-bottom-bar-icon")) {
+        let $ = childNode.querySelector("dweb-bottom-bar-icon");
+        icon.source = (_a = $ == null ? void 0 : $.getAttribute("source")) != null ? _a : "";
+        icon.type = ($ == null ? void 0 : $.hasAttribute("type")) ? $.getAttribute("type") : "NamedIcon";
+        icon.description = (_b = $ == null ? void 0 : $.getAttribute("description")) != null ? _b : "";
+        icon.size = ($ == null ? void 0 : $.hasAttribute("size")) ? $.getAttribute("size") : void 0;
+        if ($ == null ? void 0 : $.hasAttribute("color")) {
+          colors.iconColor = convertToRGBAHex($ == null ? void 0 : $.getAttribute("color"));
+        }
+        if ($ == null ? void 0 : $.hasAttribute("selected-color")) {
+          colors.iconColorSelected = convertToRGBAHex(
+            $ == null ? void 0 : $.getAttribute("selected-color")
+          );
+        }
+      }
+      if (childNode.querySelector("dweb-bottom-bar-text")) {
+        let $ = childNode.querySelector("dweb-bottom-bar-text");
+        label = (_c = $ == null ? void 0 : $.textContent) != null ? _c : "";
+        if ($ == null ? void 0 : $.hasAttribute("color")) {
+          colors.textColor = convertToRGBAHex($ == null ? void 0 : $.getAttribute("color"));
+        }
+        if ($ == null ? void 0 : $.hasAttribute("selected-color")) {
+          colors.textColorSelected = convertToRGBAHex(
+            $ == null ? void 0 : $.getAttribute("selected-color")
+          );
+        }
+      }
+      const bid = childNode.getAttribute("bid");
+      const onClickCode = `document.querySelector('dweb-bottom-bar-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+      const disabled = childNode.hasAttribute("disabled") ? true : false;
+      const selected = childNode.hasAttribute("selected") ? true : false;
+      const selectable = childNode.hasAttribute("selectable") ? true : false;
+      if (childNode.hasAttribute("indicator-color")) {
+        colors.indicatorColor = convertToRGBAHex(
+          childNode.getAttribute("indicator-color")
+        );
+      }
+      this._actionList.push({
+        icon,
+        onClickCode,
+        disabled,
+        label,
+        selectable,
+        selected,
+        colors: JSON.stringify(colors) === "{}" ? void 0 : colors
+      });
+    });
+    await this.setActions();
+  }
+  static get observedAttributes() {
+    return [
+      "hidden",
+      "background-color",
+      "foreground-color",
+      "overlay",
+      "height"
+    ];
+  }
+  async attributeChangedCallback(attrName, oldVal, newVal) {
+    if (oldVal === newVal) {
+      return;
+    }
+    if (attrName === "background-color") {
+      await this.setBackgroundColor(newVal);
+    } else if (attrName === "foreground-color") {
+      await this.setForegroundColor(newVal);
+    } else if (attrName === "height") {
+      await this.setHeight(newVal);
+    } else if (attrName === "overlay") {
+      if (this.hasAttribute(attrName)) {
+        await this._ffi.setOverlay();
+      }
+    } else if (attrName === "hidden") {
+      if (this.hasAttribute(attrName)) {
+        await this._ffi.setHidden();
+      }
+    }
+  }
+}
+class BfcsBottomBarButton extends DwebPlugin {
+  constructor() {
+    super();
+  }
+  connectedCallback() {
+    this.setAttribute("bid", (Math.random() * Date.now()).toFixed(0));
+  }
+  disconnectedCallback() {
+    this.removeEventListener("click", () => {
+    });
+  }
+  static get observedAttributes() {
+    return ["disabled", "selected", "selectable", "indicator-color"];
+  }
+  attributeChangedCallback(attrName, oldVal, newVal) {
+    if (attrName === "disabled" && oldVal !== newVal) {
+      if (this.hasAttribute(attrName)) {
+        this.setAttribute(attrName, "");
+      } else {
+        this.removeAttribute(attrName);
+      }
+    } else if (attrName === "selected" && oldVal !== newVal) {
+      if (this.hasAttribute("selected")) {
+        this.setAttribute(attrName, "");
+      } else {
+        this.removeAttribute(attrName);
+      }
+    } else if (attrName === "selectable" && oldVal !== newVal) {
+      if (this.hasAttribute("selectable")) {
+        this.setAttribute(attrName, "");
+      } else {
+        this.removeAttribute(attrName);
+      }
+    }
+  }
+}
+class BfcsBottomBarIcon extends DwebPlugin {
+  constructor() {
+    super();
+  }
+  static get observedAttributes() {
+    return ["type", "description", "size", "source", "color", "selected-color"];
+  }
+}
+class BfcsBottomBarText extends DwebPlugin {
+  constructor() {
+    super();
+  }
+  static get observedAttributes() {
+    return ["color", "selected-color"];
+  }
+}
+customElements.define("dweb-bottom-bar", BfcsBottomBar);
+customElements.define("dweb-bottom-bar-button", BfcsBottomBarButton);
+customElements.define("dweb-bottom-bar-icon", BfcsBottomBarIcon);
+customElements.define("dweb-bottom-bar-text", BfcsBottomBarText);
+const native_dialog = "";
+class DialogsFFI {
+  constructor() {
+    this._ffi = native_dialog;
+  }
+  openAlert(config, confirmFunc) {
+    return new Promise((resolve2, reject) => {
+      this._ffi.openAlert(JSON.stringify(config), confirmFunc);
+      resolve2();
+    });
+  }
+  openPrompt(config, confirmFunc, cancelFunc) {
+    return new Promise((resolve2, reject) => {
+      let cb = `((result)=>{
+        if(result){
+          ${confirmFunc}
+        }else{
+          ${cancelFunc != null ? cancelFunc : ""}
+        }
+      })`;
+      this._ffi.openPrompt(JSON.stringify(config), cb);
+      resolve2();
+    });
+  }
+  openConfirm(config, confirmFunc, cancelFunc) {
+    return new Promise((resolve2, reject) => {
+      let cb = `((result)=>{
+        if(result){
+          ${confirmFunc}
+        }else{
+          ${cancelFunc != null ? cancelFunc : ""}
+        }
+      })`;
+      this._ffi.openConfirm(JSON.stringify(config), cb);
+      resolve2();
+    });
+  }
+  openBeforeUnload(config, confirmFunc, cancelFunc) {
+    return new Promise((resolve2, reject) => {
+      let cb = `((result)=>{
+        if(result){
+          ${confirmFunc}
+        }else{
+          ${cancelFunc != null ? cancelFunc : ""}
+        }
+      })`;
+      this._ffi.openBeforeUnload(JSON.stringify(config), cb);
+      resolve2();
+    });
+  }
+}
+class BfcsDialogs extends DwebPlugin {
+  constructor() {
+    super();
+    this._ffi = new DialogsFFI();
+    this.setAttribute("did", (Math.random() * Date.now()).toFixed(0));
+  }
+  connectedCallback() {
+  }
+  disconnectedCallback() {
+  }
+  static get observedAttributes() {
+    return ["visible"];
+  }
+  async attributeChangedCallback(attrName, oldVal, newVal) {
+  }
+}
+class BfcsDialogAlert extends BfcsDialogs {
+  constructor() {
+    super();
+    this._observer = new MutationObserver(async (mutations) => {
+      if (this.hasAttribute("visible")) {
+        await this.openAlert();
+      }
+    });
+  }
+  connectedCallback() {
+    this._observer.observe(this, {
+      subtree: true,
+      childList: true,
+      attributes: true
+    });
+  }
+  disconnectedCallback() {
+    this._observer.disconnect();
+  }
+  openAlert() {
+    return new Promise((resolve2, reject) => {
+      var _a, _b, _c, _d;
+      let alertConfig = {
+        title: "",
+        content: "",
+        confirmText: "",
+        dismissOnBackPress: true,
+        dismissOnClickOutSide: false
+      };
+      alertConfig.title = (_a = this.getAttribute("title")) != null ? _a : "";
+      alertConfig.content = (_b = this.getAttribute("content")) != null ? _b : "";
+      alertConfig.dismissOnBackPress = this.hasAttribute("dismissOnBackPress") ? true : false;
+      alertConfig.dismissOnClickOutSide = this.hasAttribute(
+        "dismissOnClickOutSide"
+      ) ? true : false;
+      const did = this.getAttribute("did");
+      const childNode = this.querySelector("dweb-dialog-button");
+      let bid = "";
+      if (childNode) {
+        alertConfig.confirmText = (_c = childNode.getAttribute("label")) != null ? _c : "";
+        bid = (_d = childNode.getAttribute("bid")) != null ? _d : "";
+      }
+      const cb = `document.querySelector('dweb-dialog-alert[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+      this._ffi.openAlert(alertConfig, cb);
+      resolve2();
+    });
+  }
+  async attributeChangedCallback(attrName, oldVal, newVal) {
+    if (attrName === "visible" && oldVal !== newVal) {
+      if (this.hasAttribute("visible")) {
+        this.setAttribute("visible", "");
+      } else {
+        this.removeAttribute("visible");
+      }
+    }
+  }
+}
+class BfcsDialogPrompt extends BfcsDialogs {
+  constructor() {
+    super();
+    this._observer = new MutationObserver(async (mutations) => {
+      if (this.hasAttribute("visible")) {
+        await this.openPrompt();
+      }
+    });
+  }
+  connectedCallback() {
+    this._observer.observe(this, {
+      subtree: true,
+      childList: true,
+      attributes: true
+    });
+  }
+  disconnectedCallback() {
+    this._observer.disconnect();
+  }
+  openPrompt() {
+    return new Promise((resolve2, reject) => {
+      var _a, _b, _c;
+      let promptConfig = {
+        title: "",
+        label: "",
+        confirmText: "",
+        cancelText: "",
+        defaultValue: "",
+        dismissOnBackPress: true,
+        dismissOnClickOutSide: false
+      };
+      promptConfig.title = (_a = this.getAttribute("title")) != null ? _a : "";
+      promptConfig.label = (_b = this.getAttribute("label")) != null ? _b : "";
+      promptConfig.defaultValue = (_c = this.getAttribute("defaultValue")) != null ? _c : "";
+      promptConfig.dismissOnBackPress = this.hasAttribute("dismissOnBackPress") ? true : false;
+      promptConfig.dismissOnClickOutSide = this.hasAttribute(
+        "dismissOnClickOutSide"
+      ) ? true : false;
+      const did = this.getAttribute("did");
+      let confirmFunc = "";
+      let cancelFunc = "";
+      this.querySelectorAll("dweb-dialog-button").forEach(
+        (childNode, index) => {
+          var _a2, _b2, _c2, _d, _e;
+          const bid = (_a2 = childNode.getAttribute("bid")) != null ? _a2 : "";
+          if (childNode.hasAttribute("aria-label")) {
+            if (childNode.getAttribute("aria-label") === "confirm") {
+              promptConfig.confirmText = (_b2 = childNode.getAttribute("label")) != null ? _b2 : "";
+              confirmFunc = `document.querySelector('dweb-dialog-prompt[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+            } else {
+              promptConfig.cancelText = (_c2 = childNode.getAttribute("label")) != null ? _c2 : "";
+              cancelFunc = `document.querySelector('dweb-dialog-prompt[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+            }
+          } else {
+            if (index === 0) {
+              promptConfig.confirmText = (_d = childNode.getAttribute("label")) != null ? _d : "";
+              confirmFunc = `document.querySelector('dweb-dialog-prompt[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+            } else {
+              promptConfig.cancelText = (_e = childNode.getAttribute("label")) != null ? _e : "";
+              cancelFunc = `document.querySelector('dweb-dialog-prompt[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+            }
+          }
+        }
+      );
+      this._ffi.openPrompt(promptConfig, confirmFunc, cancelFunc);
+      resolve2();
+    });
+  }
+  async attributeChangedCallback(attrName, oldVal, newVal) {
+    if (attrName === "visible" && oldVal !== newVal) {
+      if (this.hasAttribute("visible")) {
+        this.setAttribute("visible", "");
+      } else {
+        this.removeAttribute("visible");
+      }
+    }
+  }
+}
+class BfcsDialogConfirm extends BfcsDialogs {
+  constructor() {
+    super();
+    this._observer = new MutationObserver(async (mutations) => {
+      if (this.hasAttribute("visible")) {
+        await this.openConfirm();
+      }
+    });
+  }
+  connectedCallback() {
+    this._observer.observe(this, {
+      subtree: true,
+      childList: true,
+      attributes: true
+    });
+  }
+  disconnectedCallback() {
+    this._observer.disconnect();
+  }
+  openConfirm() {
+    return new Promise((resolve2, reject) => {
+      var _a, _b;
+      let confirmConfig = {
+        title: "",
+        message: "",
+        confirmText: "",
+        cancelText: "",
+        dismissOnBackPress: true,
+        dismissOnClickOutSide: false
+      };
+      confirmConfig.title = (_a = this.getAttribute("title")) != null ? _a : "";
+      confirmConfig.message = (_b = this.getAttribute("message")) != null ? _b : "";
+      confirmConfig.dismissOnBackPress = this.hasAttribute("dismissOnBackPress") ? true : false;
+      confirmConfig.dismissOnClickOutSide = this.hasAttribute(
+        "dismissOnClickOutSide"
+      ) ? true : false;
+      const did = this.getAttribute("did");
+      let confirmFunc = "";
+      let cancelFunc = "";
+      this.querySelectorAll("dweb-dialog-button").forEach(
+        (childNode, index) => {
+          var _a2, _b2, _c, _d, _e;
+          const bid = (_a2 = childNode.getAttribute("bid")) != null ? _a2 : "";
+          if (childNode.hasAttribute("aria-label")) {
+            if (childNode.getAttribute("aria-label") === "confirm") {
+              confirmConfig.confirmText = (_b2 = childNode.getAttribute("label")) != null ? _b2 : "";
+              confirmFunc = `document.querySelector('dweb-dialog-confirm[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+            } else {
+              confirmConfig.cancelText = (_c = childNode.getAttribute("label")) != null ? _c : "";
+              cancelFunc = `document.querySelector('dweb-dialog-confirm[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+            }
+          } else {
+            if (index === 0) {
+              confirmConfig.confirmText = (_d = childNode.getAttribute("label")) != null ? _d : "";
+              confirmFunc = `document.querySelector('dweb-dialog-confirm[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+            } else {
+              confirmConfig.cancelText = (_e = childNode.getAttribute("label")) != null ? _e : "";
+              cancelFunc = `document.querySelector('dweb-dialog-confirm[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+            }
+          }
+        }
+      );
+      this._ffi.openConfirm(confirmConfig, confirmFunc, cancelFunc);
+      resolve2();
+    });
+  }
+  async attributeChangedCallback(attrName, oldVal, newVal) {
+    if (attrName === "visible" && oldVal !== newVal) {
+      if (this.hasAttribute("visible")) {
+        this.setAttribute("visible", "");
+      } else {
+        this.removeAttribute("visible");
+      }
+    }
+  }
+}
+class BfcsDialogBeforeUnload extends BfcsDialogs {
+  constructor() {
+    super();
+    this._observer = new MutationObserver(async (mutations) => {
+      if (this.hasAttribute("visible")) {
+        await this.openBeforeUnload();
+      }
+    });
+  }
+  connectedCallback() {
+    this._observer.observe(this, {
+      subtree: true,
+      childList: true,
+      attributes: true
+    });
+  }
+  disconnectedCallback() {
+    this._observer.disconnect();
+  }
+  openBeforeUnload() {
+    return new Promise((resolve2, reject) => {
+      var _a, _b;
+      let confirmConfig = {
+        title: "",
+        message: "",
+        confirmText: "",
+        cancelText: "",
+        dismissOnBackPress: true,
+        dismissOnClickOutSide: false
+      };
+      confirmConfig.title = (_a = this.getAttribute("title")) != null ? _a : "";
+      confirmConfig.message = (_b = this.getAttribute("message")) != null ? _b : "";
+      confirmConfig.dismissOnBackPress = this.hasAttribute("dismissOnBackPress") ? true : false;
+      confirmConfig.dismissOnClickOutSide = this.hasAttribute(
+        "dismissOnClickOutSide"
+      ) ? true : false;
+      const did = this.getAttribute("did");
+      let confirmFunc = "";
+      let cancelFunc = "";
+      this.querySelectorAll("dweb-dialog-button").forEach(
+        (childNode, index) => {
+          var _a2, _b2, _c, _d, _e;
+          const bid = (_a2 = childNode.getAttribute("bid")) != null ? _a2 : "";
+          if (childNode.hasAttribute("aria-label")) {
+            if (childNode.getAttribute("aria-label") === "confirm") {
+              confirmConfig.confirmText = (_b2 = childNode.getAttribute("label")) != null ? _b2 : "";
+              confirmFunc = `document.querySelector('dweb-dialog-before-unload[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+            } else {
+              confirmConfig.cancelText = (_c = childNode.getAttribute("label")) != null ? _c : "";
+              cancelFunc = `document.querySelector('dweb-dialog-before-unload[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+            }
+          } else {
+            if (index === 0) {
+              confirmConfig.confirmText = (_d = childNode.getAttribute("label")) != null ? _d : "";
+              confirmFunc = `document.querySelector('dweb-dialog-before-unload[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+            } else {
+              confirmConfig.cancelText = (_e = childNode.getAttribute("label")) != null ? _e : "";
+              cancelFunc = `document.querySelector('dweb-dialog-before-unload[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+            }
+          }
+        }
+      );
+      this._ffi.openBeforeUnload(confirmConfig, confirmFunc, cancelFunc);
+      resolve2();
+    });
+  }
+  async attributeChangedCallback(attrName, oldVal, newVal) {
+    if (attrName === "visible" && oldVal !== newVal) {
+      if (this.hasAttribute("visible")) {
+        this.setAttribute("visible", "");
+      } else {
+        this.removeAttribute("visible");
+      }
+    }
+  }
+}
+class BfcsDialogButton extends DwebPlugin {
+  constructor() {
+    super();
+  }
+  connectedCallback() {
+    var _a;
+    this.setAttribute("bid", (Math.random() * Date.now()).toFixed(0));
+    this.setAttribute("label", (_a = this.textContent) != null ? _a : "");
+    this.textContent = "";
+  }
+  disconnectedCallback() {
+    this.removeEventListener("click", () => {
+    });
+  }
+}
+customElements.define("dweb-dialog-alert", BfcsDialogAlert);
+customElements.define("dweb-dialog-prompt", BfcsDialogPrompt);
+customElements.define("dweb-dialog-confirm", BfcsDialogConfirm);
+customElements.define("dweb-dialog-before-unload", BfcsDialogBeforeUnload);
+customElements.define("dweb-dialog-button", BfcsDialogButton);
+class BfspIcon extends DwebPlugin {
+  constructor() {
+    super();
+  }
+  connectedCallback() {
+  }
+  disconnectedCallback() {
+  }
+  static get observedAttributes() {
+    return ["type", "description", "size", "source"];
+  }
+  attributeChangedCallback(attrName, oldVal, newVal) {
+  }
+}
+customElements.define("dweb-icon", BfspIcon);
+const system_ui = "";
+class StatusBarFFI {
+  constructor() {
+    this._ffi = system_ui;
+  }
+  async setStatusBarColor(color, barStyle) {
+    let colorHex;
+    let darkIcons;
+    if (!color) {
+      colorHex = this._ffi.getStatusBarColor();
+    } else {
+      colorHex = getColorInt(
+        color.slice(0, -2),
+        color.slice(-2)
+      );
+    }
+    if (!barStyle) {
+      let isDarkIcons = await this.getStatusBarStyle();
+      darkIcons = isDarkIcons ? 1 : 0;
+    } else {
+      switch (barStyle) {
+        case "light-content":
+          darkIcons = -1;
+          break;
+        case "dark-content":
+          darkIcons = 1;
+          break;
+        default:
+          darkIcons = 0;
+      }
+    }
+    this._ffi.setStatusBarColor(colorHex, darkIcons);
+    return;
+  }
+  getStatusBarColor() {
+    return new Promise((resolve2, reject) => {
+      const color = this._ffi.getStatusBarColor();
+      const colorHex = getColorHex(color);
+      resolve2(colorHex);
+    });
+  }
+  getStatusBarVisible() {
+    return new Promise((resolve2, reject) => {
+      const isVisible = this._ffi.getStatusBarVisible();
+      resolve2(isVisible);
+    });
+  }
+  toggleStatusBarVisible() {
+    return new Promise((resolve2, reject) => {
+      this._ffi.toggleStatusBarVisible(0);
+      resolve2();
+    });
+  }
+  async setStatusBarHidden() {
+    const isVisible = await this.getStatusBarVisible();
+    if (isVisible) {
+      await this.toggleStatusBarVisible();
+    }
+    return;
+  }
+  getStatusBarOverlay() {
+    return new Promise((resolve2, reject) => {
+      const overlay = this._ffi.getStatusBarOverlay();
+      resolve2(overlay);
+    });
+  }
+  toggleStatusBarOverlay() {
+    return new Promise((resolve2, reject) => {
+      this._ffi.toggleStatusBarOverlay(0);
+      resolve2();
+    });
+  }
+  setStatusBarOverlay() {
+    return new Promise((resolve2, reject) => {
+      this._ffi.toggleStatusBarOverlay(1);
+      resolve2();
+    });
+  }
+  getStatusBarStyle() {
+    return new Promise((resolve2, reject) => {
+      const isDarkIcons = this._ffi.getStatusBarStyle();
+      let barStyle;
+      if (isDarkIcons) {
+        barStyle = "dark-content";
+      } else {
+        barStyle = "light-content";
+      }
+      resolve2(barStyle);
+    });
+  }
+}
+class BfcsStatusBar extends DwebPlugin {
+  constructor() {
+    super();
+    this._ffi = new StatusBarFFI();
+  }
+  connectedCallback() {
+    console.log("statusBar\u521D\u59CB\u5316");
+    this._init();
+  }
+  disconnectedCallback() {
+  }
+  async _init() {
+    const barStyle = await this.getStatusBarStyle();
+    this.setAttribute("bar-style", barStyle);
+  }
+  async setStatusBarColor(color, barStyle) {
+    const colorHex = convertToRGBAHex(color != null ? color : "");
+    await this._ffi.setStatusBarColor(colorHex, barStyle);
+    return;
+  }
+  async getStatusBarColor() {
+    const colorHex = await this._ffi.getStatusBarColor();
+    return colorHex;
+  }
+  async getStatusBarVisible() {
+    const isVisible = await this._ffi.getStatusBarVisible();
+    return isVisible;
+  }
+  async toggleStatusBarVisible() {
+    await this._ffi.toggleStatusBarVisible();
+    return;
+  }
+  async getStatusBarOverlay() {
+    let overlay = await this._ffi.getStatusBarOverlay();
+    return overlay;
+  }
+  async toggleStatusBarOverlay() {
+    await this._ffi.toggleStatusBarOverlay();
+    return;
+  }
+  async getStatusBarStyle() {
+    const barStyle = await this._ffi.getStatusBarStyle();
+    return barStyle;
+  }
+  static get observedAttributes() {
+    return ["overlay", "hidden", "bar-style", "background-color"];
+  }
+  attributeChangedCallback(attrName, oldVal, newVal) {
+    var _a;
+    if (attrName === "overlay") {
+      if (this.hasAttribute(attrName)) {
+        this._ffi.setStatusBarOverlay();
+      }
+    } else if (attrName === "hidden") {
+      if (this.hasAttribute(attrName)) {
+        this._ffi.setStatusBarHidden();
+      }
+    } else if (attrName === "bar-style") {
+      if (this.hasAttribute(attrName)) {
+        this.setStatusBarColor(
+          (_a = this.getAttribute("background-color")) != null ? _a : "",
+          newVal ? newVal : void 0
+        );
+      }
+    } else if (attrName === "background-color") {
+      if (this.hasAttribute(attrName)) {
+        let barStyle = this.getAttribute("bar-style") ? this.getAttribute("bar-style") : void 0;
+        this.setStatusBarColor(newVal, barStyle);
+      }
+    }
+  }
+}
+customElements.define("dweb-status-bar", BfcsStatusBar);
+const top_bar = "";
+class TopBarFFI {
+  constructor() {
+    this._ffi = top_bar;
+  }
+  back() {
+    return new Promise((resolve2, reject) => {
+      this._ffi.back();
+      resolve2();
+    });
+  }
+  getEnabled() {
+    return new Promise((resolve2, reject) => {
+      const isEnabled = this._ffi.getEnabled();
+      resolve2(isEnabled);
+    });
+  }
+  toggleEnabled() {
+    return new Promise((resolve2, reject) => {
+      this._ffi.toggleEnabled(0);
+      resolve2();
+    });
+  }
+  async setHidden() {
+    const isEnabled = await this.getEnabled();
+    if (isEnabled) {
+      this.toggleEnabled();
+    }
+    return;
+  }
+  getOverlay() {
+    return new Promise((resolve2, reject) => {
+      const isOverlay = this._ffi.getOverlay();
+      resolve2(isOverlay);
+    });
+  }
+  toggleOverlay() {
+    return new Promise((resolve2, reject) => {
+      this._ffi.toggleOverlay(0);
+      resolve2();
+    });
+  }
+  setOverlay() {
+    return new Promise((resolve2, reject) => {
+      this._ffi.toggleOverlay(1);
+      resolve2();
+    });
+  }
+  getTitle() {
+    return new Promise((resolve2, reject) => {
+      const title = this._ffi.getTitle();
+      resolve2(title);
+    });
+  }
+  setTitle(title) {
+    return new Promise((resolve2, reject) => {
+      this._ffi.setTitle(title);
+      resolve2();
+    });
+  }
+  hasTitle() {
+    return new Promise((resolve2, reject) => {
+      const hasTitle = this._ffi.hasTitle();
+      resolve2(hasTitle);
+    });
+  }
+  getHeight() {
+    return new Promise((resolve2, reject) => {
+      const height = this._ffi.getHeight();
+      resolve2(height);
+    });
+  }
+  getActions() {
+    return new Promise((resolve2, reject) => {
+      const actionList = JSON.parse(this._ffi.getActions());
+      resolve2(actionList);
+    });
+  }
+  setActions(actionList) {
+    return new Promise((resolve2, reject) => {
+      this._ffi.setActions(JSON.stringify(actionList));
+      resolve2();
+    });
+  }
+  getBackgroundColor() {
+    return new Promise((resolve2, reject) => {
+      const color = this._ffi.getBackgroundColor();
+      const colorHex = getColorHex(color);
+      resolve2(colorHex);
+    });
+  }
+  setBackgroundColor(color) {
+    return new Promise(async (resolve2, reject) => {
+      const colorHex = getColorInt(
+        color.slice(0, -2),
+        color.slice(-2)
+      );
+      this._ffi.setBackgroundColor(colorHex);
+      resolve2();
+    });
+  }
+  getForegroundColor() {
+    return new Promise((resolve2, reject) => {
+      const color = this._ffi.getForegroundColor();
+      const colorHex = getColorHex(color);
+      resolve2(colorHex);
+    });
+  }
+  setForegroundColor(color) {
+    return new Promise((resolve2, reject) => {
+      const colorHex = getColorInt(
+        color.slice(0, -2),
+        color.slice(-2)
+      );
+      this._ffi.setForegroundColor(colorHex);
+      resolve2();
+    });
+  }
+}
+class BfcsTopBar extends HTMLElement {
+  constructor() {
+    super();
+    this._actionList = [];
+    this._ffi = new TopBarFFI();
+    this._observer = new MutationObserver(async (mutations) => {
+      await this.collectActions();
+    });
+  }
+  connectedCallback() {
+    this._observer.observe(this, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+      attributeFilter: ["disabled", "type", "description", "size", "source"]
+    });
+    this._init();
+  }
+  disconnectedCallback() {
+    this._observer.disconnect();
+  }
+  async _init() {
+    const height = await this.getHeight();
+    this.setAttribute("height", `${height}`);
+  }
+  async back() {
+    await this._ffi.back();
+    return;
+  }
+  async toggleEnabled() {
+    await this._ffi.toggleEnabled();
+    return;
+  }
+  async getEnabled() {
+    const isEnabled = await this._ffi.getEnabled();
+    return isEnabled;
+  }
+  async getTitle() {
+    const title = await this._ffi.getTitle();
+    return title;
+  }
+  async setTitle(title) {
+    await this._ffi.setTitle(title);
+    return;
+  }
+  async hasTitle() {
+    const has2 = await this._ffi.hasTitle();
+    return has2;
+  }
+  async getOverlay() {
+    const overlay = await this._ffi.getOverlay();
+    return overlay;
+  }
+  async toggleOverlay() {
+    await this._ffi.toggleOverlay();
+    return;
+  }
+  async getHeight() {
+    const height = await this._ffi.getHeight();
+    return height;
+  }
+  async getBackgroundColor() {
+    const color = await this._ffi.getBackgroundColor();
+    return color;
+  }
+  async setBackgroundColor(color) {
+    const colorHex = convertToRGBAHex(color);
+    await this._ffi.setBackgroundColor(colorHex);
+    return;
+  }
+  async getForegroundColor() {
+    const color = await this._ffi.getForegroundColor();
+    return color;
+  }
+  async setForegroundColor(color) {
+    const colorHex = convertToRGBAHex(color);
+    await this._ffi.setForegroundColor(colorHex);
+    return;
+  }
+  async getActions() {
+    this._actionList = await this._ffi.getActions();
+    return this._actionList;
+  }
+  async setActions() {
+    await this._ffi.setActions(this._actionList);
+    return;
+  }
+  async collectActions() {
+    this._actionList = [];
+    this.querySelectorAll("dweb-top-bar-button").forEach((childNode) => {
+      var _a, _b;
+      let icon = {
+        source: "",
+        type: "NamedIcon"
+      };
+      if (childNode.querySelector("dweb-icon")) {
+        let $ = childNode.querySelector("dweb-icon");
+        icon.source = (_a = $ == null ? void 0 : $.getAttribute("source")) != null ? _a : "";
+        icon.type = ($ == null ? void 0 : $.hasAttribute("type")) ? $.getAttribute("type") : "NamedIcon";
+        icon.description = (_b = $ == null ? void 0 : $.getAttribute("description")) != null ? _b : "";
+        icon.size = ($ == null ? void 0 : $.hasAttribute("size")) ? $.getAttribute("size") : void 0;
+      }
+      const bid = childNode.getAttribute("bid");
+      const onClickCode = `document.querySelector('dweb-top-bar-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+      const disabled = childNode.hasAttribute("disabled") ? true : false;
+      this._actionList.push({ icon, onClickCode, disabled });
+    });
+    await this.setActions();
+  }
+  static get observedAttributes() {
+    return [
+      "title",
+      "hidden",
+      "background-color",
+      "foreground-color",
+      "overlay"
+    ];
+  }
+  async attributeChangedCallback(attrName, oldVal, newVal) {
+    if (oldVal === newVal) {
+      return;
+    }
+    if (attrName === "title") {
+      await this.setTitle(newVal);
+    } else if (attrName === "background-color") {
+      await this.setBackgroundColor(newVal);
+    } else if (attrName === "foreground-color") {
+      await this.setForegroundColor(newVal);
+    } else if (attrName === "overlay") {
+      if (this.hasAttribute(attrName)) {
+        await this._ffi.setOverlay();
+      }
+    } else if (attrName === "hidden") {
+      if (this.hasAttribute(attrName)) {
+        await this._ffi.setHidden();
+      }
+    }
+  }
+}
+class BfcsTopBarButton extends DwebPlugin {
+  constructor() {
+    super();
+  }
+  connectedCallback() {
+    this.setAttribute("bid", (Math.random() * Date.now()).toFixed(0));
+  }
+  disconnectedCallback() {
+    this.removeEventListener("click", () => {
+    });
+  }
+  static get observedAttributes() {
+    return ["disabled"];
+  }
+  attributeChangedCallback(attrName, oldVal, newVal) {
+    if (attrName === "disabled" && oldVal !== newVal) {
+      if (this.hasAttribute(attrName)) {
+        this.setAttribute(attrName, "");
+      } else {
+        this.removeAttribute(attrName);
+      }
+    }
+  }
+}
+customElements.define("dweb-top-bar", BfcsTopBar);
+customElements.define("dweb-top-bar-button", BfcsTopBarButton);
 const _hoisted_1$1 = { class: "card" };
 const _hoisted_2 = { class: "card" };
-const _hoisted_3 = /* @__PURE__ */ createStaticVNode('<div style="margin-top:50px;" data-v-b8ad775e><input id="toastMessage" type="text" placeholder="Toast message" data-v-b8ad775e></div><p data-v-b8ad775e> Check out <a href="https://vuejs.org/guide/quick-start.html#local" target="_blank" data-v-b8ad775e>create-vue</a>, the official Vue + Vite starter </p><p data-v-b8ad775e> Install <a href="https://github.com/johnsoncodehk/volar" target="_blank" data-v-b8ad775e>Volar</a> in your IDE for a better DX </p><p class="read-the-docs" data-v-b8ad775e>Click on the Vite and Vue logos to learn more</p>', 4);
+const _hoisted_3 = /* @__PURE__ */ createStaticVNode('<div style="margin-top:50px;" data-v-9227e2da><input id="toastMessage" type="text" placeholder="Toast message" data-v-9227e2da></div><p data-v-9227e2da> Check out <a href="https://vuejs.org/guide/quick-start.html#local" target="_blank" data-v-9227e2da>create-vue</a>, the official Vue + Vite starter </p><p data-v-9227e2da> Install <a href="https://github.com/johnsoncodehk/volar" target="_blank" data-v-9227e2da>Volar</a> in your IDE for a better DX </p><p class="read-the-docs" data-v-9227e2da>Click on the Vite and Vue logos to learn more</p>', 4);
 const _sfc_main$1 = /* @__PURE__ */ defineComponent({
   __name: "HelloWorld",
   props: {
@@ -4767,8 +6115,7 @@ const _sfc_main$1 = /* @__PURE__ */ defineComponent({
     let scannerData = ref("\u626B\u7801\u8FD4\u56DE\u7684\u6570\u636E");
     let dwebPluginData = ref("dweb\u7684\u6570\u636E");
     onMounted(async () => {
-      console.log("document.querySelector('dweb-messager'):", document.querySelector("dweb-messager"));
-      console.log("document.querySelector('dweb-scanner'):", document.querySelector("dweb-scanner"));
+      console.log("document.querySelector('dweb-status-bar')!=>", document.querySelector("dweb-status-bar"));
     });
     async function openScanner() {
       const scanner = document.querySelector("dweb-scanner");
@@ -4782,9 +6129,15 @@ const _sfc_main$1 = /* @__PURE__ */ defineComponent({
     return (_ctx, _cache) => {
       const _component_dweb_messager = resolveComponent("dweb-messager");
       const _component_dweb_scanner = resolveComponent("dweb-scanner");
+      const _component_dweb_status_bar = resolveComponent("dweb-status-bar");
       return openBlock(), createElementBlock(Fragment, null, [
         createVNode(_component_dweb_messager, { id: "dweb" }),
         createVNode(_component_dweb_scanner, { channelId: "helloWorld" }),
+        createVNode(_component_dweb_status_bar, {
+          id: "status_bar",
+          "background-color": "#f00f",
+          "bar-style": "dark-content"
+        }),
         createBaseVNode("h1", null, toDisplayString(__props.msg), 1),
         createBaseVNode("div", _hoisted_1$1, [
           createBaseVNode("button", {
@@ -4797,7 +6150,7 @@ const _sfc_main$1 = /* @__PURE__ */ defineComponent({
           createBaseVNode("button", {
             type: "button",
             onClick: onDwebPlugin
-          }, "webPlugin\u6D88\u606F"),
+          }, "webMessage\u6D88\u606F"),
           createBaseVNode("p", null, toDisplayString(unref(dwebPluginData)), 1)
         ]),
         _hoisted_3
@@ -4805,7 +6158,7 @@ const _sfc_main$1 = /* @__PURE__ */ defineComponent({
     };
   }
 });
-const HelloWorld_vue_vue_type_style_index_0_scoped_b8ad775e_lang = "";
+const HelloWorld_vue_vue_type_style_index_0_scoped_9227e2da_lang = "";
 const _export_sfc = (sfc, props) => {
   const target = sfc.__vccOpts || sfc;
   for (const [key, val] of props) {
@@ -4813,7 +6166,7 @@ const _export_sfc = (sfc, props) => {
   }
   return target;
 };
-const HelloWorld = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["__scopeId", "data-v-b8ad775e"]]);
+const HelloWorld = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["__scopeId", "data-v-9227e2da"]]);
 const _hoisted_1 = /* @__PURE__ */ createStaticVNode('<div data-v-e2cfde70><a href="https://vitejs.dev" target="_blank" data-v-e2cfde70><img src="' + _imports_0 + '" class="logo" alt="Vite logo" data-v-e2cfde70></a><a href="https://vuejs.org/" target="_blank" data-v-e2cfde70><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-e2cfde70></a><a href="https://vuejs.org/" target="_blank" data-v-e2cfde70><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-e2cfde70></a><a href="https://vuejs.org/" target="_blank" data-v-e2cfde70><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-e2cfde70></a></div>', 1);
 const _sfc_main = /* @__PURE__ */ defineComponent({
   __name: "App",

@@ -44,7 +44,7 @@ function copyDir(src, dist, callback) {
     }
   }
 }
-copyDir('./build', '/Users/mac/Desktop/waterbang/project/android-deno-runtime-example/app/src/main/assets', function (err) {
+copyDir('./build', '../android/app/src/main/assets', function (err) {
   if (err) {
     console.log(err);
   }

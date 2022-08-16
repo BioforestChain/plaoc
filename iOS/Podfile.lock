@@ -1,0 +1,44 @@
+PODS:
+  - CocoaLumberjack (3.7.4):
+    - CocoaLumberjack/Core (= 3.7.4)
+  - CocoaLumberjack/Core (3.7.4)
+  - RxSwift (6.5.0)
+  - SDWebImage (5.12.6):
+    - SDWebImage/Core (= 5.12.6)
+  - SDWebImage/Core (5.12.6)
+  - SnapKit (5.6.0)
+  - SVGKit (3.0.0):
+    - CocoaLumberjack (~> 3.0)
+  - SwiftyJSON (5.0.1)
+  - UIColor_Hex_Swift (5.1.7)
+
+DEPENDENCIES:
+  - RxSwift
+  - SDWebImage
+  - SnapKit
+  - SVGKit
+  - SwiftyJSON
+  - UIColor_Hex_Swift
+
+SPEC REPOS:
+  trunk:
+    - CocoaLumberjack
+    - RxSwift
+    - SDWebImage
+    - SnapKit
+    - SVGKit
+    - SwiftyJSON
+    - UIColor_Hex_Swift
+
+SPEC CHECKSUMS:
+  CocoaLumberjack: 543c79c114dadc3b1aba95641d8738b06b05b646
+  RxSwift: 5710a9e6b17f3c3d6e40d6e559b9fa1e813b2ef8
+  SDWebImage: a47aea9e3d8816015db4e523daff50cfd294499d
+  SnapKit: e01d52ebb8ddbc333eefe2132acf85c8227d9c25
+  SVGKit: 1ad7513f8c74d9652f94ed64ddecda1a23864dea
+  SwiftyJSON: 2f33a42c6fbc52764d96f13368585094bfd8aa5e
+  UIColor_Hex_Swift: 31cd3e47440f07a20d2503a36bb0437a445b3c29
+
+PODFILE CHECKSUM: 557ff6ece453a41ccee0a9357c43a111a8448db9
+
+COCOAPODS: 1.11.3

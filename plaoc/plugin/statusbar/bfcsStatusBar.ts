@@ -1,7 +1,7 @@
 import { convertToRGBAHex } from "./../util";
 import { DwebPlugin } from "../native/dweb-plugin";
 import { StatusBarFFI } from "./ffi#android";
-import { StatusBar } from "./bfcsStatusBar.d";
+import { StatusBar } from "./bfcsStatusBar.type";
 import "../typings";
 
 export class BfcsStatusBar extends DwebPlugin {

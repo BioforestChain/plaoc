@@ -1,6 +1,6 @@
 import "../typings";
 import { getColorInt, getColorHex } from "./../util";
-import { StatusBar } from "./bfcsStatusBar.d";
+import { StatusBar } from "./bfcsStatusBar.type";
 export const system_ui: any = "";
 
 export class StatusBarFFI implements StatusBar.IStatusBarFFI {
