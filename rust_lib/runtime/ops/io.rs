@@ -378,16 +378,18 @@ impl StdFileResourceInner {
       }
       Self::Stdout(_) => {
         // bypass the file and use std::io::stdout()
-        let mut stdout = std::io::stdout().lock();
-        stdout.write_all(buf)?;
-        stdout.flush()?;
+        log::info!("{}", std::str::from_utf8(buf).unwrap());
+        // let mut stdout = std::io::stdout().lock();
+        // stdout.write_all(buf)?;
+        // stdout.flush()?;
         Ok(())
       }
       Self::Stderr(_) => {
         // bypass the file and use std::io::stderr()
-        let mut stderr = std::io::stderr().lock();
-        stderr.write_all(buf)?;
-        stderr.flush()?;
+        log::error!("{}", std::str::from_utf8(buf).unwrap());
+        // let mut stderr = std::io::stderr().lock();
+        // stderr.write_all(buf)?;
+        // stderr.flush()?;
         Ok(())
       }
     }
