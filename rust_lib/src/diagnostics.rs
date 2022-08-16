@@ -6,7 +6,6 @@ use deno_core::serde::Deserialize;
 use deno_core::serde::Deserializer;
 use deno_core::serde::Serialize;
 use deno_core::serde::Serializer;
-use deno_graph::ModuleGraphError;
 use once_cell::sync::Lazy;
 use regex::Regex;
 use std::error::Error;
@@ -16,7 +15,6 @@ const MAX_SOURCE_LINE_LENGTH: usize = 150;
 
 const UNSTABLE_DENO_PROPS: &[&str] = &[
   "BenchDefinition",
-  "CompilerOptions",
   "CreateHttpClientOptions",
   "DatagramConn",
   "Diagnostic",
@@ -27,11 +25,8 @@ const UNSTABLE_DENO_PROPS: &[&str] = &[
   "EmitResult",
   "HttpClient",
   "Location",
-  "MXRecord",
   "Metrics",
   "OpMetrics",
-  "RecordType",
-  "SRVRecord",
   "SetRawOptions",
   "SignalStream",
   "StartTlsOptions",
@@ -39,13 +34,10 @@ const UNSTABLE_DENO_PROPS: &[&str] = &[
   "UnixConnectOptions",
   "UnixListenOptions",
   "addSignalListener",
-  "applySourceMap",
   "bench",
   "connect",
   "consoleSize",
   "createHttpClient",
-  "emit",
-  "formatDiagnostics",
   "futime",
   "futimeSync",
   "hostname",
@@ -60,7 +52,6 @@ const UNSTABLE_DENO_PROPS: &[&str] = &[
   "setRaw",
   "shutdown",
   "Signal",
-  "sleepSync",
   "startTls",
   "systemMemoryInfo",
   "umask",
@@ -74,8 +65,10 @@ const UNSTABLE_DENO_PROPS: &[&str] = &[
   "SpawnOutput",
 ];
 
-static MSG_MISSING_PROPERTY_DENO: Lazy<Regex> =
-  Lazy::new(|| Regex::new(r#"Property '([^']+)' does not exist on type 'typeof Deno'"#).unwrap());
+static MSG_MISSING_PROPERTY_DENO: Lazy<Regex> = Lazy::new(|| {
+  Regex::new(r#"Property '([^']+)' does not exist on type 'typeof Deno'"#)
+    .unwrap()
+});
 
 static MSG_SUGGESTION: Lazy<Regex> =
   Lazy::new(|| Regex::new(r#" Did you mean '([^']+)'\?"#).unwrap());
@@ -88,11 +81,7 @@ fn format_message(msg: &str, code: &u64) -> String {
       if let Some(captures) = MSG_MISSING_PROPERTY_DENO.captures(msg) {
         if let Some(property) = captures.get(1) {
           if UNSTABLE_DENO_PROPS.contains(&property.as_str()) {
-            return format!(
-              "{} 'Deno.{}' is an unstable API. Did you forget to run with the '--unstable' flag?",
-              msg,
-              property.as_str()
-            );
+            return format!("{} 'Deno.{}' is an unstable API. Did you forget to run with the '--unstable' flag?", msg, property.as_str());
           }
         }
       }
@@ -104,7 +93,9 @@ fn format_message(msg: &str, code: &u64) -> String {
         MSG_MISSING_PROPERTY_DENO.captures(msg),
         MSG_SUGGESTION.captures(msg),
       ) {
-        if let (Some(property), Some(suggestion)) = (caps_property.get(1), caps_suggestion.get(1)) {
+        if let (Some(property), Some(suggestion)) =
+          (caps_property.get(1), caps_suggestion.get(1))
+        {
           if UNSTABLE_DENO_PROPS.contains(&property.as_str()) {
             return format!("{} 'Deno.{}' is an unstable API. Did you forget to run with the '--unstable' flag, or did you mean '{}'?", MSG_SUGGESTION.replace(msg, ""), property.as_str(), suggestion.as_str());
           }
@@ -248,7 +239,9 @@ impl Diagnostic {
   }
 
   fn fmt_frame(&self, f: &mut fmt::Formatter, level: usize) -> fmt::Result {
-    if let (Some(file_name), Some(start)) = (self.file_name.as_ref(), self.start.as_ref()) {
+    if let (Some(file_name), Some(start)) =
+      (self.file_name.as_ref(), self.start.as_ref())
+    {
       write!(
         f,
         "\n{:indent$}    at {}:{}:{}",
@@ -277,10 +270,16 @@ impl Diagnostic {
     }
   }
 
-  fn fmt_source_line(&self, f: &mut fmt::Formatter, level: usize) -> fmt::Result {
-    if let (Some(source_line), Some(start), Some(end)) = (&self.source_line, &self.start, &self.end)
+  fn fmt_source_line(
+    &self,
+    f: &mut fmt::Formatter,
+    level: usize,
+  ) -> fmt::Result {
+    if let (Some(source_line), Some(start), Some(end)) =
+      (&self.source_line, &self.start, &self.end)
     {
-      if !source_line.is_empty() && source_line.len() <= MAX_SOURCE_LINE_LENGTH {
+      if !source_line.is_empty() && source_line.len() <= MAX_SOURCE_LINE_LENGTH
+      {
         write!(f, "\n{:indent$}{}", "", source_line, indent = level)?;
         let length = if start.line == end.line {
           end.character - start.character
@@ -353,21 +352,6 @@ impl Diagnostics {
     Diagnostics(diagnostics)
   }
 
-  pub fn extend_graph_errors(&mut self, errors: Vec<ModuleGraphError>) {
-    self.0.extend(errors.into_iter().map(|err| Diagnostic {
-      category: DiagnosticCategory::Error,
-      code: 900001,
-      start: None,
-      end: None,
-      message_text: Some(err.to_string()),
-      message_chain: None,
-      source: None,
-      source_line: None,
-      file_name: Some(err.specifier().to_string()),
-      related_information: None,
-    }));
-  }
-
   /// Return a set of diagnostics where only the values where the predicate
   /// returns `true` are included.
   pub fn filter<P>(&self, predicate: P) -> Self
@@ -422,3 +406,208 @@ impl fmt::Display for Diagnostics {
 }
 
 impl Error for Diagnostics {}
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+  use deno_core::serde_json;
+  use deno_core::serde_json::json;
+  use test_util::strip_ansi_codes;
+
+  #[test]
+  fn test_de_diagnostics() {
+    let value = json!([
+      {
+        "messageText": "Unknown compiler option 'invalid'.",
+        "category": 1,
+        "code": 5023
+      },
+      {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 7
+        },
+        "fileName": "test.ts",
+        "messageText": "Cannot find name 'console'. Do you need to change your target library? Try changing the `lib` compiler option to include 'dom'.",
+        "sourceLine": "console.log(\"a\");",
+        "category": 1,
+        "code": 2584
+      },
+      {
+        "start": {
+          "line": 7,
+          "character": 0
+        },
+        "end": {
+          "line": 7,
+          "character": 7
+        },
+        "fileName": "test.ts",
+        "messageText": "Cannot find name 'foo_Bar'. Did you mean 'foo_bar'?",
+        "sourceLine": "foo_Bar();",
+        "relatedInformation": [
+          {
+            "start": {
+              "line": 3,
+              "character": 9
+            },
+            "end": {
+              "line": 3,
+              "character": 16
+            },
+            "fileName": "test.ts",
+            "messageText": "'foo_bar' is declared here.",
+            "sourceLine": "function foo_bar() {",
+            "category": 3,
+            "code": 2728
+          }
+        ],
+        "category": 1,
+        "code": 2552
+      },
+      {
+        "start": {
+          "line": 18,
+          "character": 0
+        },
+        "end": {
+          "line": 18,
+          "character": 1
+        },
+        "fileName": "test.ts",
+        "messageChain": {
+          "messageText": "Type '{ a: { b: { c(): { d: number; }; }; }; }' is not assignable to type '{ a: { b: { c(): { d: string; }; }; }; }'.",
+          "category": 1,
+          "code": 2322,
+          "next": [
+            {
+              "messageText": "The types of 'a.b.c().d' are incompatible between these types.",
+              "category": 1,
+              "code": 2200,
+              "next": [
+                {
+                  "messageText": "Type 'number' is not assignable to type 'string'.",
+                  "category": 1,
+                  "code": 2322
+                }
+              ]
+            }
+          ]
+        },
+        "sourceLine": "x = y;",
+        "code": 2322,
+        "category": 1
+      }
+    ]);
+    let diagnostics: Diagnostics =
+      serde_json::from_value(value).expect("cannot deserialize");
+    assert_eq!(diagnostics.0.len(), 4);
+    assert!(diagnostics.0[0].source_line.is_none());
+    assert!(diagnostics.0[0].file_name.is_none());
+    assert!(diagnostics.0[0].start.is_none());
+    assert!(diagnostics.0[0].end.is_none());
+    assert!(diagnostics.0[0].message_text.is_some());
+    assert!(diagnostics.0[0].message_chain.is_none());
+    assert!(diagnostics.0[0].related_information.is_none());
+    assert!(diagnostics.0[1].source_line.is_some());
+    assert!(diagnostics.0[1].file_name.is_some());
+    assert!(diagnostics.0[1].start.is_some());
+    assert!(diagnostics.0[1].end.is_some());
+    assert!(diagnostics.0[1].message_text.is_some());
+    assert!(diagnostics.0[1].message_chain.is_none());
+    assert!(diagnostics.0[1].related_information.is_none());
+    assert!(diagnostics.0[2].source_line.is_some());
+    assert!(diagnostics.0[2].file_name.is_some());
+    assert!(diagnostics.0[2].start.is_some());
+    assert!(diagnostics.0[2].end.is_some());
+    assert!(diagnostics.0[2].message_text.is_some());
+    assert!(diagnostics.0[2].message_chain.is_none());
+    assert!(diagnostics.0[2].related_information.is_some());
+  }
+
+  #[test]
+  fn test_diagnostics_no_source() {
+    let value = json!([
+      {
+        "messageText": "Unknown compiler option 'invalid'.",
+        "category":1,
+        "code":5023
+      }
+    ]);
+    let diagnostics: Diagnostics = serde_json::from_value(value).unwrap();
+    let actual = diagnostics.to_string();
+    assert_eq!(
+      strip_ansi_codes(&actual),
+      "TS5023 [ERROR]: Unknown compiler option \'invalid\'."
+    );
+  }
+
+  #[test]
+  fn test_diagnostics_basic() {
+    let value = json!([
+      {
+        "start": {
+          "line": 0,
+          "character": 0
+        },
+        "end": {
+          "line": 0,
+          "character": 7
+        },
+        "fileName": "test.ts",
+        "messageText": "Cannot find name 'console'. Do you need to change your target library? Try changing the `lib` compiler option to include 'dom'.",
+        "sourceLine": "console.log(\"a\");",
+        "category": 1,
+        "code": 2584
+      }
+    ]);
+    let diagnostics: Diagnostics = serde_json::from_value(value).unwrap();
+    let actual = diagnostics.to_string();
+    assert_eq!(strip_ansi_codes(&actual), "TS2584 [ERROR]: Cannot find name \'console\'. Do you need to change your target library? Try changing the `lib` compiler option to include \'dom\'.\nconsole.log(\"a\");\n~~~~~~~\n    at test.ts:1:1");
+  }
+
+  #[test]
+  fn test_diagnostics_related_info() {
+    let value = json!([
+      {
+        "start": {
+          "line": 7,
+          "character": 0
+        },
+        "end": {
+          "line": 7,
+          "character": 7
+        },
+        "fileName": "test.ts",
+        "messageText": "Cannot find name 'foo_Bar'. Did you mean 'foo_bar'?",
+        "sourceLine": "foo_Bar();",
+        "relatedInformation": [
+          {
+            "start": {
+              "line": 3,
+              "character": 9
+            },
+            "end": {
+              "line": 3,
+              "character": 16
+            },
+            "fileName": "test.ts",
+            "messageText": "'foo_bar' is declared here.",
+            "sourceLine": "function foo_bar() {",
+            "category": 3,
+            "code": 2728
+          }
+        ],
+        "category": 1,
+        "code": 2552
+      }
+    ]);
+    let diagnostics: Diagnostics = serde_json::from_value(value).unwrap();
+    let actual = diagnostics.to_string();
+    assert_eq!(strip_ansi_codes(&actual), "TS2552 [ERROR]: Cannot find name \'foo_Bar\'. Did you mean \'foo_bar\'?\nfoo_Bar();\n~~~~~~~\n    at test.ts:8:1\n\n    \'foo_bar\' is declared here.\n    function foo_bar() {\n             ~~~~~~~\n        at test.ts:4:10");
+  }
+}

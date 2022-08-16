@@ -91,6 +91,7 @@ impl ModuleLoader for AssetsModuleLoader {
         _maybe_referrer: Option<ModuleSpecifier>,
         _is_dynamic: bool,
     ) -> Pin<Box<ModuleSourceFuture>> {
+
         let module_specifier = module_specifier.clone();
         let path = module_specifier
             .to_file_path()
@@ -101,6 +102,7 @@ impl ModuleLoader for AssetsModuleLoader {
                 ))
             })
             .unwrap();
+        log::info!("loading path {:?}", path);
         let module_type = if let Some(extension) = path.extension() {
             let ext = extension.to_string_lossy().to_lowercase();
             if ext == "json" {
@@ -137,9 +139,11 @@ impl ModuleLoader for AssetsModuleLoader {
             .to_string()
         };
 
+        log::info!("loaded code {:?}: {}", path,code);
+
         return async move {
             let module = ModuleSource {
-                code,
+                code: code.into_bytes().into_boxed_slice(),
                 module_type,
                 module_url_specified: module_specifier.clone().to_string(),
                 module_url_found: module_specifier.to_string(),

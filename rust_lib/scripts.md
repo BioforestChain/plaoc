@@ -11,9 +11,9 @@ cargo run
 ```shell
 rustup  target add aarch64-linux-android
 
-cargo build --target=aarch64-linux-android --release
+RUST_BACKTRACE=full cargo build -vv --target=aarch64-linux-android --release
 
-cargo build --target=aarch64-apple-darwin --release
+RUST_BACKTRACE=full cargo build -vv --target=aarch64-apple-darwin --release
 ```
 
 修改默认编译器
@@ -26,25 +26,22 @@ rustup set default-host x86_64-pc-windows-gnu
 ### 如果遇到v8报错需要设置环境变量
 
 ```powershell
-$env:RUSTY_V8_MIRROR="D:/dev\AndroidStudioProjects\RustEample\rust_lib\assets\rusty_v8_mirror\"
-$env:RUSTY_V8_ARCHIVE="D:\dev\AndroidStudioProjects\RustEample\rust_lib\assets\rusty_v8_mirror\v0.42.0\rusty_v8_release_x86_64-pc-windows-msvc.lib"
-$env:RUSTY_V8_ARCHIVE="D:\dev\AndroidStudioProjects\RustEample\rust_lib\assets\rusty_v8_mirror\v0.42.0\librusty_v8_release_aarch64-linux-android.a"
+$env:RUSTY_V8_MIRROR="%PWD%\assets\rusty_v8_mirror\"
+$env:RUSTY_V8_ARCHIVE="%PWD%\assets\rusty_v8_mirror\v0.48.1\rusty_v8_release_x86_64-pc-windows-msvc.lib"
+$env:RUSTY_V8_ARCHIVE="%PWD%\assets\rusty_v8_mirror\v0.48.1\librusty_v8_release_aarch64-linux-android.a"
 ```
 
 ```cmd
-set RUSTY_V8_MIRROR=D:\dev\AndroidStudioProjects\RustEample\rust_lib\assets\rusty_v8_mirror\
-set RUSTY_V8_ARCHIVE=D:\dev\AndroidStudioProjects\RustEample\rust_lib\assets\rusty_v8_mirror\v0.42.0\rusty_v8_release_x86_64-pc-windows-msvc.lib
+set RUSTY_V8_MIRROR=$PWD\assets\rusty_v8_mirror\
+set RUSTY_V8_ARCHIVE=$PWD\assets\rusty_v8_mirror\v0.48.1\rusty_v8_release_x86_64-pc-windows-msvc.lib
 ```
 
 ```bash
-export RUSTY_V8_MIRROR="/mnt/d/dev/AndroidStudioProjects/RustEample/rust_lib/assets/rusty_v8_mirror/"
-export RUSTY_V8_ARCHIVE="/mnt/d/dev/AndroidStudioProjects/RustEample/rust_lib/assets/rusty_v8_mirror/v0.42.0/librusty_v8_release_aarch64-linux-android.a"
+export RUSTY_V8_MIRROR="$PWD/assets/rusty_v8_mirror/"
 
-export RUSTY_V8_MIRROR="/Users/mac/Desktop/waterbang/project/android-deno-runtime-example/rust_lib/assets/rusty_v8_mirror/"
-export RUSTY_V8_ARCHIVE="/Users/mac/Desktop/waterbang/project/android-deno-runtime-example/rust_lib/assets/rusty_v8_mirror/v0.42.0/librusty_v8_release_aarch64-linux-android.a"
-
-
-export RUSTY_V8_ARCHIVE="/Users/mac/Desktop/waterbang/project/android-deno-runtime-example/rust_lib/assets/rusty_v8_mirror/v0.42.0/librusty_v8_release_aarch64-apple-darwin.a"
+export RUSTY_V8_ARCHIVE="$PWD/assets/rusty_v8_mirror/v0.48.1/librusty_v8_release_aarch64-linux-android.a"
+export RUSTY_V8_ARCHIVE="$PWD/assets/rusty_v8_mirror/v0.48.1/librusty_v8_release_aarch64-unknown-linux-gnu.a"
+export RUSTY_V8_ARCHIVE="$PWD/assets/rusty_v8_mirror/v0.48.1/librusty_v8_release_aarch64-apple-darwin.a"
 ```
 
 ### 修复`unable to find library -lgcc`的问题
@@ -79,9 +76,13 @@ RUST_BACKTRACE=1 cargo build --target=aarch64-linux-android --release
 原因是环境变量的名称错误，需要更改一下
 
 ```bash
-cd /Users/mac/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/bin/
+# 把 aarch64-linux-android-clang 加入环境变量
+export PATH="$PATH:$ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/darwin-x86_64/bin"
+# PS: $ANDROID_NDK_ROOT 大概是："/Users/kzf/Library/Android/sdk/ndk/22.0.7026061" 需要代码NDK版本号
 
-cp aarch64-linux-android28-clang aarch64-linux-android-clang 
+# 确保 aarch64-linux-android-clang 存在
+cd $ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/darwin-x86_64/bin/
+cp aarch64-linux-android30-clang aarch64-linux-android-clang 
 ```
 
 ### 修复error: failed to run custom build command for `libffi-sys v1.3.2`

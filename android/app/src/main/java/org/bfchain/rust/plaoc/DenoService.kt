@@ -17,7 +17,7 @@ private const val TAG = "DENO_SERVICE"
  * 第三块分区：数据主体 动态创建
  */
 // 这里当做一个连接池，每当有客户端传过来方法就注册一下，返回的时候就知道数据是谁要的了 <handleFunction,headId>
-val rust_call_map = mutableMapOf<String, ByteArray>()
+val rust_call_map = mutableMapOf<ExportNative, ByteArray>()
 
 // 存储版本号 <versionID,headerID>
 val version_head_map = mutableMapOf<ByteArray, ByteArray>()
@@ -72,7 +72,7 @@ fun warpCallback(bytes: ByteArray, store: Boolean = true) {
     mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true) //允许出现特殊字符和转义符
     mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true) //允许使用单引号
     val handle = mapper.readValue(stringData, RustHandle::class.java)
-    val funName = (handle.function[0]).toString()
+    val funName = ExportNative.valueOf((handle.function[0]))
     if (store) {
         rust_call_map[funName] = headId     // 存一下头部标记，返回数据的时候才知道给谁,存储的调用的函数名跟头部标记一一对应
     }
@@ -96,7 +96,7 @@ fun parseBytesFactory(bytes: ByteArray): ByteData {
 /**
  * 创建二进制数据返回
  */
-fun createBytesFactory(callFun: String, message: String): ByteArray {
+fun createBytesFactory(callFun: ExportNative, message: String): ByteArray {
     val headId = rust_call_map[callFun] ?: ByteArray(2).plus(0x00)
     val versionId = version_head_map[headId] ?: ByteArray(1).plus(0x01)
     val msgBit = message.encodeToByteArray()

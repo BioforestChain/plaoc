@@ -31,7 +31,7 @@ import org.bfchain.rust.plaoc.webView.sendToJavaScript
 import java.net.URL
 
 
-val callable_map = mutableMapOf<String, (data: String) -> Unit>()
+val callable_map = mutableMapOf<ExportNative, (data: String) -> Unit>()
 
 class MainActivity : AppCompatActivity() {
     var isQRCode = false //是否是识别二维码
@@ -46,17 +46,17 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        callable_map[ExportNative().openScanner] = { openScannerActivity() }
-        callable_map[ExportNative().openDWebView] = {
+        callable_map[ExportNative.OpenScanner] = { openScannerActivity() }
+        callable_map[ExportNative.OpenDWebView] = {
             openDWebViewActivity(it)
         }
-        callable_map[ExportNative().initMetaData] = {
+        callable_map[ExportNative.InitMetaData] = {
             initMetaData(it)
         }
-        callable_map[ExportNative().denoRuntime] = {
+        callable_map[ExportNative.DenoRuntime] = {
             DenoService().denoRuntime(this.assets, it)
         }
-        callable_map[ExportNative().evalJsRuntime] =
+        callable_map[ExportNative.EvalJsRuntime] =
             { sendToJavaScript(it) }
 
         // 启动Deno服务

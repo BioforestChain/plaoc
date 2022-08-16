@@ -1,6 +1,7 @@
 pub mod android;
 mod diagnostics;
 mod errors;
+mod colors;
 mod fmt_errors;
 mod js_bridge;
 mod module_loader;

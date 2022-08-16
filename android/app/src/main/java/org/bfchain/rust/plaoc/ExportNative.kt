@@ -1,11 +1,11 @@
 package org.bfchain.rust.plaoc
 
 
-class ExportNative {
-    val openScanner = "openScanner"
-    val openDWebView = "openDWebView"
-    val initMetaData = "initMetaData"
-    val denoRuntime = "denoRuntime"
-    val evalJsRuntime = "evalJsRuntime"
+enum class ExportNative(val type: String) {
+    OpenScanner("openScanner"),
+    OpenDWebView("openDWebView"),
+    InitMetaData("initMetaData"),
+    DenoRuntime("denoRuntime"),
+    EvalJsRuntime("evalJsRuntime"),
 }
 

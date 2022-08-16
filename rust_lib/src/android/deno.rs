@@ -32,7 +32,7 @@ pub async extern "system" fn Java_org_bfchain_rust_plaoc_DenoService_initDeno(
             .with_min_level(Level::Debug)
             .with_tag("myrust::BFS"),
     );
-    log::info!("启动BFS后端");
+    log::info!("启动BFS后端!!");
     let asset_manager_ptr = unsafe {
         ndk_sys::AAssetManager_fromJava(env.get_native_interface(), jasset_manager.cast())
     };

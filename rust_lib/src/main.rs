@@ -1,5 +1,6 @@
 mod diagnostics;
 mod errors;
+mod colors;
 mod fmt_errors;
 mod module_loader;
 mod my_deno_runtime;
