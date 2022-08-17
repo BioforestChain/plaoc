@@ -95,3 +95,19 @@ brew install autoconf automake libtool
 
 然后 在ext/ffi/cargo.toml
 修改版本为：libffi = "3.0.0"
+
+### thread 'main' panicked at 'called `Result::unwrap()` on an `Err` value: Os { code: 2, kind: NotFound, message: "No such file or directory" }', /Users/waterbang/.cargo/registry/src/github.com-1ecc6299db9ec823/v8-0.48.1/build.rs:366:30
+
+```bash
+export RUSTY_V8_ARCHIVE="$PWD/assets/rusty_v8_mirror/v0.48.1/librusty_v8_release_aarch64-linux-android.a"
+```
+
+### ld: symbol(s) not found for architecture x86_64
+
+确保以下文件存在
+  > rust_lib/assets/rusty_v8_mirror/v0.48.1/librusty_v8_release_aarch64-linux-android.a
+  > rust_lib/assets/rusty_v8_mirror/v0.48.1/librusty_v8_release_x86_64-apple-darwin.a
+
+```bash
+ brew install glib glib-utils
+```

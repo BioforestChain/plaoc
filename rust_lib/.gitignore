@@ -1,6 +1,7 @@
 /target
 Cargo.lock
-rusty_v8_mirror
+assets/rusty_v8_mirror/v0.48.1
+android/.idea
 runtime-1.24.3
 cargo-1.24.3.toml
 *.rs.

@@ -22,4 +22,4 @@ local.properties
 /test-vue3/build
 /plaoc/yarn-error.log
 
-rust_lib/assets/rusty_v8_mirror
+rust_lib/assets/rusty_v8_mirror/v0.48.1
