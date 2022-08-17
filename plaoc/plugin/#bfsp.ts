@@ -14,6 +14,12 @@ export default defineConfig((info) => {
       dependencies: {},
       devDependencies: {},
     },
+    tsConfig: {
+      compilerOptions: {
+        module: "ES2022",
+        target: "ES2022",
+      },
+    },
   };
 
   return config;
