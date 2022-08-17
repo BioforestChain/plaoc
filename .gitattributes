@@ -1,2 +1,5 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+*.a filter=lfs diff=lfs merge=lfs -text
+librusty_v8_release_aarch64-linux-android.a filter=lfs diff=lfs merge=lfs -text
+librusty_v8_release_x86_64-apple-darwin.a filter=lfs diff=lfs merge=lfs -text

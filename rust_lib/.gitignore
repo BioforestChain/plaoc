@@ -1,4 +1,6 @@
 /target
 Cargo.lock
 rusty_v8_mirror
+runtime-1.24.3
+cargo-1.24.3.toml
 *.rs.

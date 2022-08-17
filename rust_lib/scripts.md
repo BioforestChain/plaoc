@@ -55,6 +55,8 @@ echo "INPUT(-lunwind)" > libgcc.a
 java.lang.UnsatisfiedLinkError: dlopen failed: cannot locate symbol "__emutls_get_address" referenced by "/data/app/~~xgQux0SWdH8NR7GLHyXCNg==/org.bfchain.rust.example-1rL1uIoeTHAxKOyHiDM32w==/base.apk!/lib/arm64-v8a/librust_lib.so"...
 ```
 
+
+
 目前已知的解决方法就是把ndk锁在22版本以下
 
 ### 修复 failed to run custom build command for `ring v0.16.20`

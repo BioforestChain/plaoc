@@ -45,7 +45,7 @@ function copyDir(src, dist, callback) {
   }
 }
 console.log(process.cwd())
-copyDir('./bfs-service/dist/esm', '../android/app/src/main/assets/bfs-service', function (err) {
+copyDir('./bfs-service/dist/esm', '../android/app/src/main/assets/', function (err) {
   if (err) {
     console.log(err);
   }

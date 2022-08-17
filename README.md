@@ -18,6 +18,7 @@
 如何测试
 
 ```bash
+
 # 前端
 cd test-vue3
 
@@ -57,6 +58,11 @@ bfsw dev
 
 ### deno-runtime
 
+首先要保证一下文件存在：
+
+1. rust_lib/assets/rusty_v8_mirror/v0.48.1/librusty_v8_release_aarch64-linux-android.a
+2. rust_lib/assets/rusty_v8_mirror/v0.48.1/librusty_v8_release_x86_64-apple-darwin.a
+
 ```bash
 cd rust_lib
 
@@ -66,6 +72,8 @@ cross build --target=aarch64-linux-android --release
 ```
 
 ### android
+
+查看rust_lib/README.md
 
 直接在android上运行，以上可能有路径问题，记得切换为自己的路径，deno-rumtime 遇到问题，详情查看 `/rust_lib/scripts.md`。
 或者[这里](https://www.waterbang.top/2022/08/08/BFS%E5%BC%80%E5%8F%91%E9%97%AE%E9%A2%98%E6%B1%87%E6%80%BB/).
