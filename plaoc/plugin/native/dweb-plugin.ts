@@ -72,18 +72,14 @@ export class DwebPlugin extends HTMLElement {
     return data;
   }
   /**返回需要监听的属性 */
-  static get observedAttributes() {
-    return ["channelId"]; // 用来区分多个组件
-  }
-  /**当属性值改变的时候会调用 attributeChangedCallback 这个我 */
-  attributeChangedCallback(name: string, oldValue: string, newValue: string) {
-    console.log("channelId: ", name, oldValue, newValue);
-    if (name === "channelId") {
-      this.channelId = newValue;
-    }
-  }
+//   static get observedAttributes() {
+//     return ["channelId"]; // 用来区分多个组件
+//   }
+//   /**当属性值改变的时候会调用 attributeChangedCallback 这个我 */
+//   attributeChangedCallback(name: string, oldValue: string, newValue: string) {
+//     console.log("channelId: ", name, oldValue, newValue);
+//     if (name === "channelId") {
+//       this.channelId = newValue;
+//     }
+//   }
 }
-
-type Interator<T> = {
-  next: () => Promise<{ value: T; done: boolean }>;
-};

@@ -1,6 +1,6 @@
 import { convertToRGBAHex } from "./../util";
 import { DwebPlugin } from "../native/dweb-plugin";
-import { BottomBarFFI } from "./ffi#android";
+import { BottomBarFFI } from "./ffi";
 import "../typings";
 import { BottomBar } from "./bfcsBottomBar.type";
 import { Icon } from "../icon/bfspIcon.type";

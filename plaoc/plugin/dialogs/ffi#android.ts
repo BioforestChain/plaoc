@@ -1,8 +1,7 @@
 import { Dialogs } from "./bfcsDialogs.type";
 
-export const native_dialog: any = "";
 export class DialogsFFI implements Dialogs.IDialogsFFI {
-  private _ffi: Dialogs.DialogsAndroidFFI = native_dialog;
+  private _ffi: Dialogs.DialogsAndroidFFI = (window as any).native_dialog;
 
   openAlert(config: Dialogs.IAlertConfig, confirmFunc: string): Promise<void> {
     return new Promise<void>((resolve, reject) => {

@@ -1,10 +1,10 @@
 import "../typings";
 import { getColorInt, getColorHex } from "./../util";
 import { StatusBar } from "./bfcsStatusBar.type";
-export const system_ui: any = "";
+
 
 export class StatusBarFFI implements StatusBar.IStatusBarFFI {
-  private _ffi: StatusBar.StatusBarAndroidFFI = system_ui;
+  private _ffi: StatusBar.StatusBarAndroidFFI = (window as any).system_ui;
 
   async setStatusBarColor(
     color?: Color.RGBAHex,

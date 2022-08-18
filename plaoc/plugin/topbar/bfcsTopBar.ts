@@ -1,6 +1,6 @@
 import { convertToRGBAHex } from "./../util";
 
-import { TopBarFFI } from "./ffi#android";
+import { TopBarFFI } from "./ffi";
 import { TopBar } from "./bfcsTopBar.type";
 import "../typings";
 import { Icon } from "../icon/bfspIcon.type";

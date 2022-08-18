@@ -1,4 +1,4 @@
-import { DialogsFFI } from "./ffi#android";
+import { DialogsFFI } from "./ffi";
 import { DwebPlugin } from "../native/dweb-plugin";
 import { Dialogs } from "./bfcsDialogs.type";
 

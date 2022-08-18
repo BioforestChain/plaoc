@@ -1,8 +1,7 @@
 import { getColorInt, getColorHex, convertToRGBAHex } from "./../util";
 import { BottomBar } from "./bfcsBottomBar.type";
-const bottom_bar: any = "";
 export class BottomBarFFI implements BottomBar.IBottomBarFFI {
-  private _ffi: BottomBar.BottomBarAndroidFFI = bottom_bar;
+  private _ffi: BottomBar.BottomBarAndroidFFI = (window as any).bottom_bar;
 
   getEnabled(): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {

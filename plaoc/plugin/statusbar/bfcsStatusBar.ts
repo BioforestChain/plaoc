@@ -1,6 +1,6 @@
 import { convertToRGBAHex } from "./../util";
 import { DwebPlugin } from "../native/dweb-plugin";
-import { StatusBarFFI } from "./ffi#android";
+import { StatusBarFFI } from "./ffi";
 import { StatusBar } from "./bfcsStatusBar.type";
 import "../typings";
 

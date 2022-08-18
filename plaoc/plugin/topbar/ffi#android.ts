@@ -1,9 +1,9 @@
 import "../typings";
 import { getColorInt, getColorHex } from "./../util";
 import { TopBar } from "./bfcsTopBar.type";
-const top_bar: any = "";
+
 export class TopBarFFI implements TopBar.ITopBarFFI {
-  private _ffi: TopBar.TopBarAndroidFFI = top_bar;
+  private _ffi: TopBar.TopBarAndroidFFI = (window as any).top_bar;
 
   back(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
