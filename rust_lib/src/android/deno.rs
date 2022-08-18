@@ -1,12 +1,13 @@
 #![cfg(target_os = "android")]
 use android_logger::Config;
 use log::Level;
+use ndk_sys::AAssetManager;
 use serde::Deserialize;
 use serde_json::from_str;
-use std::{fmt, sync::RwLock};
+use std::{borrow::Borrow, fmt, sync::RwLock};
 // 引用 jni 库的一些内容，就是上面添加的 jni 依赖
 use crate::js_bridge::call_js_function;
-use crate::js_bridge::call_js_function::{BUFFER_RESOLVE};
+use crate::js_bridge::call_js_function::BUFFER_RESOLVE;
 use crate::module_loader::AssetsModuleLoader;
 use crate::my_deno_runtime::bootstrap_deno_runtime;
 use jni::{
@@ -15,7 +16,9 @@ use jni::{
 };
 
 use jni_sys::jbyteArray;
-use std::sync::Arc;
+use ndk::asset::{Asset, AssetManager};
+use std::rc::Rc;
+use std::sync::{Arc, Mutex};
 use std::{collections::HashMap, ptr::NonNull};
 
 /// 初始化的一些操作
@@ -27,15 +30,16 @@ pub async extern "system" fn Java_org_bfchain_rust_plaoc_DenoService_initDeno(
     _context: JObject,
     jasset_manager: JObject,
 ) {
+    log::info!("启动BFS后端!!");
     android_logger::init_once(
         Config::default()
             .with_min_level(Level::Debug)
             .with_tag("myrust::BFS"),
     );
-    log::info!("启动BFS后端!!");
     let asset_manager_ptr = unsafe {
         ndk_sys::AAssetManager_fromJava(env.get_native_interface(), jasset_manager.cast())
     };
+
     bootstrap_deno_runtime(
         Arc::new(AssetsModuleLoader::from_ptr(
             NonNull::new(asset_manager_ptr).unwrap(),
@@ -47,32 +51,32 @@ pub async extern "system" fn Java_org_bfchain_rust_plaoc_DenoService_initDeno(
     .unwrap();
 }
 
-#[no_mangle]
-#[tokio::main]
-pub async extern "system" fn Java_org_bfchain_rust_plaoc_DenoService_denoRuntime(
-    env: JNIEnv,
-    _context: JObject,
-    jasset_manager: JObject,
-    path: JString,
-) {
-    let asset_path = String::from(env.get_string(path).unwrap());
-    let asset_manager_ptr = unsafe {
-        ndk_sys::AAssetManager_fromJava(env.get_native_interface(), jasset_manager.cast())
-    };
-    android_logger::init_once(
-        Config::default()
-            .with_min_level(Level::Debug)
-            .with_tag("myrust::denoRuntime"),
-    );
-    bootstrap_deno_runtime(
-        Arc::new(AssetsModuleLoader::from_ptr(
-            NonNull::new(asset_manager_ptr).unwrap(),
-        )),
-        asset_path.as_str(),
-    )
-    .await
-    .unwrap();
-}
+// #[no_mangle]
+// #[tokio::main]
+// pub async extern "system" fn Java_org_bfchain_rust_plaoc_DenoService_denoRuntime(
+//     env: JNIEnv,
+//     _context: JObject,
+//     jasset_manager: JObject,
+//     path: JString,
+// ) {
+//     let asset_path = String::from(env.get_string(path).unwrap());
+//     let asset_manager_ptr = Rc::new(unsafe {
+//         ndk_sys::AAssetManager_fromJava(env.get_native_interface(), jasset_manager.cast())
+//     });
+//     android_logger::init_once(
+//         Config::default()
+//             .with_min_level(Level::Debug)
+//             .with_tag("myrust::denoRuntime"),
+//     );
+//     let module_loader_builder = || {
+//         Rc::new(AssetsModuleLoader::from_ptr(
+//             NonNull::new(*asset_manager_ptr.clone()).unwrap(),
+//         ))
+//     };
+//     bootstrap_deno_runtime(module_loader_builder, asset_path.as_str())
+//         .await
+//         .unwrap();
+// }
 
 #[derive(Deserialize, Debug)]
 struct JsBackData {

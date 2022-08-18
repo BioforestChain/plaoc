@@ -1,16 +1,15 @@
-#![cfg(target_os = "android")]
 use crate::errors::get_error_class_name;
 use crate::fmt_errors::format_js_error;
-use crate::module_loader::AssetsModuleLoader;
 use crate::ops::cli_exts;
+use deno_broadcast_channel::InMemoryBroadcastChannel;
 use deno_core::error::AnyError;
 use deno_core::futures::future::LocalFutureObj;
 use deno_core::CompiledWasmModuleStore;
-use deno_core::Extension;
+use deno_core::FsModuleLoader;
+use deno_core::ModuleLoader;
 use deno_core::ModuleSpecifier;
 use deno_core::SharedArrayBufferStore;
 use deno_runtime::colors;
-use deno_broadcast_channel::InMemoryBroadcastChannel;
 use deno_runtime::deno_web::BlobStore;
 use deno_runtime::ops::worker_host::CreateWebWorkerCb;
 use deno_runtime::ops::worker_host::PreloadModuleCb;
@@ -22,6 +21,9 @@ use deno_runtime::BootstrapOptions;
 use std::rc::Rc;
 use std::sync::Arc;
 
+#[cfg(target_os = "android")]
+use crate::module_loader::AssetsModuleLoader;
+
 fn create_web_worker_preload_module_callback() -> Arc<PreloadModuleCb> {
     Arc::new(move |worker| {
         let fut = async move { Ok(worker) };
@@ -30,12 +32,17 @@ fn create_web_worker_preload_module_callback() -> Arc<PreloadModuleCb> {
 }
 
 fn create_web_worker_callback(
-    module_loader_arc: Arc<AssetsModuleLoader>,
+    #[cfg(target_os = "android")] module_loader_builder: Arc<AssetsModuleLoader>,
+    #[cfg(not(target_os = "android"))] module_loader_builder: Arc<Rc<dyn ModuleLoader>>,
     stdio: deno_runtime::ops::io::Stdio,
 ) -> Arc<CreateWebWorkerCb> {
     Arc::new(move |args| {
-        let module_loader: Rc<AssetsModuleLoader> = Rc::new((*module_loader_arc.clone()).clone());
-        let create_web_worker_cb = create_web_worker_callback(module_loader_arc.clone(), stdio.clone());
+        #[cfg(target_os = "android")]
+        let module_loader = Rc::new((*module_loader_builder.clone()).clone());
+        #[cfg(not(target_os = "android"))]
+        let module_loader = *module_loader_builder.clone();
+
+        let create_web_worker_cb = create_web_worker_callback(module_loader_builder.clone(), stdio.clone());
         let preload_module_cb = create_web_worker_preload_module_callback();
 
         let extensions = cli_exts();
@@ -100,15 +107,20 @@ fn create_web_worker_callback(
 }
 
 pub fn create_main_worker(
-    module_loader_arc: Arc<AssetsModuleLoader>,
+    #[cfg(target_os = "android")] module_loader_builder: Arc<AssetsModuleLoader>,
+    #[cfg(not(target_os = "android"))] module_loader_builder: Arc<Rc<dyn ModuleLoader>>,
     main_module: ModuleSpecifier,
     permissions: Permissions,
     stdio: deno_runtime::ops::io::Stdio,
 ) -> MainWorker {
     log::info!("1");
-    let module_loader: Rc<AssetsModuleLoader> = Rc::new((*module_loader_arc.clone()).clone());
+    #[cfg(target_os = "android")]
+    let module_loader = Rc::new((*module_loader_builder.clone()).clone());
+    #[cfg(not(target_os = "android"))]
+    let module_loader = *module_loader_builder.clone();
+
     log::info!("2");
-    let create_web_worker_cb = create_web_worker_callback(module_loader_arc, stdio.clone());
+    let create_web_worker_cb = create_web_worker_callback(module_loader_builder, stdio.clone());
     log::info!("3");
     let web_worker_preload_module_cb = create_web_worker_preload_module_callback();
 
@@ -158,17 +170,22 @@ pub fn create_main_worker(
 
 // #[tokio::main]
 pub async fn bootstrap_deno_runtime(
-    module_loader: Arc<AssetsModuleLoader>,
+    #[cfg(target_os = "android")] module_loader_builder: Arc<AssetsModuleLoader>,
+    #[cfg(not(target_os = "android"))] module_loader_builder: Arc<Rc<dyn ModuleLoader>>,
     entry_js_path: &str,
 ) -> Result<(), AnyError> {
     let main_module = deno_core::resolve_path(entry_js_path)?;
     let permissions = Permissions::allow_all();
 
-
-    let mut worker = create_main_worker(module_loader, main_module.clone(), permissions, Default::default());
+    let mut worker = create_main_worker(
+        module_loader_builder,
+        main_module.clone(),
+        permissions,
+        Default::default(),
+    );
     log::info!("start deno runtime!!!");
 
-    // worker.execute_main_module(&main_module).await?;
-    // worker.run_event_loop(false).await?;
+    worker.execute_main_module(&main_module).await?;
+    worker.run_event_loop(false).await?;
     Ok(())
 }

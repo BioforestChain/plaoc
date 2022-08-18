@@ -1,9 +1,15 @@
 #![cfg(target_os = "android")]
 
-use anyhow::Error;
+use deno_core::anyhow::Error;
 // use assets_manager::{loader, Asset, AssetCache};
 use deno_core::error::generic_error;
-use deno_core::*;
+use deno_core::resolve_import;
+use deno_core::ModuleLoader;
+use deno_core::ModuleSource;
+use deno_core::ModuleSourceFuture;
+use deno_core::ModuleSpecifier;
+use deno_core::ModuleType;
+
 use futures::future::FutureExt;
 use ndk::asset::{Asset, AssetManager};
 use std::ffi::CString;
@@ -74,6 +80,7 @@ impl Clone for AssetsModuleLoader {
         AssetsModuleLoader::from_ptr(self.cache.ptr())
     }
 }
+// impl Copy for AssetsModuleLoader {}
 
 impl ModuleLoader for AssetsModuleLoader {
     fn resolve(
@@ -91,7 +98,6 @@ impl ModuleLoader for AssetsModuleLoader {
         _maybe_referrer: Option<ModuleSpecifier>,
         _is_dynamic: bool,
     ) -> Pin<Box<ModuleSourceFuture>> {
-
         let module_specifier = module_specifier.clone();
         let path = module_specifier
             .to_file_path()
@@ -139,7 +145,7 @@ impl ModuleLoader for AssetsModuleLoader {
             .to_string()
         };
 
-        log::info!("loaded code {:?}: {}", path,code);
+        log::info!("loaded code {:?}: {}", path, code);
 
         return async move {
             let module = ModuleSource {

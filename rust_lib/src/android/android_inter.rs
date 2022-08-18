@@ -11,7 +11,6 @@ use std::{
 };
 // 引用 jni 库的一些内容，就是上面添加的 jni 依赖
 use crate::module_loader::AssetsModuleLoader;
-use crate::my_deno_runtime::bootstrap_deno_runtime;
 use jni::{
     objects::{GlobalRef, JByteBuffer, JObject, JString, JValue},
     sys::{jint, jstring, JNI_ERR, JNI_VERSION_1_4},
