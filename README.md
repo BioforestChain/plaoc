@@ -13,6 +13,18 @@
 
 ## 如何开发
 
+## docker编译
+
+```shell
+# 在plaoc根目录执行
+docker run -it -v $(pwd):/plaoc waterbang/aarch64-linux-android:arm-ndk21-rust1.60.0 /bin/bash
+
+cd /plaoc/rust_lib
+
+./build-android.sh
+
+```
+
 ### 测试（现在只提供vue3）
 
 如何测试

@@ -59,10 +59,6 @@ async fn main() -> Result<(), AnyError> {
 
     // test 2
     let js_path = Path::new(env!("CARGO_MANIFEST_DIR")).join("assets/hello_runtime.js");
-    bootstrap_deno_runtime(
-        Arc::new(Rc::new(FsModuleLoader {})),
-        &js_path.to_string_lossy(),
-    )
-    .await?;
+    bootstrap_deno_runtime(|| Rc::new(FsModuleLoader {}), &js_path.to_string_lossy()).await?;
     Ok(())
 }

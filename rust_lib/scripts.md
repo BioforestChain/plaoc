@@ -18,7 +18,7 @@ RUST_BACKTRACE=full cargo build -vv --target=aarch64-apple-darwin --release
 
 修改默认编译器
 
-```
+```bash
 rustup set default-host x86_64-pc-windows-msvc
 rustup set default-host x86_64-pc-windows-gnu
 ```
@@ -55,8 +55,6 @@ echo "INPUT(-lunwind)" > libgcc.a
 java.lang.UnsatisfiedLinkError: dlopen failed: cannot locate symbol "__emutls_get_address" referenced by "/data/app/~~xgQux0SWdH8NR7GLHyXCNg==/org.bfchain.rust.example-1rL1uIoeTHAxKOyHiDM32w==/base.apk!/lib/arm64-v8a/librust_lib.so"...
 ```
 
-
-
 目前已知的解决方法就是把ndk锁在22版本以下
 
 ### 修复 failed to run custom build command for `ring v0.16.20`
@@ -89,7 +87,7 @@ cp aarch64-linux-android30-clang aarch64-linux-android-clang
 
 ### 修复error: failed to run custom build command for `libffi-sys v1.3.2`
 
-```
+```bash
 brew install autoconf automake libtool   
 ```
 
@@ -110,4 +108,18 @@ export RUSTY_V8_ARCHIVE="$PWD/assets/rusty_v8_mirror/v0.48.1/librusty_v8_release
 
 ```bash
  brew install glib glib-utils
+```
+
+### error: failed to add native library /Users/mac/Desktop/waterbang/project/plaoc/rust_lib/target/aarch64-linux-android/release/gn_out/obj/librusty_v8.a: file too small to be an archive
+
+```bash
+export RUSTY_V8_MIRROR="$PWD/assets/rusty_v8_mirror/"
+```
+
+### Relocations in generic ELF (EM: 183)/usr/bin/ld: /plaoc/rust_lib/target/release/deps/libv8-43d0f1725d683f0e.rlib: error adding symbols: file in wrong format  collect2: error: ld returned 1 exit status
+
+注意这里使用了错误的链接器
+
+```bash
+unset RUSTY_V8_ARCHIVE
 ```

@@ -33,14 +33,14 @@ fn create_web_worker_preload_module_callback() -> Arc<PreloadModuleCb> {
 
 fn create_web_worker_callback(
     #[cfg(target_os = "android")] module_loader_builder: Arc<AssetsModuleLoader>,
-    #[cfg(not(target_os = "android"))] module_loader_builder: Arc<Rc<dyn ModuleLoader>>,
+    #[cfg(not(target_os = "android"))] module_loader_builder: fn()->Rc<dyn ModuleLoader>,
     stdio: deno_runtime::ops::io::Stdio,
 ) -> Arc<CreateWebWorkerCb> {
     Arc::new(move |args| {
         #[cfg(target_os = "android")]
         let module_loader = Rc::new((*module_loader_builder.clone()).clone());
         #[cfg(not(target_os = "android"))]
-        let module_loader = *module_loader_builder.clone();
+        let module_loader = module_loader_builder();
 
         let create_web_worker_cb = create_web_worker_callback(module_loader_builder.clone(), stdio.clone());
         let preload_module_cb = create_web_worker_preload_module_callback();
@@ -108,7 +108,7 @@ fn create_web_worker_callback(
 
 pub fn create_main_worker(
     #[cfg(target_os = "android")] module_loader_builder: Arc<AssetsModuleLoader>,
-    #[cfg(not(target_os = "android"))] module_loader_builder: Arc<Rc<dyn ModuleLoader>>,
+    #[cfg(not(target_os = "android"))] module_loader_builder: fn()->Rc<dyn ModuleLoader>,
     main_module: ModuleSpecifier,
     permissions: Permissions,
     stdio: deno_runtime::ops::io::Stdio,
@@ -117,7 +117,7 @@ pub fn create_main_worker(
     #[cfg(target_os = "android")]
     let module_loader = Rc::new((*module_loader_builder.clone()).clone());
     #[cfg(not(target_os = "android"))]
-    let module_loader = *module_loader_builder.clone();
+    let module_loader = module_loader_builder();
 
     log::info!("2");
     let create_web_worker_cb = create_web_worker_callback(module_loader_builder, stdio.clone());
@@ -171,7 +171,7 @@ pub fn create_main_worker(
 // #[tokio::main]
 pub async fn bootstrap_deno_runtime(
     #[cfg(target_os = "android")] module_loader_builder: Arc<AssetsModuleLoader>,
-    #[cfg(not(target_os = "android"))] module_loader_builder: Arc<Rc<dyn ModuleLoader>>,
+    #[cfg(not(target_os = "android"))] module_loader_builder: fn()->Rc<dyn ModuleLoader>,
     entry_js_path: &str,
 ) -> Result<(), AnyError> {
     let main_module = deno_core::resolve_path(entry_js_path)?;
