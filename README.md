@@ -36,7 +36,7 @@ cd test-vue3
 
 yarn install
 
-# 后端 
+# 后端
 cd test-vue3/bfs-service
 
 bfsp init
@@ -70,7 +70,7 @@ bfsw dev
 
 ### deno-runtime
 
-首先要保证一下文件存在：
+首先要保证一下文件存在,点击下载[rusty_v8 v0.48.1](https://download.waterbang.top/s/vMFe?path=%2F)：
 
 1. rust_lib/assets/rusty_v8_mirror/v0.48.1/librusty_v8_release_aarch64-linux-android.a
 2. rust_lib/assets/rusty_v8_mirror/v0.48.1/librusty_v8_release_x86_64-apple-darwin.a

@@ -59,7 +59,7 @@ java.lang.UnsatisfiedLinkError: dlopen failed: cannot locate symbol "__emutls_ge
 
 ### 修复 failed to run custom build command for `ring v0.16.20`
 
-运行  
+运行
 
 ```bash
 RUST_BACKTRACE=1 cargo build --target=aarch64-linux-android --release
@@ -82,13 +82,13 @@ export PATH="$PATH:$ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/darwin-x86_64/bin"
 
 # 确保 aarch64-linux-android-clang 存在
 cd $ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/darwin-x86_64/bin/
-cp aarch64-linux-android30-clang aarch64-linux-android-clang 
+cp aarch64-linux-android30-clang aarch64-linux-android-clang
 ```
 
 ### 修复error: failed to run custom build command for `libffi-sys v1.3.2`
 
 ```bash
-brew install autoconf automake libtool   
+brew install autoconf automake libtool
 ```
 
 然后 在ext/ffi/cargo.toml
@@ -122,4 +122,12 @@ export RUSTY_V8_MIRROR="$PWD/assets/rusty_v8_mirror/"
 
 ```bash
 unset RUSTY_V8_ARCHIVE
+```
+
+### link CC error: could not compile `deno_graph` due to previous error
+
+```bash
+ [target.x86_64-linux-android]
+   ar = "/Users/waterbang/Library/Android/sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64/bin/x86_64-linux-android-ar"
+   linker = "/Users/waterbang/Library/Android/sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64/bin/x86_64-linux-android28-clang++"
 ```
