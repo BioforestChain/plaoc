@@ -3,7 +3,6 @@
 
 ((window) => {
   const core = window.Deno.core;
-  const ops = core.ops;
   const { setExitHandler } = window.__bootstrap.os;
   const { Console } = window.__bootstrap.console;
   const { serializePermissions } = window.__bootstrap.permissions;
@@ -511,13 +510,14 @@
   }
 
   function pledgePermissions(permissions) {
-    return ops.op_pledge_test_permissions(
+    return core.opSync(
+      "op_pledge_test_permissions",
       serializePermissions(permissions),
     );
   }
 
   function restorePermissions(token) {
-    ops.op_restore_test_permissions(token);
+    core.opSync("op_restore_test_permissions", token);
   }
 
   function withPermissions(fn, permissions) {
@@ -709,7 +709,7 @@
       columnNumber: jsError.frames[1].columnNumber,
     };
 
-    const { id, filteredOut } = ops.op_register_test(testDesc);
+    const { id, filteredOut } = core.opSync("op_register_test", testDesc);
     testDesc.id = id;
     testDesc.filteredOut = filteredOut;
 
@@ -731,7 +731,7 @@
       return;
     }
 
-    ops.op_bench_check_unstable();
+    core.opSync("op_bench_check_unstable");
     let benchDesc;
     const defaults = {
       ignore: false,
@@ -815,7 +815,7 @@
     const AsyncFunction = (async () => {}).constructor;
     benchDesc.async = AsyncFunction === benchDesc.fn.constructor;
 
-    const { id, filteredOut } = ops.op_register_bench(benchDesc);
+    const { id, filteredOut } = core.opSync("op_register_bench", benchDesc);
     benchDesc.id = id;
     benchDesc.filteredOut = filteredOut;
 
@@ -1016,20 +1016,20 @@
 
   function getTestOrigin() {
     if (origin == null) {
-      origin = ops.op_get_test_origin();
+      origin = core.opSync("op_get_test_origin");
     }
     return origin;
   }
 
   function getBenchOrigin() {
     if (origin == null) {
-      origin = ops.op_get_bench_origin();
+      origin = core.opSync("op_get_bench_origin");
     }
     return origin;
   }
 
   function benchNow() {
-    return ops.op_bench_now();
+    return core.opSync("op_bench_now");
   }
 
   // This function is called by Rust side if we're in `deno test` or
@@ -1051,7 +1051,7 @@
       (desc) => !desc.filteredOut,
     );
 
-    ops.op_dispatch_test_event({
+    core.opSync("op_dispatch_test_event", {
       plan: {
         origin,
         total: filtered.length,
@@ -1079,11 +1079,11 @@
     }
 
     for (const desc of filtered) {
-      ops.op_dispatch_test_event({ wait: desc.id });
+      core.opSync("op_dispatch_test_event", { wait: desc.id });
       const earlier = DateNow();
       const result = await runTest(desc);
       const elapsed = DateNow() - earlier;
-      ops.op_dispatch_test_event({
+      core.opSync("op_dispatch_test_event", {
         result: [desc.id, result, elapsed],
       });
     }
@@ -1096,7 +1096,7 @@
     const originalConsole = globalThis.console;
 
     globalThis.console = new Console((s) => {
-      ops.op_dispatch_bench_event({ output: s });
+      core.opSync("op_dispatch_bench_event", { output: s });
     });
 
     const only = ArrayPrototypeFilter(benchDescs, (bench) => bench.only);
@@ -1120,7 +1120,7 @@
       (a, b) => groups.indexOf(a.group) - groups.indexOf(b.group),
     );
 
-    ops.op_dispatch_bench_event({
+    core.opSync("op_dispatch_bench_event", {
       plan: {
         origin,
         total: filtered.length,
@@ -1131,8 +1131,8 @@
 
     for (const desc of filtered) {
       desc.baseline = !!desc.baseline;
-      ops.op_dispatch_bench_event({ wait: desc.id });
-      ops.op_dispatch_bench_event({
+      core.opSync("op_dispatch_bench_event", { wait: desc.id });
+      core.opSync("op_dispatch_bench_event", {
         result: [desc.id, await runBench(desc)],
       });
     }
@@ -1173,7 +1173,7 @@
     if (state.reportedWait) {
       return;
     }
-    ops.op_dispatch_test_event({ stepWait: desc.id });
+    core.opSync("op_dispatch_test_event", { stepWait: desc.id });
     state.reportedWait = true;
   }
 
@@ -1194,7 +1194,7 @@
     } else {
       result = state.status;
     }
-    ops.op_dispatch_test_event({
+    core.opSync("op_dispatch_test_event", {
       stepResult: [desc.id, result, state.elapsed],
     });
     state.reportedResult = true;
@@ -1293,7 +1293,7 @@
         stepDesc.parent = desc;
         stepDesc.rootId = rootId;
         stepDesc.rootName = rootName;
-        const { id } = ops.op_register_test_step(stepDesc);
+        const { id } = core.opSync("op_register_test_step", stepDesc);
         stepDesc.id = id;
         const state = {
           context: createTestContext(stepDesc),

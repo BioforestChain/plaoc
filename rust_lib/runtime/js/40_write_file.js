@@ -2,7 +2,6 @@
 "use strict";
 ((window) => {
   const core = window.__bootstrap.core;
-  const ops = core.ops;
   const { abortSignal } = window.__bootstrap;
   const { pathFromURL } = window.__bootstrap.util;
 
@@ -12,7 +11,7 @@
     options = {},
   ) {
     options.signal?.throwIfAborted();
-    ops.op_write_file_sync({
+    core.opSync("op_write_file_sync", {
       path: pathFromURL(path),
       data,
       mode: options.mode,
@@ -30,7 +29,7 @@
     let abortHandler;
     if (options.signal) {
       options.signal.throwIfAborted();
-      cancelRid = ops.op_cancel_handle();
+      cancelRid = core.opSync("op_cancel_handle");
       abortHandler = () => core.tryClose(cancelRid);
       options.signal[abortSignal.add](abortHandler);
     }

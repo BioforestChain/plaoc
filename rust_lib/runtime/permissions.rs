@@ -215,16 +215,12 @@ impl NetDescriptor {
   fn new<T: AsRef<str>>(host: &&(T, Option<u16>)) -> Self {
     NetDescriptor(host.0.as_ref().to_string(), host.1)
   }
-}
 
-impl FromStr for NetDescriptor {
-  type Err = AnyError;
-
-  fn from_str(s: &str) -> Result<Self, Self::Err> {
-    let url = url::Url::parse(&format!("http://{s}"))?;
+  pub fn from_string(host: String) -> Self {
+    let url = url::Url::parse(&format!("http://{}", host)).unwrap();
     let hostname = url.host_str().unwrap().to_string();
 
-    Ok(NetDescriptor(hostname, url.port()))
+    NetDescriptor(hostname, url.port())
   }
 }
 
@@ -1130,12 +1126,12 @@ pub struct Permissions {
 impl Default for Permissions {
   fn default() -> Self {
     Self {
-      read: Permissions::new_read(&None, false).unwrap(),
-      write: Permissions::new_write(&None, false).unwrap(),
-      net: Permissions::new_net(&None, false).unwrap(),
-      env: Permissions::new_env(&None, false).unwrap(),
-      run: Permissions::new_run(&None, false).unwrap(),
-      ffi: Permissions::new_ffi(&None, false).unwrap(),
+      read: Permissions::new_read(&None, false),
+      write: Permissions::new_write(&None, false),
+      net: Permissions::new_net(&None, false),
+      env: Permissions::new_env(&None, false),
+      run: Permissions::new_run(&None, false),
+      ffi: Permissions::new_ffi(&None, false),
       hrtime: Permissions::new_hrtime(false),
     }
   }
@@ -1157,106 +1153,90 @@ impl Permissions {
   pub fn new_read(
     state: &Option<Vec<PathBuf>>,
     prompt: bool,
-  ) -> Result<UnaryPermission<ReadDescriptor>, AnyError> {
-    Ok(UnaryPermission::<ReadDescriptor> {
+  ) -> UnaryPermission<ReadDescriptor> {
+    UnaryPermission::<ReadDescriptor> {
       global_state: global_state_from_option(state),
-      granted_list: resolve_read_allowlist(state)?,
+      granted_list: resolve_read_allowlist(state),
       prompt,
       ..Default::default()
-    })
+    }
   }
 
   pub fn new_write(
     state: &Option<Vec<PathBuf>>,
     prompt: bool,
-  ) -> Result<UnaryPermission<WriteDescriptor>, AnyError> {
-    Ok(UnaryPermission::<WriteDescriptor> {
+  ) -> UnaryPermission<WriteDescriptor> {
+    UnaryPermission::<WriteDescriptor> {
       global_state: global_state_from_option(state),
-      granted_list: resolve_write_allowlist(state)?,
+      granted_list: resolve_write_allowlist(state),
       prompt,
       ..Default::default()
-    })
+    }
   }
 
   pub fn new_net(
     state: &Option<Vec<String>>,
     prompt: bool,
-  ) -> Result<UnaryPermission<NetDescriptor>, AnyError> {
-    Ok(UnaryPermission::<NetDescriptor> {
+  ) -> UnaryPermission<NetDescriptor> {
+    UnaryPermission::<NetDescriptor> {
       global_state: global_state_from_option(state),
-      granted_list: state.as_ref().map_or_else(
-        || Ok(HashSet::new()),
-        |v| {
+      granted_list: state
+        .as_ref()
+        .map(|v| {
           v.iter()
-            .map(|x| NetDescriptor::from_str(x))
-            .collect::<Result<HashSet<NetDescriptor>, AnyError>>()
-        },
-      )?,
+            .map(|x| NetDescriptor::from_string(x.clone()))
+            .collect()
+        })
+        .unwrap_or_else(HashSet::new),
       prompt,
       ..Default::default()
-    })
+    }
   }
 
   pub fn new_env(
     state: &Option<Vec<String>>,
     prompt: bool,
-  ) -> Result<UnaryPermission<EnvDescriptor>, AnyError> {
-    Ok(UnaryPermission::<EnvDescriptor> {
+  ) -> UnaryPermission<EnvDescriptor> {
+    UnaryPermission::<EnvDescriptor> {
       global_state: global_state_from_option(state),
-      granted_list: state.as_ref().map_or_else(
-        || Ok(HashSet::new()),
-        |v| {
-          v.iter()
-            .map(|x| {
-              if x.is_empty() {
-                Err(AnyError::msg("Empty path is not allowed"))
-              } else {
-                Ok(EnvDescriptor::new(x))
-              }
-            })
-            .collect()
-        },
-      )?,
+      granted_list: state
+        .as_ref()
+        .map(|v| v.iter().map(EnvDescriptor::new).collect())
+        .unwrap_or_else(HashSet::new),
       prompt,
       ..Default::default()
-    })
+    }
   }
 
   pub fn new_run(
     state: &Option<Vec<String>>,
     prompt: bool,
-  ) -> Result<UnaryPermission<RunDescriptor>, AnyError> {
-    Ok(UnaryPermission::<RunDescriptor> {
+  ) -> UnaryPermission<RunDescriptor> {
+    UnaryPermission::<RunDescriptor> {
       global_state: global_state_from_option(state),
-      granted_list: state.as_ref().map_or_else(
-        || Ok(HashSet::new()),
-        |v| {
+      granted_list: state
+        .as_ref()
+        .map(|v| {
           v.iter()
-            .map(|x| {
-              if x.is_empty() {
-                Err(AnyError::msg("Empty path is not allowed"))
-              } else {
-                Ok(RunDescriptor::from_str(x).unwrap())
-              }
-            })
+            .map(|x| RunDescriptor::from_str(x).unwrap())
             .collect()
-        },
-      )?,
+        })
+        .unwrap_or_else(HashSet::new),
       prompt,
       ..Default::default()
-    })
+    }
   }
 
   pub fn new_ffi(
     state: &Option<Vec<PathBuf>>,
     prompt: bool,
-  ) -> Result<UnaryPermission<FfiDescriptor>, AnyError> {
-    Ok(UnaryPermission::<FfiDescriptor> {
+  ) -> UnaryPermission<FfiDescriptor> {
+    UnaryPermission::<FfiDescriptor> {
       global_state: global_state_from_option(state),
-      granted_list: resolve_ffi_allowlist(state)?,
+      granted_list: resolve_ffi_allowlist(state),
       prompt,
       ..Default::default()
-    })
+    }
   }
 
   pub fn new_hrtime(state: bool) -> UnitPermission {
@@ -1268,26 +1248,26 @@ impl Permissions {
     )
   }
 
-  pub fn from_options(opts: &PermissionsOptions) -> Result<Self, AnyError> {
-    Ok(Self {
-      read: Permissions::new_read(&opts.allow_read, opts.prompt)?,
-      write: Permissions::new_write(&opts.allow_write, opts.prompt)?,
-      net: Permissions::new_net(&opts.allow_net, opts.prompt)?,
-      env: Permissions::new_env(&opts.allow_env, opts.prompt)?,
-      run: Permissions::new_run(&opts.allow_run, opts.prompt)?,
-      ffi: Permissions::new_ffi(&opts.allow_ffi, opts.prompt)?,
+  pub fn from_options(opts: &PermissionsOptions) -> Self {
+    Self {
+      read: Permissions::new_read(&opts.allow_read, opts.prompt),
+      write: Permissions::new_write(&opts.allow_write, opts.prompt),
+      net: Permissions::new_net(&opts.allow_net, opts.prompt),
+      env: Permissions::new_env(&opts.allow_env, opts.prompt),
+      run: Permissions::new_run(&opts.allow_run, opts.prompt),
+      ffi: Permissions::new_ffi(&opts.allow_ffi, opts.prompt),
       hrtime: Permissions::new_hrtime(opts.allow_hrtime),
-    })
+    }
   }
 
   pub fn allow_all() -> Self {
     Self {
-      read: Permissions::new_read(&Some(vec![]), false).unwrap(),
-      write: Permissions::new_write(&Some(vec![]), false).unwrap(),
-      net: Permissions::new_net(&Some(vec![]), false).unwrap(),
-      env: Permissions::new_env(&Some(vec![]), false).unwrap(),
-      run: Permissions::new_run(&Some(vec![]), false).unwrap(),
-      ffi: Permissions::new_ffi(&Some(vec![]), false).unwrap(),
+      read: Permissions::new_read(&Some(vec![]), false),
+      write: Permissions::new_write(&Some(vec![]), false),
+      net: Permissions::new_net(&Some(vec![]), false),
+      env: Permissions::new_env(&Some(vec![]), false),
+      run: Permissions::new_run(&Some(vec![]), false),
+      ffi: Permissions::new_ffi(&Some(vec![]), false),
       hrtime: Permissions::new_hrtime(true),
     }
   }
@@ -1356,11 +1336,11 @@ impl deno_websocket::WebSocketPermissions for Permissions {
   }
 }
 
-// impl deno_ffi::FfiPermissions for Permissions {
-//   fn check(&mut self, path: Option<&Path>) -> Result<(), AnyError> {
-//     self.ffi.check(path)
-//   }
-// }
+impl deno_ffi::FfiPermissions for Permissions {
+  fn check(&mut self, path: Option<&Path>) -> Result<(), AnyError> {
+    self.ffi.check(path)
+  }
+}
 
 fn unit_permission_from_flag_bool(
   flag: bool,
@@ -1390,55 +1370,43 @@ fn global_state_from_option<T>(flag: &Option<Vec<T>>) -> PermissionState {
 
 pub fn resolve_read_allowlist(
   allow: &Option<Vec<PathBuf>>,
-) -> Result<HashSet<ReadDescriptor>, AnyError> {
+) -> HashSet<ReadDescriptor> {
   if let Some(v) = allow {
     v.iter()
       .map(|raw_path| {
-        if raw_path.as_os_str().is_empty() {
-          Err(AnyError::msg("Empty path is not allowed"))
-        } else {
-          resolve_from_cwd(Path::new(&raw_path)).map(ReadDescriptor)
-        }
+        ReadDescriptor(resolve_from_cwd(Path::new(&raw_path)).unwrap())
       })
       .collect()
   } else {
-    Ok(HashSet::new())
+    HashSet::new()
   }
 }
 
 pub fn resolve_write_allowlist(
   allow: &Option<Vec<PathBuf>>,
-) -> Result<HashSet<WriteDescriptor>, AnyError> {
+) -> HashSet<WriteDescriptor> {
   if let Some(v) = allow {
     v.iter()
       .map(|raw_path| {
-        if raw_path.as_os_str().is_empty() {
-          Err(AnyError::msg("Empty path is not allowed"))
-        } else {
-          resolve_from_cwd(Path::new(&raw_path)).map(WriteDescriptor)
-        }
+        WriteDescriptor(resolve_from_cwd(Path::new(&raw_path)).unwrap())
       })
       .collect()
   } else {
-    Ok(HashSet::new())
+    HashSet::new()
   }
 }
 
 pub fn resolve_ffi_allowlist(
   allow: &Option<Vec<PathBuf>>,
-) -> Result<HashSet<FfiDescriptor>, AnyError> {
+) -> HashSet<FfiDescriptor> {
   if let Some(v) = allow {
     v.iter()
       .map(|raw_path| {
-        if raw_path.as_os_str().is_empty() {
-          Err(AnyError::msg("Empty path is not allowed"))
-        } else {
-          resolve_from_cwd(Path::new(&raw_path)).map(FfiDescriptor)
-        }
+        FfiDescriptor(resolve_from_cwd(Path::new(&raw_path)).unwrap())
       })
       .collect()
   } else {
-    Ok(HashSet::new())
+    HashSet::new()
   }
 }
 
@@ -1719,7 +1687,7 @@ pub fn create_child_permissions(
     ChildUnaryPermissionArg::NotGranted => {}
     ChildUnaryPermissionArg::GrantedList(granted_list) => {
       worker_perms.env.granted_list =
-        Permissions::new_env(&Some(granted_list), false)?.granted_list;
+        Permissions::new_env(&Some(granted_list), false).granted_list;
       if !worker_perms
         .env
         .granted_list
@@ -1764,7 +1732,7 @@ pub fn create_child_permissions(
     ChildUnaryPermissionArg::NotGranted => {}
     ChildUnaryPermissionArg::GrantedList(granted_list) => {
       worker_perms.net.granted_list =
-        Permissions::new_net(&Some(granted_list), false)?.granted_list;
+        Permissions::new_net(&Some(granted_list), false).granted_list;
       if !worker_perms
         .net
         .granted_list
@@ -1795,7 +1763,7 @@ pub fn create_child_permissions(
       worker_perms.ffi.granted_list = Permissions::new_ffi(
         &Some(granted_list.iter().map(PathBuf::from).collect()),
         false,
-      )?
+      )
       .granted_list;
       if !worker_perms
         .ffi
@@ -1827,7 +1795,7 @@ pub fn create_child_permissions(
       worker_perms.read.granted_list = Permissions::new_read(
         &Some(granted_list.iter().map(PathBuf::from).collect()),
         false,
-      )?
+      )
       .granted_list;
       if !worker_perms
         .read
@@ -1857,7 +1825,7 @@ pub fn create_child_permissions(
     ChildUnaryPermissionArg::NotGranted => {}
     ChildUnaryPermissionArg::GrantedList(granted_list) => {
       worker_perms.run.granted_list =
-        Permissions::new_run(&Some(granted_list), false)?.granted_list;
+        Permissions::new_run(&Some(granted_list), false).granted_list;
       if !worker_perms
         .run
         .granted_list
@@ -1888,7 +1856,7 @@ pub fn create_child_permissions(
       worker_perms.write.granted_list = Permissions::new_write(
         &Some(granted_list.iter().map(PathBuf::from).collect()),
         false,
-      )?
+      )
       .granted_list;
       if !worker_perms
         .write
@@ -2112,8 +2080,7 @@ mod tests {
       allow_read: Some(allowlist.clone()),
       allow_write: Some(allowlist),
       ..Default::default()
-    })
-    .unwrap();
+    });
 
     // Inside of /a/specific and /a/specific/dir/name
     assert!(perms.read.check(Path::new("/a/specific/dir/name")).is_ok());
@@ -2179,8 +2146,7 @@ mod tests {
         "www.github.com:443"
       ]),
       ..Default::default()
-    })
-    .unwrap();
+    });
 
     let domain_tests = vec![
       ("localhost", 1234, true),
@@ -2215,8 +2181,7 @@ mod tests {
     let mut perms = Permissions::from_options(&PermissionsOptions {
       allow_net: Some(svec![]), // this means `--allow-net` is present without values following `=` sign
       ..Default::default()
-    })
-    .unwrap();
+    });
 
     let domain_tests = vec![
       ("localhost", 1234),
@@ -2250,8 +2215,7 @@ mod tests {
     let mut perms = Permissions::from_options(&PermissionsOptions {
       allow_net: None,
       ..Default::default()
-    })
-    .unwrap();
+    });
 
     let domain_tests = vec![
       ("localhost", 1234),
@@ -2292,8 +2256,7 @@ mod tests {
         "www.github.com:443"
       ]),
       ..Default::default()
-    })
-    .unwrap();
+    });
 
     let url_tests = vec![
       // Any protocol + port for localhost should be ok, since we don't specify
@@ -2351,8 +2314,7 @@ mod tests {
       allow_read: Some(read_allowlist),
       allow_net: Some(svec!["localhost"]),
       ..Default::default()
-    })
-    .unwrap();
+    });
 
     let mut fixtures = vec![
       (
@@ -2411,29 +2373,26 @@ mod tests {
       read: UnaryPermission {
         global_state: PermissionState::Prompt,
         ..Permissions::new_read(&Some(vec![PathBuf::from("/foo")]), false)
-          .unwrap()
       },
       write: UnaryPermission {
         global_state: PermissionState::Prompt,
         ..Permissions::new_write(&Some(vec![PathBuf::from("/foo")]), false)
-          .unwrap()
       },
       net: UnaryPermission {
         global_state: PermissionState::Prompt,
-        ..Permissions::new_net(&Some(svec!["127.0.0.1:8000"]), false).unwrap()
+        ..Permissions::new_net(&Some(svec!["127.0.0.1:8000"]), false)
       },
       env: UnaryPermission {
         global_state: PermissionState::Prompt,
-        ..Permissions::new_env(&Some(svec!["HOME"]), false).unwrap()
+        ..Permissions::new_env(&Some(svec!["HOME"]), false)
       },
       run: UnaryPermission {
         global_state: PermissionState::Prompt,
-        ..Permissions::new_run(&Some(svec!["deno"]), false).unwrap()
+        ..Permissions::new_run(&Some(svec!["deno"]), false)
       },
       ffi: UnaryPermission {
         global_state: PermissionState::Prompt,
         ..Permissions::new_ffi(&Some(vec![PathBuf::from("deno")]), false)
-          .unwrap()
       },
       hrtime: UnitPermission {
         state: PermissionState::Prompt,
@@ -2524,7 +2483,6 @@ mod tests {
           &Some(vec![PathBuf::from("/foo"), PathBuf::from("/foo/baz")]),
           false,
         )
-        .unwrap()
       },
       write: UnaryPermission {
         global_state: PermissionState::Prompt,
@@ -2532,7 +2490,6 @@ mod tests {
           &Some(vec![PathBuf::from("/foo"), PathBuf::from("/foo/baz")]),
           false,
         )
-        .unwrap()
       },
       net: UnaryPermission {
         global_state: PermissionState::Prompt,
@@ -2540,20 +2497,18 @@ mod tests {
           &Some(svec!["127.0.0.1", "127.0.0.1:8000"]),
           false,
         )
-        .unwrap()
       },
       env: UnaryPermission {
         global_state: PermissionState::Prompt,
-        ..Permissions::new_env(&Some(svec!["HOME"]), false).unwrap()
+        ..Permissions::new_env(&Some(svec!["HOME"]), false)
       },
       run: UnaryPermission {
         global_state: PermissionState::Prompt,
-        ..Permissions::new_run(&Some(svec!["deno"]), false).unwrap()
+        ..Permissions::new_run(&Some(svec!["deno"]), false)
       },
       ffi: UnaryPermission {
         global_state: PermissionState::Prompt,
         ..Permissions::new_ffi(&Some(vec![PathBuf::from("deno")]), false)
-          .unwrap()
       },
       hrtime: UnitPermission {
         state: PermissionState::Denied,
@@ -2581,12 +2536,12 @@ mod tests {
   #[test]
   fn test_check() {
     let mut perms = Permissions {
-      read: Permissions::new_read(&None, true).unwrap(),
-      write: Permissions::new_write(&None, true).unwrap(),
-      net: Permissions::new_net(&None, true).unwrap(),
-      env: Permissions::new_env(&None, true).unwrap(),
-      run: Permissions::new_run(&None, true).unwrap(),
-      ffi: Permissions::new_ffi(&None, true).unwrap(),
+      read: Permissions::new_read(&None, true),
+      write: Permissions::new_write(&None, true),
+      net: Permissions::new_net(&None, true),
+      env: Permissions::new_env(&None, true),
+      run: Permissions::new_run(&None, true),
+      ffi: Permissions::new_ffi(&None, true),
       hrtime: Permissions::new_hrtime(false),
     };
 
@@ -2631,12 +2586,12 @@ mod tests {
   #[test]
   fn test_check_fail() {
     let mut perms = Permissions {
-      read: Permissions::new_read(&None, true).unwrap(),
-      write: Permissions::new_write(&None, true).unwrap(),
-      net: Permissions::new_net(&None, true).unwrap(),
-      env: Permissions::new_env(&None, true).unwrap(),
-      run: Permissions::new_run(&None, true).unwrap(),
-      ffi: Permissions::new_ffi(&None, true).unwrap(),
+      read: Permissions::new_read(&None, true),
+      write: Permissions::new_write(&None, true),
+      net: Permissions::new_net(&None, true),
+      env: Permissions::new_env(&None, true),
+      run: Permissions::new_run(&None, true),
+      ffi: Permissions::new_ffi(&None, true),
       hrtime: Permissions::new_hrtime(false),
     };
 
@@ -2697,7 +2652,7 @@ mod tests {
     let mut perms = Permissions::allow_all();
     perms.env = UnaryPermission {
       global_state: PermissionState::Prompt,
-      ..Permissions::new_env(&Some(svec!["HOME"]), false).unwrap()
+      ..Permissions::new_env(&Some(svec!["HOME"]), false)
     };
 
     prompt_value.set(true);
@@ -2855,9 +2810,9 @@ mod tests {
   #[test]
   fn test_create_child_permissions() {
     let mut main_perms = Permissions {
-      env: Permissions::new_env(&Some(vec![]), false).unwrap(),
+      env: Permissions::new_env(&Some(vec![]), false),
       hrtime: Permissions::new_hrtime(true),
-      net: Permissions::new_net(&Some(svec!["foo", "bar"]), false).unwrap(),
+      net: Permissions::new_net(&Some(svec!["foo", "bar"]), false),
       ..Default::default()
     };
     assert_eq!(
@@ -2873,8 +2828,8 @@ mod tests {
       )
       .unwrap(),
       Permissions {
-        env: Permissions::new_env(&Some(vec![]), false).unwrap(),
-        net: Permissions::new_net(&Some(svec!["foo"]), false).unwrap(),
+        env: Permissions::new_env(&Some(vec![]), false),
+        net: Permissions::new_net(&Some(svec!["foo"]), false),
         ..Default::default()
       }
     );
@@ -2910,8 +2865,7 @@ mod tests {
     let mut main_perms = Permissions::from_options(&PermissionsOptions {
       prompt: true,
       ..Default::default()
-    })
-    .unwrap();
+    });
     prompt_value.set(true);
     let worker_perms = create_child_permissions(
       &mut main_perms,
@@ -2931,8 +2885,7 @@ mod tests {
     let mut main_perms = Permissions::from_options(&PermissionsOptions {
       prompt: true,
       ..Default::default()
-    })
-    .unwrap();
+    });
     prompt_value.set(false);
     assert!(main_perms.write.check(&PathBuf::from("foo")).is_err());
     let worker_perms = create_child_permissions(
@@ -2941,15 +2894,5 @@ mod tests {
     )
     .unwrap();
     assert_eq!(worker_perms.write.denied_list, main_perms.write.denied_list);
-  }
-
-  #[test]
-  fn test_handle_empty_value() {
-    assert!(Permissions::new_read(&Some(vec![PathBuf::new()]), false).is_err());
-    assert!(Permissions::new_env(&Some(vec![String::new()]), false).is_err());
-    assert!(Permissions::new_run(&Some(vec![String::new()]), false).is_err());
-    assert!(Permissions::new_ffi(&Some(vec![PathBuf::new()]), false).is_err());
-    assert!(Permissions::new_net(&Some(svec![String::new()]), false).is_err());
-    assert!(Permissions::new_write(&Some(vec![PathBuf::new()]), false).is_err());
   }
 }

@@ -3,12 +3,11 @@
 
 ((window) => {
   const core = window.Deno.core;
-  const ops = core.ops;
   const { pathFromURL } = window.__bootstrap.util;
   const { abortSignal } = window.__bootstrap;
 
   function readFileSync(path) {
-    return ops.op_readfile_sync(pathFromURL(path));
+    return core.opSync("op_readfile_sync", pathFromURL(path));
   }
 
   async function readFile(path, options) {
@@ -16,7 +15,7 @@
     let abortHandler;
     if (options?.signal) {
       options.signal.throwIfAborted();
-      cancelRid = ops.op_cancel_handle();
+      cancelRid = core.opSync("op_cancel_handle");
       abortHandler = () => core.tryClose(cancelRid);
       options.signal[abortSignal.add](abortHandler);
     }
@@ -39,7 +38,7 @@
   }
 
   function readTextFileSync(path) {
-    return ops.op_readfile_text_sync(pathFromURL(path));
+    return core.opSync("op_readfile_text_sync", pathFromURL(path));
   }
 
   async function readTextFile(path, options) {
@@ -47,7 +46,7 @@
     let abortHandler;
     if (options?.signal) {
       options.signal.throwIfAborted();
-      cancelRid = ops.op_cancel_handle();
+      cancelRid = core.opSync("op_cancel_handle");
       abortHandler = () => core.tryClose(cancelRid);
       options.signal[abortSignal.add](abortHandler);
     }

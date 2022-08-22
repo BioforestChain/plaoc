@@ -3,7 +3,6 @@
 
 ((window) => {
   const core = window.Deno.core;
-  const ops = core.ops;
   const {
     Date,
     DatePrototype,
@@ -16,7 +15,7 @@
   const build = window.__bootstrap.build.build;
 
   function chmodSync(path, mode) {
-    ops.op_chmod_sync({ path: pathFromURL(path), mode });
+    core.opSync("op_chmod_sync", { path: pathFromURL(path), mode });
   }
 
   async function chmod(path, mode) {
@@ -28,7 +27,7 @@
     uid,
     gid,
   ) {
-    ops.op_chown_sync({ path: pathFromURL(path), uid, gid });
+    core.opSync("op_chown_sync", { path: pathFromURL(path), uid, gid });
   }
 
   async function chown(
@@ -46,7 +45,7 @@
     fromPath,
     toPath,
   ) {
-    ops.op_copy_file_sync({
+    core.opSync("op_copy_file_sync", {
       from: pathFromURL(fromPath),
       to: pathFromURL(toPath),
     });
@@ -63,15 +62,15 @@
   }
 
   function cwd() {
-    return ops.op_cwd();
+    return core.opSync("op_cwd");
   }
 
   function chdir(directory) {
-    ops.op_chdir(pathFromURL(directory));
+    core.opSync("op_chdir", pathFromURL(directory));
   }
 
   function makeTempDirSync(options = {}) {
-    return ops.op_make_temp_dir_sync(options);
+    return core.opSync("op_make_temp_dir_sync", options);
   }
 
   function makeTempDir(options = {}) {
@@ -79,7 +78,7 @@
   }
 
   function makeTempFileSync(options = {}) {
-    return ops.op_make_temp_file_sync(options);
+    return core.opSync("op_make_temp_file_sync", options);
   }
 
   function makeTempFile(options = {}) {
@@ -100,7 +99,7 @@
   }
 
   function mkdirSync(path, options) {
-    ops.op_mkdir_sync(mkdirArgs(path, options));
+    core.opSync("op_mkdir_sync", mkdirArgs(path, options));
   }
 
   async function mkdir(
@@ -111,7 +110,7 @@
   }
 
   function readDirSync(path) {
-    return ops.op_read_dir_sync(pathFromURL(path))[
+    return core.opSync("op_read_dir_sync", pathFromURL(path))[
       SymbolIterator
     ]();
   }
@@ -129,7 +128,7 @@
   }
 
   function readLinkSync(path) {
-    return ops.op_read_link_sync(pathFromURL(path));
+    return core.opSync("op_read_link_sync", pathFromURL(path));
   }
 
   function readLink(path) {
@@ -137,7 +136,7 @@
   }
 
   function realPathSync(path) {
-    return ops.op_realpath_sync(pathFromURL(path));
+    return core.opSync("op_realpath_sync", pathFromURL(path));
   }
 
   function realPath(path) {
@@ -148,7 +147,7 @@
     path,
     options = {},
   ) {
-    ops.op_remove_sync({
+    core.opSync("op_remove_sync", {
       path: pathFromURL(path),
       recursive: !!options.recursive,
     });
@@ -165,7 +164,7 @@
   }
 
   function renameSync(oldpath, newpath) {
-    ops.op_rename_sync({
+    core.opSync("op_rename_sync", {
       oldpath: pathFromURL(oldpath),
       newpath: pathFromURL(newpath),
     });
@@ -204,7 +203,7 @@
   }
 
   function fstatSync(rid) {
-    return parseFileInfo(ops.op_fstat_sync(rid));
+    return parseFileInfo(core.opSync("op_fstat_sync", rid));
   }
 
   async function fstat(rid) {
@@ -220,7 +219,7 @@
   }
 
   function lstatSync(path) {
-    const res = ops.op_stat_sync({
+    const res = core.opSync("op_stat_sync", {
       path: pathFromURL(path),
       lstat: true,
     });
@@ -236,7 +235,7 @@
   }
 
   function statSync(path) {
-    const res = ops.op_stat_sync({
+    const res = core.opSync("op_stat_sync", {
       path: pathFromURL(path),
       lstat: false,
     });
@@ -252,7 +251,7 @@
   }
 
   function ftruncateSync(rid, len) {
-    ops.op_ftruncate_sync({ rid, len: coerceLen(len) });
+    core.opSync("op_ftruncate_sync", { rid, len: coerceLen(len) });
   }
 
   async function ftruncate(rid, len) {
@@ -260,7 +259,7 @@
   }
 
   function truncateSync(path, len) {
-    ops.op_truncate_sync({ path, len: coerceLen(len) });
+    core.opSync("op_truncate_sync", { path, len: coerceLen(len) });
   }
 
   async function truncate(path, len) {
@@ -268,11 +267,11 @@
   }
 
   function umask(mask) {
-    return ops.op_umask(mask);
+    return core.opSync("op_umask", mask);
   }
 
   function linkSync(oldpath, newpath) {
-    ops.op_link_sync({ oldpath, newpath });
+    core.opSync("op_link_sync", { oldpath, newpath });
   }
 
   async function link(oldpath, newpath) {
@@ -305,7 +304,7 @@
     atime,
     mtime,
   ) {
-    ops.op_futime_sync({
+    core.opSync("op_futime_sync", {
       rid,
       atime: toUnixTimeFromEpoch(atime),
       mtime: toUnixTimeFromEpoch(mtime),
@@ -329,7 +328,7 @@
     atime,
     mtime,
   ) {
-    ops.op_utime_sync({
+    core.opSync("op_utime_sync", {
       path: pathFromURL(path),
       atime: toUnixTimeFromEpoch(atime),
       mtime: toUnixTimeFromEpoch(mtime),
@@ -353,7 +352,7 @@
     newpath,
     options,
   ) {
-    ops.op_symlink_sync({
+    core.opSync("op_symlink_sync", {
       oldpath: pathFromURL(oldpath),
       newpath: pathFromURL(newpath),
       options,
@@ -373,7 +372,7 @@
   }
 
   function fdatasyncSync(rid) {
-    ops.op_fdatasync_sync(rid);
+    core.opSync("op_fdatasync_sync", rid);
   }
 
   async function fdatasync(rid) {
@@ -381,7 +380,7 @@
   }
 
   function fsyncSync(rid) {
-    ops.op_fsync_sync(rid);
+    core.opSync("op_fsync_sync", rid);
   }
 
   async function fsync(rid) {
@@ -389,7 +388,7 @@
   }
 
   function flockSync(rid, exclusive) {
-    ops.op_flock_sync(rid, exclusive === true);
+    core.opSync("op_flock_sync", rid, exclusive === true);
   }
 
   async function flock(rid, exclusive) {
@@ -397,7 +396,7 @@
   }
 
   function funlockSync(rid) {
-    ops.op_funlock_sync(rid);
+    core.opSync("op_funlock_sync", rid);
   }
 
   async function funlock(rid) {

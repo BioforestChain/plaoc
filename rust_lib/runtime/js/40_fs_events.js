@@ -3,7 +3,6 @@
 
 ((window) => {
   const core = window.Deno.core;
-  const ops = core.ops;
   const { BadResourcePrototype, InterruptedPrototype } = core;
   const {
     ArrayIsArray,
@@ -16,7 +15,7 @@
 
     constructor(paths, options) {
       const { recursive } = options;
-      this.#rid = ops.op_fs_events_open({ recursive, paths });
+      this.#rid = core.opSync("op_fs_events_open", { recursive, paths });
     }
 
     get rid() {

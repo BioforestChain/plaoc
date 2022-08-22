@@ -89,13 +89,9 @@ impl MainWorker {
     permissions: Permissions,
     options: WorkerOptions,
   ) -> Self {
-    log::info!("main bootstrap_from_options 1");
     let bootstrap_options = options.bootstrap.clone();
-    log::info!("main bootstrap_from_options 2");
     let mut worker = Self::from_options(main_module, permissions, options);
-    log::info!("main bootstrap_from_options 3");
     worker.bootstrap(&bootstrap_options);
-    log::info!("main bootstrap_from_options 4");
     worker
   }
 
@@ -104,7 +100,6 @@ impl MainWorker {
     permissions: Permissions,
     mut options: WorkerOptions,
   ) -> Self {
-    log::info!("main from_options 1");
     // Permissions: many ops depend on this
     let unstable = options.bootstrap.unstable;
     let enable_testing_features = options.bootstrap.enable_testing_features;
@@ -118,7 +113,6 @@ impl MainWorker {
       .build();
     let exit_code = ExitCode(Arc::new(AtomicI32::new(0)));
 
-    log::info!("main from_options 2");
     // Internal modules
     let mut extensions: Vec<Extension> = vec![
       // Web APIs
@@ -167,7 +161,6 @@ impl MainWorker {
         unstable,
         options.unsafely_ignore_certificate_errors.clone(),
       ),
-      // deno_node::init() // todo(dsherret): re-enable,
       ops::os::init(exit_code.clone()),
       ops::permissions::init(),
       ops::process::init(),
@@ -199,7 +192,6 @@ impl MainWorker {
       );
     }
 
-    log::info!("main from_options 3");
     Self {
       js_runtime,
       should_break_on_first_statement: options.should_break_on_first_statement,
@@ -208,25 +200,10 @@ impl MainWorker {
   }
 
   pub fn bootstrap(&mut self, options: &BootstrapOptions) {
-    log::info!("main bootstrap 1");
     let script = format!("bootstrap.mainRuntime({})", options.as_json());
-    log::info!("main bootstrap 1.1");
-    self
-      .execute_script("gaubee:test1", "typeof console").unwrap();
-      log::info!("main bootstrap 1.2");
-      self
-            .execute_script("gaubee:test2", "Deno.core.print(\"gaubee:test2\",true)").unwrap();
-    log::info!("main bootstrap 1.3");
-    self
-          .execute_script("gaubee:test3", "Deno.core.print(typeof console,true)").unwrap();
-    log::info!("main bootstrap 1.4");
-    self
-        .execute_script("gaubee:test4", "console.log(678)").unwrap();
-    log::info!("main bootstrap 2:{}", script);
     self
       .execute_script(&located_script_name!(), &script)
       .expect("Failed to execute bootstrap script");
-    log::info!("main bootstrap 3");
   }
 
   /// See [JsRuntime::execute_script](deno_core::JsRuntime::execute_script)
@@ -239,26 +216,24 @@ impl MainWorker {
     Ok(())
   }
 
-  /// Loads and instantiates specified JavaScript module as "main" module.
-  pub async fn preload_main_module(
+  /// Loads and instantiates specified JavaScript module
+  /// as "main" or "side" module.
+  pub async fn preload_module(
     &mut self,
     module_specifier: &ModuleSpecifier,
+    main: bool,
   ) -> Result<ModuleId, AnyError> {
-    self
-      .js_runtime
-      .load_main_module(module_specifier, None)
-      .await
-  }
-
-  /// Loads and instantiates specified JavaScript module as "side" module.
-  pub async fn preload_side_module(
-    &mut self,
-    module_specifier: &ModuleSpecifier,
-  ) -> Result<ModuleId, AnyError> {
-    self
-      .js_runtime
-      .load_side_module(module_specifier, None)
-      .await
+    if main {
+      self
+        .js_runtime
+        .load_main_module(module_specifier, None)
+        .await
+    } else {
+      self
+        .js_runtime
+        .load_side_module(module_specifier, None)
+        .await
+    }
   }
 
   /// Executes specified JavaScript module.
@@ -266,7 +241,6 @@ impl MainWorker {
     &mut self,
     id: ModuleId,
   ) -> Result<(), AnyError> {
-    self.wait_for_inspector_session();
     let mut receiver = self.js_runtime.mod_evaluate(id);
     tokio::select! {
       // Not using biased mode leads to non-determinism for relatively simple
@@ -291,7 +265,8 @@ impl MainWorker {
     &mut self,
     module_specifier: &ModuleSpecifier,
   ) -> Result<(), AnyError> {
-    let id = self.preload_side_module(module_specifier).await?;
+    let id = self.preload_module(module_specifier, false).await?;
+    self.wait_for_inspector_session();
     self.evaluate_module(id).await
   }
 
@@ -302,7 +277,8 @@ impl MainWorker {
     &mut self,
     module_specifier: &ModuleSpecifier,
   ) -> Result<(), AnyError> {
-    let id = self.preload_main_module(module_specifier).await?;
+    let id = self.preload_module(module_specifier, true).await?;
+    self.wait_for_inspector_session();
     self.evaluate_module(id).await
   }
 

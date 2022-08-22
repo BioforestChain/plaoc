@@ -3,7 +3,6 @@
 
 ((window) => {
   const core = window.Deno.core;
-  const ops = core.ops;
   const { FsFile } = window.__bootstrap.files;
   const { readAll } = window.__bootstrap.io;
   const { pathFromURL } = window.__bootstrap.util;
@@ -17,7 +16,7 @@
   } = window.__bootstrap.primordials;
 
   function opKill(pid, signo) {
-    ops.op_kill(pid, signo);
+    core.opSync("op_kill", pid, signo);
   }
 
   function opRunStatus(rid) {
@@ -26,7 +25,7 @@
 
   function opRun(request) {
     assert(request.cmd.length > 0);
-    return ops.op_run(request);
+    return core.opSync("op_run", request);
   }
 
   async function runStatus(rid) {

@@ -3,11 +3,10 @@
 
 ((window) => {
   const core = window.__bootstrap.core;
-  const ops = core.ops;
   const { HttpConn } = window.__bootstrap.http;
 
   function serveHttp(conn) {
-    const rid = ops.op_http_start(conn.rid);
+    const rid = core.opSync("op_http_start", conn.rid);
     return new HttpConn(rid, conn.remoteAddr, conn.localAddr);
   }
 

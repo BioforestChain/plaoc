@@ -345,14 +345,10 @@ impl WebWorker {
     worker_id: WorkerId,
     options: WebWorkerOptions,
   ) -> (Self, SendableWebWorkerHandle) {
-    log::info!("bootstrap_from_options 1");
     let bootstrap_options = options.bootstrap.clone();
-    log::info!("bootstrap_from_options 2");
     let (mut worker, handle) =
       Self::from_options(name, permissions, main_module, worker_id, options);
-    log::info!("bootstrap_from_options 3");
     worker.bootstrap(&bootstrap_options);
-    log::info!("bootstrap_from_options 4");
     (worker, handle)
   }
 
@@ -374,8 +370,6 @@ impl WebWorker {
         Ok(())
       })
       .build();
-
-    log::info!("from_options 1");
 
     let mut extensions: Vec<Extension> = vec![
       // Web APIs
@@ -425,7 +419,6 @@ impl WebWorker {
         unstable,
         options.unsafely_ignore_certificate_errors.clone(),
       ),
-      // deno_node::init(), // todo(dsherret): re-enable
       ops::os::init_for_worker(),
       ops::permissions::init(),
       ops::process::init(),
@@ -438,7 +431,6 @@ impl WebWorker {
       perm_ext,
     ];
 
-    log::info!("from_options 2");
     // Append exts
     extensions.extend(std::mem::take(&mut options.extensions));
 
@@ -453,7 +445,6 @@ impl WebWorker {
       ..Default::default()
     });
 
-    log::info!("from_options 3");
     if let Some(server) = options.maybe_inspector_server.clone() {
       server.register_inspector(
         main_module.to_string(),
@@ -462,7 +453,6 @@ impl WebWorker {
       );
     }
 
-    log::info!("from_options 4");
     let (internal_handle, external_handle) = {
       let handle = js_runtime.v8_isolate().thread_safe_handle();
       let (internal_handle, external_handle) =
@@ -473,7 +463,6 @@ impl WebWorker {
       (internal_handle, external_handle)
     };
 
-    log::info!("from_options 5");
     (
       Self {
         id: worker_id,
@@ -524,26 +513,24 @@ impl WebWorker {
     Ok(())
   }
 
-  /// Loads and instantiates specified JavaScript module as "main" module.
-  pub async fn preload_main_module(
+  /// Loads and instantiates specified JavaScript module
+  /// as "main" or "side" module.
+  pub async fn preload_module(
     &mut self,
     module_specifier: &ModuleSpecifier,
+    main: bool,
   ) -> Result<ModuleId, AnyError> {
-    self
-      .js_runtime
-      .load_main_module(module_specifier, None)
-      .await
-  }
-
-  /// Loads and instantiates specified JavaScript module as "side" module.
-  pub async fn preload_side_module(
-    &mut self,
-    module_specifier: &ModuleSpecifier,
-  ) -> Result<ModuleId, AnyError> {
-    self
-      .js_runtime
-      .load_side_module(module_specifier, None)
-      .await
+    if main {
+      self
+        .js_runtime
+        .load_main_module(module_specifier, None)
+        .await
+    } else {
+      self
+        .js_runtime
+        .load_side_module(module_specifier, None)
+        .await
+    }
   }
 
   /// Loads, instantiates and executes specified JavaScript module.
@@ -554,7 +541,7 @@ impl WebWorker {
     &mut self,
     module_specifier: &ModuleSpecifier,
   ) -> Result<(), AnyError> {
-    let id = self.preload_side_module(module_specifier).await?;
+    let id = self.preload_module(module_specifier, false).await?;
     let mut receiver = self.js_runtime.mod_evaluate(id);
     tokio::select! {
       biased;
@@ -712,7 +699,7 @@ pub fn run_web_worker(
     } else {
       // TODO(bartlomieju): add "type": "classic", ie. ability to load
       // script instead of module
-      match worker.preload_main_module(&specifier).await {
+      match worker.preload_module(&specifier, true).await {
         Ok(id) => {
           worker.start_polling_for_messages();
           worker.execute_main_module(id).await
