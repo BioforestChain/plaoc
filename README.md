@@ -15,56 +15,54 @@
 
 ## docker编译
 
-```shell
+    ```bash
+    # 如果不自己构建可以不运行这一句
+    docker build -t waterbang/aarch64-linux-android:arm-ndk21-rust1.63.0 .
+    # 在plaoc根目录执行
+    docker run -it -v $(pwd):/plaoc waterbag/aarch64-linux-android:arm-ndk21-rust1.63.0 /bin/bash
 
-docker build -t waterbang/aarch64-linux-android:arm-ndk21-rust1.63.0 .
-# 在plaoc根目录执行
-docker run -it -v $(pwd):/plaoc waterbang/aarch64-linux-android:arm-ndk21-rust1.63.0 /bin/bash
+    cd /plaoc/rust_lib
 
-cd /plaoc/rust_lib
-
-./build-android.sh
-
-```
+    RUST_BACKTRACE=1 cargo build -vv --target=aarch64-linux-android --release
+    ```
 
 ### 测试（现在只提供vue3）
 
 如何测试
 
-```bash
+    ```bash
+    # 前端
+    cd test-vue3
 
-# 前端
-cd test-vue3
+    yarn install
 
-yarn install
+    # 后端
+    cd test-vue3/bfs-service
 
-# 后端
-cd test-vue3/bfs-service
+    bfsp init
 
-bfsp init
+    bfsp dev
 
-bfsp dev
+    # 前端上传到android
+    yarn build
 
-# 前端上传到android
-yarn build
+    # 后端上传到android
+    node test-vue3/bfs-service/copy.cjs
 
-# 后端上传到android
-node test-vue3/bfs-service/copy.cjs
-
-#后续封装成.bfsa
-```
+    #后续封装成.bfsa
+    ```
 
 ### plaoc
 
 BFS 启动
 
-```bash
-cd plaoc
+    ```bash
+    cd plaoc
 
-bfsw init
+    bfsw init
 
-bfsw dev
-```
+    bfsw dev
+    ```
 
 #### 前端包 @bfsx/plugin
 
@@ -74,16 +72,16 @@ bfsw dev
 
 首先要保证一下文件存在,点击下载[rusty_v8 v0.48.1](https://download.waterbang.top/s/vMFe?path=%2F)：
 
-1. rust_lib/assets/rusty_v8_mirror/v0.48.1/librusty_v8_release_aarch64-linux-android.a
-2. rust_lib/assets/rusty_v8_mirror/v0.48.1/librusty_v8_release_x86_64-apple-darwin.a
+> 1. rust_lib/assets/rusty_v8_mirror/v0.48.1/librusty_v8_release_aarch64-linux-android.a
+> 2. rust_lib/assets/rusty_v8_mirror/v0.48.1/librusty_v8_release_x86_64-apple-darwin.a
 
-```bash
-cd rust_lib
+    ```bash
+    cd rust_lib
 
-cargo build --target=aarch64-linux-android --release
+    cargo build --target=aarch64-linux-android --release
 
-cross build --target=aarch64-linux-android --release
-```
+    cross build --target=aarch64-linux-android --release
+    ```
 
 ### android
 
