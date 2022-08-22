@@ -16,8 +16,10 @@
 ## docker编译
 
 ```shell
+
+docker build -t waterbang/aarch64-linux-android:arm-ndk21-rust1.63.0 .
 # 在plaoc根目录执行
-docker run -it -v $(pwd):/plaoc waterbang/aarch64-linux-android:arm-ndk21-rust1.60.0 /bin/bash
+docker run -it -v $(pwd):/plaoc waterbang/aarch64-linux-android:arm-ndk21-rust1.63.0 /bin/bash
 
 cd /plaoc/rust_lib
 
