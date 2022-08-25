@@ -1,0 +1,35 @@
+name: GitHub Actions create so
+# 什么时候触发
+on: [push, pull_request, workflow_dispatch]
+
+# 准备工作
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: waterbang/aarch64-linux-android:arm-ndk21-rust1.63.0
+      options: --cpus 2
+    steps:
+      - name: Checkout pynab
+        uses: actions/checkout@v2
+
+      - name: Run test suite in chroot environment
+        uses: pguyot/arm-runner-action@v2
+        id: arm_runner
+        with:
+          base_image: raspios_lite:2022-04-04
+          commands: |
+            arch
+      # 获取 子模块
+      - name: Checkout submodules
+        shell: bash
+        run: |
+          git submodule init
+          git submodule update
+      - name: build librust.so
+        run: |
+          arch
+          rustup default stable
+          rustup target add aarch64-linux-android
+          export RUSTY_V8_ARCHIVE=rust_lib/assets/rusty_v8_mirror/v0.48.1/librusty_v8_release_aarch64-linux-android.a
+          cd rust_lib &&  RUST_BACKTRACE=1 cargo build -vv --target=aarch64-linux-android --release

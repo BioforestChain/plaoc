@@ -106,6 +106,9 @@ export RUSTY_V8_ARCHIVE="$PWD/assets/rusty_v8_mirror/v0.48.1/librusty_v8_release
   > rust_lib/assets/rusty_v8_mirror/v0.48.1/librusty_v8_release_aarch64-linux-android.a
   > rust_lib/assets/rusty_v8_mirror/v0.48.1/librusty_v8_release_x86_64-apple-darwin.a
 
+如果是linux则是
+  > rust_lib/assets/rusty_v8_mirror/v0.48.1/librusty_v8_release_x86_64-unknown-linux-gnu.a
+
 ```bash
  brew install glib glib-utils
 ```

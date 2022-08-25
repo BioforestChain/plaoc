@@ -378,24 +378,16 @@ impl StdFileResourceInner {
       }
       Self::Stdout(_) => {
         // bypass the file and use std::io::stdout()
-        if cfg!(target_os = "android") {
-          log::info!("{}", std::str::from_utf8(buf).unwrap());
-        } else {
-          let mut stdout = std::io::stdout().lock();
-          stdout.write_all(buf)?;
-          stdout.flush()?;
-        }
+        let mut stdout = std::io::stdout().lock();
+        stdout.write_all(buf)?;
+        stdout.flush()?;
         Ok(())
       }
       Self::Stderr(_) => {
         // bypass the file and use std::io::stderr()
-        if cfg!(target_os = "android") {
-          log::error!("{}", std::str::from_utf8(buf).unwrap());
-        } else {
-          let mut stderr = std::io::stderr().lock();
-          stderr.write_all(buf)?;
-          stderr.flush()?;
-        }
+        let mut stderr = std::io::stderr().lock();
+        stderr.write_all(buf)?;
+        stderr.flush()?;
         Ok(())
       }
     }
@@ -589,6 +581,16 @@ impl Resource for StdFileResource {
 
   fn write(self: Rc<Self>, buf: ZeroCopyBuf) -> AsyncResult<usize> {
     Box::pin(self.write(buf))
+  }
+
+  #[cfg(unix)]
+  fn backing_fd(self: Rc<Self>) -> Option<std::os::unix::prelude::RawFd> {
+    use std::os::unix::io::AsRawFd;
+    self
+      .with_inner_and_metadata(move |std_file, _| {
+        Ok(std_file.with_file(|f| f.as_raw_fd()))
+      })
+      .ok()
   }
 }
 

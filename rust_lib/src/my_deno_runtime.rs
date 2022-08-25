@@ -12,7 +12,7 @@ use deno_core::SharedArrayBufferStore;
 use deno_runtime::colors;
 use deno_runtime::deno_web::BlobStore;
 use deno_runtime::ops::worker_host::CreateWebWorkerCb;
-use deno_runtime::ops::worker_host::PreloadModuleCb;
+use deno_runtime::ops::worker_host::WorkerEventCb;
 use deno_runtime::permissions::Permissions;
 use deno_runtime::web_worker::{WebWorker, WebWorkerOptions};
 use deno_runtime::worker::MainWorker;
@@ -24,7 +24,7 @@ use std::sync::Arc;
 #[cfg(target_os = "android")]
 use crate::module_loader::AssetsModuleLoader;
 
-fn create_web_worker_preload_module_callback() -> Arc<PreloadModuleCb> {
+fn create_web_worker_preload_module_callback() -> Arc<WorkerEventCb> {
     Arc::new(move |worker| {
         let fut = async move { Ok(worker) };
         LocalFutureObj::new(Box::new(fut))
@@ -33,7 +33,7 @@ fn create_web_worker_preload_module_callback() -> Arc<PreloadModuleCb> {
 
 fn create_web_worker_callback(
     #[cfg(target_os = "android")] module_loader_builder: Arc<AssetsModuleLoader>,
-    #[cfg(not(target_os = "android"))] module_loader_builder: fn()->Rc<dyn ModuleLoader>,
+    #[cfg(not(target_os = "android"))] module_loader_builder: fn() -> Rc<dyn ModuleLoader>,
     stdio: deno_runtime::ops::io::Stdio,
 ) -> Arc<CreateWebWorkerCb> {
     Arc::new(move |args| {
@@ -42,11 +42,17 @@ fn create_web_worker_callback(
         #[cfg(not(target_os = "android"))]
         let module_loader = module_loader_builder();
 
-        let create_web_worker_cb = create_web_worker_callback(module_loader_builder.clone(), stdio.clone());
+        let create_web_worker_cb =
+            create_web_worker_callback(module_loader_builder.clone(), stdio.clone());
         let preload_module_cb = create_web_worker_preload_module_callback();
 
         let extensions = cli_exts();
-
+        let create_web_worker_cb = Arc::new(|_| {
+            todo!("Web workers are not supported in the example");
+        });
+        let web_worker_event_cb = Arc::new(|_| {
+            todo!("Web workers are not supported in the example");
+        });
         let options = WebWorkerOptions {
             bootstrap: BootstrapOptions {
                 args: vec![],
@@ -73,6 +79,8 @@ fn create_web_worker_callback(
             source_map_getter: None,
             format_js_error_fn: Some(Arc::new(format_js_error)),
             // use_deno_namespace: args.use_deno_namespace,
+            pre_execute_module_cb: web_worker_event_cb,
+            npm_resolver: None,
             worker_type: args.worker_type,
             maybe_inspector_server: None,
             get_error_class_fn: Some(&get_error_class_name),
@@ -108,7 +116,7 @@ fn create_web_worker_callback(
 
 pub fn create_main_worker(
     #[cfg(target_os = "android")] module_loader_builder: Arc<AssetsModuleLoader>,
-    #[cfg(not(target_os = "android"))] module_loader_builder: fn()->Rc<dyn ModuleLoader>,
+    #[cfg(not(target_os = "android"))] module_loader_builder: fn() -> Rc<dyn ModuleLoader>,
     main_module: ModuleSpecifier,
     permissions: Permissions,
     stdio: deno_runtime::ops::io::Stdio,
@@ -128,6 +136,12 @@ pub fn create_main_worker(
     let extensions = cli_exts();
 
     log::info!("5");
+    let create_web_worker_cb = Arc::new(|_| {
+        todo!("Web workers are not supported in the example");
+    });
+    let web_worker_event_cb = Arc::new(|_| {
+        todo!("Web workers are not supported in the example");
+    });
     let options = WorkerOptions {
         bootstrap: BootstrapOptions {
             args: vec![],
@@ -150,7 +164,8 @@ pub fn create_main_worker(
         seed: None,
         source_map_getter: None,
         format_js_error_fn: Some(Arc::new(format_js_error)),
-        create_web_worker_cb,
+        web_worker_pre_execute_module_cb: web_worker_event_cb,
+        npm_resolver: None,
         web_worker_preload_module_cb,
         maybe_inspector_server: None,
         should_break_on_first_statement: false,
@@ -162,6 +177,7 @@ pub fn create_main_worker(
         shared_array_buffer_store: Some(SharedArrayBufferStore::default()),
         compiled_wasm_module_store: Some(CompiledWasmModuleStore::default()),
         stdio: stdio.clone(),
+        create_web_worker_cb: create_web_worker_cb,
     };
 
     log::info!("6");
@@ -171,7 +187,7 @@ pub fn create_main_worker(
 // #[tokio::main]
 pub async fn bootstrap_deno_runtime(
     #[cfg(target_os = "android")] module_loader_builder: Arc<AssetsModuleLoader>,
-    #[cfg(not(target_os = "android"))] module_loader_builder: fn()->Rc<dyn ModuleLoader>,
+    #[cfg(not(target_os = "android"))] module_loader_builder: fn() -> Rc<dyn ModuleLoader>,
     entry_js_path: &str,
 ) -> Result<(), AnyError> {
     let main_module = deno_core::resolve_path(entry_js_path)?;

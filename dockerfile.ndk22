@@ -1,0 +1,23 @@
+FROM --platform=linux/arm64/v8 ubuntu:latest
+
+# https://developer.android.com/studio/index.html#command-tools
+ARG NDK_VERSION=android-ndk-r22b
+
+RUN mkdir -p /opt/android-sdk-linux/ndk &&  cd /opt/android-sdk-linux/ndk
+
+RUN apt-get update && \
+  apt-get install  zip unzip wget -y
+
+#cmake
+# RUN wget https://cmake.org/files/v3.14/cmake-3.14.2.tar.gz  && \
+#   tar xvf cmake-3.14.2.tar.gz && cd cmake-3.14.2 && ./bootstrap && make &&  make install
+
+# RUN apt-get remove cmake -y && \
+#   ln -s /usr/local/bin/cmake /usr/bin/
+
+# NDK相关环境配置
+RUN wget https://dl.google.com/android/repository/${NDK_VERSION}-linux-x86_64.zip && \
+  unzip /${NDK_VERSION}-linux-x86_64.zip
+
+ENV ANDROID_HOME=opt/android-sdk-linux/android-sdk-linux
+ENV ANDROID_NDK_HOME=opt/android-sdk-linux/${NDK_VERSION}

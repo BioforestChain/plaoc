@@ -19,7 +19,7 @@
     # 如果不自己构建可以不运行这一句
     docker build -t waterbang/aarch64-linux-android:arm-ndk21-rust1.63.0 .
     # 在plaoc根目录执行
-    docker run -it -v $(pwd):/plaoc waterbag/aarch64-linux-android:arm-ndk21-rust1.63.0 /bin/bash
+    docker run -it -rm -v $(pwd):/plaoc waterbang/aarch64-linux-android:arm-ndk21-rust1.63.0 /bin/bash
 
     cd /plaoc/rust_lib
 
@@ -70,7 +70,7 @@ BFS 启动
 
 ### deno-runtime
 
-首先要保证一下文件存在,点击下载[rusty_v8 v0.48.1](https://download.waterbang.top/s/vMFe?path=%2F)：
+首先要保证一下文件存在,点击下载[rusty_v8 v0.48.1](https://github.com/waterbang/rusty_v8/releases)：
 
 > 1. rust_lib/assets/rusty_v8_mirror/v0.48.1/librusty_v8_release_aarch64-linux-android.a
 > 2. rust_lib/assets/rusty_v8_mirror/v0.48.1/librusty_v8_release_x86_64-apple-darwin.a
