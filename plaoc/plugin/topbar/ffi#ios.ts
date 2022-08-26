@@ -1,4 +1,5 @@
 import "../typings";
+import { Color } from "../typings/types/color.type";
 import { TopBar } from "./bfcsTopBar.type";
 
 export class TopBarFFI implements TopBar.ITopBarFFI {

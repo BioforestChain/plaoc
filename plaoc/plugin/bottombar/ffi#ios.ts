@@ -1,4 +1,5 @@
 import "../typings";
+import { Color } from "../typings/types/color.type";
 import { convertToRGBAHex } from "./../util";
 import { BottomBar } from "./bfcsBottomBar.type";
 

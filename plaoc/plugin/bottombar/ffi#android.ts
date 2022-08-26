@@ -1,3 +1,4 @@
+import { Color } from "../typings/types/color.type";
 import { getColorInt, getColorHex, convertToRGBAHex } from "./../util";
 import { BottomBar } from "./bfcsBottomBar.type";
 export class BottomBarFFI implements BottomBar.IBottomBarFFI {

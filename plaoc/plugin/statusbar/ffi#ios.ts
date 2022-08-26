@@ -1,4 +1,5 @@
 import "../typings";
+import { Color } from "../typings/types/color.type";
 import { StatusBar } from "./bfcsStatusBar.type";
 
 export class StatusBarFFI implements StatusBar.IStatusBarFFI {

@@ -1,9 +1,9 @@
 export enum callDeno {
-  openDWebView = "openDWebView",
-  openScanner = "openScanner",
-  initMetaData = "initMetaData",
-  denoRuntime = "denoRuntime",
-  evalJsRuntime = "evalJsRuntime",
+  openDWebView = "OpenDWebView",
+  openScanner = "OpenScanner",
+  initMetaData = "InitMetaData",
+  denoRuntime = "DenoRuntime",
+  evalJsRuntime = "EvalJsRuntime",
 }
 
 export enum callDVebView {

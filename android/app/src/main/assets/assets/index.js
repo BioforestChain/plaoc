@@ -4727,15 +4727,6 @@ class DwebPlugin extends HTMLElement {
     console.log(data);
     return data;
   }
-  static get observedAttributes() {
-    return ["channelId"];
-  }
-  attributeChangedCallback(name, oldValue, newValue) {
-    console.log("channelId: ", name, oldValue, newValue);
-    if (name === "channelId") {
-      this.channelId = newValue;
-    }
-  }
 }
 class DWebMessager extends DwebPlugin {
   constructor() {
@@ -4752,7 +4743,7 @@ class OpenScanner extends DwebPlugin {
     super();
   }
   async openScanner() {
-    const ok = await this.onPolling("openScanner");
+    const ok = await this.onPolling("OpenScanner");
     if (ok !== "ok") {
       throw new Error("\u6253\u5F00\u626B\u7801\u5931\u8D25\uFF01");
     }
@@ -4902,10 +4893,9 @@ function convertToRGBAHex(color) {
   }
   return colorHex.length === 9 ? colorHex : color;
 }
-const bottom_bar = "";
 class BottomBarFFI {
   constructor() {
-    this._ffi = bottom_bar;
+    this._ffi = window.bottom_bar;
   }
   getEnabled() {
     return new Promise((resolve2, reject) => {
@@ -5266,10 +5256,9 @@ customElements.define("dweb-bottom-bar", BfcsBottomBar);
 customElements.define("dweb-bottom-bar-button", BfcsBottomBarButton);
 customElements.define("dweb-bottom-bar-icon", BfcsBottomBarIcon);
 customElements.define("dweb-bottom-bar-text", BfcsBottomBarText);
-const native_dialog = "";
 class DialogsFFI {
   constructor() {
-    this._ffi = native_dialog;
+    this._ffi = window.native_dialog;
   }
   openAlert(config, confirmFunc) {
     return new Promise((resolve2, reject) => {
@@ -5655,10 +5644,9 @@ class BfspIcon extends DwebPlugin {
   }
 }
 customElements.define("dweb-icon", BfspIcon);
-const system_ui = "";
 class StatusBarFFI {
   constructor() {
-    this._ffi = system_ui;
+    this._ffi = window.system_ui;
   }
   async setStatusBarColor(color, barStyle) {
     let colorHex;
@@ -5819,10 +5807,9 @@ class BfcsStatusBar extends DwebPlugin {
   }
 }
 customElements.define("dweb-status-bar", BfcsStatusBar);
-const top_bar = "";
 class TopBarFFI {
   constructor() {
-    this._ffi = top_bar;
+    this._ffi = window.top_bar;
   }
   back() {
     return new Promise((resolve2, reject) => {

@@ -4,6 +4,7 @@ import { BottomBarFFI } from "./ffi";
 import "../typings";
 import { BottomBar } from "./bfcsBottomBar.type";
 import { Icon } from "../icon/bfspIcon.type";
+import { Color } from "../typings/types/color.type";
 
 export class BfcsBottomBar extends DwebPlugin {
   private _ffi: BottomBarFFI;

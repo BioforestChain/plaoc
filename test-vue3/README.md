@@ -15,3 +15,18 @@ Since TypeScript cannot handle type information for `.vue` imports, they are shi
 
 You can learn more about Take Over mode [here](https://github.com/johnsoncodehk/volar/discussions/471).
 # plaoc-ts
+
+## 如何开发使用
+
+先在文件夹plaoc/plaoc/plugin下执行：
+    ```bash
+    npm link 
+    ```
+
+然后在此文件夹根目录执行
+
+```bash
+npm link @bfsx/plugin
+```
+
+这样修改plugin 就能动态测试了

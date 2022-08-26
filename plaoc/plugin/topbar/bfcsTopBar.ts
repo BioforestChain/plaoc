@@ -4,6 +4,7 @@ import { TopBarFFI } from "./ffi";
 import { TopBar } from "./bfcsTopBar.type";
 import "../typings";
 import { Icon } from "../icon/bfspIcon.type";
+import { Color } from "../typings/types/color.type";
 
 export class BfcsTopBar extends HTMLElement {
   private _ffi: TopBar.ITopBarFFI;

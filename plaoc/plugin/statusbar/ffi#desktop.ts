@@ -1,3 +1,4 @@
+import { Color } from "../typings/types/color.type";
 import { convertToRGBAHex } from "../util";
 import { StatusBar } from "./bfcsStatusBar.type";
 

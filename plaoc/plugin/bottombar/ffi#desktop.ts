@@ -1,6 +1,7 @@
 import { convertToRGBAHex } from "../util";
 import { BottomBar } from "./bfcsBottomBar.type";
 import "../typings";
+import { Color } from "../typings/types/color.type";
 
 // 等到dweb-communication组件注册成功，再执行StatusBarFFI代码
 await customElements.whenDefined("dweb-communication");

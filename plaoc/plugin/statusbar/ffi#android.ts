@@ -1,4 +1,5 @@
 import "../typings";
+import { Color } from "../typings/types/color.type";
 import { getColorInt, getColorHex } from "./../util";
 import { StatusBar } from "./bfcsStatusBar.type";
 

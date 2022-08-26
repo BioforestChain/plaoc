@@ -108,7 +108,7 @@ impl ModuleLoader for AssetsModuleLoader {
                 ))
             })
             .unwrap();
-        log::info!("loading path {:?}", path);
+        // log::info!("loading path {:?}", path);
         let module_type = if let Some(extension) = path.extension() {
             let ext = extension.to_string_lossy().to_lowercase();
             if ext == "json" {
@@ -145,7 +145,7 @@ impl ModuleLoader for AssetsModuleLoader {
             .to_string()
         };
 
-        log::info!("loaded code {:?}: {}", path, code);
+        // log::info!("loaded code {:?}: {}", path, code);
 
         return async move {
             let module = ModuleSource {

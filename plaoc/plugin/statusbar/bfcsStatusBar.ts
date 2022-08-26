@@ -3,6 +3,7 @@ import { DwebPlugin } from "../native/dweb-plugin";
 import { StatusBarFFI } from "./ffi";
 import { StatusBar } from "./bfcsStatusBar.type";
 import "../typings";
+import { Color } from "../typings/types/color.type";
 
 export class BfcsStatusBar extends DwebPlugin {
   private _ffi: StatusBar.IStatusBarFFI;

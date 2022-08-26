@@ -1,4 +1,6 @@
 import { Icon } from "../icon/bfspIcon.type";
+import { Color } from "../typings/types/color.type";
+import { Data } from "../typings/types/data.type";
 export namespace BottomBar {
   export interface BottomBarAndroidFFI {
     getEnabled(): boolean;

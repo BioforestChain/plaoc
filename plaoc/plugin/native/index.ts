@@ -18,7 +18,7 @@ export class OpenScanner extends DwebPlugin {
     super();
   }
   async openScanner(): Promise<string> {
-    const ok = await this.onPolling("openScanner");
+    const ok = await this.onPolling("OpenScanner");
     if (ok !== "ok") {
       throw new Error("打开扫码失败！"); // todo 记录日志
     }

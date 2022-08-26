@@ -1,6 +1,7 @@
 import { convertToRGBAHex } from "../util";
 import { TopBar } from "./bfcsTopBar.type";
 import "../typings";
+import { Color } from "../typings/types/color.type";
 
 // 等到dweb-communication组件注册成功，再执行topBarFFI代码
 await customElements.whenDefined("dweb-communication");

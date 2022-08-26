@@ -1,4 +1,5 @@
 import "../typings";
+import { Color } from "../typings/types/color.type";
 
 export namespace StatusBar {
   // android端ffi

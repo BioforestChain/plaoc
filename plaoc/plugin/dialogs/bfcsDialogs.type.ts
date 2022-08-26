@@ -1,4 +1,5 @@
 import "../typings";
+import { Data } from "../typings/types/data.type";
 
 export namespace Dialogs {
   export interface IBaseConfig {

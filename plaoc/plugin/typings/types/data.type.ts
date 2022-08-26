@@ -1,3 +1,3 @@
-declare namespace Data {
-  type DataString<T> = string;
+export namespace Data {
+  export  type DataString<T> = string;
 }
