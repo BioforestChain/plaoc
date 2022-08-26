@@ -1,4 +1,6 @@
 /// <reference lib="dom" />
 
-import { BfcsKeyboard } from "./Keyboard";
+import "@plaoc/plugin-typings";
+
+import { BfcsKeyboard } from "./bfcsKeyboard";
 customElements.define("dweb-keyboard", BfcsKeyboard);
