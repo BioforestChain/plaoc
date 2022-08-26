@@ -13,13 +13,23 @@
 
 ## 如何开发
 
-## docker编译
+### 如何在linux/amd64构建arm64
+
+下面的命令会起一个容器不要杀掉。
+
+    ```bash
+    docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+    docker buildx create --name multiarch --driver docker-container --use
+    docker buildx inspect --bootstrap
+    ```  
+
+### docker编译so
 
     ```bash
     # 如果不自己构建可以不运行这一句
-    docker build -t waterbang/aarch64-linux-android:arm-ndk21-rust1.63.0 .
+    docker buildx build --platform linux/arm64  -t waterbang/aarch64-linux-android:arm-ndk25-rust1.63.0 .
     # 在plaoc根目录执行
-    docker run -it -v $(pwd):/plaoc waterbag/aarch64-linux-android:arm-ndk21-rust1.63.0 /bin/bash
+    docker run -it -v /Users/mac/Desktop/waterbang/project/plaoc/qemu-aarch64-static:/usr/bin/qemu-aarch64-static -v $(pwd):/plaoc  waterbang/aarch64-linux-android:arm-ndk25-rust1.63.0  /bin/bash
 
     cd /plaoc/rust_lib
 
