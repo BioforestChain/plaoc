@@ -60,8 +60,8 @@ class MainActivity : AppCompatActivity() {
             { sendToJavaScript(it) }
 
         // 启动Deno服务
-        val deno = Intent(this, DenoService::class.java)
-        startService(deno)
+        /*val deno = Intent(this, DenoService::class.java)
+        startService(deno)*/
     }
 
     // 选择图片后回调到这
