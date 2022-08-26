@@ -11,9 +11,9 @@ cargo run
 ```shell
 rustup  target add aarch64-linux-android
 
-RUST_BACKTRACE=full cargo build -vv --target=aarch64-linux-android --release
+RUST_BACKTRACE=full cargo build  --target=aarch64-linux-android --release
 
-RUST_BACKTRACE=full cargo build -vv --target=aarch64-apple-darwin --release
+RUST_BACKTRACE=full cargo build  --target=aarch64-apple-darwin --release
 ```
 
 修改默认编译器
@@ -80,9 +80,13 @@ RUST_BACKTRACE=1 cargo build --target=aarch64-linux-android --release
 export PATH="$PATH:$ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/darwin-x86_64/bin"
 # PS: $ANDROID_NDK_ROOT 大概是："/Users/kzf/Library/Android/sdk/ndk/22.0.7026061" 需要代码NDK版本号
 
-# 确保 aarch64-linux-android-clang 存在
+# mac确保 aarch64-linux-android-clang 存在
 cd $ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/darwin-x86_64/bin/
 cp aarch64-linux-android30-clang aarch64-linux-android-clang
+
+# mac确保 clang 存在,或者指定export CC="$ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/darwin-x86_64/bin/aarch64-linux-android30-clang"
+cd $ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/darwin-x86_64/bin/
+cp aarch64-linux-android30-clang clang
 ```
 
 ### 修复error: failed to run custom build command for `libffi-sys v1.3.2`
