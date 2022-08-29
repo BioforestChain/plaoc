@@ -4767,94 +4767,106 @@ const loop = (delay) => new Promise((resolve2) => setTimeout(resolve2, delay));
 customElements.define("dweb-messager", DWebMessager);
 customElements.define("dweb-view", DWebView);
 customElements.define("dweb-scanner", OpenScanner);
-const virtual_keyboard = "";
-class BfcsKeyboard extends DwebPlugin {
+class VirtualKeyboardFFI {
   constructor() {
-    super();
-    this._ffi = virtual_keyboard;
-    this.setAttribute("hidden", "");
+    this._ffi = window.virtual_keyboard;
   }
-  connectedCallback() {
-    var _a;
-    if (this.hasAttribute("for") && ((_a = this.getAttribute("for")) == null ? void 0 : _a.length)) {
-      this.$element = document.querySelector("#" + this.getAttribute("for"));
-      this.$element.dispatchEvent(new CustomEvent("focus"));
-      this.$element.dispatchEvent(new CustomEvent("blur"));
-      this.$element.addEventListener("focus", () => {
-        this.removeAttribute("hidden");
-      });
-      this.$element.addEventListener("blur", () => {
-        this.setAttribute("hidden", "");
-      });
-    }
-  }
-  disconnectedCallback() {
-    this.$element.removeEventListener("focus", () => {
-    });
-    this.$element.removeEventListener("blur", () => {
-    });
-  }
-  getSafeArea() {
+  getKeyboardSafeArea() {
     return new Promise((resolve2, reject) => {
       const safeArea = JSON.parse(this._ffi.getSafeArea());
       resolve2(safeArea);
     });
   }
-  getHeight() {
+  getKeyboardHeight() {
     return new Promise((resolve2, reject) => {
       const height = this._ffi.getHeight();
       resolve2(height);
     });
   }
-  getOverlay() {
+  getKeyboardOverlay() {
     return new Promise((resolve2, reject) => {
       const overlay = this._ffi.getOverlay();
       resolve2(overlay);
     });
   }
-  toggleOverlay() {
+  toggleKeyboardOverlay() {
     return new Promise((resolve2, reject) => {
       this._ffi.toggleOverlay(0);
       resolve2();
     });
   }
-  show() {
+  async setKeyboardOverlay() {
+    const overlay = await this.getKeyboardOverlay();
+    if (!overlay) {
+      await this.toggleKeyboardOverlay();
+    }
+    return;
+  }
+  showKeyboard() {
     return new Promise((resolve2, reject) => {
-      this._ffi.show();
+      setTimeout(() => {
+        this._ffi.show();
+      }, 500);
       resolve2();
     });
   }
-  syncShow() {
-  }
-  hide() {
+  hideKeyboard() {
     return new Promise((resolve2, reject) => {
       this._ffi.hide();
       resolve2();
     });
   }
-  syncHide() {
+}
+class BfcsKeyboard extends HTMLElement {
+  constructor() {
+    super();
+    this._ffi = new VirtualKeyboardFFI();
+    this._init();
+  }
+  connectedCallback() {
+  }
+  disconnectedCallback() {
+  }
+  async _init() {
+    this.setAttribute("hidden", "");
+  }
+  async getKeyboardSafeArea() {
+    const safeArea = await this._ffi.getKeyboardSafeArea();
+    return safeArea;
+  }
+  async getKeyboardHeight() {
+    const height = await this._ffi.getKeyboardHeight();
+    return height;
+  }
+  async getKeyboardOverlay() {
+    const overlay = await this._ffi.getKeyboardOverlay();
+    return overlay;
+  }
+  async toggleKeyboardOverlay() {
+    await this._ffi.toggleKeyboardOverlay();
+    return;
+  }
+  async showKeyboard() {
+    this.removeAttribute("hidden");
+    await this._ffi.showKeyboard();
+    return;
+  }
+  async hideKeyboard() {
+    this.setAttribute("hidden", "");
+    await this._ffi.hideKeyboard();
+    return;
   }
   static get observedAttributes() {
     return ["overlay", "hidden"];
   }
   attributeChangedCallback(attrName, oldVal, newVal) {
-    if (attrName === "overlay") {
+    if (attrName === "overlay" && oldVal !== newVal) {
       if (this.hasAttribute(attrName)) {
-        this._ffi.toggleOverlay(1);
+        this._ffi.setKeyboardOverlay();
       }
-    } else if (attrName === "hidden") {
+    } else if (attrName === "hidden" && oldVal !== newVal) {
       if (this.hasAttribute(attrName)) {
-        if (this.hasAttribute("sync")) {
-          this.syncHide();
-        } else {
-          this.hide();
-        }
-      } else {
-        if (this.hasAttribute("sync")) {
-          this.syncShow();
-        } else {
-          this.show();
-        }
+        this.hideKeyboard();
       }
     }
   }
@@ -6090,9 +6102,18 @@ class BfcsTopBarButton extends DwebPlugin {
 }
 customElements.define("dweb-top-bar", BfcsTopBar);
 customElements.define("dweb-top-bar-button", BfcsTopBarButton);
-const _hoisted_1$1 = { class: "card" };
-const _hoisted_2 = { class: "card" };
-const _hoisted_3 = /* @__PURE__ */ createStaticVNode('<div style="margin-top:50px;" data-v-9227e2da><input id="toastMessage" type="text" placeholder="Toast message" data-v-9227e2da></div><p data-v-9227e2da> Check out <a href="https://vuejs.org/guide/quick-start.html#local" target="_blank" data-v-9227e2da>create-vue</a>, the official Vue + Vite starter </p><p data-v-9227e2da> Install <a href="https://github.com/johnsoncodehk/volar" target="_blank" data-v-9227e2da>Volar</a> in your IDE for a better DX </p><p class="read-the-docs" data-v-9227e2da>Click on the Vite and Vue logos to learn more</p>', 4);
+const _hoisted_1$1 = /* @__PURE__ */ createTextVNode("add");
+const _hoisted_2 = /* @__PURE__ */ createTextVNode("title");
+const _hoisted_3 = /* @__PURE__ */ createTextVNode("ok");
+const _hoisted_4 = /* @__PURE__ */ createTextVNode("ok");
+const _hoisted_5 = /* @__PURE__ */ createTextVNode("No");
+const _hoisted_6 = /* @__PURE__ */ createTextVNode("ok");
+const _hoisted_7 = /* @__PURE__ */ createTextVNode("No");
+const _hoisted_8 = /* @__PURE__ */ createTextVNode("ok");
+const _hoisted_9 = /* @__PURE__ */ createTextVNode("No");
+const _hoisted_10 = { class: "card" };
+const _hoisted_11 = { class: "card" };
+const _hoisted_12 = /* @__PURE__ */ createStaticVNode('<div style="margin-top:50px;" data-v-535d993a><input id="toastMessage" type="text" placeholder="Toast message" data-v-535d993a></div><p data-v-535d993a> Check out <a href="https://vuejs.org/guide/quick-start.html#local" target="_blank" data-v-535d993a>create-vue</a>, the official Vue + Vite starter </p><p data-v-535d993a> Install <a href="https://github.com/johnsoncodehk/volar" target="_blank" data-v-535d993a>Volar</a> in your IDE for a better DX </p><p class="read-the-docs" data-v-535d993a>Click on the Vite and Vue logos to learn more</p>', 4);
 const _sfc_main$1 = /* @__PURE__ */ defineComponent({
   __name: "HelloWorld",
   props: {
@@ -6103,6 +6124,9 @@ const _sfc_main$1 = /* @__PURE__ */ defineComponent({
     let dwebPluginData = ref("dweb\u7684\u6570\u636E");
     onMounted(async () => {
       console.log("document.querySelector('dweb-status-bar')!=>", document.querySelector("dweb-status-bar"));
+      console.log("aaa=>", document.getElementById("aaa"));
+      console.log("bbb=>", document.getElementById("bbb"));
+      console.log("ccc =>", document.getElementById("ccc"));
     });
     async function openScanner() {
       const scanner = document.querySelector("dweb-scanner");
@@ -6111,41 +6135,246 @@ const _sfc_main$1 = /* @__PURE__ */ defineComponent({
       scannerData.value = iter;
     }
     async function onDwebPlugin() {
-      document.querySelector("dweb-messager");
+      const dwebPlugin = document.querySelector("dweb-messager");
+      console.log("dwebPlugin:", dwebPlugin);
+      console.log("_ffixxx:", window.system_ui);
     }
     return (_ctx, _cache) => {
+      const _component_dweb_status_bar = resolveComponent("dweb-status-bar");
+      const _component_dweb_icon = resolveComponent("dweb-icon");
+      const _component_dweb_top_bar_button = resolveComponent("dweb-top-bar-button");
+      const _component_dweb_top_bar = resolveComponent("dweb-top-bar");
+      const _component_dweb_bottom_bar_icon = resolveComponent("dweb-bottom-bar-icon");
+      const _component_dweb_bottom_bar_text = resolveComponent("dweb-bottom-bar-text");
+      const _component_dweb_bottom_bar_button = resolveComponent("dweb-bottom-bar-button");
+      const _component_dweb_bottom_bar = resolveComponent("dweb-bottom-bar");
+      const _component_dweb_keyboard = resolveComponent("dweb-keyboard");
+      const _component_dweb_dialog_button = resolveComponent("dweb-dialog-button");
+      const _component_dweb_dialog_alert = resolveComponent("dweb-dialog-alert");
+      const _component_dweb_dialog_prompt = resolveComponent("dweb-dialog-prompt");
+      const _component_dweb_dialog_confirm = resolveComponent("dweb-dialog-confirm");
+      const _component_dweb_dialog_before_unload = resolveComponent("dweb-dialog-before-unload");
       const _component_dweb_messager = resolveComponent("dweb-messager");
       const _component_dweb_scanner = resolveComponent("dweb-scanner");
-      const _component_dweb_status_bar = resolveComponent("dweb-status-bar");
       return openBlock(), createElementBlock(Fragment, null, [
-        createVNode(_component_dweb_messager, { id: "dweb" }),
-        createVNode(_component_dweb_scanner, { channelId: "helloWorld" }),
         createVNode(_component_dweb_status_bar, {
           id: "status_bar",
-          "background-color": "#f00f",
+          "background-color": "#f71",
           "bar-style": "dark-content"
         }),
+        createVNode(_component_dweb_top_bar, {
+          id: "topbar",
+          title: "test",
+          "background-color": "rgba(255, 255, 255)",
+          "foreground-color": "#0000ffff"
+        }, {
+          default: withCtx(() => [
+            createVNode(_component_dweb_top_bar_button, { id: "aaa" }, {
+              default: withCtx(() => [
+                createVNode(_component_dweb_icon, { source: "Filled.AddCircle" })
+              ]),
+              _: 1
+            }),
+            createVNode(_component_dweb_top_bar_button, {
+              id: "bbb",
+              disabled: ""
+            }, {
+              default: withCtx(() => [
+                createVNode(_component_dweb_icon, {
+                  source: "Filled.Add",
+                  size: "20"
+                })
+              ]),
+              _: 1
+            }),
+            createVNode(_component_dweb_top_bar_button, { id: "ccc" }, {
+              default: withCtx(() => [
+                createVNode(_component_dweb_icon, {
+                  source: "https://www.vectorlogo.zone/logos/rust-lang/rust-lang-icon.svg",
+                  type: "AssetIcon"
+                })
+              ]),
+              _: 1
+            })
+          ]),
+          _: 1
+        }),
+        createVNode(_component_dweb_bottom_bar, {
+          id: "bottom_bar",
+          "background-color": "#ff00ffff",
+          "foreground-color": "#000000ff"
+        }, {
+          default: withCtx(() => [
+            createVNode(_component_dweb_bottom_bar_button, {
+              id: "ddd",
+              selectable: "",
+              "indicator-color": "#00ff00ff"
+            }, {
+              default: withCtx(() => [
+                createVNode(_component_dweb_bottom_bar_icon, {
+                  source: "Filled.AddCircle",
+                  color: "#ff00aaff",
+                  "selected-color": "rgba(255, 0, 0, 1)"
+                }),
+                createVNode(_component_dweb_bottom_bar_text, {
+                  color: "#0000ffff",
+                  "selected-color": "rgba(255, 0, 0, 1)"
+                }, {
+                  default: withCtx(() => [
+                    _hoisted_1$1
+                  ]),
+                  _: 1
+                })
+              ]),
+              _: 1
+            }),
+            createVNode(_component_dweb_bottom_bar_button, { id: "eee" }, {
+              default: withCtx(() => [
+                createVNode(_component_dweb_bottom_bar_icon, {
+                  source: "https://www.vectorlogo.zone/logos/rust-lang/rust-lang-icon.svg",
+                  type: "AssetIcon",
+                  size: "50"
+                })
+              ]),
+              _: 1
+            }),
+            createVNode(_component_dweb_bottom_bar_button, {
+              id: "fff",
+              selected: "",
+              selectable: ""
+            }, {
+              default: withCtx(() => [
+                createVNode(_component_dweb_bottom_bar_icon, { source: "Filled.Add" }),
+                createVNode(_component_dweb_bottom_bar_text, null, {
+                  default: withCtx(() => [
+                    _hoisted_2
+                  ]),
+                  _: 1
+                })
+              ]),
+              _: 1
+            })
+          ]),
+          _: 1
+        }),
+        createVNode(_component_dweb_keyboard, {
+          id: "key_board",
+          overlay: ""
+        }),
+        createVNode(_component_dweb_dialog_alert, {
+          id: "dda",
+          title: "alert",
+          content: "content"
+        }, {
+          default: withCtx(() => [
+            createVNode(_component_dweb_dialog_button, { id: "ddb" }, {
+              default: withCtx(() => [
+                _hoisted_3
+              ]),
+              _: 1
+            })
+          ]),
+          _: 1
+        }),
+        createVNode(_component_dweb_dialog_prompt, {
+          id: "ddp",
+          title: "prompt",
+          label: "label",
+          defaultValue: "default"
+        }, {
+          default: withCtx(() => [
+            createVNode(_component_dweb_dialog_button, {
+              id: "ddpo",
+              "aria-label": "cancel"
+            }, {
+              default: withCtx(() => [
+                _hoisted_4
+              ]),
+              _: 1
+            }),
+            createVNode(_component_dweb_dialog_button, {
+              id: "ddpn",
+              "aria-label": "confirm"
+            }, {
+              default: withCtx(() => [
+                _hoisted_5
+              ]),
+              _: 1
+            })
+          ]),
+          _: 1
+        }),
+        createVNode(_component_dweb_dialog_confirm, {
+          id: "ddc",
+          title: "confirm",
+          message: "message"
+        }, {
+          default: withCtx(() => [
+            createVNode(_component_dweb_dialog_button, {
+              id: "ok",
+              "aria-label": "confirm"
+            }, {
+              default: withCtx(() => [
+                _hoisted_6
+              ]),
+              _: 1
+            }),
+            createVNode(_component_dweb_dialog_button, {
+              id: "no",
+              "aria-label": "cancel"
+            }, {
+              default: withCtx(() => [
+                _hoisted_7
+              ]),
+              _: 1
+            })
+          ]),
+          _: 1
+        }),
+        createVNode(_component_dweb_dialog_before_unload, {
+          id: "before_unload",
+          title: "test",
+          message: "before-unload"
+        }, {
+          default: withCtx(() => [
+            createVNode(_component_dweb_dialog_button, { id: "buo" }, {
+              default: withCtx(() => [
+                _hoisted_8
+              ]),
+              _: 1
+            }),
+            createVNode(_component_dweb_dialog_button, { id: "bun" }, {
+              default: withCtx(() => [
+                _hoisted_9
+              ]),
+              _: 1
+            })
+          ]),
+          _: 1
+        }),
+        createVNode(_component_dweb_messager, { id: "dweb" }),
+        createVNode(_component_dweb_scanner, { channelId: "helloWorld" }),
         createBaseVNode("h1", null, toDisplayString(__props.msg), 1),
-        createBaseVNode("div", _hoisted_1$1, [
+        createBaseVNode("div", _hoisted_10, [
           createBaseVNode("button", {
             type: "button",
             onClick: openScanner
           }, "\u542F\u52A8\u626B\u7801"),
           createBaseVNode("p", null, toDisplayString(unref(scannerData)), 1)
         ]),
-        createBaseVNode("div", _hoisted_2, [
+        createBaseVNode("div", _hoisted_11, [
           createBaseVNode("button", {
             type: "button",
             onClick: onDwebPlugin
           }, "webMessage\u6D88\u606F"),
           createBaseVNode("p", null, toDisplayString(unref(dwebPluginData)), 1)
         ]),
-        _hoisted_3
+        _hoisted_12
       ], 64);
     };
   }
 });
-const HelloWorld_vue_vue_type_style_index_0_scoped_9227e2da_lang = "";
+const HelloWorld_vue_vue_type_style_index_0_scoped_535d993a_lang = "";
 const _export_sfc = (sfc, props) => {
   const target = sfc.__vccOpts || sfc;
   for (const [key, val] of props) {
@@ -6153,7 +6382,7 @@ const _export_sfc = (sfc, props) => {
   }
   return target;
 };
-const HelloWorld = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["__scopeId", "data-v-9227e2da"]]);
+const HelloWorld = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["__scopeId", "data-v-535d993a"]]);
 const _hoisted_1 = /* @__PURE__ */ createStaticVNode('<div data-v-e2cfde70><a href="https://vitejs.dev" target="_blank" data-v-e2cfde70><img src="' + _imports_0 + '" class="logo" alt="Vite logo" data-v-e2cfde70></a><a href="https://vuejs.org/" target="_blank" data-v-e2cfde70><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-e2cfde70></a><a href="https://vuejs.org/" target="_blank" data-v-e2cfde70><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-e2cfde70></a><a href="https://vuejs.org/" target="_blank" data-v-e2cfde70><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-e2cfde70></a></div>', 1);
 const _sfc_main = /* @__PURE__ */ defineComponent({
   __name: "App",

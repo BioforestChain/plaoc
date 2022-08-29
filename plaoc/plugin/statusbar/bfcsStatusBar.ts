@@ -10,7 +10,6 @@ export class BfcsStatusBar extends DwebPlugin {
 
   constructor() {
     super();
-
     this._ffi = new StatusBarFFI();
   }
   /**每次将 Web 组件附加到 DOM 时，都会调用一次该 方法 */

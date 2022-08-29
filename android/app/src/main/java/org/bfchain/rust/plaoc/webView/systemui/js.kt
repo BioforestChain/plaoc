@@ -49,6 +49,10 @@ class SystemUiFFI(
             isDarkIcons.value = darkIcons.toBooleanOrNull()
         }
     }
+  @JavascriptInterface
+  fun getStatusBarStyle(): Boolean? {
+    return systemUIState.statusBar.isDarkIcons.value
+  }
 
     @JavascriptInterface
     fun getStatusBarVisible(): Boolean {

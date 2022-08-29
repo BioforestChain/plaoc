@@ -113,21 +113,16 @@ pub fn create_main_worker(
     permissions: Permissions,
     stdio: deno_runtime::ops::io::Stdio,
 ) -> MainWorker {
-    log::info!("1");
     #[cfg(target_os = "android")]
     let module_loader = Rc::new((*module_loader_builder.clone()).clone());
     #[cfg(not(target_os = "android"))]
     let module_loader = module_loader_builder();
 
-    log::info!("2");
     let create_web_worker_cb = create_web_worker_callback(module_loader_builder, stdio.clone());
-    log::info!("3");
     let web_worker_preload_module_cb = create_web_worker_preload_module_callback();
 
-    log::info!("4");
     let extensions = cli_exts();
 
-    log::info!("5");
     let options = WorkerOptions {
         bootstrap: BootstrapOptions {
             args: vec![],

@@ -12,6 +12,9 @@ let scannerData = ref("扫码返回的数据");
 let dwebPluginData = ref("dweb的数据");
 onMounted(async () => {
   console.log("document.querySelector('dweb-status-bar')!=>", document.querySelector('dweb-status-bar'));
+   console.log("aaa=>", document.getElementById('aaa'));
+    console.log("bbb=>", document.getElementById('bbb'));
+     console.log("ccc =>", document.getElementById('ccc'));
 })
 
 async function openScanner() {
@@ -22,6 +25,8 @@ const scanner = document.querySelector<OpenScanner>('dweb-scanner')!;
 }
 async function onDwebPlugin() {
    const dwebPlugin = document.querySelector<DWebMessager>('dweb-messager')!;
+   console.log("dwebPlugin:",dwebPlugin);
+  console.log("_ffixxx:",(window as any).system_ui);
   // const iter = await dwebPlugin
   // console.log("document.querySelector('dweb-plugin') as dwebPlugin -->",JSON.stringify(iter))
   // dwebPluginData.value = iter
@@ -29,10 +34,49 @@ async function onDwebPlugin() {
 
 </script>
 <template>
+   <dweb-status-bar id="status_bar" background-color="#f71" bar-style="dark-content"></dweb-status-bar>
+    <dweb-top-bar id="topbar" title="test" background-color="rgba(255, 255, 255)" foreground-color="#0000ffff">
+        <dweb-top-bar-button id="aaa">
+            <dweb-icon source="Filled.AddCircle"></dweb-icon>
+        </dweb-top-bar-button>
+        <dweb-top-bar-button id="bbb" disabled>
+            <dweb-icon source="Filled.Add" size="20"></dweb-icon>
+        </dweb-top-bar-button>
+        <dweb-top-bar-button id="ccc">
+            <dweb-icon source="https://www.vectorlogo.zone/logos/rust-lang/rust-lang-icon.svg" type="AssetIcon"></dweb-icon>
+        </dweb-top-bar-button>
+    </dweb-top-bar>
+     <dweb-bottom-bar id="bottom_bar" background-color="#ff00ffff" foreground-color="#000000ff">
+        <dweb-bottom-bar-button id="ddd" selectable indicator-color="#00ff00ff">
+            <dweb-bottom-bar-icon source="Filled.AddCircle" color="#ff00aaff" selected-color="rgba(255, 0, 0, 1)"></dweb-bottom-bar-icon>
+            <dweb-bottom-bar-text color="#0000ffff" selected-color="rgba(255, 0, 0, 1)">add</dweb-bottom-bar-text>
+        </dweb-bottom-bar-button>
+        <dweb-bottom-bar-button id="eee">
+            <dweb-bottom-bar-icon source="https://www.vectorlogo.zone/logos/rust-lang/rust-lang-icon.svg" type="AssetIcon" size="50"></dweb-bottom-bar-icon>
+        </dweb-bottom-bar-button>
+        <dweb-bottom-bar-button id="fff" selected selectable>
+            <dweb-bottom-bar-icon source="Filled.Add"></dweb-bottom-bar-icon>
+            <dweb-bottom-bar-text>title</dweb-bottom-bar-text>
+        </dweb-bottom-bar-button>
+    </dweb-bottom-bar>
+    <dweb-keyboard id="key_board" overlay></dweb-keyboard>
+    <dweb-dialog-alert id="dda" title="alert" content="content">
+        <dweb-dialog-button id="ddb">ok</dweb-dialog-button>
+    </dweb-dialog-alert>
+    <dweb-dialog-prompt id="ddp" title="prompt" label="label" defaultValue="default">
+        <dweb-dialog-button id="ddpo" aria-label="cancel">ok</dweb-dialog-button>
+        <dweb-dialog-button id="ddpn" aria-label="confirm">No</dweb-dialog-button>
+    </dweb-dialog-prompt>
+    <dweb-dialog-confirm id="ddc" title="confirm" message="message">
+        <dweb-dialog-button id="ok" aria-label="confirm">ok</dweb-dialog-button>
+        <dweb-dialog-button id="no" aria-label="cancel">No</dweb-dialog-button>
+    </dweb-dialog-confirm>
+    <dweb-dialog-before-unload id="before_unload" title="test" message="before-unload">
+        <dweb-dialog-button id="buo">ok</dweb-dialog-button>
+        <dweb-dialog-button id="bun">No</dweb-dialog-button>
+    </dweb-dialog-before-unload>
 <dweb-messager id="dweb"></dweb-messager>
 <dweb-scanner channelId="helloWorld"></dweb-scanner>
-<dweb-status-bar id="status_bar" background-color="#f00f" bar-style="dark-content"></dweb-status-bar>
-
   <h1>{{ msg }}</h1>
 
   <div class="card">

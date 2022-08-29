@@ -188,7 +188,6 @@ fun DWebView(
                     })
                     val navigatorFFI = NavigatorFFI(webView, activity, navController)
                     webView.addJavascriptInterface(navigatorFFI, "my_nav")
-
                     val systemUiFFI = SystemUiFFI(
                         activity,
                         webView,
