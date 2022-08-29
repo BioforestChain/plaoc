@@ -1,5 +1,6 @@
 package org.bfchain.libappmgr
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
@@ -12,10 +13,14 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.bfchain.libappmgr.model.AppInfo
 import org.bfchain.libappmgr.ui.theme.AppMgrTheme
+import org.bfchain.libappmgr.ui.view.AppInfoGridView
 import org.bfchain.libappmgr.utils.FilesUtil
 import org.bfchain.libappmgr.utils.SPUtil
 
@@ -39,9 +44,11 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@SuppressLint("UnrememberedMutableState")
 @Composable
 fun Gretting(name: String, context: Context) {
-    Text(text = "Hello $name")
+    // Text(text = "Hello $name")
+    var appInfoList : MutableList<AppInfo> = mutableStateListOf()
     LaunchedEffect(Unit) {
 
         //FilesUtil.traverseAppDirectory(context, FilesUtil.APP_DIR_TYPE.RememberApp)
@@ -53,6 +60,9 @@ fun Gretting(name: String, context: Context) {
             firstLoading = false
         }
 
-        FilesUtil.getAppInfoList(context)
+        appInfoList.clear()
+        appInfoList.addAll(FilesUtil.getAppInfoList(context))
     }
+
+    AppInfoGridView(appInfoList = appInfoList)
 }

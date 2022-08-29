@@ -5,6 +5,7 @@ import android.os.Build
 import android.util.Log
 import org.bfchain.libappmgr.model.AppInfo
 import java.io.File
+import java.io.FileOutputStream
 
 /**
  * 主要用于文件的存储和读取操作，包括文件的解压操作
@@ -73,8 +74,7 @@ object FilesUtil {
         iconName: String,
         type: APP_DIR_TYPE
     ): String {
-        return getAppDirectory(context, type) + File.separator + appName +
-                File.separator + DIR_SYS + File.separator + iconName
+        return getAppDirectory(context, type) + File.separator + appName + iconName
     }
 
     /**
@@ -104,18 +104,18 @@ object FilesUtil {
      * @param filename
      */
     fun getFileContent(filename: String): String? {
-        var file: File = File(filename)
+        var file = File(filename)
         if (!file.exists()) {
             return null
         }
-        return file.bufferedReader().use { it.readText() }
+        return file.bufferedReader().use { it.readText()}
     }
 
     /**
      * 将content信息写入到文件中
      */
     private fun writeFileContent(filename: String, content: String) {
-        var file: File = File(filename)
+        var file = File(filename)
         if (!file.exists()) {
             file.createNewFile()
         }
@@ -161,10 +161,16 @@ object FilesUtil {
                         )
                     }
                 } else {// 文件
-                    context.assets.open(oldPath).bufferedReader().use {
-                        writeFileContent(newPath, it.readText())
+                    var inputStream = context.assets.open(oldPath)
+                    var outputStream = FileOutputStream(newPath)
+                    var read : Int = inputStream.read()
+                    while (read != -1) {
+                        outputStream.write(read)
+                        read = inputStream.read()
                     }
-                    File(newPath).mkdirs()
+                    outputStream.flush()
+                    outputStream.close()
+                    inputStream.close()
                 }
             }
         } catch (e: Exception) {
@@ -175,7 +181,7 @@ object FilesUtil {
     /**
      * 获取system-app和remember-app目录下的所有appinfo
      */
-    fun getAppInfoList(context: Context) {
+    fun getAppInfoList(context: Context): List<AppInfo> {
         // 1.从system-app/boot/bfs-app-id/boot/link.json取值，将获取到内容保存到appInfo中
         // 2.将system-app中到bfs-app-id信息保存到map里面，用于后续交验
         // 3.从remember-app/boot/bfs-app-id/boot/link.json取值，补充到列表中
@@ -188,11 +194,9 @@ object FilesUtil {
         // Log.d(TAG, "$systemAppMap , $rememberAppMap")
         systemAppMap?.forEach {
             val appInfo =
-                getFileContent(it.value + File.separator + DIR_BOOT + File.separator + FILE_LINK_JSON)?.let { it1 ->
-                    JsonUtil.getAppInfoFromLinkJson(
-                        it1,
-                        APP_DIR_TYPE.SystemApp
-                    )
+                getFileContent(it.value + File.separator +
+                        DIR_BOOT + File.separator + FILE_LINK_JSON)?.let { it1 ->
+                    JsonUtil.getAppInfoFromLinkJson(context, it1, APP_DIR_TYPE.SystemApp)
                 }
             // Log.d(TAG, "getAppInfoList system-app $appInfo")
             if (appInfo != null) {
@@ -203,11 +207,9 @@ object FilesUtil {
         rememberAppMap?.forEach {
             if (!systemAppExist.containsKey(it.key)) {
                 val appInfo =
-                    getFileContent(it.value + File.separator + DIR_BOOT + File.separator + FILE_LINK_JSON)?.let { it1 ->
-                        JsonUtil.getAppInfoFromLinkJson(
-                            it1,
-                            APP_DIR_TYPE.RememberApp
-                        )
+                    getFileContent(it.value + File.separator +
+                            DIR_BOOT + File.separator + FILE_LINK_JSON)?.let { it1 ->
+                        JsonUtil.getAppInfoFromLinkJson(context, it1, APP_DIR_TYPE.RememberApp)
                     }
                 Log.d(TAG, "getAppInfoList remember-app appInfo=$appInfo")
                 if (appInfo != null) {
@@ -215,5 +217,6 @@ object FilesUtil {
                 }
             }
         }
+        return appInfoList
     }
 }

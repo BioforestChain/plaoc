@@ -48,5 +48,6 @@ data class AppInfo(
     var author: String, // 作者名称与TA的链接，用“,”进行分割，比如： ["kzf,kezhaofeng@bnqkl.cn,https://bnqkl.cn/developer/kzf"]
     var homepage: String = "", // 应用网络主页，一般是https网站。用户可以通过一些特定的操作来访问应用主页了解更多应用信息
     var autoUpdate: AutoUpdateInfo?, // 自动更新的相关配置
-    var isSystemApp: Boolean = false // 判断是recommend-app还是system-app
+    var isSystemApp: Boolean = false, // 判断是recommend-app还是system-app
+    var iconPath: String = "" // 将icon转为实际路径
 )
