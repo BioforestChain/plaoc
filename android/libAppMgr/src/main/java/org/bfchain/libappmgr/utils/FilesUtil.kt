@@ -3,14 +3,19 @@ package org.bfchain.libappmgr.utils
 import android.content.Context
 import android.os.Build
 import android.util.Log
+import org.bfchain.libappmgr.model.AppInfo
 import java.io.File
 
 /**
  * 主要用于文件的存储和读取操作，包括文件的解压操作
  */
 object FilesUtil {
-    private val RememberApp: String = "remember-app"
-    private val SystemApp: String = "system-app"
+    const val TAG: String = "FilesUtil"
+    private val RememberApp: String = "remember-app" // 内置应用
+    private val SystemApp: String = "system-app" // 下载应用后
+    private val DIR_BOOT: String = "boot" // 存放 link.json 数据
+    private val DIR_SYS: String = "sys" // 存放 icon 信息等
+    private val FILE_LINK_JSON: String = "link.json"
 
     enum class APP_DIR_TYPE { RememberApp, SystemApp }
 
@@ -30,46 +35,67 @@ object FilesUtil {
     }
 
     /**
-     * 遍历应用第一级目录信息
+     * 获取当前目录子目录列表
      */
-    fun traverseAppDirectory(context: Context, type: APP_DIR_TYPE): List<String> {
-        return traverseFileTree(getAppDirectory(context, type))
-    }
-
-    fun getAppIconPathName(context: Context, appName: String, iconName: String): String {
-        return getAppDirectory(context, APP_DIR_TYPE.RememberApp) + File.separator + appName +
-                File.separator + "sys" + File.separator + iconName
+    fun getChildrenDirectoryList(context: Context, rootPath: String): Map<String, String>? {
+        // Log.d(TAG, "getChildrenDirectoryList $rootPath")
+        return getChildrenDirectoryList(context, File(rootPath))
     }
 
     /**
-     * 遍历当前目录下第一级所有目录信息
+     * 获取当前目录子目录列表
+     */
+    fun getChildrenDirectoryList(context: Context, file: File): Map<String, String>? {
+        if (file.exists()) {
+            if (!file.exists()) {
+                file.mkdirs()
+            }
+            var childrenMap: HashMap<String, String> = HashMap<String, String>()
+            file.listFiles().forEach {
+                if (it.isDirectory) {
+                    // Log.d(TAG, "name=${it.name}, absolutePath=${it.absolutePath}")
+                    childrenMap[it.name] = it.absolutePath
+                }
+            }
+            if (childrenMap.isNotEmpty()) {
+                return childrenMap
+            }
+        }
+        return null
+    }
+
+    /**
+     * 获取相应应用的图标
+     */
+    fun getAppIconPathName(
+        context: Context,
+        appName: String,
+        iconName: String,
+        type: APP_DIR_TYPE
+    ): String {
+        return getAppDirectory(context, type) + File.separator + appName +
+                File.separator + DIR_SYS + File.separator + iconName
+    }
+
+    /**
+     * 遍历当前目录及其子目录所有文件和文件夹
      */
     private fun traverseFileTree(fileName: String): List<String> {
-        Log.d("lin.huang", "traverseFileTree fileName=" + fileName)
         return traverseFileTree(File(fileName))
     }
 
     /**
-     * 遍历当前目录下第一级所有目录信息
+     * 遍历当前目录及其子目录所有文件和文件夹
      */
     private fun traverseFileTree(file: File): List<String> {
-        Log.d("lin.huang", "traverseFileTree exists1=" + file.exists())
         if (!file.exists()) {
             file.mkdirs()
         }
-        Log.d("lin.huang", "traverseFileTree exists2=" + file.exists())
         var fileList = arrayListOf<String>()
-        file.listFiles().forEach {
-            Log.d("lin.huang", "path->" + it.absolutePath)
-            if (it.isDirectory) {
-                fileList.add(it.absolutePath)
-            }
-        }
-        /*val fileTreeWalk = file.walk() // 遍历目录及其子目录所有文件和目录
+        val fileTreeWalk = file.walk() // 遍历目录及其子目录所有文件和目录
         fileTreeWalk.iterator().forEach {
-            Log.d("lin.huang", "path->" + it.absolutePath)
             fileList.add(it.absolutePath)
-        }*/
+        }
         return fileList
     }
 
@@ -111,11 +137,7 @@ object FilesUtil {
      * 将assert目录下的文件拷贝到app目录remember-app目录下
      */
     fun copyAssetsToRememberAppDir(context: Context) {
-        copyFilesFassets(
-            context,
-            RememberApp,
-            getAppDirectory(context, APP_DIR_TYPE.RememberApp)
-        )
+        copyFilesFassets(context, RememberApp, getAppDirectory(context, APP_DIR_TYPE.RememberApp))
     }
 
     /**
@@ -126,22 +148,19 @@ object FilesUtil {
      */
     private fun copyFilesFassets(context: Context, oldPath: String, newPath: String) {
         try {
-            var fileNames = context.assets.list(oldPath) //获取assets目录下的所有文件及目录名，空目录不会存在
+            val fileNames = context.assets.list(oldPath) //获取assets目录下的所有文件及目录名，空目录不会存在
             if (fileNames != null) {
                 if (fileNames.isNotEmpty()) { // 目录
-                    //Log.d("lin.huang", "oldPath1->$oldPath==========================================================")
                     val file = File(newPath);
                     file.mkdirs();//如果文件夹不存在，则递归
                     fileNames.forEach {
-                        Log.d("lin.huang", "oldPath1->$oldPath, $it")
                         copyFilesFassets(
                             context,
                             oldPath + File.separator + it,
                             newPath + File.separator + it
-                        );
+                        )
                     }
                 } else {// 文件
-                    //Log.d("lin.huang", "oldPath2->$oldPath")
                     context.assets.open(oldPath).bufferedReader().use {
                         writeFileContent(newPath, it.readText())
                     }
@@ -149,8 +168,52 @@ object FilesUtil {
                 }
             }
         } catch (e: Exception) {
-            // TODO Auto-generated catch block
             e.printStackTrace()
+        }
+    }
+
+    /**
+     * 获取system-app和remember-app目录下的所有appinfo
+     */
+    fun getAppInfoList(context: Context) {
+        // 1.从system-app/boot/bfs-app-id/boot/link.json取值，将获取到内容保存到appInfo中
+        // 2.将system-app中到bfs-app-id信息保存到map里面，用于后续交验
+        // 3.从remember-app/boot/bfs-app-id/boot/link.json取值，补充到列表中
+        val systemAppMap =
+            getChildrenDirectoryList(context, getAppDirectory(context, APP_DIR_TYPE.SystemApp))
+        val rememberAppMap =
+            getChildrenDirectoryList(context, getAppDirectory(context, APP_DIR_TYPE.RememberApp))
+        val appInfoList = ArrayList<AppInfo>()
+        val systemAppExist = HashMap<String, String>()
+        // Log.d(TAG, "$systemAppMap , $rememberAppMap")
+        systemAppMap?.forEach {
+            val appInfo =
+                getFileContent(it.value + File.separator + DIR_BOOT + File.separator + FILE_LINK_JSON)?.let { it1 ->
+                    JsonUtil.getAppInfoFromLinkJson(
+                        it1,
+                        APP_DIR_TYPE.SystemApp
+                    )
+                }
+            // Log.d(TAG, "getAppInfoList system-app $appInfo")
+            if (appInfo != null) {
+                appInfoList.add(appInfo)
+                systemAppExist[it.key] = it.value
+            }
+        }
+        rememberAppMap?.forEach {
+            if (!systemAppExist.containsKey(it.key)) {
+                val appInfo =
+                    getFileContent(it.value + File.separator + DIR_BOOT + File.separator + FILE_LINK_JSON)?.let { it1 ->
+                        JsonUtil.getAppInfoFromLinkJson(
+                            it1,
+                            APP_DIR_TYPE.RememberApp
+                        )
+                    }
+                Log.d(TAG, "getAppInfoList remember-app appInfo=$appInfo")
+                if (appInfo != null) {
+                    appInfoList.add(appInfo)
+                }
+            }
         }
     }
 }
