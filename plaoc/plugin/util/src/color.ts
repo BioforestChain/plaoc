@@ -1,3 +1,5 @@
+import { Color } from "../../typings/types/color.type";
+
 // 将RGB 和 Alpha 转化为 ARGB color int
 export function getColorInt(
   color: Color.RGBHex,

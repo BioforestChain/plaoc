@@ -17,8 +17,8 @@ export class BfcsTopBar extends DwebPlugin {
 
     this._ffi = new TopBarFFI();
     this._observer = new MutationObserver(async (mutations) => {
-       console.log("BfcsTopBar MutationObserver: =>")
-       await this.collectActions();
+      console.log("BfcsTopBar MutationObserver: =>");
+      await this.collectActions();
     });
   }
 
@@ -28,7 +28,14 @@ export class BfcsTopBar extends DwebPlugin {
       subtree: true,
       childList: true,
       attributes: true,
-      attributeFilter: ["disabled", "type", "description", "size", "source"],
+      attributeFilter: [
+        "disabled",
+        "type",
+        "description",
+        "size",
+        "source",
+        "height",
+      ],
     });
 
     this._init();
@@ -143,7 +150,10 @@ export class BfcsTopBar extends DwebPlugin {
 
   async collectActions() {
     this._actionList = [];
-    console.log("this.querySelectorAll:",JSON.stringify(this.querySelectorAll("dweb-top-bar-button")))
+    console.log(
+      "this.querySelectorAll:",
+      JSON.stringify(this.querySelectorAll("dweb-top-bar-button"))
+    );
     this.querySelectorAll("dweb-top-bar-button").forEach((childNode) => {
       let icon: Icon.IPlaocIcon = {
         source: "",
@@ -160,7 +170,7 @@ export class BfcsTopBar extends DwebPlugin {
           : ("NamedIcon" as Icon.IconType.NamedIcon);
         icon.description = $?.getAttribute("description") ?? "";
         icon.size = $?.hasAttribute("size")
-          ? (($.getAttribute("size") as unknown) as number)
+          ? ($.getAttribute("size") as unknown as number)
           : undefined;
       }
 
@@ -168,7 +178,7 @@ export class BfcsTopBar extends DwebPlugin {
       const onClickCode = `document.querySelector('dweb-top-bar-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
       const disabled = childNode.hasAttribute("disabled") ? true : false;
       this._actionList.push({ icon, onClickCode, disabled });
-      console.log("icon, disabled:",icon, disabled);
+      console.log("icon, disabled:", icon, disabled);
     });
 
     await this.setActions();

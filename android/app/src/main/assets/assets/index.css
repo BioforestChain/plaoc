@@ -80,18 +80,18 @@ button:focus-visible {
   }
 }
 
-.read-the-docs[data-v-be72e9a4] {
+.read-the-docs[data-v-c74781b8] {
   color: #888;
 }
 
-.logo[data-v-ae465483] {
+.logo[data-v-e4e1e73b] {
   height: 6em;
   padding: 1.5em;
   will-change: filter;
 }
-.logo[data-v-ae465483]:hover {
+.logo[data-v-e4e1e73b]:hover {
   filter: drop-shadow(0 0 2em #646cffaa);
 }
-.logo.vue[data-v-ae465483]:hover {
+.logo.vue[data-v-e4e1e73b]:hover {
   filter: drop-shadow(0 0 2em #42b883aa);
 }

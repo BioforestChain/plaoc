@@ -5071,6 +5071,8 @@ class BfcsBottomBar extends DwebPlugin {
     console.log("bottom_bar:", height);
     if (height) {
       this.setAttribute("height", `${height}`);
+    } else {
+      await this.collectActions();
     }
   }
   async toggleEnabled() {
@@ -5125,6 +5127,7 @@ class BfcsBottomBar extends DwebPlugin {
     return;
   }
   async collectActions() {
+    console.log("collectActions");
     this._actionList = [];
     this.querySelectorAll("dweb-bottom-bar-button").forEach((childNode) => {
       var _a, _b, _c;
@@ -5193,7 +5196,12 @@ class BfcsBottomBar extends DwebPlugin {
     ];
   }
   async attributeChangedCallback(attrName, oldVal, newVal) {
-    console.log("bottom_bar attributeChangedCallback:", attrName, oldVal, newVal);
+    console.log(
+      "bottom_bar attributeChangedCallback:",
+      attrName,
+      oldVal,
+      newVal
+    );
     if (oldVal === newVal) {
       return;
     }
@@ -5945,15 +5953,9 @@ class BfcsTopBar extends DwebPlugin {
     super();
     this._actionList = [];
     this._ffi = new TopBarFFI();
-    this._observer = new MutationObserver((mutationsList, observer) => {
-      console.log("mutationsList:", mutationsList);
-      for (let mutation of mutationsList) {
-        if (mutation.type === "childList") {
-          console.log("A child node has been added or removed.");
-        } else if (mutation.type === "attributes") {
-          console.log("The " + mutation.attributeName + " attribute was modified.");
-        }
-      }
+    this._observer = new MutationObserver(async (mutations) => {
+      console.log("BfcsTopBar MutationObserver: =>");
+      await this.collectActions();
     });
   }
   connectedCallback() {
@@ -5962,7 +5964,14 @@ class BfcsTopBar extends DwebPlugin {
       subtree: true,
       childList: true,
       attributes: true,
-      attributeFilter: ["disabled", "type", "description", "size", "source"]
+      attributeFilter: [
+        "disabled",
+        "type",
+        "description",
+        "size",
+        "source",
+        "height"
+      ]
     });
     this._init();
   }
@@ -6037,7 +6046,10 @@ class BfcsTopBar extends DwebPlugin {
   }
   async collectActions() {
     this._actionList = [];
-    console.log("this.querySelectorAll:", JSON.stringify(this.querySelectorAll("dweb-top-bar-button")));
+    console.log(
+      "this.querySelectorAll:",
+      JSON.stringify(this.querySelectorAll("dweb-top-bar-button"))
+    );
     this.querySelectorAll("dweb-top-bar-button").forEach((childNode) => {
       var _a, _b;
       let icon = {
@@ -6117,7 +6129,7 @@ customElements.define("dweb-top-bar", BfcsTopBar);
 customElements.define("dweb-top-bar-button", BfcsTopBarButton);
 const _hoisted_1$1 = { class: "card" };
 const _hoisted_2$1 = { class: "card" };
-const _hoisted_3$1 = /* @__PURE__ */ createStaticVNode('<div style="margin-top:50px;" data-v-be72e9a4><input id="toastMessage" type="text" placeholder="Toast message" data-v-be72e9a4></div><p data-v-be72e9a4> Check out <a href="https://vuejs.org/guide/quick-start.html#local" target="_blank" data-v-be72e9a4>create-vue</a>, the official Vue + Vite starter </p><p data-v-be72e9a4> Install <a href="https://github.com/johnsoncodehk/volar" target="_blank" data-v-be72e9a4>Volar</a> in your IDE for a better DX </p><p class="read-the-docs" data-v-be72e9a4>Click on the Vite and Vue logos to learn more</p>', 4);
+const _hoisted_3$1 = /* @__PURE__ */ createStaticVNode('<div style="margin-top:50px;" data-v-c74781b8><input id="toastMessage" type="text" placeholder="Toast message" data-v-c74781b8></div><p data-v-c74781b8> Check out <a href="https://vuejs.org/guide/quick-start.html#local" target="_blank" data-v-c74781b8>create-vue</a>, the official Vue + Vite starter </p><p data-v-c74781b8> Install <a href="https://github.com/johnsoncodehk/volar" target="_blank" data-v-c74781b8>Volar</a> in your IDE for a better DX </p><p class="read-the-docs" data-v-c74781b8>Click on the Vite and Vue logos to learn more</p>', 4);
 const _sfc_main$1 = /* @__PURE__ */ defineComponent({
   __name: "HelloWorld",
   props: {
@@ -6213,7 +6225,7 @@ const _sfc_main$1 = /* @__PURE__ */ defineComponent({
     };
   }
 });
-const HelloWorld_vue_vue_type_style_index_0_scoped_be72e9a4_lang = "";
+const HelloWorld_vue_vue_type_style_index_0_scoped_c74781b8_lang = "";
 const _export_sfc = (sfc, props) => {
   const target = sfc.__vccOpts || sfc;
   for (const [key, val] of props) {
@@ -6221,8 +6233,8 @@ const _export_sfc = (sfc, props) => {
   }
   return target;
 };
-const HelloWorld = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["__scopeId", "data-v-be72e9a4"]]);
-const _hoisted_1 = /* @__PURE__ */ createStaticVNode('<div data-v-ae465483><a href="https://vitejs.dev" target="_blank" data-v-ae465483><img src="' + _imports_0 + '" class="logo" alt="Vite logo" data-v-ae465483></a><a href="https://vuejs.org/" target="_blank" data-v-ae465483><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-ae465483></a><a href="https://vuejs.org/" target="_blank" data-v-ae465483><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-ae465483></a><a href="https://vuejs.org/" target="_blank" data-v-ae465483><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-ae465483></a></div>', 1);
+const HelloWorld = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["__scopeId", "data-v-c74781b8"]]);
+const _hoisted_1 = /* @__PURE__ */ createStaticVNode('<div data-v-e4e1e73b><a href="https://vitejs.dev" target="_blank" data-v-e4e1e73b><img src="' + _imports_0 + '" class="logo" alt="Vite logo" data-v-e4e1e73b></a><a href="https://vuejs.org/" target="_blank" data-v-e4e1e73b><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-e4e1e73b></a><a href="https://vuejs.org/" target="_blank" data-v-e4e1e73b><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-e4e1e73b></a><a href="https://vuejs.org/" target="_blank" data-v-e4e1e73b><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-e4e1e73b></a></div>', 1);
 const _hoisted_2 = /* @__PURE__ */ createTextVNode("\u4E3B\u9875");
 const _hoisted_3 = /* @__PURE__ */ createTextVNode("\u6D88\u606F");
 const _hoisted_4 = /* @__PURE__ */ createTextVNode("\u4E2A\u4EBA\u7A7A\u95F4");
@@ -6312,6 +6324,6 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
     };
   }
 });
-const App_vue_vue_type_style_index_0_scoped_ae465483_lang = "";
-const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["__scopeId", "data-v-ae465483"]]);
+const App_vue_vue_type_style_index_0_scoped_e4e1e73b_lang = "";
+const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["__scopeId", "data-v-e4e1e73b"]]);
 createApp(App).mount("#app");

@@ -50,9 +50,11 @@ export class BfcsBottomBar extends DwebPlugin {
 
   private async _init() {
     const height = await this.getHeight();
-    console.log("bottom_bar:",height)
+    console.log("bottom_bar:", height);
     if (height) {
       this.setAttribute("height", `${height}`);
+    } else {
+      await this.collectActions();
     }
   }
 
@@ -133,6 +135,7 @@ export class BfcsBottomBar extends DwebPlugin {
   }
 
   async collectActions() {
+    console.log("collectActions");
     this._actionList = [];
 
     this.querySelectorAll("dweb-bottom-bar-button").forEach((childNode) => {
@@ -153,7 +156,7 @@ export class BfcsBottomBar extends DwebPlugin {
           : ("NamedIcon" as Icon.IconType.NamedIcon);
         icon.description = $?.getAttribute("description") ?? "";
         icon.size = $?.hasAttribute("size")
-          ? (($.getAttribute("size") as unknown) as number)
+          ? ($.getAttribute("size") as unknown as number)
           : undefined;
 
         if ($?.hasAttribute("color")) {
@@ -221,7 +224,12 @@ export class BfcsBottomBar extends DwebPlugin {
     oldVal: unknown,
     newVal: unknown
   ) {
-    console.log("bottom_bar attributeChangedCallback:",attrName,oldVal,newVal)
+    console.log(
+      "bottom_bar attributeChangedCallback:",
+      attrName,
+      oldVal,
+      newVal
+    );
     if (oldVal === newVal) {
       return;
     }
