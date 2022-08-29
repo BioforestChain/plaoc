@@ -4817,7 +4817,7 @@ class VirtualKeyboardFFI {
     });
   }
 }
-class BfcsKeyboard extends HTMLElement {
+class BfcsKeyboard extends DwebPlugin {
   constructor() {
     super();
     this._ffi = new VirtualKeyboardFFI();
@@ -5068,6 +5068,7 @@ class BfcsBottomBar extends DwebPlugin {
   }
   async _init() {
     const height = await this.getHeight();
+    console.log("bottom_bar:", height);
     if (height) {
       this.setAttribute("height", `${height}`);
     }
@@ -5192,6 +5193,7 @@ class BfcsBottomBar extends DwebPlugin {
     ];
   }
   async attributeChangedCallback(attrName, oldVal, newVal) {
+    console.log("bottom_bar attributeChangedCallback:", attrName, oldVal, newVal);
     if (oldVal === newVal) {
       return;
     }
@@ -5898,6 +5900,7 @@ class TopBarFFI {
   }
   setActions(actionList) {
     return new Promise((resolve2, reject) => {
+      console.log("JSON.stringify(actionList):", JSON.stringify(actionList));
       this._ffi.setActions(JSON.stringify(actionList));
       resolve2();
     });
@@ -5937,16 +5940,24 @@ class TopBarFFI {
     });
   }
 }
-class BfcsTopBar extends HTMLElement {
+class BfcsTopBar extends DwebPlugin {
   constructor() {
     super();
     this._actionList = [];
     this._ffi = new TopBarFFI();
-    this._observer = new MutationObserver(async (mutations) => {
-      await this.collectActions();
+    this._observer = new MutationObserver((mutationsList, observer) => {
+      console.log("mutationsList:", mutationsList);
+      for (let mutation of mutationsList) {
+        if (mutation.type === "childList") {
+          console.log("A child node has been added or removed.");
+        } else if (mutation.type === "attributes") {
+          console.log("The " + mutation.attributeName + " attribute was modified.");
+        }
+      }
     });
   }
   connectedCallback() {
+    console.log("BfcsTopBar connectedCallback:", this._observer);
     this._observer.observe(this, {
       subtree: true,
       childList: true,
@@ -6026,6 +6037,7 @@ class BfcsTopBar extends HTMLElement {
   }
   async collectActions() {
     this._actionList = [];
+    console.log("this.querySelectorAll:", JSON.stringify(this.querySelectorAll("dweb-top-bar-button")));
     this.querySelectorAll("dweb-top-bar-button").forEach((childNode) => {
       var _a, _b;
       let icon = {
@@ -6043,6 +6055,7 @@ class BfcsTopBar extends HTMLElement {
       const onClickCode = `document.querySelector('dweb-top-bar-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
       const disabled = childNode.hasAttribute("disabled") ? true : false;
       this._actionList.push({ icon, onClickCode, disabled });
+      console.log("icon, disabled:", icon, disabled);
     });
     await this.setActions();
   }
@@ -6102,18 +6115,9 @@ class BfcsTopBarButton extends DwebPlugin {
 }
 customElements.define("dweb-top-bar", BfcsTopBar);
 customElements.define("dweb-top-bar-button", BfcsTopBarButton);
-const _hoisted_1$1 = /* @__PURE__ */ createTextVNode("add");
-const _hoisted_2 = /* @__PURE__ */ createTextVNode("title");
-const _hoisted_3 = /* @__PURE__ */ createTextVNode("ok");
-const _hoisted_4 = /* @__PURE__ */ createTextVNode("ok");
-const _hoisted_5 = /* @__PURE__ */ createTextVNode("No");
-const _hoisted_6 = /* @__PURE__ */ createTextVNode("ok");
-const _hoisted_7 = /* @__PURE__ */ createTextVNode("No");
-const _hoisted_8 = /* @__PURE__ */ createTextVNode("ok");
-const _hoisted_9 = /* @__PURE__ */ createTextVNode("No");
-const _hoisted_10 = { class: "card" };
-const _hoisted_11 = { class: "card" };
-const _hoisted_12 = /* @__PURE__ */ createStaticVNode('<div style="margin-top:50px;" data-v-535d993a><input id="toastMessage" type="text" placeholder="Toast message" data-v-535d993a></div><p data-v-535d993a> Check out <a href="https://vuejs.org/guide/quick-start.html#local" target="_blank" data-v-535d993a>create-vue</a>, the official Vue + Vite starter </p><p data-v-535d993a> Install <a href="https://github.com/johnsoncodehk/volar" target="_blank" data-v-535d993a>Volar</a> in your IDE for a better DX </p><p class="read-the-docs" data-v-535d993a>Click on the Vite and Vue logos to learn more</p>', 4);
+const _hoisted_1$1 = { class: "card" };
+const _hoisted_2$1 = { class: "card" };
+const _hoisted_3$1 = /* @__PURE__ */ createStaticVNode('<div style="margin-top:50px;" data-v-be72e9a4><input id="toastMessage" type="text" placeholder="Toast message" data-v-be72e9a4></div><p data-v-be72e9a4> Check out <a href="https://vuejs.org/guide/quick-start.html#local" target="_blank" data-v-be72e9a4>create-vue</a>, the official Vue + Vite starter </p><p data-v-be72e9a4> Install <a href="https://github.com/johnsoncodehk/volar" target="_blank" data-v-be72e9a4>Volar</a> in your IDE for a better DX </p><p class="read-the-docs" data-v-be72e9a4>Click on the Vite and Vue logos to learn more</p>', 4);
 const _sfc_main$1 = /* @__PURE__ */ defineComponent({
   __name: "HelloWorld",
   props: {
@@ -6124,9 +6128,7 @@ const _sfc_main$1 = /* @__PURE__ */ defineComponent({
     let dwebPluginData = ref("dweb\u7684\u6570\u636E");
     onMounted(async () => {
       console.log("document.querySelector('dweb-status-bar')!=>", document.querySelector("dweb-status-bar"));
-      console.log("aaa=>", document.getElementById("aaa"));
-      console.log("bbb=>", document.getElementById("bbb"));
-      console.log("ccc =>", document.getElementById("ccc"));
+      console.log("dweb-top-bar-button =>", document.getElementById("aaa"));
     });
     async function openScanner() {
       const scanner = document.querySelector("dweb-scanner");
@@ -6137,23 +6139,13 @@ const _sfc_main$1 = /* @__PURE__ */ defineComponent({
     async function onDwebPlugin() {
       const dwebPlugin = document.querySelector("dweb-messager");
       console.log("dwebPlugin:", dwebPlugin);
-      console.log("_ffixxx:", window.system_ui);
+      console.log("_ffixxx:", JSON.stringify(Object.keys(window.bottom_bar)));
     }
     return (_ctx, _cache) => {
       const _component_dweb_status_bar = resolveComponent("dweb-status-bar");
       const _component_dweb_icon = resolveComponent("dweb-icon");
       const _component_dweb_top_bar_button = resolveComponent("dweb-top-bar-button");
       const _component_dweb_top_bar = resolveComponent("dweb-top-bar");
-      const _component_dweb_bottom_bar_icon = resolveComponent("dweb-bottom-bar-icon");
-      const _component_dweb_bottom_bar_text = resolveComponent("dweb-bottom-bar-text");
-      const _component_dweb_bottom_bar_button = resolveComponent("dweb-bottom-bar-button");
-      const _component_dweb_bottom_bar = resolveComponent("dweb-bottom-bar");
-      const _component_dweb_keyboard = resolveComponent("dweb-keyboard");
-      const _component_dweb_dialog_button = resolveComponent("dweb-dialog-button");
-      const _component_dweb_dialog_alert = resolveComponent("dweb-dialog-alert");
-      const _component_dweb_dialog_prompt = resolveComponent("dweb-dialog-prompt");
-      const _component_dweb_dialog_confirm = resolveComponent("dweb-dialog-confirm");
-      const _component_dweb_dialog_before_unload = resolveComponent("dweb-dialog-before-unload");
       const _component_dweb_messager = resolveComponent("dweb-messager");
       const _component_dweb_scanner = resolveComponent("dweb-scanner");
       return openBlock(), createElementBlock(Fragment, null, [
@@ -6181,7 +6173,7 @@ const _sfc_main$1 = /* @__PURE__ */ defineComponent({
             }, {
               default: withCtx(() => [
                 createVNode(_component_dweb_icon, {
-                  source: "Filled.Add",
+                  source: "Filled.AddCircle",
                   size: "20"
                 })
               ]),
@@ -6190,7 +6182,7 @@ const _sfc_main$1 = /* @__PURE__ */ defineComponent({
             createVNode(_component_dweb_top_bar_button, { id: "ccc" }, {
               default: withCtx(() => [
                 createVNode(_component_dweb_icon, {
-                  source: "https://www.vectorlogo.zone/logos/rust-lang/rust-lang-icon.svg",
+                  source: "/vite.svg",
                   type: "AssetIcon"
                 })
               ]),
@@ -6199,6 +6191,52 @@ const _sfc_main$1 = /* @__PURE__ */ defineComponent({
           ]),
           _: 1
         }),
+        createVNode(_component_dweb_messager, { id: "dweb" }),
+        createVNode(_component_dweb_scanner, { channelId: "helloWorld" }),
+        createBaseVNode("h1", null, toDisplayString(__props.msg), 1),
+        createBaseVNode("div", _hoisted_1$1, [
+          createBaseVNode("button", {
+            type: "button",
+            onClick: openScanner
+          }, "\u542F\u52A8\u626B\u7801"),
+          createBaseVNode("p", null, toDisplayString(unref(scannerData)), 1)
+        ]),
+        createBaseVNode("div", _hoisted_2$1, [
+          createBaseVNode("button", {
+            type: "button",
+            onClick: onDwebPlugin
+          }, "webMessage\u6D88\u606F"),
+          createBaseVNode("p", null, toDisplayString(unref(dwebPluginData)), 1)
+        ]),
+        _hoisted_3$1
+      ], 64);
+    };
+  }
+});
+const HelloWorld_vue_vue_type_style_index_0_scoped_be72e9a4_lang = "";
+const _export_sfc = (sfc, props) => {
+  const target = sfc.__vccOpts || sfc;
+  for (const [key, val] of props) {
+    target[key] = val;
+  }
+  return target;
+};
+const HelloWorld = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["__scopeId", "data-v-be72e9a4"]]);
+const _hoisted_1 = /* @__PURE__ */ createStaticVNode('<div data-v-ae465483><a href="https://vitejs.dev" target="_blank" data-v-ae465483><img src="' + _imports_0 + '" class="logo" alt="Vite logo" data-v-ae465483></a><a href="https://vuejs.org/" target="_blank" data-v-ae465483><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-ae465483></a><a href="https://vuejs.org/" target="_blank" data-v-ae465483><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-ae465483></a><a href="https://vuejs.org/" target="_blank" data-v-ae465483><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-ae465483></a></div>', 1);
+const _hoisted_2 = /* @__PURE__ */ createTextVNode("\u4E3B\u9875");
+const _hoisted_3 = /* @__PURE__ */ createTextVNode("\u6D88\u606F");
+const _hoisted_4 = /* @__PURE__ */ createTextVNode("\u4E2A\u4EBA\u7A7A\u95F4");
+const _sfc_main = /* @__PURE__ */ defineComponent({
+  __name: "App",
+  setup(__props) {
+    return (_ctx, _cache) => {
+      const _component_dweb_bottom_bar_icon = resolveComponent("dweb-bottom-bar-icon");
+      const _component_dweb_bottom_bar_text = resolveComponent("dweb-bottom-bar-text");
+      const _component_dweb_bottom_bar_button = resolveComponent("dweb-bottom-bar-button");
+      const _component_dweb_bottom_bar = resolveComponent("dweb-bottom-bar");
+      return openBlock(), createElementBlock(Fragment, null, [
+        _hoisted_1,
+        createVNode(HelloWorld, { msg: "DwebView-js \u267B\uFE0F Deno-js" }),
         createVNode(_component_dweb_bottom_bar, {
           id: "bottom_bar",
           "background-color": "#ff00ffff",
@@ -6212,7 +6250,8 @@ const _sfc_main$1 = /* @__PURE__ */ defineComponent({
             }, {
               default: withCtx(() => [
                 createVNode(_component_dweb_bottom_bar_icon, {
-                  source: "Filled.AddCircle",
+                  source: "/vite.svg",
+                  type: "AssetIcon",
                   color: "#ff00aaff",
                   "selected-color": "rgba(255, 0, 0, 1)"
                 }),
@@ -6221,7 +6260,7 @@ const _sfc_main$1 = /* @__PURE__ */ defineComponent({
                   "selected-color": "rgba(255, 0, 0, 1)"
                 }, {
                   default: withCtx(() => [
-                    _hoisted_1$1
+                    _hoisted_2
                   ]),
                   _: 1
                 })
@@ -6231,9 +6270,18 @@ const _sfc_main$1 = /* @__PURE__ */ defineComponent({
             createVNode(_component_dweb_bottom_bar_button, { id: "eee" }, {
               default: withCtx(() => [
                 createVNode(_component_dweb_bottom_bar_icon, {
-                  source: "https://www.vectorlogo.zone/logos/rust-lang/rust-lang-icon.svg",
+                  source: "/vite.svg",
                   type: "AssetIcon",
                   size: "50"
+                }),
+                createVNode(_component_dweb_bottom_bar_text, {
+                  color: "#0000ffff",
+                  "selected-color": "rgba(255, 0, 0, 1)"
+                }, {
+                  default: withCtx(() => [
+                    _hoisted_3
+                  ]),
+                  _: 1
                 })
               ]),
               _: 1
@@ -6244,10 +6292,13 @@ const _sfc_main$1 = /* @__PURE__ */ defineComponent({
               selectable: ""
             }, {
               default: withCtx(() => [
-                createVNode(_component_dweb_bottom_bar_icon, { source: "Filled.Add" }),
+                createVNode(_component_dweb_bottom_bar_icon, {
+                  source: "/vite.svg",
+                  type: "AssetIcon"
+                }),
                 createVNode(_component_dweb_bottom_bar_text, null, {
                   default: withCtx(() => [
-                    _hoisted_2
+                    _hoisted_4
                   ]),
                   _: 1
                 })
@@ -6256,145 +6307,11 @@ const _sfc_main$1 = /* @__PURE__ */ defineComponent({
             })
           ]),
           _: 1
-        }),
-        createVNode(_component_dweb_keyboard, {
-          id: "key_board",
-          overlay: ""
-        }),
-        createVNode(_component_dweb_dialog_alert, {
-          id: "dda",
-          title: "alert",
-          content: "content"
-        }, {
-          default: withCtx(() => [
-            createVNode(_component_dweb_dialog_button, { id: "ddb" }, {
-              default: withCtx(() => [
-                _hoisted_3
-              ]),
-              _: 1
-            })
-          ]),
-          _: 1
-        }),
-        createVNode(_component_dweb_dialog_prompt, {
-          id: "ddp",
-          title: "prompt",
-          label: "label",
-          defaultValue: "default"
-        }, {
-          default: withCtx(() => [
-            createVNode(_component_dweb_dialog_button, {
-              id: "ddpo",
-              "aria-label": "cancel"
-            }, {
-              default: withCtx(() => [
-                _hoisted_4
-              ]),
-              _: 1
-            }),
-            createVNode(_component_dweb_dialog_button, {
-              id: "ddpn",
-              "aria-label": "confirm"
-            }, {
-              default: withCtx(() => [
-                _hoisted_5
-              ]),
-              _: 1
-            })
-          ]),
-          _: 1
-        }),
-        createVNode(_component_dweb_dialog_confirm, {
-          id: "ddc",
-          title: "confirm",
-          message: "message"
-        }, {
-          default: withCtx(() => [
-            createVNode(_component_dweb_dialog_button, {
-              id: "ok",
-              "aria-label": "confirm"
-            }, {
-              default: withCtx(() => [
-                _hoisted_6
-              ]),
-              _: 1
-            }),
-            createVNode(_component_dweb_dialog_button, {
-              id: "no",
-              "aria-label": "cancel"
-            }, {
-              default: withCtx(() => [
-                _hoisted_7
-              ]),
-              _: 1
-            })
-          ]),
-          _: 1
-        }),
-        createVNode(_component_dweb_dialog_before_unload, {
-          id: "before_unload",
-          title: "test",
-          message: "before-unload"
-        }, {
-          default: withCtx(() => [
-            createVNode(_component_dweb_dialog_button, { id: "buo" }, {
-              default: withCtx(() => [
-                _hoisted_8
-              ]),
-              _: 1
-            }),
-            createVNode(_component_dweb_dialog_button, { id: "bun" }, {
-              default: withCtx(() => [
-                _hoisted_9
-              ]),
-              _: 1
-            })
-          ]),
-          _: 1
-        }),
-        createVNode(_component_dweb_messager, { id: "dweb" }),
-        createVNode(_component_dweb_scanner, { channelId: "helloWorld" }),
-        createBaseVNode("h1", null, toDisplayString(__props.msg), 1),
-        createBaseVNode("div", _hoisted_10, [
-          createBaseVNode("button", {
-            type: "button",
-            onClick: openScanner
-          }, "\u542F\u52A8\u626B\u7801"),
-          createBaseVNode("p", null, toDisplayString(unref(scannerData)), 1)
-        ]),
-        createBaseVNode("div", _hoisted_11, [
-          createBaseVNode("button", {
-            type: "button",
-            onClick: onDwebPlugin
-          }, "webMessage\u6D88\u606F"),
-          createBaseVNode("p", null, toDisplayString(unref(dwebPluginData)), 1)
-        ]),
-        _hoisted_12
+        })
       ], 64);
     };
   }
 });
-const HelloWorld_vue_vue_type_style_index_0_scoped_535d993a_lang = "";
-const _export_sfc = (sfc, props) => {
-  const target = sfc.__vccOpts || sfc;
-  for (const [key, val] of props) {
-    target[key] = val;
-  }
-  return target;
-};
-const HelloWorld = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["__scopeId", "data-v-535d993a"]]);
-const _hoisted_1 = /* @__PURE__ */ createStaticVNode('<div data-v-e2cfde70><a href="https://vitejs.dev" target="_blank" data-v-e2cfde70><img src="' + _imports_0 + '" class="logo" alt="Vite logo" data-v-e2cfde70></a><a href="https://vuejs.org/" target="_blank" data-v-e2cfde70><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-e2cfde70></a><a href="https://vuejs.org/" target="_blank" data-v-e2cfde70><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-e2cfde70></a><a href="https://vuejs.org/" target="_blank" data-v-e2cfde70><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-e2cfde70></a></div>', 1);
-const _sfc_main = /* @__PURE__ */ defineComponent({
-  __name: "App",
-  setup(__props) {
-    return (_ctx, _cache) => {
-      return openBlock(), createElementBlock(Fragment, null, [
-        _hoisted_1,
-        createVNode(HelloWorld, { msg: "DwebView-js \u267B\uFE0F Deno-js" })
-      ], 64);
-    };
-  }
-});
-const App_vue_vue_type_style_index_0_scoped_e2cfde70_lang = "";
-const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["__scopeId", "data-v-e2cfde70"]]);
+const App_vue_vue_type_style_index_0_scoped_ae465483_lang = "";
+const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["__scopeId", "data-v-ae465483"]]);
 createApp(App).mount("#app");

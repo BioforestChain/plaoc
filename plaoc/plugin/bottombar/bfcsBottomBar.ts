@@ -50,7 +50,7 @@ export class BfcsBottomBar extends DwebPlugin {
 
   private async _init() {
     const height = await this.getHeight();
-
+    console.log("bottom_bar:",height)
     if (height) {
       this.setAttribute("height", `${height}`);
     }
@@ -221,6 +221,7 @@ export class BfcsBottomBar extends DwebPlugin {
     oldVal: unknown,
     newVal: unknown
   ) {
+    console.log("bottom_bar attributeChangedCallback:",attrName,oldVal,newVal)
     if (oldVal === newVal) {
       return;
     }

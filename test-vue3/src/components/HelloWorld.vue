@@ -12,9 +12,7 @@ let scannerData = ref("扫码返回的数据");
 let dwebPluginData = ref("dweb的数据");
 onMounted(async () => {
   console.log("document.querySelector('dweb-status-bar')!=>", document.querySelector('dweb-status-bar'));
-   console.log("aaa=>", document.getElementById('aaa'));
-    console.log("bbb=>", document.getElementById('bbb'));
-     console.log("ccc =>", document.getElementById('ccc'));
+  console.log("dweb-top-bar-button =>", document.getElementById('aaa'));
 })
 
 async function openScanner() {
@@ -26,7 +24,7 @@ const scanner = document.querySelector<OpenScanner>('dweb-scanner')!;
 async function onDwebPlugin() {
    const dwebPlugin = document.querySelector<DWebMessager>('dweb-messager')!;
    console.log("dwebPlugin:",dwebPlugin);
-  console.log("_ffixxx:",(window as any).system_ui);
+   console.log("_ffixxx:",JSON.stringify(Object.keys((window as any).bottom_bar)));
   // const iter = await dwebPlugin
   // console.log("document.querySelector('dweb-plugin') as dwebPlugin -->",JSON.stringify(iter))
   // dwebPluginData.value = iter
@@ -40,26 +38,13 @@ async function onDwebPlugin() {
             <dweb-icon source="Filled.AddCircle"></dweb-icon>
         </dweb-top-bar-button>
         <dweb-top-bar-button id="bbb" disabled>
-            <dweb-icon source="Filled.Add" size="20"></dweb-icon>
+            <dweb-icon source="Filled.AddCircle" size="20"></dweb-icon>
         </dweb-top-bar-button>
         <dweb-top-bar-button id="ccc">
-            <dweb-icon source="https://www.vectorlogo.zone/logos/rust-lang/rust-lang-icon.svg" type="AssetIcon"></dweb-icon>
+            <dweb-icon source="/vite.svg" type="AssetIcon"></dweb-icon>
         </dweb-top-bar-button>
     </dweb-top-bar>
-     <dweb-bottom-bar id="bottom_bar" background-color="#ff00ffff" foreground-color="#000000ff">
-        <dweb-bottom-bar-button id="ddd" selectable indicator-color="#00ff00ff">
-            <dweb-bottom-bar-icon source="Filled.AddCircle" color="#ff00aaff" selected-color="rgba(255, 0, 0, 1)"></dweb-bottom-bar-icon>
-            <dweb-bottom-bar-text color="#0000ffff" selected-color="rgba(255, 0, 0, 1)">add</dweb-bottom-bar-text>
-        </dweb-bottom-bar-button>
-        <dweb-bottom-bar-button id="eee">
-            <dweb-bottom-bar-icon source="https://www.vectorlogo.zone/logos/rust-lang/rust-lang-icon.svg" type="AssetIcon" size="50"></dweb-bottom-bar-icon>
-        </dweb-bottom-bar-button>
-        <dweb-bottom-bar-button id="fff" selected selectable>
-            <dweb-bottom-bar-icon source="Filled.Add"></dweb-bottom-bar-icon>
-            <dweb-bottom-bar-text>title</dweb-bottom-bar-text>
-        </dweb-bottom-bar-button>
-    </dweb-bottom-bar>
-    <dweb-keyboard id="key_board" overlay></dweb-keyboard>
+    <!-- <dweb-keyboard id="key_board" overlay></dweb-keyboard>
     <dweb-dialog-alert id="dda" title="alert" content="content">
         <dweb-dialog-button id="ddb">ok</dweb-dialog-button>
     </dweb-dialog-alert>
@@ -74,7 +59,7 @@ async function onDwebPlugin() {
     <dweb-dialog-before-unload id="before_unload" title="test" message="before-unload">
         <dweb-dialog-button id="buo">ok</dweb-dialog-button>
         <dweb-dialog-button id="bun">No</dweb-dialog-button>
-    </dweb-dialog-before-unload>
+    </dweb-dialog-before-unload> -->
 <dweb-messager id="dweb"></dweb-messager>
 <dweb-scanner channelId="helloWorld"></dweb-scanner>
   <h1>{{ msg }}</h1>

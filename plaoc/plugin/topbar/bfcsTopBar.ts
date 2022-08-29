@@ -5,8 +5,9 @@ import { TopBar } from "./bfcsTopBar.type";
 import "../typings";
 import { Icon } from "../icon/bfspIcon.type";
 import { Color } from "../typings/types/color.type";
+import { DwebPlugin } from "../native/dweb-plugin";
 
-export class BfcsTopBar extends HTMLElement {
+export class BfcsTopBar extends DwebPlugin {
   private _ffi: TopBar.ITopBarFFI;
   private _observer: MutationObserver;
   private _actionList: TopBar.TopBarItem[] = [];
@@ -16,11 +17,13 @@ export class BfcsTopBar extends HTMLElement {
 
     this._ffi = new TopBarFFI();
     this._observer = new MutationObserver(async (mutations) => {
-      await this.collectActions();
+       console.log("BfcsTopBar MutationObserver: =>")
+       await this.collectActions();
     });
   }
 
   connectedCallback() {
+    console.log("BfcsTopBar connectedCallback:", this._observer);
     this._observer.observe(this, {
       subtree: true,
       childList: true,
@@ -140,7 +143,7 @@ export class BfcsTopBar extends HTMLElement {
 
   async collectActions() {
     this._actionList = [];
-
+    console.log("this.querySelectorAll:",JSON.stringify(this.querySelectorAll("dweb-top-bar-button")))
     this.querySelectorAll("dweb-top-bar-button").forEach((childNode) => {
       let icon: Icon.IPlaocIcon = {
         source: "",
@@ -165,6 +168,7 @@ export class BfcsTopBar extends HTMLElement {
       const onClickCode = `document.querySelector('dweb-top-bar-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
       const disabled = childNode.hasAttribute("disabled") ? true : false;
       this._actionList.push({ icon, onClickCode, disabled });
+      console.log("icon, disabled:",icon, disabled);
     });
 
     await this.setActions();

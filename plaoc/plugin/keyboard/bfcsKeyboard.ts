@@ -1,7 +1,8 @@
 import { VirtualKeyboardFFI } from "./ffi";
 import { Keyboard } from "./bfcsKeyboard.type";
+import { DwebPlugin } from '../native/dweb-plugin';
 
-export class BfcsKeyboard extends HTMLElement {
+export class BfcsKeyboard extends DwebPlugin {
   private _ffi: Keyboard.IVirtualKeyboardFFI;
 
   constructor() {
