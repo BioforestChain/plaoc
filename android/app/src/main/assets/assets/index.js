@@ -4904,9 +4904,8 @@ function convertToRGBAHex(color) {
       }
       colorHex = color.padEnd(9, "F");
     }
-    console.log("colorHex1:", color.length, color, colorHex);
   }
-  return colorHex.length === 9 ? colorHex : color;
+  return colorHex;
 }
 class BottomBarFFI {
   constructor() {
@@ -5181,7 +5180,6 @@ class BfcsBottomBar extends DwebPlugin {
           childNode.getAttribute("indicator-color")
         );
       }
-      console.log(JSON.stringify(colors));
       this._actionList.push({
         icon,
         onClickCode,
@@ -6118,7 +6116,7 @@ const style = "";
 const _imports_0 = "/vite.svg";
 const _imports_1 = "data:image/png;base64,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";
 const _hoisted_1$1 = { class: "card" };
-const _hoisted_2 = /* @__PURE__ */ createStaticVNode('<div style="margin-top:50px;" data-v-534935bd><input id="toastMessage" type="text" placeholder="Toast message" data-v-534935bd></div><p data-v-534935bd> Check out <a href="https://vuejs.org/guide/quick-start.html#local" target="_blank" data-v-534935bd>create-vue</a>, the official Vue + Vite starter </p><p data-v-534935bd> Install <a href="https://github.com/johnsoncodehk/volar" target="_blank" data-v-534935bd>Volar</a> in your IDE for a better DX </p><p class="read-the-docs" data-v-534935bd>Click on the Vite and Vue logos to learn more</p>', 4);
+const _hoisted_2 = /* @__PURE__ */ createStaticVNode('<div style="margin-top:50px;" data-v-e8b9485e><input id="toastMessage" type="text" placeholder="Toast message" data-v-e8b9485e></div><p data-v-e8b9485e> Check out <a href="https://vuejs.org/guide/quick-start.html#local" target="_blank" data-v-e8b9485e>create-vue</a>, the official Vue + Vite starter </p><p data-v-e8b9485e> Install <a href="https://github.com/johnsoncodehk/volar" target="_blank" data-v-e8b9485e>Volar</a> in your IDE for a better DX </p><p class="read-the-docs" data-v-e8b9485e>Click on the Vite and Vue logos to learn more</p>', 4);
 const _sfc_main$1 = /* @__PURE__ */ defineComponent({
   __name: "HelloWorld",
   props: {
@@ -6139,7 +6137,7 @@ const _sfc_main$1 = /* @__PURE__ */ defineComponent({
       return openBlock(), createElementBlock(Fragment, null, [
         createVNode(_component_dweb_status_bar, {
           id: "status_bar",
-          "background-color": "#f71",
+          "background-color": "#EADDFF",
           "bar-style": "dark-content"
         }),
         createVNode(_component_dweb_messager, { id: "dweb" }),
@@ -6156,7 +6154,7 @@ const _sfc_main$1 = /* @__PURE__ */ defineComponent({
     };
   }
 });
-const HelloWorld_vue_vue_type_style_index_0_scoped_534935bd_lang = "";
+const HelloWorld_vue_vue_type_style_index_0_scoped_e8b9485e_lang = "";
 const _export_sfc = (sfc, props) => {
   const target = sfc.__vccOpts || sfc;
   for (const [key, val] of props) {
@@ -6164,8 +6162,8 @@ const _export_sfc = (sfc, props) => {
   }
   return target;
 };
-const HelloWorld = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["__scopeId", "data-v-534935bd"]]);
-const _hoisted_1 = /* @__PURE__ */ createStaticVNode('<div data-v-5c06b8b6><a href="https://vitejs.dev" target="_blank" data-v-5c06b8b6><img src="' + _imports_0 + '" class="logo" alt="Vite logo" data-v-5c06b8b6></a><a href="https://vuejs.org/" target="_blank" data-v-5c06b8b6><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-5c06b8b6></a><a href="https://vuejs.org/" target="_blank" data-v-5c06b8b6><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-5c06b8b6></a><a href="https://vuejs.org/" target="_blank" data-v-5c06b8b6><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-5c06b8b6></a></div>', 1);
+const HelloWorld = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["__scopeId", "data-v-e8b9485e"]]);
+const _hoisted_1 = /* @__PURE__ */ createStaticVNode('<div data-v-f6aa93d9><a href="https://vitejs.dev" target="_blank" data-v-f6aa93d9><img src="' + _imports_0 + '" class="logo" alt="Vite logo" data-v-f6aa93d9></a><a href="https://vuejs.org/" target="_blank" data-v-f6aa93d9><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-f6aa93d9></a><a href="https://vuejs.org/" target="_blank" data-v-f6aa93d9><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-f6aa93d9></a><a href="https://vuejs.org/" target="_blank" data-v-f6aa93d9><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-f6aa93d9></a></div>', 1);
 const _sfc_main = /* @__PURE__ */ defineComponent({
   __name: "App",
   setup(__props) {
@@ -6189,8 +6187,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         createVNode(_component_dweb_top_bar, {
           id: "topbar",
           title: "Ar \u626B\u96F7",
-          "background-color": "rgba(255, 255, 255)",
-          "foreground-color": "#0000ffff"
+          "background-color": "#CCC2DC"
         }, {
           default: withCtx(() => [
             createVNode(_component_dweb_top_bar_button, { id: "aaa" }, {
@@ -6216,7 +6213,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         createVNode(_component_dweb_bottom_bar, {
           id: "bottom_bar",
           "background-color": "#D0BCFF",
-          "indicator-color": "#381E72"
+          "indicator-color": "#f3bf44"
         }, {
           default: withCtx(() => [
             createVNode(_component_dweb_bottom_bar_button, {
@@ -6226,12 +6223,12 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
               default: withCtx(() => [
                 createVNode(_component_dweb_bottom_bar_icon, {
                   source: "https://objectjson.waterbang.top/test-vue3/land.svg",
-                  "selected-color": "#ffffffff",
+                  "un-source": "https://objectjson.waterbang.top/test-vue3/land-not.svg",
                   type: "AssetIcon"
                 }),
                 createVNode(_component_dweb_bottom_bar_text, {
-                  color: "#332D41ff",
-                  "selected-color": "#381E72ff",
+                  color: "#FFD8E4",
+                  "selected-color": "#B3261E",
                   value: "\u571F\u5730"
                 })
               ]),
@@ -6247,11 +6244,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                   source: "https://objectjson.waterbang.top/test-vue3/scanner.svg",
                   type: "AssetIcon"
                 }),
-                createVNode(_component_dweb_bottom_bar_text, {
-                  color: "#332D41ff",
-                  "selected-color": "#381E72ff",
-                  value: "\u626B\u7801"
-                })
+                createVNode(_component_dweb_bottom_bar_text, { value: "\u626B\u7801" })
               ]),
               _: 1
             }),
@@ -6259,12 +6252,12 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
               default: withCtx(() => [
                 createVNode(_component_dweb_bottom_bar_icon, {
                   source: "https://objectjson.waterbang.top/test-vue3/home.svg",
-                  color: "#ffffffff",
+                  "un-source": "https://objectjson.waterbang.top/test-vue3/home-not.svg",
                   type: "AssetIcon"
                 }),
                 createVNode(_component_dweb_bottom_bar_text, {
-                  color: "#332D41ff",
-                  "selected-color": "#381E72ff",
+                  color: "#FFD8E4",
+                  "selected-color": "#B3261E",
                   value: "\u4E2A\u4EBA\u7A7A\u95F4"
                 })
               ]),
@@ -6278,6 +6271,6 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
     };
   }
 });
-const App_vue_vue_type_style_index_0_scoped_5c06b8b6_lang = "";
-const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["__scopeId", "data-v-5c06b8b6"]]);
+const App_vue_vue_type_style_index_0_scoped_f6aa93d9_lang = "";
+const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["__scopeId", "data-v-f6aa93d9"]]);
 createApp(App).mount("#app");

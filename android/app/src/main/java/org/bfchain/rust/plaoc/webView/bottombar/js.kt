@@ -65,10 +65,14 @@ class BottomBarFFI(
 
     @JavascriptInterface
     fun setActions(actionListJson: DataString<List<BottomBarAction>>) {
+      Log.i("actionListJson","actionListJson:$actionListJson")
         state.actions.clear()
         val actionList = actionListJson.toData<List<BottomBarAction>>(object :
             TypeToken<List<BottomBarAction>>() {}.type)
         actionList.toCollection(state.actions)
+      actionList.forEach{
+        Log.i("actionList","actionListJson:$it")
+      }
     }
 
     @JavascriptInterface
@@ -118,6 +122,8 @@ data class BottomBarAction(
 
         @Composable
         fun toNavigationBarItemColors(): NavigationBarItemColors {
+          Log.i(TAG, "indicatorColor:$indicatorColor, iconColor:$iconColor, iconColorSelected:$iconColorSelected, " +
+            "textColor:$textColor, textColorSelected:$textColorSelected")
             val defaultColors = NavigationBarItemDefaults.colors()
             val indicatorColor = indicatorColor?.toComposeColor() ?: defaultColors.indicatorColor
             val iconColor =
@@ -130,8 +136,7 @@ data class BottomBarAction(
             val textColorSelected = ColorState(
                 textColorSelected?.toComposeColor() ?: defaultColors.indicatorColor
             )
-//          Log.i(TAG, "defaultColors:$defaultColors, indicatorColor:$indicatorColor, iconColor:$iconColor, iconColorSelected:$iconColorSelected, " +
-//            "textColor:$textColor, textColorSelected:$textColorSelected")
+
             val colors = @Stable object : NavigationBarItemColors {
                 override val indicatorColor: Color
                     @Composable get() = indicatorColor

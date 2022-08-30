@@ -23,7 +23,7 @@ async function onDwebPlugin() {
 
 </script>
 <template>
-   <dweb-status-bar id="status_bar" background-color="#f71" bar-style="dark-content"></dweb-status-bar>
+   <dweb-status-bar id="status_bar" background-color="#EADDFF" bar-style="dark-content"></dweb-status-bar>
     <!-- <dweb-keyboard id="key_board" overlay></dweb-keyboard>
     <dweb-dialog-alert id="dda" title="alert" content="content">
         <dweb-dialog-button id="ddb">ok</dweb-dialog-button>

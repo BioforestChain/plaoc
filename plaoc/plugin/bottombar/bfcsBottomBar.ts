@@ -193,13 +193,12 @@ export class BfcsBottomBar extends DwebPlugin {
       const selected = childNode.hasAttribute("selected") ? true : false;
       // 不允许选择，不加diSelectable属性则允许选择
       const diSelectable = childNode.hasAttribute("diSelectable") ? false : true;
-
+      // 指示器颜色
       if (childNode.hasAttribute("indicator-color")) {
         colors.indicatorColor = convertToRGBAHex(
           childNode.getAttribute("indicator-color")!
         );
       }
-      console.log(JSON.stringify(colors))
       this._actionList.push({
         icon,
         onClickCode,

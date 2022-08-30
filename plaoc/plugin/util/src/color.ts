@@ -22,7 +22,7 @@ export function getColorHex(color: number): Color.RGBAHex {
 }
 
 // 将rgba(r, b, g, a)或#rrbbggaa或#rgba转为#rrbbggaa 十六进制
-export function convertToRGBAHex(color: string): Color.RGBAHex {
+export function convertToRGBAHex(color: string):Color.RGBAHex {
   let colorHex = "#";
 
   if (color.startsWith("rgba(")) {
@@ -58,8 +58,6 @@ export function convertToRGBAHex(color: string): Color.RGBAHex {
       // 填充成9字符格式，不然android无法渲染
       colorHex = color.padEnd(9,"F");
     }
-    console.log("colorHex1:", color.length, color,colorHex)
   }
-
-  return (colorHex.length === 9 ? colorHex : color) as Color.RGBAHex;
+  return colorHex as Color.RGBAHex;
 }
