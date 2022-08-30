@@ -198,19 +198,33 @@ class MainActivity : AppCompatActivity() {
 
     fun onClick(v: View) {
         when (v.id) {
-            R.id.btn -> openScannerActivity()
-            R.id.btn0 -> startActivity(MultipleQRCodeScanningActivity::class.java)
-            R.id.btn1 -> startActivity(BarcodeScanningActivity::class.java)
-            R.id.btn2 -> {
-                LogUtils.d("android调用js并且返回数据")
-//                DWebViewActivity().callJavascript()
+            R.id.imageButton1 -> {
+              LogUtils.d("启动了Ar 扫雷")
+              openDWebWindow(
+                activity = getContext(),
+                url = "https://bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj.dweb/index.html"
+              )
             }
-            R.id.btn3 -> {
-                LogUtils.d("启动了DWebView")
-                openDWebWindow(
-                    activity = getContext(),
-                    url = "https://bMr9vohVtvBvWRS3p4bwgzSMoLHTPHSvVj.dweb/hello_runtime.html"
-                )
+          R.id.imageButton2 -> {
+            LogUtils.d("启动了DWebView")
+            openDWebWindow(
+              activity = getContext(),
+              url = "https://bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj.dweb/index.html"
+            )
+          }
+          R.id.imageButton3 -> {
+            LogUtils.d("启动了DWebView")
+            openDWebWindow(
+              activity = getContext(),
+              url = "https://bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj.dweb/index.html"
+            )
+          }
+          R.id.imageButton4 -> {
+            LogUtils.d("启动了DWebView")
+            openDWebWindow(
+              activity = getContext(),
+              url = "https://bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj.dweb/index.html"
+            )
             }
         }
     }

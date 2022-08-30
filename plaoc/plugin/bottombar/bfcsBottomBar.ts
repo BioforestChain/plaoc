@@ -139,6 +139,7 @@ export class BfcsBottomBar extends DwebPlugin {
     this._actionList = [];
     this.querySelectorAll("dweb-bottom-bar-button").forEach((childNode) => {
       let icon: Icon.IPlaocIcon = {
+        un_source:"",
         source: "",
         type: "NamedIcon" as Icon.IconType.NamedIcon,
       };
@@ -149,6 +150,7 @@ export class BfcsBottomBar extends DwebPlugin {
       if (childNode.querySelector("dweb-bottom-bar-icon")) {
         let $ = childNode.querySelector("dweb-bottom-bar-icon")!;
 
+         icon.un_source = $.getAttribute("un-source") ?? "";
         icon.source = $.getAttribute("source") ?? "";
         icon.type = $.hasAttribute("type")
           ? ($.getAttribute("type") as Icon.IconType)
@@ -197,7 +199,7 @@ export class BfcsBottomBar extends DwebPlugin {
           childNode.getAttribute("indicator-color")!
         );
       }
-
+      console.log(JSON.stringify(colors))
       this._actionList.push({
         icon,
         onClickCode,
@@ -205,7 +207,7 @@ export class BfcsBottomBar extends DwebPlugin {
         label,
         selectable:diSelectable,
         selected,
-        colors: JSON.stringify(colors) === "{}" ? undefined : colors,
+        colors: Object.keys(colors).length === 0 ? undefined : colors,
       });
     });
 
@@ -227,12 +229,6 @@ export class BfcsBottomBar extends DwebPlugin {
     oldVal: unknown,
     newVal: unknown
   ) {
-    console.log(
-      "bottom_bar attributeChangedCallback:",
-      attrName,
-      oldVal,
-      newVal
-    );
     if (oldVal === newVal) {
       return;
     }

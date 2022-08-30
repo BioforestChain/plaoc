@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { OpenScanner,DWebMessager} from '@bfsx/plugin';
+import { DWebMessager} from '@bfsx/plugin';
 defineProps<{ msg: string }>()
 
 function getToastMessage(data:string) {

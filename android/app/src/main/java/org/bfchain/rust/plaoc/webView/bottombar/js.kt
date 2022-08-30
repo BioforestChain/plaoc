@@ -107,7 +107,7 @@ data class BottomBarAction(
     val colors: Colors?
 ) {
 
-    data class Colors(
+  data class Colors(
         val indicatorColor: ColorInt?,
         val iconColor: ColorInt?,
         val iconColorSelected: ColorInt?,
@@ -130,16 +130,17 @@ data class BottomBarAction(
             val textColorSelected = ColorState(
                 textColorSelected?.toComposeColor() ?: defaultColors.indicatorColor
             )
-
+//          Log.i(TAG, "defaultColors:$defaultColors, indicatorColor:$indicatorColor, iconColor:$iconColor, iconColorSelected:$iconColorSelected, " +
+//            "textColor:$textColor, textColorSelected:$textColorSelected")
             val colors = @Stable object : NavigationBarItemColors {
                 override val indicatorColor: Color
                     @Composable get() = indicatorColor
 
 
                 /**
-                 * Represents the icon color for this item, depending on whether it is [selected].
+                 * 表示该项的图标颜色，取决于它是否被[选中]。
                  *
-                 * @param selected whether the item is selected
+                 * @param selected 项目是否被选中
                  */
                 @Composable
                 override fun iconColor(selected: Boolean) = if (selected) {
@@ -149,9 +150,9 @@ data class BottomBarAction(
                 }
 
                 /**
-                 * Represents the text color for this item, depending on whether it is [selected].
+                 * 表示该项的文本颜色，取决于它是否被[选中]。
                  *
-                 * @param selected whether the item is selected
+                 * @param selected 项目是否被选中
                  */
                 @Composable
                 override fun textColor(selected: Boolean) = if (selected) {

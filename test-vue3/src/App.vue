@@ -38,9 +38,9 @@ const scanner = document.querySelector<OpenScanner>('dweb-scanner')!;
     </a>
   </div>
   <HelloWorld :msg="scannerData" />
-     <dweb-bottom-bar id="bottom_bar" background-color="#D0BCFFff"  >
+     <dweb-bottom-bar id="bottom_bar" background-color="#D0BCFF" indicator-color="#381E72" >
         <dweb-bottom-bar-button id="ddd" selected   >
-            <dweb-bottom-bar-icon source="https://objectjson.waterbang.top/test-vue3/land.svg" type="AssetIcon" ></dweb-bottom-bar-icon>
+            <dweb-bottom-bar-icon source="https://objectjson.waterbang.top/test-vue3/land.svg" selected-color="#ffffffff" type="AssetIcon" ></dweb-bottom-bar-icon>
             <dweb-bottom-bar-text color="#332D41ff" selected-color="#381E72ff" value="土地"></dweb-bottom-bar-text>
         </dweb-bottom-bar-button>
         <dweb-bottom-bar-button id="eee"  @click="openScanner" diSelectable>
@@ -48,7 +48,7 @@ const scanner = document.querySelector<OpenScanner>('dweb-scanner')!;
             <dweb-bottom-bar-text color="#332D41ff" selected-color="#381E72ff" value="扫码"></dweb-bottom-bar-text>
         </dweb-bottom-bar-button>
         <dweb-bottom-bar-button id="fff" >
-            <dweb-bottom-bar-icon source="https://objectjson.waterbang.top/test-vue3/home.svg" type="AssetIcon" ></dweb-bottom-bar-icon>
+            <dweb-bottom-bar-icon source="https://objectjson.waterbang.top/test-vue3/home.svg" color="#ffffffff" type="AssetIcon" ></dweb-bottom-bar-icon>
             <dweb-bottom-bar-text color="#332D41ff"  selected-color="#381E72ff" value="个人空间"></dweb-bottom-bar-text>
         </dweb-bottom-bar-button>
     </dweb-bottom-bar>
