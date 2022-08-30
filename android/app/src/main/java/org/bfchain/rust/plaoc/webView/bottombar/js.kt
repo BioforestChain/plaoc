@@ -65,10 +65,14 @@ class BottomBarFFI(
 
     @JavascriptInterface
     fun setActions(actionListJson: DataString<List<BottomBarAction>>) {
+      Log.i("actionListJson","actionListJson:$actionListJson")
         state.actions.clear()
         val actionList = actionListJson.toData<List<BottomBarAction>>(object :
             TypeToken<List<BottomBarAction>>() {}.type)
         actionList.toCollection(state.actions)
+      actionList.forEach{
+        Log.i("actionList","actionListJson:$it")
+      }
     }
 
     @JavascriptInterface
@@ -107,7 +111,7 @@ data class BottomBarAction(
     val colors: Colors?
 ) {
 
-    data class Colors(
+  data class Colors(
         val indicatorColor: ColorInt?,
         val iconColor: ColorInt?,
         val iconColorSelected: ColorInt?,
@@ -118,6 +122,8 @@ data class BottomBarAction(
 
         @Composable
         fun toNavigationBarItemColors(): NavigationBarItemColors {
+          Log.i(TAG, "indicatorColor:$indicatorColor, iconColor:$iconColor, iconColorSelected:$iconColorSelected, " +
+            "textColor:$textColor, textColorSelected:$textColorSelected")
             val defaultColors = NavigationBarItemDefaults.colors()
             val indicatorColor = indicatorColor?.toComposeColor() ?: defaultColors.indicatorColor
             val iconColor =
@@ -137,9 +143,9 @@ data class BottomBarAction(
 
 
                 /**
-                 * Represents the icon color for this item, depending on whether it is [selected].
+                 * 表示该项的图标颜色，取决于它是否被[选中]。
                  *
-                 * @param selected whether the item is selected
+                 * @param selected 项目是否被选中
                  */
                 @Composable
                 override fun iconColor(selected: Boolean) = if (selected) {
@@ -149,9 +155,9 @@ data class BottomBarAction(
                 }
 
                 /**
-                 * Represents the text color for this item, depending on whether it is [selected].
+                 * 表示该项的文本颜色，取决于它是否被[选中]。
                  *
-                 * @param selected whether the item is selected
+                 * @param selected 项目是否被选中
                  */
                 @Composable
                 override fun textColor(selected: Boolean) = if (selected) {

@@ -89,13 +89,13 @@ impl MainWorker {
     permissions: Permissions,
     options: WorkerOptions,
   ) -> Self {
-    log::info!("main bootstrap_from_options 1");
+    // log::info!("main bootstrap_from_options 1");
     let bootstrap_options = options.bootstrap.clone();
-    log::info!("main bootstrap_from_options 2");
+    // log::info!("main bootstrap_from_options 2");
     let mut worker = Self::from_options(main_module, permissions, options);
-    log::info!("main bootstrap_from_options 3");
+    // log::info!("main bootstrap_from_options 3");
     worker.bootstrap(&bootstrap_options);
-    log::info!("main bootstrap_from_options 4");
+    // log::info!("main bootstrap_from_options 4");
     worker
   }
 
@@ -104,7 +104,6 @@ impl MainWorker {
     permissions: Permissions,
     mut options: WorkerOptions,
   ) -> Self {
-    log::info!("main from_options 1");
     // Permissions: many ops depend on this
     let unstable = options.bootstrap.unstable;
     let enable_testing_features = options.bootstrap.enable_testing_features;
@@ -118,7 +117,6 @@ impl MainWorker {
       .build();
     let exit_code = ExitCode(Arc::new(AtomicI32::new(0)));
 
-    log::info!("main from_options 2");
     // Internal modules
     let mut extensions: Vec<Extension> = vec![
       // Web APIs
@@ -208,25 +206,23 @@ impl MainWorker {
   }
 
   pub fn bootstrap(&mut self, options: &BootstrapOptions) {
-    log::info!("main bootstrap 1");
-    let script = format!("bootstrap.mainRuntime({})", options.as_json());
-    log::info!("main bootstrap 1.1");
-    self
-      .execute_script("gaubee:test1", "typeof console").unwrap();
-      log::info!("main bootstrap 1.2");
-      self
-            .execute_script("gaubee:test2", "Deno.core.print(\"gaubee:test2\",true)").unwrap();
-    log::info!("main bootstrap 1.3");
-    self
-          .execute_script("gaubee:test3", "Deno.core.print(typeof console,true)").unwrap();
-    log::info!("main bootstrap 1.4");
-    self
-        .execute_script("gaubee:test4", "console.log(678)").unwrap();
-    log::info!("main bootstrap 2:{}", script);
-    self
-      .execute_script(&located_script_name!(), &script)
-      .expect("Failed to execute bootstrap script");
-    log::info!("main bootstrap 3");
+    // log::info!("main bootstrap 1");
+    // let script = format!("bootstrap.mainRuntime({})", options.as_json());
+    // log::info!("main bootstrap 1.1");
+    // self.execute_script("gaubee:test1", "typeof console").unwrap();
+    //   log::info!("main bootstrap 1.2");
+      // self.execute_script("gaubee:test2", "Deno.core.print(\"gaubee:test2\",true)").unwrap();
+    // log::info!("main bootstrap 1.3");
+    // self
+    //       .execute_script("gaubee:test3", "Deno.core.print(typeof console,true)").unwrap();
+    // log::info!("main bootstrap 1.4");
+    // self
+    //     .execute_script("gaubee:test4", "console.log(678)").unwrap();
+    // log::info!("main bootstrap 2:{}", script);
+    // self
+    //   .execute_script(&located_script_name!(), &script)
+    //   .expect("Failed to execute bootstrap script");
+    // log::info!("main bootstrap 3");
   }
 
   /// See [JsRuntime::execute_script](deno_core::JsRuntime::execute_script)

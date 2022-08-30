@@ -9,7 +9,7 @@ const metaData = {
     privateKey: "bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj",
     enter: "index.html"
   },
-  whitelist: ["https://unpkg.com"],
+  whitelist: ["https://unpkg.com", "https://cn.vitejs.dev"],
   dwebview: {
     importmap: [
       {

@@ -28,7 +28,7 @@ export class BfcsBottomBar extends DwebPlugin {
       attributeFilter: [
         "disabled",
         "selected",
-        "selectable",
+        "diSelectable", // 不允许选择，不加diSelectable属性则允许选择
         "label",
         // "colors",
         "type",
@@ -38,6 +38,7 @@ export class BfcsBottomBar extends DwebPlugin {
         "color",
         "selected-color",
         "indicator-color",
+        "height"
       ],
     });
 
@@ -50,9 +51,11 @@ export class BfcsBottomBar extends DwebPlugin {
 
   private async _init() {
     const height = await this.getHeight();
-
+    console.log("bottom_bar:", height);
     if (height) {
       this.setAttribute("height", `${height}`);
+    } else {
+      await this.collectActions();
     }
   }
 
@@ -134,9 +137,9 @@ export class BfcsBottomBar extends DwebPlugin {
 
   async collectActions() {
     this._actionList = [];
-
     this.querySelectorAll("dweb-bottom-bar-button").forEach((childNode) => {
       let icon: Icon.IPlaocIcon = {
+        un_source:"",
         source: "",
         type: "NamedIcon" as Icon.IconType.NamedIcon,
       };
@@ -145,37 +148,41 @@ export class BfcsBottomBar extends DwebPlugin {
       let label: string = "";
 
       if (childNode.querySelector("dweb-bottom-bar-icon")) {
-        let $ = childNode.querySelector("dweb-bottom-bar-icon");
+        let $ = childNode.querySelector("dweb-bottom-bar-icon")!;
 
-        icon.source = $?.getAttribute("source") ?? "";
-        icon.type = $?.hasAttribute("type")
+         icon.un_source = $.getAttribute("un-source") ?? "";
+        icon.source = $.getAttribute("source") ?? "";
+        icon.type = $.hasAttribute("type")
           ? ($.getAttribute("type") as Icon.IconType)
           : ("NamedIcon" as Icon.IconType.NamedIcon);
-        icon.description = $?.getAttribute("description") ?? "";
-        icon.size = $?.hasAttribute("size")
-          ? (($.getAttribute("size") as unknown) as number)
+        icon.description = $.getAttribute("description") ?? "";
+        icon.size = $.hasAttribute("size")
+          ? ($.getAttribute("size") as unknown as number)
           : undefined;
 
-        if ($?.hasAttribute("color")) {
-          colors.iconColor = convertToRGBAHex($?.getAttribute("color")!);
+        if ($.hasAttribute("color")) {
+          colors.iconColor = convertToRGBAHex($.getAttribute("color")!);
         }
-        if ($?.hasAttribute("selected-color")) {
+        if ($.hasAttribute("selected-color")) {
           colors.iconColorSelected = convertToRGBAHex(
-            $?.getAttribute("selected-color")!
+            $.getAttribute("selected-color")!
           );
         }
       }
 
       if (childNode.querySelector("dweb-bottom-bar-text")) {
-        let $ = childNode.querySelector("dweb-bottom-bar-text");
+        let $ = childNode.querySelector("dweb-bottom-bar-text")!;
 
-        label = $?.textContent ?? "";
-        if ($?.hasAttribute("color")) {
+         if ($.hasAttribute("value")) {
+          label = $.getAttribute("value")!
+        }
+        
+        if ($.hasAttribute("color")) {
           colors.textColor = convertToRGBAHex($?.getAttribute("color")!);
         }
-        if ($?.hasAttribute("selected-color")) {
+        if ($.hasAttribute("selected-color")) {
           colors.textColorSelected = convertToRGBAHex(
-            $?.getAttribute("selected-color")!
+            $.getAttribute("selected-color")!
           );
         }
       }
@@ -184,22 +191,22 @@ export class BfcsBottomBar extends DwebPlugin {
       const onClickCode = `document.querySelector('dweb-bottom-bar-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
       const disabled = childNode.hasAttribute("disabled") ? true : false;
       const selected = childNode.hasAttribute("selected") ? true : false;
-      const selectable = childNode.hasAttribute("selectable") ? true : false;
-
+      // 不允许选择，不加diSelectable属性则允许选择
+      const diSelectable = childNode.hasAttribute("diSelectable") ? false : true;
+      // 指示器颜色
       if (childNode.hasAttribute("indicator-color")) {
         colors.indicatorColor = convertToRGBAHex(
           childNode.getAttribute("indicator-color")!
         );
       }
-
       this._actionList.push({
         icon,
         onClickCode,
         disabled,
         label,
-        selectable,
+        selectable:diSelectable,
         selected,
-        colors: JSON.stringify(colors) === "{}" ? undefined : colors,
+        colors: Object.keys(colors).length === 0 ? undefined : colors,
       });
     });
 

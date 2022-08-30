@@ -9,7 +9,7 @@
     android:id="@+id/textView4"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:text="recommend"
+    android:text="bottom style"
     app:layout_constraintBottom_toTopOf="@+id/guideline10"
     app:layout_constraintEnd_toStartOf="@+id/guideline9"
     app:layout_constraintHorizontal_bias="0.59"
@@ -18,20 +18,19 @@
     app:layout_constraintVertical_bias="0.454" />
 
   <ImageButton
-    android:id="@+id/imageButton11"
+    android:id="@+id/imageButton4"
     android:layout_width="70dp"
     android:layout_height="70dp"
     android:contentDescription="@string/app_name"
     app:layout_constraintBottom_toTopOf="@+id/guideline6"
     app:layout_constraintEnd_toStartOf="@+id/guideline4"
-    app:layout_constraintHorizontal_bias="0.927"
-    app:layout_constraintStart_toStartOf="@+id/guideline3"
+    app:layout_constraintStart_toStartOf="@+id/guideline2"
     app:layout_constraintTop_toTopOf="@+id/guideline5"
     app:layout_constraintVertical_bias="0.8"
     tools:srcCompat="@tools:sample/avatars" />
 
   <ImageButton
-    android:id="@+id/imageButton12"
+    android:id="@+id/imageButton3"
     android:layout_width="70dp"
     android:layout_height="70dp"
     android:contentDescription="@string/app_name"
@@ -65,10 +64,12 @@
     app:layout_constraintGuide_begin="395dp" />
 
   <ImageButton
-    android:id="@+id/imageButton10"
+    android:id="@+id/imageButton1"
     android:layout_width="70dp"
     android:layout_height="70dp"
     android:contentDescription="@string/app_name"
+    android:onClick="onClick"
+    android:src="@drawable/vite_foreground"
     app:layout_constraintBottom_toTopOf="@+id/guideline6"
     app:layout_constraintEnd_toStartOf="@+id/guideline3"
     app:layout_constraintHorizontal_bias="0.578"
@@ -78,7 +79,7 @@
     tools:srcCompat="@tools:sample/avatars" />
 
   <ImageButton
-    android:id="@+id/imageButton13"
+    android:id="@+id/imageButton2"
     android:layout_width="70dp"
     android:layout_height="70dp"
     android:contentDescription="@string/app_name"
@@ -88,6 +89,7 @@
     app:layout_constraintStart_toStartOf="@+id/guideline3"
     app:layout_constraintTop_toTopOf="@+id/guideline5"
     app:layout_constraintVertical_bias="0.8"
+    tools:src="@drawable/ic_launcher_foreground"
     tools:srcCompat="@tools:sample/avatars" />
 
   <androidx.constraintlayout.widget.Guideline
@@ -148,11 +150,11 @@
     android:id="@+id/textView3"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:text="recommend"
+    android:text="AR 扫雷"
     app:layout_constraintBottom_toTopOf="@+id/guideline10"
     app:layout_constraintEnd_toStartOf="@+id/guideline3"
     app:layout_constraintStart_toStartOf="@+id/guideline7"
-    app:layout_constraintTop_toBottomOf="@+id/imageButton10" />
+    app:layout_constraintTop_toBottomOf="@+id/imageButton1" />
 
   <TextView
     android:id="@+id/textView5"
@@ -162,7 +164,7 @@
     app:layout_constraintBottom_toTopOf="@+id/guideline10"
     app:layout_constraintEnd_toStartOf="@+id/guideline2"
     app:layout_constraintStart_toStartOf="@+id/guideline9"
-    app:layout_constraintTop_toBottomOf="@+id/imageButton12" />
+    app:layout_constraintTop_toBottomOf="@+id/imageButton3" />
 
   <TextView
     android:id="@+id/textView6"
@@ -172,6 +174,6 @@
     app:layout_constraintBottom_toTopOf="@+id/guideline10"
     app:layout_constraintEnd_toStartOf="@+id/guideline4"
     app:layout_constraintStart_toStartOf="@+id/guideline2"
-    app:layout_constraintTop_toBottomOf="@+id/imageButton11" />
+    app:layout_constraintTop_toBottomOf="@+id/imageButton4" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

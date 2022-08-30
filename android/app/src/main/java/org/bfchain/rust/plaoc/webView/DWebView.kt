@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color.Companion
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -40,7 +41,6 @@ import org.bfchain.rust.plaoc.webkit.*
 import java.net.URI
 import java.net.URL
 import kotlin.math.min
-
 
 private const val TAG = "DWebView"
 
@@ -144,9 +144,9 @@ fun DWebView(
         DWebTopBar(jsUtil, state, topBarState)
     }
 
-    val bottomBarState = BottomBarState.Default()
+  val bottomBarState = BottomBarState.Default()
 
-    @Composable
+  @Composable
     fun BottomAppBar() {
         DWebBottomBar(jsUtil, bottomBarState)
     }
@@ -188,7 +188,6 @@ fun DWebView(
                     })
                     val navigatorFFI = NavigatorFFI(webView, activity, navController)
                     webView.addJavascriptInterface(navigatorFFI, "my_nav")
-
                     val systemUiFFI = SystemUiFFI(
                         activity,
                         webView,

@@ -1,3 +1,4 @@
+// 记得大写开头，跟kotlin enum  保持一直
 export enum callDeno {
   openDWebView = "OpenDWebView",
   openScanner = "OpenScanner",
@@ -7,7 +8,7 @@ export enum callDeno {
 }
 
 export enum callDVebView {
-  openScanner = "dweb-scanner",
-  openDWebView = "dweb-view",
+  OpenScanner = "dweb-scanner",
+  OpenDWebView = "dweb-view",
 }
 // const callDeno

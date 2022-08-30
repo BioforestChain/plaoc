@@ -1,3 +1,5 @@
+import { Color } from "../../typings/types/color.type";
+
 // 将RGB 和 Alpha 转化为 ARGB color int
 export function getColorInt(
   color: Color.RGBHex,
@@ -20,7 +22,7 @@ export function getColorHex(color: number): Color.RGBAHex {
 }
 
 // 将rgba(r, b, g, a)或#rrbbggaa或#rgba转为#rrbbggaa 十六进制
-export function convertToRGBAHex(color: string): Color.RGBAHex {
+export function convertToRGBAHex(color: string):Color.RGBAHex {
   let colorHex = "#";
 
   if (color.startsWith("rgba(")) {
@@ -38,18 +40,24 @@ export function convertToRGBAHex(color: string): Color.RGBAHex {
 
       colorHex += itemHex;
     }
-  } else if (color.startsWith("#")) {
-    if (color.length === 5) {
-      colorHex =
+  }
+  if (color.startsWith("#")) {
+    if (color.length === 9) {
+      colorHex = color;
+    } else {
+      // 如果是 #f71 这种格式的话,转换为5字符格式
+      if (color.length === 4) {
+         colorHex =
         color.slice(0, 1) +
         color.slice(1, 2).repeat(2) +
         color.slice(2, 3).repeat(2) +
         color.slice(3, 4).repeat(2) +
-        color.slice(4, 5).repeat(2);
-    } else if (color.length === 9) {
-      colorHex = color;
+           color.slice(4, 5).repeat(2);
+        color = colorHex;
+      }
+      // 填充成9字符格式，不然android无法渲染
+      colorHex = color.padEnd(9,"F");
     }
   }
-
-  return (colorHex.length === 9 ? colorHex : color) as Color.RGBAHex;
+  return colorHex as Color.RGBAHex;
 }

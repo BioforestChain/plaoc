@@ -4670,9 +4670,6 @@ function normalizeContainer(container) {
   }
   return container;
 }
-const style = "";
-const _imports_0 = "/vite.svg";
-const _imports_1 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAZAAAAGQCAIAAAAP3aGbAAAHxklEQVR4nO3d0Y0jRxAFQVJY/10+mbCNQ6tUORNhADlLLhP989DfP3/+fAAK/vm/HwDglGABGYIFZAgWkCFYQIZgARmCBWQIFpAhWECGYAEZggVkCBaQIVhAhmABGYIFZAgWkCFYQIZgARmCBWQIFpAhWECGYAEZggVk/Nx6oe/3e+ulik6udzz5iLZdE3nxmW/9h0x+RLf+fL+OWy/lhAVkCBaQIVhAhmABGYIFZAgWkCFYQIZgARmCBWQIFpAhWEDGtS3hiW1DuRMXV2CTe8OFu8Vbj/3gXd7LfyAnnLCADMECMgQLyBAsIEOwgAzBAjIEC8gQLCBDsIAMwQIyBAvIGN0SnpicJi2cbm3bCQ5funfrsR98n+DLfyBOWECGYAEZggVkCBaQIVhAhmABGYIFZAgWkCFYQIZgARmCBWSs2xI+2K0V2LbB3cXF2eRMcuFOkF85YQEZggVkCBaQIVhAhmABGYIFZAgWkCFYQIZgARmCBWQIFpBhSzhn2y1v2+5APHypl1/M93JOWECGYAEZggVkCBaQIVhAhmABGYIFZAgWkCFYQIZgARmCBWSs2xJab/1q24V6h89z65ud3BsOTylPvPwH4oQFZAgWkCFYQIZgARmCBWQIFpAhWECGYAEZggVkCBaQIVhAxuiWcNsIbtjkMG3yzsGLX2vxI7ro5T+QE05YQIZgARmCBWQIFpAhWECGYAEZggVkCBaQIVhAhmABGYIFZAgWkPF9+b2MRbcmspMD6YUe/Kc9mBMWkCFYQIZgARmCBWQIFpAhWECGYAEZggVkCBaQIVhAhmABGeu2hAtv9zyx7ZEW7gQnJ5C3FJ/5M/vNDv8XOWEBGYIFZAgWkCFYQIZgARmCBWQIFpAhWECGYAEZggVkCBaQ8XPrhaKrq19dfJ7J9dbCS/e2jde2Xe94+FIv54QFZAgWkCFYQIZgARmCBWQIFpAhWECGYAEZggVkCBaQIVhAxrUtYXEGte0ywUOTj31xk7jtsrxJD55tDnPCAjIEC8gQLCBDsIAMwQIyBAvIECwgQ7CADMECMgQLyBAsIOPalvDE5E1wt+ZUF4dy2xSf+TO7y7t1BeShWyvRyY9oeCbphAVkCBaQIVhAhmABGYIFZAgWkCFYQIZgARmCBWQIFpAhWEDGd/IKs23vFR3TPVjxWxt+5uIFoBc5YQEZggVkCBaQIVhAhmABGYIFZAgWkCFYQIZgARmCBWQIFpDx2HsJh69vmxy4vXyS+eB7CbeZ/MEecsICMgQLyBAsIEOwgAzBAjIEC8gQLCBDsIAMwQIyBAvIECwg49qWcNvobHJwd/h2Tx2dLZxk3nqkB3+t0cd2wgIyBAvIECwgQ7CADMECMgQLyBAsIEOwgAzBAjIEC8gQLCBDsICM0YtUT2ybm05e23koeh9t8bGHx9jb/rEXDqSdsIAMwQIyBAvIECwgQ7CADMECMgQLyBAsIEOwgAzBAjIEC8j4btvKbVucXbTtoz5x8SN6+Z9/YvL23+J7fZywgBDBAjIEC8gQLCBDsIAMwQIyBAvIECwgQ7CADMECMgQLyFh3L+GJyVXaxffatvA6sfDPL77OoeFd3q/cSwjw9wQLyBAsIEOwgAzBAjIEC8gQLCBDsIAMwQIyBAvIECwg49q9hNuWWcOjvG0Lr4XXMp54+X/jtse+xb2EwBsJFpAhWECGYAEZggVkCBaQIVhAhmABGYIFZAgWkCFYQMa1LeHRmwVvlFu4Atv2OsO27Q1vvdfFt3swJywgQ7CADMECMgQLyBAsIEOwgAzBAjIEC8gQLCBDsIAMwQIy1t1LeEt0BLdtAxjdG554+Z92YtsloR8nLCBEsIAMwQIyBAvIECwgQ7CADMECMgQLyBAsIEOwgAzBAjJ+br3QtivVtj3Px07wkm3f7PDzTH4jC/9DnLCADMECMgQLyBAsIEOwgAzBAjIEC8gQLCBDsIAMwQIyBAvIuLYlXDg6m3Syulq4zHqzyY/68L1efnHnCScsIEOwgAzBAjIEC8gQLCBDsIAMwQIyBAvIECwgQ7CADMECMgQLyLg2fj6x7QrMExc3otsuUr31PAtt+6gXfowLH+mEExaQIVhAhmABGYIFZAgWkCFYQIZgARmCBWQIFpAhWECGYAEZo1vCE5P3O0bnVLdGcJOvc6i43Vt4I+mDp5ROWECGYAEZggVkCBaQIVhAhmABGYIFZAgWkCFYQIZgARmCBWSs2xI+WHS9NWnyI5o0PLdcuBK9xQkLyBAsIEOwgAzBAjIEC8gQLCBDsIAMwQIyBAvIECwgQ7CADFvCOZM7wYWDu20zyYVjuuKlnMMfoxMWkCFYQIZgARmCBWQIFpAhWECGYAEZggVkCBaQIVhAhmABGeu2hAuvQrtl23pr4d5w29WNCz/qyR/IwrmlExaQIVhAhmABGYIFZAgWkCFYQIZgARmCBWQIFpAhWECGYAEZ38mB24Nt2wneMjyC27YTvOXiVzb5H7LtKsmPExYQIlhAhmABGYIFZAgWkCFYQIZgARmCBWQIFpAhWECGYAEZ17aEAP81JywgQ7CADMECMgQLyBAsIEOwgAzBAjIEC8gQLCBDsIAMwQIyBAvIECwgQ7CADMECMgQLyBAsIEOwgAzBAjIEC8gQLCBDsIAMwQIyBAvI+BeyQ0kpu4nt7AAAAABJRU5ErkJggg==";
 class DwebPlugin extends HTMLElement {
   constructor() {
     super();
@@ -4767,94 +4764,106 @@ const loop = (delay) => new Promise((resolve2) => setTimeout(resolve2, delay));
 customElements.define("dweb-messager", DWebMessager);
 customElements.define("dweb-view", DWebView);
 customElements.define("dweb-scanner", OpenScanner);
-const virtual_keyboard = "";
-class BfcsKeyboard extends DwebPlugin {
+class VirtualKeyboardFFI {
   constructor() {
-    super();
-    this._ffi = virtual_keyboard;
-    this.setAttribute("hidden", "");
+    this._ffi = window.virtual_keyboard;
   }
-  connectedCallback() {
-    var _a;
-    if (this.hasAttribute("for") && ((_a = this.getAttribute("for")) == null ? void 0 : _a.length)) {
-      this.$element = document.querySelector("#" + this.getAttribute("for"));
-      this.$element.dispatchEvent(new CustomEvent("focus"));
-      this.$element.dispatchEvent(new CustomEvent("blur"));
-      this.$element.addEventListener("focus", () => {
-        this.removeAttribute("hidden");
-      });
-      this.$element.addEventListener("blur", () => {
-        this.setAttribute("hidden", "");
-      });
-    }
-  }
-  disconnectedCallback() {
-    this.$element.removeEventListener("focus", () => {
-    });
-    this.$element.removeEventListener("blur", () => {
-    });
-  }
-  getSafeArea() {
+  getKeyboardSafeArea() {
     return new Promise((resolve2, reject) => {
       const safeArea = JSON.parse(this._ffi.getSafeArea());
       resolve2(safeArea);
     });
   }
-  getHeight() {
+  getKeyboardHeight() {
     return new Promise((resolve2, reject) => {
       const height = this._ffi.getHeight();
       resolve2(height);
     });
   }
-  getOverlay() {
+  getKeyboardOverlay() {
     return new Promise((resolve2, reject) => {
       const overlay = this._ffi.getOverlay();
       resolve2(overlay);
     });
   }
-  toggleOverlay() {
+  toggleKeyboardOverlay() {
     return new Promise((resolve2, reject) => {
       this._ffi.toggleOverlay(0);
       resolve2();
     });
   }
-  show() {
+  async setKeyboardOverlay() {
+    const overlay = await this.getKeyboardOverlay();
+    if (!overlay) {
+      await this.toggleKeyboardOverlay();
+    }
+    return;
+  }
+  showKeyboard() {
     return new Promise((resolve2, reject) => {
-      this._ffi.show();
+      setTimeout(() => {
+        this._ffi.show();
+      }, 500);
       resolve2();
     });
   }
-  syncShow() {
-  }
-  hide() {
+  hideKeyboard() {
     return new Promise((resolve2, reject) => {
       this._ffi.hide();
       resolve2();
     });
   }
-  syncHide() {
+}
+class BfcsKeyboard extends DwebPlugin {
+  constructor() {
+    super();
+    this._ffi = new VirtualKeyboardFFI();
+    this._init();
+  }
+  connectedCallback() {
+  }
+  disconnectedCallback() {
+  }
+  async _init() {
+    this.setAttribute("hidden", "");
+  }
+  async getKeyboardSafeArea() {
+    const safeArea = await this._ffi.getKeyboardSafeArea();
+    return safeArea;
+  }
+  async getKeyboardHeight() {
+    const height = await this._ffi.getKeyboardHeight();
+    return height;
+  }
+  async getKeyboardOverlay() {
+    const overlay = await this._ffi.getKeyboardOverlay();
+    return overlay;
+  }
+  async toggleKeyboardOverlay() {
+    await this._ffi.toggleKeyboardOverlay();
+    return;
+  }
+  async showKeyboard() {
+    this.removeAttribute("hidden");
+    await this._ffi.showKeyboard();
+    return;
+  }
+  async hideKeyboard() {
+    this.setAttribute("hidden", "");
+    await this._ffi.hideKeyboard();
+    return;
   }
   static get observedAttributes() {
     return ["overlay", "hidden"];
   }
   attributeChangedCallback(attrName, oldVal, newVal) {
-    if (attrName === "overlay") {
+    if (attrName === "overlay" && oldVal !== newVal) {
       if (this.hasAttribute(attrName)) {
-        this._ffi.toggleOverlay(1);
+        this._ffi.setKeyboardOverlay();
       }
-    } else if (attrName === "hidden") {
+    } else if (attrName === "hidden" && oldVal !== newVal) {
       if (this.hasAttribute(attrName)) {
-        if (this.hasAttribute("sync")) {
-          this.syncHide();
-        } else {
-          this.hide();
-        }
-      } else {
-        if (this.hasAttribute("sync")) {
-          this.syncShow();
-        } else {
-          this.show();
-        }
+        this.hideKeyboard();
       }
     }
   }
@@ -4884,14 +4893,19 @@ function convertToRGBAHex(color) {
       }
       colorHex += itemHex;
     }
-  } else if (color.startsWith("#")) {
-    if (color.length === 5) {
-      colorHex = color.slice(0, 1) + color.slice(1, 2).repeat(2) + color.slice(2, 3).repeat(2) + color.slice(3, 4).repeat(2) + color.slice(4, 5).repeat(2);
-    } else if (color.length === 9) {
+  }
+  if (color.startsWith("#")) {
+    if (color.length === 9) {
       colorHex = color;
+    } else {
+      if (color.length === 4) {
+        colorHex = color.slice(0, 1) + color.slice(1, 2).repeat(2) + color.slice(2, 3).repeat(2) + color.slice(3, 4).repeat(2) + color.slice(4, 5).repeat(2);
+        color = colorHex;
+      }
+      colorHex = color.padEnd(9, "F");
     }
   }
-  return colorHex.length === 9 ? colorHex : color;
+  return colorHex;
 }
 class BottomBarFFI {
   constructor() {
@@ -5038,7 +5052,7 @@ class BfcsBottomBar extends DwebPlugin {
       attributeFilter: [
         "disabled",
         "selected",
-        "selectable",
+        "diSelectable",
         "label",
         "type",
         "description",
@@ -5046,7 +5060,8 @@ class BfcsBottomBar extends DwebPlugin {
         "source",
         "color",
         "selected-color",
-        "indicator-color"
+        "indicator-color",
+        "height"
       ]
     });
     this._init();
@@ -5056,8 +5071,11 @@ class BfcsBottomBar extends DwebPlugin {
   }
   async _init() {
     const height = await this.getHeight();
+    console.log("bottom_bar:", height);
     if (height) {
       this.setAttribute("height", `${height}`);
+    } else {
+      await this.collectActions();
     }
   }
   async toggleEnabled() {
@@ -5116,6 +5134,7 @@ class BfcsBottomBar extends DwebPlugin {
     this.querySelectorAll("dweb-bottom-bar-button").forEach((childNode) => {
       var _a, _b, _c;
       let icon = {
+        un_source: "",
         source: "",
         type: "NamedIcon"
       };
@@ -5123,28 +5142,31 @@ class BfcsBottomBar extends DwebPlugin {
       let label = "";
       if (childNode.querySelector("dweb-bottom-bar-icon")) {
         let $ = childNode.querySelector("dweb-bottom-bar-icon");
-        icon.source = (_a = $ == null ? void 0 : $.getAttribute("source")) != null ? _a : "";
-        icon.type = ($ == null ? void 0 : $.hasAttribute("type")) ? $.getAttribute("type") : "NamedIcon";
-        icon.description = (_b = $ == null ? void 0 : $.getAttribute("description")) != null ? _b : "";
-        icon.size = ($ == null ? void 0 : $.hasAttribute("size")) ? $.getAttribute("size") : void 0;
-        if ($ == null ? void 0 : $.hasAttribute("color")) {
-          colors.iconColor = convertToRGBAHex($ == null ? void 0 : $.getAttribute("color"));
+        icon.un_source = (_a = $.getAttribute("un-source")) != null ? _a : "";
+        icon.source = (_b = $.getAttribute("source")) != null ? _b : "";
+        icon.type = $.hasAttribute("type") ? $.getAttribute("type") : "NamedIcon";
+        icon.description = (_c = $.getAttribute("description")) != null ? _c : "";
+        icon.size = $.hasAttribute("size") ? $.getAttribute("size") : void 0;
+        if ($.hasAttribute("color")) {
+          colors.iconColor = convertToRGBAHex($.getAttribute("color"));
         }
-        if ($ == null ? void 0 : $.hasAttribute("selected-color")) {
+        if ($.hasAttribute("selected-color")) {
           colors.iconColorSelected = convertToRGBAHex(
-            $ == null ? void 0 : $.getAttribute("selected-color")
+            $.getAttribute("selected-color")
           );
         }
       }
       if (childNode.querySelector("dweb-bottom-bar-text")) {
         let $ = childNode.querySelector("dweb-bottom-bar-text");
-        label = (_c = $ == null ? void 0 : $.textContent) != null ? _c : "";
-        if ($ == null ? void 0 : $.hasAttribute("color")) {
+        if ($.hasAttribute("value")) {
+          label = $.getAttribute("value");
+        }
+        if ($.hasAttribute("color")) {
           colors.textColor = convertToRGBAHex($ == null ? void 0 : $.getAttribute("color"));
         }
-        if ($ == null ? void 0 : $.hasAttribute("selected-color")) {
+        if ($.hasAttribute("selected-color")) {
           colors.textColorSelected = convertToRGBAHex(
-            $ == null ? void 0 : $.getAttribute("selected-color")
+            $.getAttribute("selected-color")
           );
         }
       }
@@ -5152,7 +5174,7 @@ class BfcsBottomBar extends DwebPlugin {
       const onClickCode = `document.querySelector('dweb-bottom-bar-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
       const disabled = childNode.hasAttribute("disabled") ? true : false;
       const selected = childNode.hasAttribute("selected") ? true : false;
-      const selectable = childNode.hasAttribute("selectable") ? true : false;
+      const diSelectable = childNode.hasAttribute("diSelectable") ? false : true;
       if (childNode.hasAttribute("indicator-color")) {
         colors.indicatorColor = convertToRGBAHex(
           childNode.getAttribute("indicator-color")
@@ -5163,9 +5185,9 @@ class BfcsBottomBar extends DwebPlugin {
         onClickCode,
         disabled,
         label,
-        selectable,
+        selectable: diSelectable,
         selected,
-        colors: JSON.stringify(colors) === "{}" ? void 0 : colors
+        colors: Object.keys(colors).length === 0 ? void 0 : colors
       });
     });
     await this.setActions();
@@ -5241,7 +5263,7 @@ class BfcsBottomBarIcon extends DwebPlugin {
     super();
   }
   static get observedAttributes() {
-    return ["type", "description", "size", "source", "color", "selected-color"];
+    return ["type", "description", "size", "source", "un-source", "color", "selected-color"];
   }
 }
 class BfcsBottomBarText extends DwebPlugin {
@@ -5249,7 +5271,7 @@ class BfcsBottomBarText extends DwebPlugin {
     super();
   }
   static get observedAttributes() {
-    return ["color", "selected-color"];
+    return ["value", "color", "selected-color"];
   }
 }
 customElements.define("dweb-bottom-bar", BfcsBottomBar);
@@ -5925,7 +5947,7 @@ class TopBarFFI {
     });
   }
 }
-class BfcsTopBar extends HTMLElement {
+class BfcsTopBar extends DwebPlugin {
   constructor() {
     super();
     this._actionList = [];
@@ -5939,7 +5961,7 @@ class BfcsTopBar extends HTMLElement {
       subtree: true,
       childList: true,
       attributes: true,
-      attributeFilter: ["disabled", "type", "description", "size", "source"]
+      attributeFilter: ["disabled", "type", "description", "size", "source", "height"]
     });
     this._init();
   }
@@ -6090,62 +6112,49 @@ class BfcsTopBarButton extends DwebPlugin {
 }
 customElements.define("dweb-top-bar", BfcsTopBar);
 customElements.define("dweb-top-bar-button", BfcsTopBarButton);
+const style = "";
+const _imports_0 = "/vite.svg";
+const _imports_1 = "data:image/png;base64,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";
 const _hoisted_1$1 = { class: "card" };
-const _hoisted_2 = { class: "card" };
-const _hoisted_3 = /* @__PURE__ */ createStaticVNode('<div style="margin-top:50px;" data-v-9227e2da><input id="toastMessage" type="text" placeholder="Toast message" data-v-9227e2da></div><p data-v-9227e2da> Check out <a href="https://vuejs.org/guide/quick-start.html#local" target="_blank" data-v-9227e2da>create-vue</a>, the official Vue + Vite starter </p><p data-v-9227e2da> Install <a href="https://github.com/johnsoncodehk/volar" target="_blank" data-v-9227e2da>Volar</a> in your IDE for a better DX </p><p class="read-the-docs" data-v-9227e2da>Click on the Vite and Vue logos to learn more</p>', 4);
+const _hoisted_2 = /* @__PURE__ */ createStaticVNode('<div style="margin-top:50px;" data-v-e8b9485e><input id="toastMessage" type="text" placeholder="Toast message" data-v-e8b9485e></div><p data-v-e8b9485e> Check out <a href="https://vuejs.org/guide/quick-start.html#local" target="_blank" data-v-e8b9485e>create-vue</a>, the official Vue + Vite starter </p><p data-v-e8b9485e> Install <a href="https://github.com/johnsoncodehk/volar" target="_blank" data-v-e8b9485e>Volar</a> in your IDE for a better DX </p><p class="read-the-docs" data-v-e8b9485e>Click on the Vite and Vue logos to learn more</p>', 4);
 const _sfc_main$1 = /* @__PURE__ */ defineComponent({
   __name: "HelloWorld",
   props: {
     msg: null
   },
   setup(__props) {
-    let scannerData = ref("\u626B\u7801\u8FD4\u56DE\u7684\u6570\u636E");
     let dwebPluginData = ref("dweb\u7684\u6570\u636E");
     onMounted(async () => {
       console.log("document.querySelector('dweb-status-bar')!=>", document.querySelector("dweb-status-bar"));
     });
-    async function openScanner() {
-      const scanner = document.querySelector("dweb-scanner");
-      const iter = await scanner.openScanner();
-      console.log("scannerData.value = await scanner.openScanner() -->", JSON.stringify(iter));
-      scannerData.value = iter;
-    }
     async function onDwebPlugin() {
-      document.querySelector("dweb-messager");
+      const dwebPlugin = document.querySelector("dweb-messager");
+      console.log("dwebPlugin:", dwebPlugin);
     }
     return (_ctx, _cache) => {
-      const _component_dweb_messager = resolveComponent("dweb-messager");
-      const _component_dweb_scanner = resolveComponent("dweb-scanner");
       const _component_dweb_status_bar = resolveComponent("dweb-status-bar");
+      const _component_dweb_messager = resolveComponent("dweb-messager");
       return openBlock(), createElementBlock(Fragment, null, [
-        createVNode(_component_dweb_messager, { id: "dweb" }),
-        createVNode(_component_dweb_scanner, { channelId: "helloWorld" }),
         createVNode(_component_dweb_status_bar, {
           id: "status_bar",
-          "background-color": "#f00f",
+          "background-color": "#EADDFF",
           "bar-style": "dark-content"
         }),
+        createVNode(_component_dweb_messager, { id: "dweb" }),
         createBaseVNode("h1", null, toDisplayString(__props.msg), 1),
         createBaseVNode("div", _hoisted_1$1, [
-          createBaseVNode("button", {
-            type: "button",
-            onClick: openScanner
-          }, "\u542F\u52A8\u626B\u7801"),
-          createBaseVNode("p", null, toDisplayString(unref(scannerData)), 1)
-        ]),
-        createBaseVNode("div", _hoisted_2, [
           createBaseVNode("button", {
             type: "button",
             onClick: onDwebPlugin
           }, "webMessage\u6D88\u606F"),
           createBaseVNode("p", null, toDisplayString(unref(dwebPluginData)), 1)
         ]),
-        _hoisted_3
+        _hoisted_2
       ], 64);
     };
   }
 });
-const HelloWorld_vue_vue_type_style_index_0_scoped_9227e2da_lang = "";
+const HelloWorld_vue_vue_type_style_index_0_scoped_e8b9485e_lang = "";
 const _export_sfc = (sfc, props) => {
   const target = sfc.__vccOpts || sfc;
   for (const [key, val] of props) {
@@ -6153,19 +6162,115 @@ const _export_sfc = (sfc, props) => {
   }
   return target;
 };
-const HelloWorld = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["__scopeId", "data-v-9227e2da"]]);
-const _hoisted_1 = /* @__PURE__ */ createStaticVNode('<div data-v-e2cfde70><a href="https://vitejs.dev" target="_blank" data-v-e2cfde70><img src="' + _imports_0 + '" class="logo" alt="Vite logo" data-v-e2cfde70></a><a href="https://vuejs.org/" target="_blank" data-v-e2cfde70><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-e2cfde70></a><a href="https://vuejs.org/" target="_blank" data-v-e2cfde70><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-e2cfde70></a><a href="https://vuejs.org/" target="_blank" data-v-e2cfde70><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-e2cfde70></a></div>', 1);
+const HelloWorld = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["__scopeId", "data-v-e8b9485e"]]);
+const _hoisted_1 = /* @__PURE__ */ createStaticVNode('<div data-v-f6aa93d9><a href="https://vitejs.dev" target="_blank" data-v-f6aa93d9><img src="' + _imports_0 + '" class="logo" alt="Vite logo" data-v-f6aa93d9></a><a href="https://vuejs.org/" target="_blank" data-v-f6aa93d9><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-f6aa93d9></a><a href="https://vuejs.org/" target="_blank" data-v-f6aa93d9><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-f6aa93d9></a><a href="https://vuejs.org/" target="_blank" data-v-f6aa93d9><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-f6aa93d9></a></div>', 1);
 const _sfc_main = /* @__PURE__ */ defineComponent({
   __name: "App",
   setup(__props) {
+    let scannerData = ref("DwebView-js \u267B\uFE0F Deno-js");
+    async function openScanner() {
+      const scanner = document.querySelector("dweb-scanner");
+      const iter = await scanner.openScanner();
+      console.log("scannerData.value = await scanner.openScanner() -->", JSON.stringify(iter));
+      scannerData.value = iter;
+    }
     return (_ctx, _cache) => {
+      const _component_dweb_icon = resolveComponent("dweb-icon");
+      const _component_dweb_top_bar_button = resolveComponent("dweb-top-bar-button");
+      const _component_dweb_top_bar = resolveComponent("dweb-top-bar");
+      const _component_dweb_bottom_bar_icon = resolveComponent("dweb-bottom-bar-icon");
+      const _component_dweb_bottom_bar_text = resolveComponent("dweb-bottom-bar-text");
+      const _component_dweb_bottom_bar_button = resolveComponent("dweb-bottom-bar-button");
+      const _component_dweb_bottom_bar = resolveComponent("dweb-bottom-bar");
+      const _component_dweb_scanner = resolveComponent("dweb-scanner");
       return openBlock(), createElementBlock(Fragment, null, [
+        createVNode(_component_dweb_top_bar, {
+          id: "topbar",
+          title: "Ar \u626B\u96F7",
+          "background-color": "#CCC2DC"
+        }, {
+          default: withCtx(() => [
+            createVNode(_component_dweb_top_bar_button, { id: "aaa" }, {
+              default: withCtx(() => [
+                createVNode(_component_dweb_icon, { source: "Filled.AddCircle" })
+              ]),
+              _: 1
+            }),
+            createVNode(_component_dweb_top_bar_button, { id: "ccc" }, {
+              default: withCtx(() => [
+                createVNode(_component_dweb_icon, {
+                  source: "https://objectjson.waterbang.top/test-vue3/vite.svg",
+                  type: "AssetIcon"
+                })
+              ]),
+              _: 1
+            })
+          ]),
+          _: 1
+        }),
         _hoisted_1,
-        createVNode(HelloWorld, { msg: "DwebView-js \u267B\uFE0F Deno-js" })
+        createVNode(HelloWorld, { msg: unref(scannerData) }, null, 8, ["msg"]),
+        createVNode(_component_dweb_bottom_bar, {
+          id: "bottom_bar",
+          "background-color": "#D0BCFF",
+          "indicator-color": "#f3bf44"
+        }, {
+          default: withCtx(() => [
+            createVNode(_component_dweb_bottom_bar_button, {
+              id: "ddd",
+              selected: ""
+            }, {
+              default: withCtx(() => [
+                createVNode(_component_dweb_bottom_bar_icon, {
+                  source: "https://objectjson.waterbang.top/test-vue3/land.svg",
+                  "un-source": "https://objectjson.waterbang.top/test-vue3/land-not.svg",
+                  type: "AssetIcon"
+                }),
+                createVNode(_component_dweb_bottom_bar_text, {
+                  color: "#FFD8E4",
+                  "selected-color": "#B3261E",
+                  value: "\u571F\u5730"
+                })
+              ]),
+              _: 1
+            }),
+            createVNode(_component_dweb_bottom_bar_button, {
+              id: "eee",
+              onClick: openScanner,
+              diSelectable: ""
+            }, {
+              default: withCtx(() => [
+                createVNode(_component_dweb_bottom_bar_icon, {
+                  source: "https://objectjson.waterbang.top/test-vue3/scanner.svg",
+                  type: "AssetIcon"
+                }),
+                createVNode(_component_dweb_bottom_bar_text, { value: "\u626B\u7801" })
+              ]),
+              _: 1
+            }),
+            createVNode(_component_dweb_bottom_bar_button, { id: "fff" }, {
+              default: withCtx(() => [
+                createVNode(_component_dweb_bottom_bar_icon, {
+                  source: "https://objectjson.waterbang.top/test-vue3/home.svg",
+                  "un-source": "https://objectjson.waterbang.top/test-vue3/home-not.svg",
+                  type: "AssetIcon"
+                }),
+                createVNode(_component_dweb_bottom_bar_text, {
+                  color: "#FFD8E4",
+                  "selected-color": "#B3261E",
+                  value: "\u4E2A\u4EBA\u7A7A\u95F4"
+                })
+              ]),
+              _: 1
+            })
+          ]),
+          _: 1
+        }),
+        createVNode(_component_dweb_scanner, { channelId: "helloWorld" })
       ], 64);
     };
   }
 });
-const App_vue_vue_type_style_index_0_scoped_e2cfde70_lang = "";
-const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["__scopeId", "data-v-e2cfde70"]]);
+const App_vue_vue_type_style_index_0_scoped_f6aa93d9_lang = "";
+const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["__scopeId", "data-v-f6aa93d9"]]);
 createApp(App).mount("#app");

@@ -5,8 +5,9 @@ import { TopBar } from "./bfcsTopBar.type";
 import "../typings";
 import { Icon } from "../icon/bfspIcon.type";
 import { Color } from "../typings/types/color.type";
+import { DwebPlugin } from "../native/dweb-plugin";
 
-export class BfcsTopBar extends HTMLElement {
+export class BfcsTopBar extends DwebPlugin {
   private _ffi: TopBar.ITopBarFFI;
   private _observer: MutationObserver;
   private _actionList: TopBar.TopBarItem[] = [];
@@ -16,7 +17,7 @@ export class BfcsTopBar extends HTMLElement {
 
     this._ffi = new TopBarFFI();
     this._observer = new MutationObserver(async (mutations) => {
-      await this.collectActions();
+       await this.collectActions();
     });
   }
 
@@ -25,7 +26,7 @@ export class BfcsTopBar extends HTMLElement {
       subtree: true,
       childList: true,
       attributes: true,
-      attributeFilter: ["disabled", "type", "description", "size", "source"],
+      attributeFilter: ["disabled", "type", "description", "size", "source","height"],
     });
 
     this._init();
@@ -48,61 +49,51 @@ export class BfcsTopBar extends HTMLElement {
 
   async back(): Promise<void> {
     await this._ffi.back();
-
     return;
   }
 
   async toggleEnabled(): Promise<void> {
     await this._ffi.toggleEnabled();
-
     return;
   }
 
   async getEnabled(): Promise<boolean> {
     const isEnabled = await this._ffi.getEnabled();
-
     return isEnabled;
   }
 
   async getTitle(): Promise<string> {
     const title = await this._ffi.getTitle();
-
     return title;
   }
 
   async setTitle(title: string): Promise<void> {
     await this._ffi.setTitle(title);
-
     return;
   }
 
   async hasTitle(): Promise<boolean> {
     const has = await this._ffi.hasTitle();
-
     return has;
   }
 
   async getOverlay(): Promise<boolean> {
     const overlay = await this._ffi.getOverlay();
-
     return overlay;
   }
 
   async toggleOverlay(): Promise<void> {
     await this._ffi.toggleOverlay();
-
     return;
   }
 
   async getHeight(): Promise<number> {
     const height = await this._ffi.getHeight();
-
     return height;
   }
 
   async getBackgroundColor(): Promise<Color.RGBAHex> {
     const color = await this._ffi.getBackgroundColor();
-
     return color;
   }
 
@@ -115,32 +106,27 @@ export class BfcsTopBar extends HTMLElement {
 
   async getForegroundColor(): Promise<Color.RGBAHex> {
     const color = await this._ffi.getForegroundColor();
-
     return color;
   }
 
   async setForegroundColor(color: string): Promise<void> {
     const colorHex = convertToRGBAHex(color);
     await this._ffi.setForegroundColor(colorHex);
-
     return;
   }
 
   async getActions(): Promise<TopBar.TopBarItem[]> {
     this._actionList = await this._ffi.getActions();
-
     return this._actionList;
   }
 
   async setActions(): Promise<void> {
     await this._ffi.setActions(this._actionList);
-
     return;
   }
 
   async collectActions() {
     this._actionList = [];
-
     this.querySelectorAll("dweb-top-bar-button").forEach((childNode) => {
       let icon: Icon.IPlaocIcon = {
         source: "",
@@ -157,7 +143,7 @@ export class BfcsTopBar extends HTMLElement {
           : ("NamedIcon" as Icon.IconType.NamedIcon);
         icon.description = $?.getAttribute("description") ?? "";
         icon.size = $?.hasAttribute("size")
-          ? (($.getAttribute("size") as unknown) as number)
+          ? ($.getAttribute("size") as unknown as number)
           : undefined;
       }
 

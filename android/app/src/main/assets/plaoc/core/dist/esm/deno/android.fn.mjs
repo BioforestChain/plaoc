@@ -7,8 +7,8 @@ var callDeno = /* @__PURE__ */ ((callDeno2) => {
   return callDeno2;
 })(callDeno || {});
 var callDVebView = /* @__PURE__ */ ((callDVebView2) => {
-  callDVebView2["openScanner"] = "dweb-scanner";
-  callDVebView2["openDWebView"] = "dweb-view";
+  callDVebView2["OpenScanner"] = "dweb-scanner";
+  callDVebView2["OpenDWebView"] = "dweb-view";
   return callDVebView2;
 })(callDVebView || {});
 export {

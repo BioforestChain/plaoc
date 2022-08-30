@@ -3,12 +3,17 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="../../../../../../../layout/compose-model-1661828625414.xml" value="1.0" />
+        <entry key="../../../../../../../layout/compose-model-1661828970715.xml" value="0.2101851851851852" />
+        <entry key="../../../../../../../layout/compose-model-1661829139808.xml" value="0.22" />
         <entry key="..\:/dev/AndroidStudioProjects/RustEample/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.1575" />
         <entry key="..\:/dev/AndroidStudioProjects/RustEample/app/src/main/res/layout/activity_main.xml" value="0.1125" />
         <entry key="app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.2785" />
         <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.2785" />
+        <entry key="app/src/main/res/drawable/ic_launcher_foreground.xml" value="0.1135" />
+        <entry key="app/src/main/res/drawable/vite_background.xml" value="0.1135" />
+        <entry key="app/src/main/res/drawable/vite_foreground.xml" value="0.1135" />
         <entry key="app/src/main/res/layout/activity_barcode_scanning.xml" value="0.2321504916631039" />
-        <entry key="app/src/main/res/layout/activity_main.rng" value="0.1" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.33" />
         <entry key="app/src/main/res/layout/barcode_result_dialog.xml" value="0.21333903377511756" />
         <entry key="app/src/main/res/layout/multiple_qrcode_scan_activity.xml" value="0.33" />
@@ -16,6 +21,10 @@
         <entry key="app/src/main/res/layout/result_dialog.xml" value="0.21333903377511756" />
         <entry key="app/src/main/res/layout/text_result_dialog.xml" value="0.21333903377511756" />
         <entry key="app/src/main/res/layout/webview.xml" value="0.2821718683197948" />
+        <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.1135" />
+        <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.1135" />
+        <entry key="app/src/main/res/mipmap-anydpi-v26/vite.xml" value="0.1135" />
+        <entry key="app/src/main/res/mipmap-anydpi-v26/vite_round.xml" value="0.1135" />
         <entry key="mlkit-barcode-scanning/src/main/res/drawable/ml_flashlight_selector.xml" value="0.1655" />
         <entry key="mlkit-barcode-scanning/src/main/res/layout/ml_qrcode_camera_scan.xml" value="0.25" />
         <entry key="mlkit-camera-core/src/main/res/layout/ml_camera_scan.xml" value="0.21333903377511756" />
@@ -27,12 +36,5 @@
   </component>
   <component name="ProjectType">
     <option name="id" value="Android" />
-  </component>
-  <component name="VisualizationToolProject">
-    <option name="state">
-      <ProjectState>
-        <option name="scale" value="0.1" />
-      </ProjectState>
-    </option>
   </component>
 </project>
