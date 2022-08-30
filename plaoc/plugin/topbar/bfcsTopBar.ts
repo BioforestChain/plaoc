@@ -17,25 +17,16 @@ export class BfcsTopBar extends DwebPlugin {
 
     this._ffi = new TopBarFFI();
     this._observer = new MutationObserver(async (mutations) => {
-      console.log("BfcsTopBar MutationObserver: =>");
-      await this.collectActions();
+       await this.collectActions();
     });
   }
 
   connectedCallback() {
-    console.log("BfcsTopBar connectedCallback:", this._observer);
     this._observer.observe(this, {
       subtree: true,
       childList: true,
       attributes: true,
-      attributeFilter: [
-        "disabled",
-        "type",
-        "description",
-        "size",
-        "source",
-        "height",
-      ],
+      attributeFilter: ["disabled", "type", "description", "size", "source","height"],
     });
 
     this._init();
@@ -58,61 +49,51 @@ export class BfcsTopBar extends DwebPlugin {
 
   async back(): Promise<void> {
     await this._ffi.back();
-
     return;
   }
 
   async toggleEnabled(): Promise<void> {
     await this._ffi.toggleEnabled();
-
     return;
   }
 
   async getEnabled(): Promise<boolean> {
     const isEnabled = await this._ffi.getEnabled();
-
     return isEnabled;
   }
 
   async getTitle(): Promise<string> {
     const title = await this._ffi.getTitle();
-
     return title;
   }
 
   async setTitle(title: string): Promise<void> {
     await this._ffi.setTitle(title);
-
     return;
   }
 
   async hasTitle(): Promise<boolean> {
     const has = await this._ffi.hasTitle();
-
     return has;
   }
 
   async getOverlay(): Promise<boolean> {
     const overlay = await this._ffi.getOverlay();
-
     return overlay;
   }
 
   async toggleOverlay(): Promise<void> {
     await this._ffi.toggleOverlay();
-
     return;
   }
 
   async getHeight(): Promise<number> {
     const height = await this._ffi.getHeight();
-
     return height;
   }
 
   async getBackgroundColor(): Promise<Color.RGBAHex> {
     const color = await this._ffi.getBackgroundColor();
-
     return color;
   }
 
@@ -125,35 +106,27 @@ export class BfcsTopBar extends DwebPlugin {
 
   async getForegroundColor(): Promise<Color.RGBAHex> {
     const color = await this._ffi.getForegroundColor();
-
     return color;
   }
 
   async setForegroundColor(color: string): Promise<void> {
     const colorHex = convertToRGBAHex(color);
     await this._ffi.setForegroundColor(colorHex);
-
     return;
   }
 
   async getActions(): Promise<TopBar.TopBarItem[]> {
     this._actionList = await this._ffi.getActions();
-
     return this._actionList;
   }
 
   async setActions(): Promise<void> {
     await this._ffi.setActions(this._actionList);
-
     return;
   }
 
   async collectActions() {
     this._actionList = [];
-    console.log(
-      "this.querySelectorAll:",
-      JSON.stringify(this.querySelectorAll("dweb-top-bar-button"))
-    );
     this.querySelectorAll("dweb-top-bar-button").forEach((childNode) => {
       let icon: Icon.IPlaocIcon = {
         source: "",
@@ -178,7 +151,6 @@ export class BfcsTopBar extends DwebPlugin {
       const onClickCode = `document.querySelector('dweb-top-bar-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
       const disabled = childNode.hasAttribute("disabled") ? true : false;
       this._actionList.push({ icon, onClickCode, disabled });
-      console.log("icon, disabled:", icon, disabled);
     });
 
     await this.setActions();

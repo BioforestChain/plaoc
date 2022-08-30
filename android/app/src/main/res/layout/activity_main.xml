@@ -9,7 +9,7 @@
     android:id="@+id/textView4"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:text="recommend"
+    android:text="bottom style"
     app:layout_constraintBottom_toTopOf="@+id/guideline10"
     app:layout_constraintEnd_toStartOf="@+id/guideline9"
     app:layout_constraintHorizontal_bias="0.59"
@@ -24,8 +24,7 @@
     android:contentDescription="@string/app_name"
     app:layout_constraintBottom_toTopOf="@+id/guideline6"
     app:layout_constraintEnd_toStartOf="@+id/guideline4"
-    app:layout_constraintHorizontal_bias="0.927"
-    app:layout_constraintStart_toStartOf="@+id/guideline3"
+    app:layout_constraintStart_toStartOf="@+id/guideline2"
     app:layout_constraintTop_toTopOf="@+id/guideline5"
     app:layout_constraintVertical_bias="0.8"
     tools:srcCompat="@tools:sample/avatars" />
@@ -88,6 +87,7 @@
     app:layout_constraintStart_toStartOf="@+id/guideline3"
     app:layout_constraintTop_toTopOf="@+id/guideline5"
     app:layout_constraintVertical_bias="0.8"
+    tools:src="@drawable/ic_launcher_foreground"
     tools:srcCompat="@tools:sample/avatars" />
 
   <androidx.constraintlayout.widget.Guideline
@@ -148,7 +148,7 @@
     android:id="@+id/textView3"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:text="recommend"
+    android:text="AR 扫雷"
     app:layout_constraintBottom_toTopOf="@+id/guideline10"
     app:layout_constraintEnd_toStartOf="@+id/guideline3"
     app:layout_constraintStart_toStartOf="@+id/guideline7"

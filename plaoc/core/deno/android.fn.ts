@@ -7,7 +7,7 @@ export enum callDeno {
 }
 
 export enum callDVebView {
-  openScanner = "dweb-scanner",
-  openDWebView = "dweb-view",
+  OpenScanner = "dweb-scanner",
+  OpenDWebView = "dweb-view",
 }
 // const callDeno

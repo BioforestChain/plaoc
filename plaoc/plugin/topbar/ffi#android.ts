@@ -101,7 +101,6 @@ export class TopBarFFI implements TopBar.ITopBarFFI {
 
   setActions(actionList: TopBar.TopBarItem[]): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      console.log("JSON.stringify(actionList):",JSON.stringify(actionList))
       this._ffi.setActions(JSON.stringify(actionList));
 
       resolve();

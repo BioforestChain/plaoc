@@ -4670,9 +4670,6 @@ function normalizeContainer(container) {
   }
   return container;
 }
-const style = "";
-const _imports_0 = "/vite.svg";
-const _imports_1 = "data:image/png;base64,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";
 class DwebPlugin extends HTMLElement {
   constructor() {
     super();
@@ -5050,7 +5047,7 @@ class BfcsBottomBar extends DwebPlugin {
       attributeFilter: [
         "disabled",
         "selected",
-        "selectable",
+        "diSelectable",
         "label",
         "type",
         "description",
@@ -5058,7 +5055,8 @@ class BfcsBottomBar extends DwebPlugin {
         "source",
         "color",
         "selected-color",
-        "indicator-color"
+        "indicator-color",
+        "height"
       ]
     });
     this._init();
@@ -5127,10 +5125,9 @@ class BfcsBottomBar extends DwebPlugin {
     return;
   }
   async collectActions() {
-    console.log("collectActions");
     this._actionList = [];
     this.querySelectorAll("dweb-bottom-bar-button").forEach((childNode) => {
-      var _a, _b, _c;
+      var _a, _b;
       let icon = {
         source: "",
         type: "NamedIcon"
@@ -5139,28 +5136,30 @@ class BfcsBottomBar extends DwebPlugin {
       let label = "";
       if (childNode.querySelector("dweb-bottom-bar-icon")) {
         let $ = childNode.querySelector("dweb-bottom-bar-icon");
-        icon.source = (_a = $ == null ? void 0 : $.getAttribute("source")) != null ? _a : "";
-        icon.type = ($ == null ? void 0 : $.hasAttribute("type")) ? $.getAttribute("type") : "NamedIcon";
-        icon.description = (_b = $ == null ? void 0 : $.getAttribute("description")) != null ? _b : "";
-        icon.size = ($ == null ? void 0 : $.hasAttribute("size")) ? $.getAttribute("size") : void 0;
-        if ($ == null ? void 0 : $.hasAttribute("color")) {
-          colors.iconColor = convertToRGBAHex($ == null ? void 0 : $.getAttribute("color"));
+        icon.source = (_a = $.getAttribute("source")) != null ? _a : "";
+        icon.type = $.hasAttribute("type") ? $.getAttribute("type") : "NamedIcon";
+        icon.description = (_b = $.getAttribute("description")) != null ? _b : "";
+        icon.size = $.hasAttribute("size") ? $.getAttribute("size") : void 0;
+        if ($.hasAttribute("color")) {
+          colors.iconColor = convertToRGBAHex($.getAttribute("color"));
         }
-        if ($ == null ? void 0 : $.hasAttribute("selected-color")) {
+        if ($.hasAttribute("selected-color")) {
           colors.iconColorSelected = convertToRGBAHex(
-            $ == null ? void 0 : $.getAttribute("selected-color")
+            $.getAttribute("selected-color")
           );
         }
       }
       if (childNode.querySelector("dweb-bottom-bar-text")) {
         let $ = childNode.querySelector("dweb-bottom-bar-text");
-        label = (_c = $ == null ? void 0 : $.textContent) != null ? _c : "";
-        if ($ == null ? void 0 : $.hasAttribute("color")) {
+        if ($.hasAttribute("value")) {
+          label = $.getAttribute("value");
+        }
+        if ($.hasAttribute("color")) {
           colors.textColor = convertToRGBAHex($ == null ? void 0 : $.getAttribute("color"));
         }
-        if ($ == null ? void 0 : $.hasAttribute("selected-color")) {
+        if ($.hasAttribute("selected-color")) {
           colors.textColorSelected = convertToRGBAHex(
-            $ == null ? void 0 : $.getAttribute("selected-color")
+            $.getAttribute("selected-color")
           );
         }
       }
@@ -5168,7 +5167,7 @@ class BfcsBottomBar extends DwebPlugin {
       const onClickCode = `document.querySelector('dweb-bottom-bar-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
       const disabled = childNode.hasAttribute("disabled") ? true : false;
       const selected = childNode.hasAttribute("selected") ? true : false;
-      const selectable = childNode.hasAttribute("selectable") ? true : false;
+      const diSelectable = childNode.hasAttribute("diSelectable") ? false : true;
       if (childNode.hasAttribute("indicator-color")) {
         colors.indicatorColor = convertToRGBAHex(
           childNode.getAttribute("indicator-color")
@@ -5179,7 +5178,7 @@ class BfcsBottomBar extends DwebPlugin {
         onClickCode,
         disabled,
         label,
-        selectable,
+        selectable: diSelectable,
         selected,
         colors: JSON.stringify(colors) === "{}" ? void 0 : colors
       });
@@ -5271,7 +5270,7 @@ class BfcsBottomBarText extends DwebPlugin {
     super();
   }
   static get observedAttributes() {
-    return ["color", "selected-color"];
+    return ["value", "color", "selected-color"];
   }
 }
 customElements.define("dweb-bottom-bar", BfcsBottomBar);
@@ -5908,7 +5907,6 @@ class TopBarFFI {
   }
   setActions(actionList) {
     return new Promise((resolve2, reject) => {
-      console.log("JSON.stringify(actionList):", JSON.stringify(actionList));
       this._ffi.setActions(JSON.stringify(actionList));
       resolve2();
     });
@@ -5954,24 +5952,15 @@ class BfcsTopBar extends DwebPlugin {
     this._actionList = [];
     this._ffi = new TopBarFFI();
     this._observer = new MutationObserver(async (mutations) => {
-      console.log("BfcsTopBar MutationObserver: =>");
       await this.collectActions();
     });
   }
   connectedCallback() {
-    console.log("BfcsTopBar connectedCallback:", this._observer);
     this._observer.observe(this, {
       subtree: true,
       childList: true,
       attributes: true,
-      attributeFilter: [
-        "disabled",
-        "type",
-        "description",
-        "size",
-        "source",
-        "height"
-      ]
+      attributeFilter: ["disabled", "type", "description", "size", "source", "height"]
     });
     this._init();
   }
@@ -6046,10 +6035,6 @@ class BfcsTopBar extends DwebPlugin {
   }
   async collectActions() {
     this._actionList = [];
-    console.log(
-      "this.querySelectorAll:",
-      JSON.stringify(this.querySelectorAll("dweb-top-bar-button"))
-    );
     this.querySelectorAll("dweb-top-bar-button").forEach((childNode) => {
       var _a, _b;
       let icon = {
@@ -6067,7 +6052,6 @@ class BfcsTopBar extends DwebPlugin {
       const onClickCode = `document.querySelector('dweb-top-bar-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
       const disabled = childNode.hasAttribute("disabled") ? true : false;
       this._actionList.push({ icon, onClickCode, disabled });
-      console.log("icon, disabled:", icon, disabled);
     });
     await this.setActions();
   }
@@ -6127,48 +6111,81 @@ class BfcsTopBarButton extends DwebPlugin {
 }
 customElements.define("dweb-top-bar", BfcsTopBar);
 customElements.define("dweb-top-bar-button", BfcsTopBarButton);
+const style = "";
+const _imports_0 = "/vite.svg";
+const _imports_1 = "data:image/png;base64,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";
 const _hoisted_1$1 = { class: "card" };
-const _hoisted_2$1 = { class: "card" };
-const _hoisted_3$1 = /* @__PURE__ */ createStaticVNode('<div style="margin-top:50px;" data-v-c74781b8><input id="toastMessage" type="text" placeholder="Toast message" data-v-c74781b8></div><p data-v-c74781b8> Check out <a href="https://vuejs.org/guide/quick-start.html#local" target="_blank" data-v-c74781b8>create-vue</a>, the official Vue + Vite starter </p><p data-v-c74781b8> Install <a href="https://github.com/johnsoncodehk/volar" target="_blank" data-v-c74781b8>Volar</a> in your IDE for a better DX </p><p class="read-the-docs" data-v-c74781b8>Click on the Vite and Vue logos to learn more</p>', 4);
+const _hoisted_2 = /* @__PURE__ */ createStaticVNode('<div style="margin-top:50px;" data-v-9e2fad53><input id="toastMessage" type="text" placeholder="Toast message" data-v-9e2fad53></div><p data-v-9e2fad53> Check out <a href="https://vuejs.org/guide/quick-start.html#local" target="_blank" data-v-9e2fad53>create-vue</a>, the official Vue + Vite starter </p><p data-v-9e2fad53> Install <a href="https://github.com/johnsoncodehk/volar" target="_blank" data-v-9e2fad53>Volar</a> in your IDE for a better DX </p><p class="read-the-docs" data-v-9e2fad53>Click on the Vite and Vue logos to learn more</p>', 4);
 const _sfc_main$1 = /* @__PURE__ */ defineComponent({
   __name: "HelloWorld",
   props: {
     msg: null
   },
   setup(__props) {
-    let scannerData = ref("\u626B\u7801\u8FD4\u56DE\u7684\u6570\u636E");
     let dwebPluginData = ref("dweb\u7684\u6570\u636E");
     onMounted(async () => {
       console.log("document.querySelector('dweb-status-bar')!=>", document.querySelector("dweb-status-bar"));
-      console.log("dweb-top-bar-button =>", document.getElementById("aaa"));
     });
-    async function openScanner() {
-      const scanner = document.querySelector("dweb-scanner");
-      const iter = await scanner.openScanner();
-      console.log("scannerData.value = await scanner.openScanner() -->", JSON.stringify(iter));
-      scannerData.value = iter;
-    }
     async function onDwebPlugin() {
       const dwebPlugin = document.querySelector("dweb-messager");
       console.log("dwebPlugin:", dwebPlugin);
-      console.log("_ffixxx:", JSON.stringify(Object.keys(window.bottom_bar)));
     }
     return (_ctx, _cache) => {
       const _component_dweb_status_bar = resolveComponent("dweb-status-bar");
-      const _component_dweb_icon = resolveComponent("dweb-icon");
-      const _component_dweb_top_bar_button = resolveComponent("dweb-top-bar-button");
-      const _component_dweb_top_bar = resolveComponent("dweb-top-bar");
       const _component_dweb_messager = resolveComponent("dweb-messager");
-      const _component_dweb_scanner = resolveComponent("dweb-scanner");
       return openBlock(), createElementBlock(Fragment, null, [
         createVNode(_component_dweb_status_bar, {
           id: "status_bar",
           "background-color": "#f71",
           "bar-style": "dark-content"
         }),
+        createVNode(_component_dweb_messager, { id: "dweb" }),
+        createBaseVNode("h1", null, toDisplayString(__props.msg), 1),
+        createBaseVNode("div", _hoisted_1$1, [
+          createBaseVNode("button", {
+            type: "button",
+            onClick: onDwebPlugin
+          }, "webMessage\u6D88\u606F"),
+          createBaseVNode("p", null, toDisplayString(unref(dwebPluginData)), 1)
+        ]),
+        _hoisted_2
+      ], 64);
+    };
+  }
+});
+const HelloWorld_vue_vue_type_style_index_0_scoped_9e2fad53_lang = "";
+const _export_sfc = (sfc, props) => {
+  const target = sfc.__vccOpts || sfc;
+  for (const [key, val] of props) {
+    target[key] = val;
+  }
+  return target;
+};
+const HelloWorld = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["__scopeId", "data-v-9e2fad53"]]);
+const _hoisted_1 = /* @__PURE__ */ createStaticVNode('<div data-v-ea920930><a href="https://vitejs.dev" target="_blank" data-v-ea920930><img src="' + _imports_0 + '" class="logo" alt="Vite logo" data-v-ea920930></a><a href="https://vuejs.org/" target="_blank" data-v-ea920930><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-ea920930></a><a href="https://vuejs.org/" target="_blank" data-v-ea920930><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-ea920930></a><a href="https://vuejs.org/" target="_blank" data-v-ea920930><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-ea920930></a></div>', 1);
+const _sfc_main = /* @__PURE__ */ defineComponent({
+  __name: "App",
+  setup(__props) {
+    let scannerData = ref("DwebView-js \u267B\uFE0F Deno-js");
+    async function openScanner() {
+      const scanner = document.querySelector("dweb-scanner");
+      const iter = await scanner.openScanner();
+      console.log("scannerData.value = await scanner.openScanner() -->", JSON.stringify(iter));
+      scannerData.value = iter;
+    }
+    return (_ctx, _cache) => {
+      const _component_dweb_icon = resolveComponent("dweb-icon");
+      const _component_dweb_top_bar_button = resolveComponent("dweb-top-bar-button");
+      const _component_dweb_top_bar = resolveComponent("dweb-top-bar");
+      const _component_dweb_bottom_bar_icon = resolveComponent("dweb-bottom-bar-icon");
+      const _component_dweb_bottom_bar_text = resolveComponent("dweb-bottom-bar-text");
+      const _component_dweb_bottom_bar_button = resolveComponent("dweb-bottom-bar-button");
+      const _component_dweb_bottom_bar = resolveComponent("dweb-bottom-bar");
+      const _component_dweb_scanner = resolveComponent("dweb-scanner");
+      return openBlock(), createElementBlock(Fragment, null, [
         createVNode(_component_dweb_top_bar, {
           id: "topbar",
-          title: "test",
+          title: "Ar \u626B\u96F7",
           "background-color": "rgba(255, 255, 255)",
           "foreground-color": "#0000ffff"
         }, {
@@ -6179,22 +6196,10 @@ const _sfc_main$1 = /* @__PURE__ */ defineComponent({
               ]),
               _: 1
             }),
-            createVNode(_component_dweb_top_bar_button, {
-              id: "bbb",
-              disabled: ""
-            }, {
-              default: withCtx(() => [
-                createVNode(_component_dweb_icon, {
-                  source: "Filled.AddCircle",
-                  size: "20"
-                })
-              ]),
-              _: 1
-            }),
             createVNode(_component_dweb_top_bar_button, { id: "ccc" }, {
               default: withCtx(() => [
                 createVNode(_component_dweb_icon, {
-                  source: "/vite.svg",
+                  source: "https://objectjson.waterbang.top/test-vue3/vite.svg",
                   type: "AssetIcon"
                 })
               ]),
@@ -6203,127 +6208,70 @@ const _sfc_main$1 = /* @__PURE__ */ defineComponent({
           ]),
           _: 1
         }),
-        createVNode(_component_dweb_messager, { id: "dweb" }),
-        createVNode(_component_dweb_scanner, { channelId: "helloWorld" }),
-        createBaseVNode("h1", null, toDisplayString(__props.msg), 1),
-        createBaseVNode("div", _hoisted_1$1, [
-          createBaseVNode("button", {
-            type: "button",
-            onClick: openScanner
-          }, "\u542F\u52A8\u626B\u7801"),
-          createBaseVNode("p", null, toDisplayString(unref(scannerData)), 1)
-        ]),
-        createBaseVNode("div", _hoisted_2$1, [
-          createBaseVNode("button", {
-            type: "button",
-            onClick: onDwebPlugin
-          }, "webMessage\u6D88\u606F"),
-          createBaseVNode("p", null, toDisplayString(unref(dwebPluginData)), 1)
-        ]),
-        _hoisted_3$1
-      ], 64);
-    };
-  }
-});
-const HelloWorld_vue_vue_type_style_index_0_scoped_c74781b8_lang = "";
-const _export_sfc = (sfc, props) => {
-  const target = sfc.__vccOpts || sfc;
-  for (const [key, val] of props) {
-    target[key] = val;
-  }
-  return target;
-};
-const HelloWorld = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["__scopeId", "data-v-c74781b8"]]);
-const _hoisted_1 = /* @__PURE__ */ createStaticVNode('<div data-v-e4e1e73b><a href="https://vitejs.dev" target="_blank" data-v-e4e1e73b><img src="' + _imports_0 + '" class="logo" alt="Vite logo" data-v-e4e1e73b></a><a href="https://vuejs.org/" target="_blank" data-v-e4e1e73b><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-e4e1e73b></a><a href="https://vuejs.org/" target="_blank" data-v-e4e1e73b><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-e4e1e73b></a><a href="https://vuejs.org/" target="_blank" data-v-e4e1e73b><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-e4e1e73b></a></div>', 1);
-const _hoisted_2 = /* @__PURE__ */ createTextVNode("\u4E3B\u9875");
-const _hoisted_3 = /* @__PURE__ */ createTextVNode("\u6D88\u606F");
-const _hoisted_4 = /* @__PURE__ */ createTextVNode("\u4E2A\u4EBA\u7A7A\u95F4");
-const _sfc_main = /* @__PURE__ */ defineComponent({
-  __name: "App",
-  setup(__props) {
-    return (_ctx, _cache) => {
-      const _component_dweb_bottom_bar_icon = resolveComponent("dweb-bottom-bar-icon");
-      const _component_dweb_bottom_bar_text = resolveComponent("dweb-bottom-bar-text");
-      const _component_dweb_bottom_bar_button = resolveComponent("dweb-bottom-bar-button");
-      const _component_dweb_bottom_bar = resolveComponent("dweb-bottom-bar");
-      return openBlock(), createElementBlock(Fragment, null, [
         _hoisted_1,
-        createVNode(HelloWorld, { msg: "DwebView-js \u267B\uFE0F Deno-js" }),
+        createVNode(HelloWorld, { msg: unref(scannerData) }, null, 8, ["msg"]),
         createVNode(_component_dweb_bottom_bar, {
           id: "bottom_bar",
-          "background-color": "#ff00ffff",
-          "foreground-color": "#000000ff"
+          "background-color": "#D0BCFFff"
         }, {
           default: withCtx(() => [
             createVNode(_component_dweb_bottom_bar_button, {
               id: "ddd",
-              selectable: "",
-              "indicator-color": "#00ff00ff"
+              selected: ""
             }, {
               default: withCtx(() => [
                 createVNode(_component_dweb_bottom_bar_icon, {
-                  source: "/vite.svg",
-                  type: "AssetIcon",
-                  color: "#ff00aaff",
-                  "selected-color": "rgba(255, 0, 0, 1)"
+                  source: "https://objectjson.waterbang.top/test-vue3/land.svg",
+                  type: "AssetIcon"
                 }),
                 createVNode(_component_dweb_bottom_bar_text, {
-                  color: "#0000ffff",
-                  "selected-color": "rgba(255, 0, 0, 1)"
-                }, {
-                  default: withCtx(() => [
-                    _hoisted_2
-                  ]),
-                  _: 1
-                })
-              ]),
-              _: 1
-            }),
-            createVNode(_component_dweb_bottom_bar_button, { id: "eee" }, {
-              default: withCtx(() => [
-                createVNode(_component_dweb_bottom_bar_icon, {
-                  source: "/vite.svg",
-                  type: "AssetIcon",
-                  size: "50"
-                }),
-                createVNode(_component_dweb_bottom_bar_text, {
-                  color: "#0000ffff",
-                  "selected-color": "rgba(255, 0, 0, 1)"
-                }, {
-                  default: withCtx(() => [
-                    _hoisted_3
-                  ]),
-                  _: 1
+                  color: "#332D41ff",
+                  "selected-color": "#381E72ff",
+                  value: "\u571F\u5730"
                 })
               ]),
               _: 1
             }),
             createVNode(_component_dweb_bottom_bar_button, {
-              id: "fff",
-              selected: "",
-              selectable: ""
+              id: "eee",
+              onClick: openScanner,
+              diSelectable: ""
             }, {
               default: withCtx(() => [
                 createVNode(_component_dweb_bottom_bar_icon, {
-                  source: "/vite.svg",
+                  source: "https://objectjson.waterbang.top/test-vue3/scanner.svg",
                   type: "AssetIcon"
                 }),
-                createVNode(_component_dweb_bottom_bar_text, null, {
-                  default: withCtx(() => [
-                    _hoisted_4
-                  ]),
-                  _: 1
+                createVNode(_component_dweb_bottom_bar_text, {
+                  color: "#332D41ff",
+                  "selected-color": "#381E72ff",
+                  value: "\u626B\u7801"
+                })
+              ]),
+              _: 1
+            }),
+            createVNode(_component_dweb_bottom_bar_button, { id: "fff" }, {
+              default: withCtx(() => [
+                createVNode(_component_dweb_bottom_bar_icon, {
+                  source: "https://objectjson.waterbang.top/test-vue3/home.svg",
+                  type: "AssetIcon"
+                }),
+                createVNode(_component_dweb_bottom_bar_text, {
+                  color: "#332D41ff",
+                  "selected-color": "#381E72ff",
+                  value: "\u4E2A\u4EBA\u7A7A\u95F4"
                 })
               ]),
               _: 1
             })
           ]),
           _: 1
-        })
+        }),
+        createVNode(_component_dweb_scanner, { channelId: "helloWorld" })
       ], 64);
     };
   }
 });
-const App_vue_vue_type_style_index_0_scoped_e4e1e73b_lang = "";
-const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["__scopeId", "data-v-e4e1e73b"]]);
+const App_vue_vue_type_style_index_0_scoped_ea920930_lang = "";
+const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["__scopeId", "data-v-ea920930"]]);
 createApp(App).mount("#app");

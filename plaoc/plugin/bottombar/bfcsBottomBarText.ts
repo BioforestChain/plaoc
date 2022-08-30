@@ -5,8 +5,10 @@ export class BfcsBottomBarText extends DwebPlugin {
   }
 
   static get observedAttributes() {
-    return ["color", "selected-color"];
+    return ["value","color", "selected-color"];
   }
+
+
 
   // attributeChangedCallback(
   //   attrName: string,
