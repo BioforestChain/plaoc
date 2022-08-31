@@ -8,7 +8,7 @@ export namespace BottomBar {
     getOverlay(): boolean;
     toggleOverlay(isOverlay: number): void;
     getHeight(): number;
-    setHeight(heightDp: number): void;
+    setHeight(heightDp: string): void;
     getActions(): Data.DataString<BottomBarItem[]>;
     setActions(actionList: Data.DataString<BottomBarItem[]>): void;
     getBackgroundColor(): number;

@@ -54,15 +54,13 @@ export class BottomBarFFI implements BottomBar.IBottomBarFFI {
   getHeight(): Promise<number> {
     return new Promise<number>((resolve, reject) => {
       const height = this._ffi.getHeight();
-
       resolve(height);
     });
   }
 
   setHeight(height: number): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      this._ffi.setHeight(height);
-
+      this._ffi.setHeight(String(height));
       resolve();
     });
   }

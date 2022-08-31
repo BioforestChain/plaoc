@@ -4955,7 +4955,7 @@ class BottomBarFFI {
   }
   setHeight(height) {
     return new Promise((resolve2, reject) => {
-      this._ffi.setHeight(height);
+      this._ffi.setHeight(String(height));
       resolve2();
     });
   }
@@ -6163,7 +6163,7 @@ const _export_sfc = (sfc, props) => {
   return target;
 };
 const HelloWorld = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["__scopeId", "data-v-e8b9485e"]]);
-const _hoisted_1 = /* @__PURE__ */ createStaticVNode('<div data-v-f6aa93d9><a href="https://vitejs.dev" target="_blank" data-v-f6aa93d9><img src="' + _imports_0 + '" class="logo" alt="Vite logo" data-v-f6aa93d9></a><a href="https://vuejs.org/" target="_blank" data-v-f6aa93d9><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-f6aa93d9></a><a href="https://vuejs.org/" target="_blank" data-v-f6aa93d9><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-f6aa93d9></a><a href="https://vuejs.org/" target="_blank" data-v-f6aa93d9><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-f6aa93d9></a></div>', 1);
+const _hoisted_1 = /* @__PURE__ */ createStaticVNode('<div data-v-445d035a><a href="https://vitejs.dev" target="_blank" data-v-445d035a><img src="' + _imports_0 + '" class="logo" alt="Vite logo" data-v-445d035a></a><a href="https://vuejs.org/" target="_blank" data-v-445d035a><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-445d035a></a><a href="https://vuejs.org/" target="_blank" data-v-445d035a><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-445d035a></a><a href="https://vuejs.org/" target="_blank" data-v-445d035a><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-445d035a></a></div>', 1);
 const _sfc_main = /* @__PURE__ */ defineComponent({
   __name: "App",
   setup(__props) {
@@ -6213,12 +6213,13 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         createVNode(_component_dweb_bottom_bar, {
           id: "bottom_bar",
           "background-color": "#D0BCFF",
-          "indicator-color": "#f3bf44"
+          height: "80"
         }, {
           default: withCtx(() => [
             createVNode(_component_dweb_bottom_bar_button, {
               id: "ddd",
-              selected: ""
+              selected: "",
+              "indicator-color": "#D0BCFF"
             }, {
               default: withCtx(() => [
                 createVNode(_component_dweb_bottom_bar_icon, {
@@ -6248,7 +6249,10 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
               ]),
               _: 1
             }),
-            createVNode(_component_dweb_bottom_bar_button, { id: "fff" }, {
+            createVNode(_component_dweb_bottom_bar_button, {
+              id: "fff",
+              "indicator-color": "#D0BCFF"
+            }, {
               default: withCtx(() => [
                 createVNode(_component_dweb_bottom_bar_icon, {
                   source: "https://objectjson.waterbang.top/test-vue3/home.svg",
@@ -6271,6 +6275,6 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
     };
   }
 });
-const App_vue_vue_type_style_index_0_scoped_f6aa93d9_lang = "";
-const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["__scopeId", "data-v-f6aa93d9"]]);
+const App_vue_vue_type_style_index_0_scoped_445d035a_lang = "";
+const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["__scopeId", "data-v-445d035a"]]);
 createApp(App).mount("#app");

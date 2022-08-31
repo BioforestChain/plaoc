@@ -90,6 +90,7 @@ export class BfcsBottomBar extends DwebPlugin {
   }
 
   async setHeight(height: number): Promise<void> {
+
     this.setAttribute("height", `${height}`);
 
     await this._ffi.setHeight(height);
@@ -215,10 +216,10 @@ export class BfcsBottomBar extends DwebPlugin {
 
   static get observedAttributes() {
     return [
-      "hidden",
-      "background-color",
-      "foreground-color",
-      "overlay",
+      "hidden", // 控制是否显示
+      "background-color", // 主背景
+      "foreground-color", // 子级背景
+      "overlay", 
       "height",
     ];
   }

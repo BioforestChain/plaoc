@@ -39,47 +39,45 @@ fun DWebBottomBar(
         contentColor = bottomBarState.foregroundColor.value,
         tonalElevation = 0.dp,
     ) {
-        if (bottomBarState.actions.size > 0) {
-            var selectedItem by remember(bottomBarState.actions) {
-                mutableStateOf(bottomBarState.actions.indexOfFirst { it.selected }
-                    .let { if (it == -1) 0 else it })
-            }
-//          val iconSource: Array<String?> = arrayOfNulls(bottomBarState.actions.size);
-//          if (iconSource[index].isNullOrEmpty()) {
-//            iconSource[index] = action.icon.source;
-//          }
+//      Log.i("xxx2","bottomBarState.height.value:${ bottomBarState.height.value}");
+      if (bottomBarState.actions.size > 0) {
+          var selectedItem by remember(bottomBarState.actions) {
+            mutableStateOf(bottomBarState.actions.indexOfFirst { it.selected }
+              .let { if (it == -1) 0 else it })
+          }
+
           bottomBarState.actions.forEachIndexed { index, action ->
-              // 如果传递了un_source，使用双图片切换
-                if (!action.icon.un_source.isNullOrEmpty()) {
-                  if ( selectedItem != index) {
-                    action.icon.currentSource = action.icon.un_source.toString();
-                  } else {
-                    action.icon.currentSource =  action.icon.source
-                  }
-                }else {
-                   action.icon.currentSource =  action.icon.source
-                }
-            NavigationBarItem(
-                    icon = {
-                        DWebIcon(action.icon)
-                    },
-                    label = if (action.label.isNotEmpty()) {
-                        { Text(action.label) }
-                    } else {
-                        null
-                    },
-                    enabled = !action.disabled,
-                    onClick = {
-                        if (action.selectable) {
-                            selectedItem = index
-                        }
-                        jsUtil?.evalQueue { action.onClickCode }
-                    },
-                    selected = selectedItem == index,
-                    colors = action.colors?.toNavigationBarItemColors()
-                        ?: NavigationBarItemDefaults.colors(),
-                )
+            // 如果传递了un_source，使用双图片切换
+            if (!action.icon.un_source.isNullOrEmpty()) {
+              if (selectedItem != index) {
+                action.icon.currentSource = action.icon.un_source.toString();
+              } else {
+                action.icon.currentSource = action.icon.source
+              }
+            } else {
+              action.icon.currentSource = action.icon.source
             }
+            NavigationBarItem(
+              icon = {
+                DWebIcon(action.icon)
+              },
+              label = if (action.label.isNotEmpty()) {
+                { Text(action.label) }
+              } else {
+                null
+              },
+              enabled = !action.disabled,
+              onClick = {
+                if (action.selectable) {
+                  selectedItem = index
+                }
+                jsUtil?.evalQueue { action.onClickCode }
+              },
+              selected = selectedItem == index,
+              colors = action.colors?.toNavigationBarItemColors()
+                ?: NavigationBarItemDefaults.colors(),
+            )
+          }
         }
     }
 }

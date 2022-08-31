@@ -53,8 +53,8 @@ class BottomBarFFI(
     }
 
     @JavascriptInterface
-    fun setHeight(heightDp: Float) {
-        state.height.value = heightDp
+    fun setHeight(heightDp: String) {
+        state.height.value = heightDp.toFloat()
     }
 
 
