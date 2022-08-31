@@ -13,7 +13,7 @@ export class BfcsBottomBarButton extends DwebPlugin {
   }
 
   static get observedAttributes() {
-    return ["disabled", "selected", "selectable", "indicator-color"];
+    return ["disabled", "selected", "diSelectable", "indicator-color"];
   }
 
   attributeChangedCallback(attrName: string, oldVal: unknown, newVal: unknown) {
@@ -29,8 +29,8 @@ export class BfcsBottomBarButton extends DwebPlugin {
       } else {
         this.removeAttribute(attrName);
       }
-    } else if (attrName === "selectable" && oldVal !== newVal) {
-      if (this.hasAttribute("selectable")) {
+    } else if (attrName === "diSelectable" && oldVal !== newVal) {
+      if (this.hasAttribute("diSelectable")) {
         this.setAttribute(attrName, "");
       } else {
         this.removeAttribute(attrName);

@@ -2,16 +2,12 @@ package org.bfchain.rust.plaoc.webView.bottombar
 
 import android.util.Log
 import androidx.compose.foundation.layout.height
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
-import org.bfchain.rust.plaoc.ExportNative
 import org.bfchain.rust.plaoc.webView.icon.DWebIcon
 import org.bfchain.rust.plaoc.webView.jsutil.JsUtil
 
@@ -39,7 +35,6 @@ fun DWebBottomBar(
         contentColor = bottomBarState.foregroundColor.value,
         tonalElevation = 0.dp,
     ) {
-//      Log.i("xxx2","bottomBarState.height.value:${ bottomBarState.height.value}");
       if (bottomBarState.actions.size > 0) {
           var selectedItem by remember(bottomBarState.actions) {
             mutableStateOf(bottomBarState.actions.indexOfFirst { it.selected }
@@ -61,6 +56,7 @@ fun DWebBottomBar(
               icon = {
                 DWebIcon(action.icon)
               },
+
               label = if (action.label.isNotEmpty()) {
                 { Text(action.label) }
               } else {

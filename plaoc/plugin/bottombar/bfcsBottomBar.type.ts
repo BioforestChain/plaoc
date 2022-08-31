@@ -4,7 +4,7 @@ import { Data } from "../typings/types/data.type";
 export namespace BottomBar {
   export interface BottomBarAndroidFFI {
     getEnabled(): boolean;
-    toggleEnabled(isEnabled: number): void;
+    toggleEnabled(isEnabled: boolean): void;
     getOverlay(): boolean;
     toggleOverlay(isOverlay: number): void;
     getHeight(): number;

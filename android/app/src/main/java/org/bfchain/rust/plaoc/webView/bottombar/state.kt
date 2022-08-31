@@ -1,6 +1,7 @@
 package org.bfchain.rust.plaoc.webView.bottombar
 
 
+import android.util.Log
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.contentColorFor
 import androidx.compose.material.primarySurface
@@ -17,7 +18,7 @@ class BottomBarState(
     val backgroundColor: MutableState<Color>,
     val foregroundColor: MutableState<Color>,
 ) {
-    val isEnabled: Boolean
+     val isEnabled: Boolean
         get() {
             return if (enabled.value == null) {
                 actions.size > 0

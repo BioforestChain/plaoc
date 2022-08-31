@@ -24,14 +24,10 @@ class BottomBarFFI(
     @JavascriptInterface
     fun getEnabled() = state.isEnabled
 
+   // 控制是否隐藏bottom bar, 此方法如果不传不会调用，一传肯定是true，也就是不显示bottom bar
     @JavascriptInterface
-    fun toggleEnabled(isEnabledInt: BoolInt): Boolean {
-        var isEnabled = isEnabledInt.toBooleanOrNull()
-        if (isEnabled == null && state.enabled.value == null) {
-            isEnabled = !state.isEnabled
-        }
-        state.enabled.value = isEnabled
-        Log.i(TAG, "toggleEnabled:${isEnabled}")
+    fun toggleEnabled(isEnabledBool: Boolean): Boolean? {
+        state.enabled.value = !isEnabledBool
         return getEnabled()
     }
 
@@ -39,7 +35,7 @@ class BottomBarFFI(
     fun getOverlay(): Boolean {
         return state.overlay.value
     }
-
+    // 控制是开启bottom bar 遮罩。
     @JavascriptInterface
     fun toggleOverlay(isOverlay: BoolInt): Boolean {
         state.overlay.value = isOverlay.toBoolean { !state.overlay.value }
@@ -65,14 +61,10 @@ class BottomBarFFI(
 
     @JavascriptInterface
     fun setActions(actionListJson: DataString<List<BottomBarAction>>) {
-      Log.i("actionListJson","actionListJson:$actionListJson")
         state.actions.clear()
         val actionList = actionListJson.toData<List<BottomBarAction>>(object :
             TypeToken<List<BottomBarAction>>() {}.type)
         actionList.toCollection(state.actions)
-      actionList.forEach{
-        Log.i("actionList","actionListJson:$it")
-      }
     }
 
     @JavascriptInterface

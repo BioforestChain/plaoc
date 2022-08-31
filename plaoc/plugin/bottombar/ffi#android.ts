@@ -14,14 +14,14 @@ export class BottomBarFFI implements BottomBar.IBottomBarFFI {
 
   toggleEnabled(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      this._ffi.toggleEnabled(0);
+      this._ffi.toggleEnabled(false);
       resolve();
     });
   }
 
   setHidden(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      this._ffi.toggleEnabled(1);
+      this._ffi.toggleEnabled(true);
 
       resolve();
     });

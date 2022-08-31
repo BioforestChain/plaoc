@@ -190,11 +190,12 @@ export class BfcsBottomBar extends DwebPlugin {
 
       const bid = childNode.getAttribute("bid");
       const onClickCode = `document.querySelector('dweb-bottom-bar-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+      // 禁止触发所有事件，包括无障碍事件
       const disabled = childNode.hasAttribute("disabled") ? true : false;
       const selected = childNode.hasAttribute("selected") ? true : false;
       // 不允许选择，不加diSelectable属性则允许选择
       const diSelectable = childNode.hasAttribute("diSelectable") ? false : true;
-      // 指示器颜色
+      // 指示器颜色，当前选中的背景颜色
       if (childNode.hasAttribute("indicator-color")) {
         colors.indicatorColor = convertToRGBAHex(
           childNode.getAttribute("indicator-color")!
@@ -217,10 +218,10 @@ export class BfcsBottomBar extends DwebPlugin {
   static get observedAttributes() {
     return [
       "hidden", // 控制是否显示
-      "background-color", // 主背景
-      "foreground-color", // 子级背景
-      "overlay", 
-      "height",
+      "background-color", // 背景色
+      "foreground-color", // 前景色
+      "overlay", // 是否开启bottombar遮罩。
+      "height", 
     ];
   }
 

@@ -6,15 +6,19 @@ import android.os.Build
 import android.os.Message
 import android.util.Log
 import android.webkit.*
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
@@ -22,6 +26,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import org.bfchain.rust.plaoc.webView.bottombar.BottomBarFFI
 import org.bfchain.rust.plaoc.webView.bottombar.BottomBarState
@@ -156,7 +161,13 @@ fun DWebView(
             .padding(overlayPadding)
             .offset { overlayOffset },
         topBar = { if (!topBarState.overlay.value and topBarState.enabled.value) TopAppBar() },
-        bottomBar = { if (!bottomBarState.overlay.value and bottomBarState.isEnabled) BottomAppBar() },
+        bottomBar = {
+          Log.i("DwebView","bottomBarState.isEnabled:${ bottomBarState.isEnabled}, bottomBarState.overlay:${ bottomBarState.overlay.value}");
+          // 如果前端传递hidden，也就是bottomBarState.isEnabled等于true，则不显示bottom bar
+          if (!bottomBarState.overlay.value and bottomBarState.isEnabled) {
+            Log.i(TAG,"哈哈")
+            BottomAppBar()
+        } },
         content = { innerPadding ->
             val jsAlertConfig = remember {
                 mutableStateOf<JsAlertConfiguration?>(null)
@@ -444,12 +455,16 @@ fun DWebView(
                 }
             }
             if (bottomBarState.overlay.value and bottomBarState.isEnabled) {
+              Log.i("<{=．．．．(嘎~嘎~嘎~)","xx");
                 Box(
                     contentAlignment = Alignment.BottomCenter,
-                    modifier = Modifier.fillMaxSize().let {
+                    modifier = Modifier.fillMaxSize().alpha(0.5f)
+                      .let {
                         it
                     }
-                ) { BottomAppBar() }
+                ) {
+                  BottomAppBar()
+                }
             }
 
             jsAlertConfig.value?.openAlertDialog { jsAlertConfig.value = null }
@@ -458,6 +473,7 @@ fun DWebView(
             jsBeforeUnloadConfig.value?.openBeforeUnloadDialog { jsBeforeUnloadConfig.value = null }
         },
         containerColor = Companion.Transparent,
+      contentColor = Companion.Transparent
     )
 }
 
