@@ -38,8 +38,8 @@ const scanner = document.querySelector<OpenScanner>('dweb-scanner')!;
     </a>
   </div>
   <HelloWorld :msg="scannerData" />
-     <dweb-bottom-bar id="bottom_bar" background-color="#D0BCFF" foreground-color="#1C1B1F"  height="70"  overlay >
-        <dweb-bottom-bar-button id="ddd" selected  indicator-color="#D0BCFF"  >
+     <dweb-bottom-bar id="bottom_bar" background-color="#D0BCFF00" foreground-color="#1C1B1F"  height="70"  overlay="0.2" >
+        <dweb-bottom-bar-button id="ddd" selected   >
             <dweb-bottom-bar-icon source="https://objectjson.waterbang.top/test-vue3/land.svg" un-source="https://objectjson.waterbang.top/test-vue3/land-not.svg"  type="AssetIcon"   ></dweb-bottom-bar-icon>
             <dweb-bottom-bar-text color="#938F99" selected-color="#1C1B1F"  value="土地"></dweb-bottom-bar-text>
         </dweb-bottom-bar-button>
@@ -47,7 +47,7 @@ const scanner = document.querySelector<OpenScanner>('dweb-scanner')!;
             <dweb-bottom-bar-icon source="https://objectjson.waterbang.top/test-vue3/scanner.svg" type="AssetIcon"></dweb-bottom-bar-icon>
             <dweb-bottom-bar-text  value="扫码"></dweb-bottom-bar-text>
         </dweb-bottom-bar-button>
-        <dweb-bottom-bar-button id="fff" indicator-color="#D0BCFF" >
+        <dweb-bottom-bar-button id="fff" indicator-color="rgba(208,188,255,0)" >
             <dweb-bottom-bar-icon source="https://objectjson.waterbang.top/test-vue3/home.svg" un-source="https://objectjson.waterbang.top/test-vue3/home-not.svg" type="AssetIcon"  ></dweb-bottom-bar-icon>
             <dweb-bottom-bar-text color="#938F99" selected-color="#1C1B1F" value="个人空间"></dweb-bottom-bar-text>
         </dweb-bottom-bar-button>

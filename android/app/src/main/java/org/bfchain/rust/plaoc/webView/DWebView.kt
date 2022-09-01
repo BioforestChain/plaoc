@@ -163,9 +163,8 @@ fun DWebView(
         topBar = { if (!topBarState.overlay.value and topBarState.enabled.value) TopAppBar() },
         bottomBar = {
           Log.i("DwebView","bottomBarState.isEnabled:${ bottomBarState.isEnabled}, bottomBarState.overlay:${ bottomBarState.overlay.value}");
-          // 如果前端传递hidden，也就是bottomBarState.isEnabled等于true，则不显示bottom bar
-          if (!bottomBarState.overlay.value and bottomBarState.isEnabled) {
-            Log.i(TAG,"哈哈")
+          // 如果前端没有传递hidden，也就是bottomBarState.isEnabled等于true，则显示bottom bar
+          if ((bottomBarState.overlay.value == 1F) and bottomBarState.isEnabled) {
             BottomAppBar()
         } },
         content = { innerPadding ->
@@ -429,7 +428,8 @@ fun DWebView(
                     if (topBarState.overlay.value or !topBarState.enabled.value) {
                         top = 0.dp
                     }
-                    if (bottomBarState.overlay.value or !bottomBarState.isEnabled) {
+                    // 如果不显示bottomBar，即bottomBarState.isEnabled 为false
+                    if (!bottomBarState.isEnabled) {
                         bottom = 0.dp
                     }
                     if ((top.value == 0F) and (bottom.value == 0F)) {
@@ -454,11 +454,11 @@ fun DWebView(
                     TopAppBar()
                 }
             }
-            if (bottomBarState.overlay.value and bottomBarState.isEnabled) {
-              Log.i("<{=．．．．(嘎~嘎~嘎~)","xx");
+            if ((bottomBarState.overlay.value != 1F) and bottomBarState.isEnabled) {
+              Log.i("<{=．．．．(嘎~嘎~嘎~)","这里是控制bottom bar 透明度的");
                 Box(
                     contentAlignment = Alignment.BottomCenter,
-                    modifier = Modifier.fillMaxSize().alpha(0.5f)
+                    modifier = Modifier.fillMaxSize()
                       .let {
                         it
                     }

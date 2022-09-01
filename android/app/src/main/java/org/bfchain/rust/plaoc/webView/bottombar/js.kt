@@ -1,6 +1,7 @@
 package org.bfchain.rust.plaoc.webView.bottombar
 
 
+import android.R.color
 import android.util.Log
 import android.webkit.JavascriptInterface
 import androidx.compose.material3.NavigationBarItemColors
@@ -32,15 +33,15 @@ class BottomBarFFI(
     }
 
     @JavascriptInterface
-    fun getOverlay(): Boolean {
-        return state.overlay.value
+    fun getOverlay(): Float {
+        return state.overlay.value?: 1F
     }
     // 控制是开启bottom bar 遮罩。
     @JavascriptInterface
-    fun toggleOverlay(isOverlay: BoolInt): Boolean {
-        state.overlay.value = isOverlay.toBoolean { !state.overlay.value }
+    fun toggleOverlay(isOverlay: String): Float {
+        state.overlay.value = isOverlay.toFloat()
         Log.i(TAG, "toggleOverlay:${state.overlay.value}")
-        return state.overlay.value
+        return state.overlay.value ?: 1F
     }
 
     @JavascriptInterface
@@ -62,9 +63,13 @@ class BottomBarFFI(
     @JavascriptInterface
     fun setActions(actionListJson: DataString<List<BottomBarAction>>) {
         state.actions.clear()
-        val actionList = actionListJson.toData<List<BottomBarAction>>(object :
+      Log.i(TAG, "actionListJson:${actionListJson}")
+      val actionList = actionListJson.toData<List<BottomBarAction>>(object :
             TypeToken<List<BottomBarAction>>() {}.type)
         actionList.toCollection(state.actions)
+      actionList.forEach{
+        Log.i(TAG, "actionList:${it.colors}")
+      }
     }
 
     @JavascriptInterface
@@ -114,25 +119,23 @@ data class BottomBarAction(
 
         @Composable
         fun toNavigationBarItemColors(): NavigationBarItemColors {
-          Log.i(TAG, "indicatorColor:$indicatorColor, iconColor:$iconColor, iconColorSelected:$iconColorSelected, " +
-            "textColor:$textColor, textColorSelected:$textColorSelected")
             val defaultColors = NavigationBarItemDefaults.colors()
+           // indicatorColor 无法控制透明度
             val indicatorColor = indicatorColor?.toComposeColor() ?: defaultColors.indicatorColor
             val iconColor =
-                ColorState(iconColor?.toComposeColor() ?: defaultColors.iconColor(false).value)
+                ColorState(iconColor?.toComposeColor()?: defaultColors.iconColor(false).value)
             val iconColorSelected = ColorState(
                 textColorSelected?.toComposeColor() ?: defaultColors.indicatorColor
             )
             val textColor =
                 ColorState(textColor?.toComposeColor() ?: defaultColors.textColor(false).value)
             val textColorSelected = ColorState(
-                textColorSelected?.toComposeColor() ?: defaultColors.indicatorColor
+                textColorSelected?.toComposeColor()  ?: defaultColors.indicatorColor
             )
 
             val colors = @Stable object : NavigationBarItemColors {
                 override val indicatorColor: Color
                     @Composable get() = indicatorColor
-
 
                 /**
                  * 表示该项的图标颜色，取决于它是否被[选中]。

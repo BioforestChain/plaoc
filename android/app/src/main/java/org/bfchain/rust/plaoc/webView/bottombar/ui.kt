@@ -1,10 +1,13 @@
 package org.bfchain.rust.plaoc.webView.bottombar
 
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
@@ -20,7 +23,8 @@ fun DWebBottomBar(
     NavigationBar(
         modifier = Modifier
             .let {
-                bottomBarState.height.value?.let { height ->
+              Log.i("xxx","bottomBarState.overlay.value${bottomBarState.overlay.value}")
+              bottomBarState.height.value?.let { height ->
                     if (height >= 0) {
                         it.height(height.dp)
                     } else {
@@ -31,7 +35,7 @@ fun DWebBottomBar(
             .onGloballyPositioned { coordinates ->
                 bottomBarState.height.value = coordinates.size.height / localDensity.density
             },
-        containerColor = bottomBarState.backgroundColor.value,
+        containerColor = bottomBarState.backgroundColor.value.copy(bottomBarState.overlay.value ?: 0F),
         contentColor = bottomBarState.foregroundColor.value,
         tonalElevation = 0.dp,
     ) {

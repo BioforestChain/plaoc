@@ -6,7 +6,7 @@ export namespace BottomBar {
     getEnabled(): boolean;
     toggleEnabled(isEnabled: boolean): void;
     getOverlay(): boolean;
-    toggleOverlay(isOverlay: number): void;
+    toggleOverlay(isOverlay: string): void;
     getHeight(): number;
     setHeight(heightDp: string): void;
     getActions(): Data.DataString<BottomBarItem[]>;
@@ -84,8 +84,8 @@ export namespace BottomBar {
     toggleEnabled(isEnabled: number): Promise<void>;
     setHidden(): Promise<void>;
     getOverlay(): Promise<boolean>;
-    toggleOverlay(isOverlay: number): Promise<void>;
-    setOverlay(): Promise<void>;
+    toggleOverlay(isOverlay: string): Promise<void>;
+    setOverlay(alpha:string): Promise<void>;
     getHeight(): Promise<number>;
     setHeight(heightDp: number): Promise<void>;
     getActions(): Promise<BottomBarItem[]>;

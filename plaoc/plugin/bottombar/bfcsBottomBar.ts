@@ -200,6 +200,7 @@ export class BfcsBottomBar extends DwebPlugin {
         colors.indicatorColor = convertToRGBAHex(
           childNode.getAttribute("indicator-color")!
         );
+      console.log("1colorHex:",colors.indicatorColor );
       }
       this._actionList.push({
         icon,
@@ -242,7 +243,7 @@ export class BfcsBottomBar extends DwebPlugin {
       await this.setHeight(newVal as number);
     } else if (attrName === "overlay") {
       if (this.hasAttribute(attrName)) {
-        await this._ffi.setOverlay();
+        await this._ffi.setOverlay(newVal as string);
       }
     } else if (attrName === "hidden") {
       if (this.hasAttribute(attrName)) {

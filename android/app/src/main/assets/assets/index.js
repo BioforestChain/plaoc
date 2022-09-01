@@ -4899,7 +4899,7 @@ function convertToRGBAHex(color) {
       colorHex = color;
     } else {
       if (color.length === 4) {
-        colorHex = color.slice(0, 1) + color.slice(1, 2).repeat(2) + color.slice(2, 3).repeat(2) + color.slice(3, 4).repeat(2) + color.slice(4, 5).repeat(2);
+        colorHex = colorHex.replace(/(.)/g, "$1$1");
         color = colorHex;
       }
       colorHex = color.padEnd(9, "F");
@@ -4937,13 +4937,13 @@ class BottomBarFFI {
   }
   toggleOverlay() {
     return new Promise((resolve2, reject) => {
-      this._ffi.toggleOverlay(0);
+      this._ffi.toggleOverlay("0");
       resolve2();
     });
   }
-  setOverlay() {
+  setOverlay(alpha) {
     return new Promise((resolve2, reject) => {
-      this._ffi.toggleOverlay(1);
+      this._ffi.toggleOverlay(alpha);
       resolve2();
     });
   }
@@ -5179,6 +5179,7 @@ class BfcsBottomBar extends DwebPlugin {
         colors.indicatorColor = convertToRGBAHex(
           childNode.getAttribute("indicator-color")
         );
+        console.log("1colorHex:", colors.indicatorColor);
       }
       this._actionList.push({
         icon,
@@ -5213,7 +5214,7 @@ class BfcsBottomBar extends DwebPlugin {
       await this.setHeight(newVal);
     } else if (attrName === "overlay") {
       if (this.hasAttribute(attrName)) {
-        await this._ffi.setOverlay();
+        await this._ffi.setOverlay(newVal);
       }
     } else if (attrName === "hidden") {
       if (this.hasAttribute(attrName)) {
@@ -6163,7 +6164,7 @@ const _export_sfc = (sfc, props) => {
   return target;
 };
 const HelloWorld = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["__scopeId", "data-v-e8b9485e"]]);
-const _hoisted_1 = /* @__PURE__ */ createStaticVNode('<div data-v-b62d32cd><a href="https://vitejs.dev" target="_blank" data-v-b62d32cd><img src="' + _imports_0 + '" class="logo" alt="Vite logo" data-v-b62d32cd></a><a href="https://vuejs.org/" target="_blank" data-v-b62d32cd><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-b62d32cd></a><a href="https://vuejs.org/" target="_blank" data-v-b62d32cd><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-b62d32cd></a><a href="https://vuejs.org/" target="_blank" data-v-b62d32cd><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-b62d32cd></a></div>', 1);
+const _hoisted_1 = /* @__PURE__ */ createStaticVNode('<div data-v-a669c74d><a href="https://vitejs.dev" target="_blank" data-v-a669c74d><img src="' + _imports_0 + '" class="logo" alt="Vite logo" data-v-a669c74d></a><a href="https://vuejs.org/" target="_blank" data-v-a669c74d><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-a669c74d></a><a href="https://vuejs.org/" target="_blank" data-v-a669c74d><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-a669c74d></a><a href="https://vuejs.org/" target="_blank" data-v-a669c74d><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-a669c74d></a></div>', 1);
 const _sfc_main = /* @__PURE__ */ defineComponent({
   __name: "App",
   setup(__props) {
@@ -6212,16 +6213,15 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         createVNode(HelloWorld, { msg: unref(scannerData) }, null, 8, ["msg"]),
         createVNode(_component_dweb_bottom_bar, {
           id: "bottom_bar",
-          "background-color": "#D0BCFF",
+          "background-color": "#D0BCFF00",
           "foreground-color": "#1C1B1F",
           height: "70",
-          overlay: ""
+          overlay: "0.2"
         }, {
           default: withCtx(() => [
             createVNode(_component_dweb_bottom_bar_button, {
               id: "ddd",
-              selected: "",
-              "indicator-color": "#D0BCFF"
+              selected: ""
             }, {
               default: withCtx(() => [
                 createVNode(_component_dweb_bottom_bar_icon, {
@@ -6253,7 +6253,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
             }),
             createVNode(_component_dweb_bottom_bar_button, {
               id: "fff",
-              "indicator-color": "#D0BCFF"
+              "indicator-color": "rgba(208,188,255,0)"
             }, {
               default: withCtx(() => [
                 createVNode(_component_dweb_bottom_bar_icon, {
@@ -6277,6 +6277,6 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
     };
   }
 });
-const App_vue_vue_type_style_index_0_scoped_b62d32cd_lang = "";
-const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["__scopeId", "data-v-b62d32cd"]]);
+const App_vue_vue_type_style_index_0_scoped_a669c74d_lang = "";
+const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["__scopeId", "data-v-a669c74d"]]);
 createApp(App).mount("#app");

@@ -47,16 +47,11 @@ export function convertToRGBAHex(color: string):Color.RGBAHex {
     } else {
       // 如果是 #f71 这种格式的话,转换为5字符格式
       if (color.length === 4) {
-         colorHex =
-        color.slice(0, 1) +
-        color.slice(1, 2).repeat(2) +
-        color.slice(2, 3).repeat(2) +
-        color.slice(3, 4).repeat(2) +
-           color.slice(4, 5).repeat(2);
+         colorHex = colorHex.replace(/(.)/g, '$1$1');
         color = colorHex;
       }
       // 填充成9字符格式，不然android无法渲染
-      colorHex = color.padEnd(9,"F");
+      colorHex = color.padEnd(9, "F");
     }
   }
   return colorHex as Color.RGBAHex;
