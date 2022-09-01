@@ -34,13 +34,13 @@ class TopBarFFI(
     }
 
     @JavascriptInterface
-    fun getOverlay(): Boolean {
+    fun getOverlay(): Float? {
         return state.overlay.value
     }
 
     @JavascriptInterface
-    fun toggleOverlay(isOverlay: BoolInt): Boolean {
-        state.overlay.value = isOverlay.toBoolean { !state.overlay.value }
+    fun toggleOverlay(isOverlay: String): Float? {
+        state.overlay.value = isOverlay.toFloat()
         Log.i(TAG, "toggleOverlay:${state.overlay.value}")
         return state.overlay.value
     }

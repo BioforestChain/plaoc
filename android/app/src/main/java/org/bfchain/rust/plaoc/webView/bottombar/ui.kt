@@ -23,7 +23,6 @@ fun DWebBottomBar(
     NavigationBar(
         modifier = Modifier
             .let {
-              Log.i("xxx","bottomBarState.overlay.value${bottomBarState.overlay.value}")
               bottomBarState.height.value?.let { height ->
                     if (height >= 0) {
                         it.height(height.dp)
@@ -35,7 +34,7 @@ fun DWebBottomBar(
             .onGloballyPositioned { coordinates ->
                 bottomBarState.height.value = coordinates.size.height / localDensity.density
             },
-        containerColor = bottomBarState.backgroundColor.value.copy(bottomBarState.overlay.value ?: 0F),
+        containerColor = bottomBarState.backgroundColor.value.copy(bottomBarState.overlay.value ?: 1F),
         contentColor = bottomBarState.foregroundColor.value,
         tonalElevation = 0.dp,
     ) {

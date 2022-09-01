@@ -6082,7 +6082,7 @@ class BfcsTopBar extends DwebPlugin {
       await this.setForegroundColor(newVal);
     } else if (attrName === "overlay") {
       if (this.hasAttribute(attrName)) {
-        await this._ffi.setOverlay();
+        await this._ffi.setOverlay(newVal);
       }
     } else if (attrName === "hidden") {
       if (this.hasAttribute(attrName)) {
@@ -6168,7 +6168,7 @@ const _export_sfc = (sfc, props) => {
   return target;
 };
 const HelloWorld = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["__scopeId", "data-v-e8b9485e"]]);
-const _hoisted_1 = /* @__PURE__ */ createStaticVNode('<div data-v-a90edcce><a href="https://vitejs.dev" target="_blank" data-v-a90edcce><img src="' + _imports_0 + '" class="logo" alt="Vite logo" data-v-a90edcce></a><a href="https://vuejs.org/" target="_blank" data-v-a90edcce><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-a90edcce></a><a href="https://vuejs.org/" target="_blank" data-v-a90edcce><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-a90edcce></a><a href="https://vuejs.org/" target="_blank" data-v-a90edcce><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-a90edcce></a></div>', 1);
+const _hoisted_1 = /* @__PURE__ */ createStaticVNode('<div data-v-df684faf><a href="https://vitejs.dev" target="_blank" data-v-df684faf><img src="' + _imports_0 + '" class="logo" alt="Vite logo" data-v-df684faf></a><a href="https://vuejs.org/" target="_blank" data-v-df684faf><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-df684faf></a><a href="https://vuejs.org/" target="_blank" data-v-df684faf><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-df684faf></a><a href="https://vuejs.org/" target="_blank" data-v-df684faf><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-df684faf></a></div>', 1);
 const _sfc_main = /* @__PURE__ */ defineComponent({
   __name: "App",
   setup(__props) {
@@ -6192,7 +6192,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         createVNode(_component_dweb_top_bar, {
           id: "topbar",
           title: "Ar \u626B\u96F7",
-          "background-color": "#CCC2DC"
+          "background-color": "#CCC2DCFF"
         }, {
           default: withCtx(() => [
             createVNode(_component_dweb_top_bar_button, { id: "aaa" }, {
@@ -6283,6 +6283,6 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
     };
   }
 });
-const App_vue_vue_type_style_index_0_scoped_a90edcce_lang = "";
-const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["__scopeId", "data-v-a90edcce"]]);
+const App_vue_vue_type_style_index_0_scoped_df684faf_lang = "";
+const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["__scopeId", "data-v-df684faf"]]);
 createApp(App).mount("#app");

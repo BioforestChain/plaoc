@@ -115,7 +115,7 @@ export namespace TopBar {
     setHidden(): Promise<void>;
     getOverlay(): Promise<boolean>;
     toggleOverlay(): Promise<void>;
-    setOverlay(): Promise<void>;
+    setOverlay(alpha:string): Promise<void>;
     getTitle(): Promise<string>;
     setTitle(title: string): Promise<void>;
     hasTitle(): Promise<boolean>;

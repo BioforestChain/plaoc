@@ -28,8 +28,8 @@ fun DWebTopBar(
     webViewState: AdWebViewState,
     topBarState: TopBarState,
 ) {
+  Log.i("xxx1","overlay:${topBarState.overlay.value}")
     val localDensity = LocalDensity.current
-
     CenterAlignedTopAppBar(
         navigationIcon = {
             IconButton(
@@ -81,7 +81,7 @@ fun DWebTopBar(
 
             @Composable
             override fun containerColor(scrollFraction: Float): State<Color> {
-                return topBarState.backgroundColor
+              return topBarState.backgroundColor
             }
 
             @Composable
