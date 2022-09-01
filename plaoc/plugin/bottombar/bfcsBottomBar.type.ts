@@ -109,6 +109,7 @@ export namespace BottomBar {
   export interface BottomBarItem {
     icon: Icon.IPlaocIcon;
     onClickCode: string;
+    alwaysShowLabel: boolean;
     label?: string;
     selected?: boolean;
     selectable?: boolean;

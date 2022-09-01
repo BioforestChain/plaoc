@@ -84,14 +84,14 @@ button:focus-visible {
   color: #888;
 }
 
-.logo[data-v-a669c74d] {
+.logo[data-v-a90edcce] {
   height: 6em;
   padding: 1.5em;
   will-change: filter;
 }
-.logo[data-v-a669c74d]:hover {
+.logo[data-v-a90edcce]:hover {
   filter: drop-shadow(0 0 2em #646cffaa);
 }
-.logo.vue[data-v-a669c74d]:hover {
+.logo.vue[data-v-a90edcce]:hover {
   filter: drop-shadow(0 0 2em #42b883aa);
 }

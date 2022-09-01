@@ -38,7 +38,8 @@ export class BfcsBottomBar extends DwebPlugin {
         "color",
         "selected-color",
         "indicator-color",
-        "height"
+        "height",
+        "hide-value"
       ],
     });
 
@@ -147,6 +148,7 @@ export class BfcsBottomBar extends DwebPlugin {
 
       let colors: BottomBar.IBottomBarColors = {};
       let label: string = "";
+      let alwaysShowLabel = false;
 
       if (childNode.querySelector("dweb-bottom-bar-icon")) {
         let $ = childNode.querySelector("dweb-bottom-bar-icon")!;
@@ -176,8 +178,10 @@ export class BfcsBottomBar extends DwebPlugin {
 
          if ($.hasAttribute("value")) {
           label = $.getAttribute("value")!
-        }
-        
+         }
+        // 是否一直显示文字，如果指定此值，则只有选择才会显示文字
+         alwaysShowLabel = ($.hasAttribute("hide-value")) ? true : false;
+ 
         if ($.hasAttribute("color")) {
           colors.textColor = convertToRGBAHex($?.getAttribute("color")!);
         }
@@ -205,6 +209,7 @@ export class BfcsBottomBar extends DwebPlugin {
       this._actionList.push({
         icon,
         onClickCode,
+        alwaysShowLabel,
         disabled,
         label,
         selectable:diSelectable,

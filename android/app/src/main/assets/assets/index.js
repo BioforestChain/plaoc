@@ -5061,7 +5061,8 @@ class BfcsBottomBar extends DwebPlugin {
         "color",
         "selected-color",
         "indicator-color",
-        "height"
+        "height",
+        "hide-value"
       ]
     });
     this._init();
@@ -5140,6 +5141,7 @@ class BfcsBottomBar extends DwebPlugin {
       };
       let colors = {};
       let label = "";
+      let alwaysShowLabel = false;
       if (childNode.querySelector("dweb-bottom-bar-icon")) {
         let $ = childNode.querySelector("dweb-bottom-bar-icon");
         icon.un_source = (_a = $.getAttribute("un-source")) != null ? _a : "";
@@ -5161,6 +5163,7 @@ class BfcsBottomBar extends DwebPlugin {
         if ($.hasAttribute("value")) {
           label = $.getAttribute("value");
         }
+        alwaysShowLabel = $.hasAttribute("hide-value") ? true : false;
         if ($.hasAttribute("color")) {
           colors.textColor = convertToRGBAHex($ == null ? void 0 : $.getAttribute("color"));
         }
@@ -5184,6 +5187,7 @@ class BfcsBottomBar extends DwebPlugin {
       this._actionList.push({
         icon,
         onClickCode,
+        alwaysShowLabel,
         disabled,
         label,
         selectable: diSelectable,
@@ -5272,7 +5276,7 @@ class BfcsBottomBarText extends DwebPlugin {
     super();
   }
   static get observedAttributes() {
-    return ["value", "color", "selected-color"];
+    return ["value", "color", "selected-color", "hide-value"];
   }
 }
 customElements.define("dweb-bottom-bar", BfcsBottomBar);
@@ -6164,7 +6168,7 @@ const _export_sfc = (sfc, props) => {
   return target;
 };
 const HelloWorld = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["__scopeId", "data-v-e8b9485e"]]);
-const _hoisted_1 = /* @__PURE__ */ createStaticVNode('<div data-v-a669c74d><a href="https://vitejs.dev" target="_blank" data-v-a669c74d><img src="' + _imports_0 + '" class="logo" alt="Vite logo" data-v-a669c74d></a><a href="https://vuejs.org/" target="_blank" data-v-a669c74d><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-a669c74d></a><a href="https://vuejs.org/" target="_blank" data-v-a669c74d><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-a669c74d></a><a href="https://vuejs.org/" target="_blank" data-v-a669c74d><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-a669c74d></a></div>', 1);
+const _hoisted_1 = /* @__PURE__ */ createStaticVNode('<div data-v-a90edcce><a href="https://vitejs.dev" target="_blank" data-v-a90edcce><img src="' + _imports_0 + '" class="logo" alt="Vite logo" data-v-a90edcce></a><a href="https://vuejs.org/" target="_blank" data-v-a90edcce><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-a90edcce></a><a href="https://vuejs.org/" target="_blank" data-v-a90edcce><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-a90edcce></a><a href="https://vuejs.org/" target="_blank" data-v-a90edcce><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-a90edcce></a></div>', 1);
 const _sfc_main = /* @__PURE__ */ defineComponent({
   __name: "App",
   setup(__props) {
@@ -6232,7 +6236,8 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                 createVNode(_component_dweb_bottom_bar_text, {
                   color: "#938F99",
                   "selected-color": "#1C1B1F",
-                  value: "\u571F\u5730"
+                  value: "\u571F\u5730",
+                  "hide-value": ""
                 })
               ]),
               _: 1
@@ -6264,7 +6269,8 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                 createVNode(_component_dweb_bottom_bar_text, {
                   color: "#938F99",
                   "selected-color": "#1C1B1F",
-                  value: "\u4E2A\u4EBA\u7A7A\u95F4"
+                  value: "\u4E2A\u4EBA\u7A7A\u95F4",
+                  "hide-value": ""
                 })
               ]),
               _: 1
@@ -6277,6 +6283,6 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
     };
   }
 });
-const App_vue_vue_type_style_index_0_scoped_a669c74d_lang = "";
-const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["__scopeId", "data-v-a669c74d"]]);
+const App_vue_vue_type_style_index_0_scoped_a90edcce_lang = "";
+const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["__scopeId", "data-v-a90edcce"]]);
 createApp(App).mount("#app");
