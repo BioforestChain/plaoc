@@ -80,6 +80,7 @@ fun DWebTopBar(
 
             @Composable
             override fun containerColor(scrollFraction: Float): State<Color> {
+              topBarState.backgroundColor.value = topBarState.backgroundColor.value.copy(topBarState.overlay.value?: 1F);
               return topBarState.backgroundColor
             }
 

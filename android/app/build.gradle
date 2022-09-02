@@ -129,8 +129,6 @@ dependencies {
     implementation "com.squareup.retrofit2:retrofit:2.6.2"
     implementation "com.squareup.retrofit2:converter-gson:2.6.2"
     // endregion
-  // https://stackoverflow.com/questions/73566582/how-do-hide-navigationbar-indicatorcolor/73567013#73567013
-  implementation "com.google.accompanist:accompanist-systemuicontroller:0.26.2-beta"
 }
 
 

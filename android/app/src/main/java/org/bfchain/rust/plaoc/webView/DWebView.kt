@@ -392,20 +392,6 @@ fun DWebView(
                             return super.shouldInterceptRequest(view, request)
                         }
 
-                        // API < 21
-//                        override fun shouldInterceptRequest(view: WebView?, url: String?): WebResourceResponse? {
-//                            if (url != null) {
-//                                if (!(url.startsWith("http://127.0.0.1") || url.startsWith(
-//                                        "https://unpkg.com"
-//                                    ))
-//                                ) {
-//                                    return super.shouldInterceptRequest(view,
-//                                        url.let { gateWay(it) })
-//                                }
-//                            }
-//                            return super.shouldInterceptRequest(view, url)
-//                        }
-
                         override fun shouldOverrideUrlLoading(
                             view: WebView?,
                             request: WebResourceRequest?
@@ -439,7 +425,8 @@ fun DWebView(
                     m.padding(start, top, end, bottom)
                 },
             )
-            // 如果前端传递了透明度属性，并且是需要显示的
+
+          // 如果前端传递了透明度属性，并且是需要显示的
             if ((topBarState.overlay.value != 1F) and topBarState.enabled.value) {
                 Box(
                     contentAlignment = Alignment.TopCenter,
@@ -448,14 +435,13 @@ fun DWebView(
                             Modifier.offset(y = WindowInsets.statusBars.getTop(this).toDp())
                         }
                     } else {
-                        Modifier
+                      Modifier
                     }
                 ) {
                     TopAppBar()
                 }
             }
             if ((bottomBarState.overlay.value != 1F) and bottomBarState.isEnabled) {
-              Log.i("<{=．．．．(嘎~嘎~嘎~)","这里是控制bottom bar 透明度的");
                 Box(
                     contentAlignment = Alignment.BottomCenter,
                     modifier = Modifier.fillMaxSize()

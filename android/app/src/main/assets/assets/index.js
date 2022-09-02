@@ -6168,7 +6168,7 @@ const _export_sfc = (sfc, props) => {
   return target;
 };
 const HelloWorld = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["__scopeId", "data-v-e8b9485e"]]);
-const _hoisted_1 = /* @__PURE__ */ createStaticVNode('<div data-v-ef555c2c><a href="https://vitejs.dev" target="_blank" data-v-ef555c2c><img src="' + _imports_0 + '" class="logo" alt="Vite logo" data-v-ef555c2c></a><a href="https://vuejs.org/" target="_blank" data-v-ef555c2c><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-ef555c2c></a><a href="https://vuejs.org/" target="_blank" data-v-ef555c2c><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-ef555c2c></a><a href="https://vuejs.org/" target="_blank" data-v-ef555c2c><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-ef555c2c></a></div>', 1);
+const _hoisted_1 = /* @__PURE__ */ createStaticVNode('<div data-v-a101168c><a href="https://vitejs.dev" target="_blank" data-v-a101168c><img src="' + _imports_0 + '" class="logo" alt="Vite logo" data-v-a101168c></a><a href="https://vuejs.org/" target="_blank" data-v-a101168c><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-a101168c></a><a href="https://vuejs.org/" target="_blank" data-v-a101168c><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-a101168c></a><a href="https://vuejs.org/" target="_blank" data-v-a101168c><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-a101168c></a></div>', 1);
 const _sfc_main = /* @__PURE__ */ defineComponent({
   __name: "App",
   setup(__props) {
@@ -6192,9 +6192,8 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         createVNode(_component_dweb_top_bar, {
           id: "topbar",
           title: "Ar \u626B\u96F7",
-          "background-color": "#ffff",
-          "foreground-color": "#f71F",
-          overlay: "0.2"
+          "background-color": "#000",
+          overlay: "0.4"
         }, {
           default: withCtx(() => [
             createVNode(_component_dweb_top_bar_button, { id: "aaa" }, {
@@ -6285,6 +6284,6 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
     };
   }
 });
-const App_vue_vue_type_style_index_0_scoped_ef555c2c_lang = "";
-const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["__scopeId", "data-v-ef555c2c"]]);
+const App_vue_vue_type_style_index_0_scoped_a101168c_lang = "";
+const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["__scopeId", "data-v-a101168c"]]);
 createApp(App).mount("#app");
