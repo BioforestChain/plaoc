@@ -1,14 +1,14 @@
 package org.bfchain.rust.plaoc.util
 
 import androidx.compose.runtime.*
-
+import kotlinx.coroutines.awaitAll
 
 @Stable
-class IsChange {
+ class IsChange  {
     val changes: MutableState<Int> = mutableStateOf(0)
-    private val policy by lazy {
-        object : SnapshotMutationPolicy<Any?> {
-            override fun equivalent(a: Any?, b: Any?): Boolean {
+   private val policy by lazy {
+       object : SnapshotMutationPolicy<Any?> {
+          override fun equivalent(a: Any?, b: Any?): Boolean {
                 return (a == b).also {
                     if (!it)
                         changes.value += 1
@@ -16,6 +16,8 @@ class IsChange {
             }
         }
     }
+
+
 
     fun <T> getPolicy(): SnapshotMutationPolicy<T> {
         return policy as SnapshotMutationPolicy<T>

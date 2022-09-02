@@ -4898,7 +4898,7 @@ function convertToRGBAHex(color) {
     if (color.length === 9) {
       colorHex = color;
     } else {
-      if (color.length === 4) {
+      if (color.length === 4 || color.length === 5) {
         colorHex = colorHex.replace(/(.)/g, "$1$1");
         color = colorHex;
       }
@@ -5871,13 +5871,13 @@ class TopBarFFI {
   }
   toggleOverlay() {
     return new Promise((resolve2, reject) => {
-      this._ffi.toggleOverlay(0);
+      this._ffi.toggleOverlay(String(0));
       resolve2();
     });
   }
-  setOverlay() {
+  setOverlay(alpha) {
     return new Promise((resolve2, reject) => {
-      this._ffi.toggleOverlay(1);
+      this._ffi.toggleOverlay(String(alpha));
       resolve2();
     });
   }
@@ -6168,7 +6168,7 @@ const _export_sfc = (sfc, props) => {
   return target;
 };
 const HelloWorld = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["__scopeId", "data-v-e8b9485e"]]);
-const _hoisted_1 = /* @__PURE__ */ createStaticVNode('<div data-v-df684faf><a href="https://vitejs.dev" target="_blank" data-v-df684faf><img src="' + _imports_0 + '" class="logo" alt="Vite logo" data-v-df684faf></a><a href="https://vuejs.org/" target="_blank" data-v-df684faf><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-df684faf></a><a href="https://vuejs.org/" target="_blank" data-v-df684faf><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-df684faf></a><a href="https://vuejs.org/" target="_blank" data-v-df684faf><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-df684faf></a></div>', 1);
+const _hoisted_1 = /* @__PURE__ */ createStaticVNode('<div data-v-ef555c2c><a href="https://vitejs.dev" target="_blank" data-v-ef555c2c><img src="' + _imports_0 + '" class="logo" alt="Vite logo" data-v-ef555c2c></a><a href="https://vuejs.org/" target="_blank" data-v-ef555c2c><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-ef555c2c></a><a href="https://vuejs.org/" target="_blank" data-v-ef555c2c><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-ef555c2c></a><a href="https://vuejs.org/" target="_blank" data-v-ef555c2c><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-ef555c2c></a></div>', 1);
 const _sfc_main = /* @__PURE__ */ defineComponent({
   __name: "App",
   setup(__props) {
@@ -6192,7 +6192,9 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         createVNode(_component_dweb_top_bar, {
           id: "topbar",
           title: "Ar \u626B\u96F7",
-          "background-color": "#CCC2DCFF"
+          "background-color": "#ffff",
+          "foreground-color": "#f71F",
+          overlay: "0.2"
         }, {
           default: withCtx(() => [
             createVNode(_component_dweb_top_bar_button, { id: "aaa" }, {
@@ -6283,6 +6285,6 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
     };
   }
 });
-const App_vue_vue_type_style_index_0_scoped_df684faf_lang = "";
-const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["__scopeId", "data-v-df684faf"]]);
+const App_vue_vue_type_style_index_0_scoped_ef555c2c_lang = "";
+const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["__scopeId", "data-v-ef555c2c"]]);
 createApp(App).mount("#app");

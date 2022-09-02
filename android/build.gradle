@@ -2,8 +2,7 @@
 
 buildscript {
     apply from: 'versions.gradle'
-    ext.kotlin_version = "1.6.10"
-    ext.compose_version = "1.1.1"
+    ext.compose_version = "1.2.0-alpha08"
     addRepos(repositories)
     repositories {
         google()
@@ -11,7 +10,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:7.2.2'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.10"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.20"
 //        classpath "com.vanniktech:gradle-maven-publish-plugin:$versions.mavenPublish"
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle filesndkVersion

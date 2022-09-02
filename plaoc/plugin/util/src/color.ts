@@ -45,8 +45,8 @@ export function convertToRGBAHex(color: string):Color.RGBAHex {
     if (color.length === 9) {
       colorHex = color;
     } else {
-      // 如果是 #f71 这种格式的话,转换为5字符格式
-      if (color.length === 4) {
+      // 如果是 #f71 或者#f72e这种格式的话,转换为5字符格式
+      if (color.length === 4 || color.length === 5) {
          colorHex = colorHex.replace(/(.)/g, '$1$1');
         color = colorHex;
       }

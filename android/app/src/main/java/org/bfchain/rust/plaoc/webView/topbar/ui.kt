@@ -28,7 +28,6 @@ fun DWebTopBar(
     webViewState: AdWebViewState,
     topBarState: TopBarState,
 ) {
-  Log.i("xxx1","overlay:${topBarState.overlay.value}")
     val localDensity = LocalDensity.current
     CenterAlignedTopAppBar(
         navigationIcon = {

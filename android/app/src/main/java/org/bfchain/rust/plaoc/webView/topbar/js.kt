@@ -41,7 +41,7 @@ class TopBarFFI(
     @JavascriptInterface
     fun toggleOverlay(isOverlay: String): Float? {
         state.overlay.value = isOverlay.toFloat()
-        Log.i(TAG, "toggleOverlay:${state.overlay.value}")
+        Log.i(TAG, "toggleOverlay:${state.overlay.value},${isOverlay}")
         return state.overlay.value
     }
 

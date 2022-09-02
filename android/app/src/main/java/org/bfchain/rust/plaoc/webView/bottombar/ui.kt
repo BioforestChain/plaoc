@@ -11,6 +11,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import org.bfchain.rust.plaoc.webView.icon.DWebIcon
 import org.bfchain.rust.plaoc.webView.jsutil.JsUtil
 
@@ -43,7 +44,9 @@ fun DWebBottomBar(
             mutableStateOf(bottomBarState.actions.indexOfFirst { it.selected }
               .let { if (it == -1) 0 else it })
           }
-
+        rememberSystemUiController().setSystemBarsColor(
+          color = Color.Transparent,
+        )
           bottomBarState.actions.forEachIndexed { index, action ->
             // 如果传递了un_source，使用双图片切换
             if (!action.icon.un_source.isNullOrEmpty()) {

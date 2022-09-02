@@ -40,7 +40,7 @@ class BottomBarFFI(
     @JavascriptInterface
     fun toggleOverlay(isOverlay: String): Float {
         state.overlay.value = isOverlay.toFloat()
-        Log.i(TAG, "toggleOverlay:${state.overlay.value}")
+//        Log.i(TAG, "toggleOverlay:${state.overlay.value}")
         return state.overlay.value ?: 1F
     }
 
@@ -63,13 +63,13 @@ class BottomBarFFI(
     @JavascriptInterface
     fun setActions(actionListJson: DataString<List<BottomBarAction>>) {
         state.actions.clear()
-      Log.i(TAG, "actionListJson:${actionListJson}")
+//      Log.i(TAG, "actionListJson:${actionListJson}")
       val actionList = actionListJson.toData<List<BottomBarAction>>(object :
             TypeToken<List<BottomBarAction>>() {}.type)
         actionList.toCollection(state.actions)
-      actionList.forEach{
-        Log.i(TAG, "actionList:${it.colors}")
-      }
+//      actionList.forEach{
+//        Log.i(TAG, "actionList:${it.colors}")
+//      }
     }
 
     @JavascriptInterface
