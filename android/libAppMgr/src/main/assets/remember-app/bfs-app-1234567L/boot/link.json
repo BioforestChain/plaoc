@@ -8,7 +8,7 @@
     "autoUpdate": {
         "maxAge": 1,
         "provider": 1,
-        "url": "https://www.baidu.com",
+        "url": "https://www.bfs-app-12.com",
         "version": "1.0.1",
         "files": [{
             "url": "https://www.google.cn",

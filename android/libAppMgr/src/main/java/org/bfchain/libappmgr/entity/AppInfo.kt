@@ -24,30 +24,34 @@ import java.util.*
  */
 
 data class FileInfo(
-    var url: String, // 链接
-    var size: Int, // 大小
-    var sha512: String // 校验码
+    val url: String, // 链接
+    val size: Int, // 大小
+    val sha512: String // 校验码
+)
+
+data class AppVersion(
+    val version: String, // 版本号
+    val files: List<FileInfo>, // 文件列表
+    val releaseNotes: String, // 本次发布的信息，一般存放更新信息
+    val releaseName: String, // 本次发布的标题，用于展示更新信息时的标题
+    val releaseDate: Date // 发布日期
 )
 
 data class AutoUpdateInfo(
-    var maxAge: Int, // 最大缓存时间，一般6小时更新一次。最快不能快于1分钟，否则按1分钟算。
-    var provider: Int, // {Generic}该更新的适配器信息，默认使用“通用适配器”
-    var url: String, // 自动更新的链接，一般是https开头，请求该链接可以获得以下“通用适配器”的字段：
-    var version: String, // 版本号
-    var files: List<FileInfo>, // 文件列表
-    var releaseNotes: String, // 本次发布的信息，一般存放更新信息
-    var releaseName: String, // 本次发布的标题，用于展示更新信息时的标题
-    var releaseDate: Date // 发布日期
+    val maxAge: Int, // 最大缓存时间，一般6小时更新一次。最快不能快于1分钟，否则按1分钟算。
+    val provider: Int, // {Generic}该更新的适配器信息，默认使用“通用适配器”
+    val url: String, // 自动更新的链接，一般是https开头，请求该链接可以获得以下“通用适配器”的字段：
 )
 
 data class AppInfo(
-    var version: String, // 该文件格式的版本号，用于告知解析器该如何认知接下来的字段。以下字段是 1.0.0 的字段描述
-    var bfsAppId: String, // 唯一标识，也就是 bfs-app-id，跟文件夹一致。长度为7+1（校验位）的大写英文字母或数字
-    var name: String, // 应用名词（没有i18n的支持）
-    var icon: String, // 应用图标（没有不同主题的支持），一般是 file:///sys/icon.png
-    var author: String, // 作者名称与TA的链接，用“,”进行分割，比如： ["kzf,kezhaofeng@bnqkl.cn,https://bnqkl.cn/developer/kzf"]
-    var homepage: String = "", // 应用网络主页，一般是https网站。用户可以通过一些特定的操作来访问应用主页了解更多应用信息
-    var autoUpdate: AutoUpdateInfo?, // 自动更新的相关配置
+    val version: String, // 该文件格式的版本号，用于告知解析器该如何认知接下来的字段。以下字段是 1.0.0 的字段描述
+    val bfsAppId: String, // 唯一标识，也就是 bfs-app-id，跟文件夹一致。长度为7+1（校验位）的大写英文字母或数字
+    val name: String, // 应用名词（没有i18n的支持）
+    val icon: String, // 应用图标（没有不同主题的支持），一般是 file:///sys/icon.png
+    val author: String, // 作者名称与TA的链接，用“,”进行分割，比如： ["kzf,kezhaofeng@bnqkl.cn,https://bnqkl.cn/developer/kzf"]
+    val homepage: String = "", // 应用网络主页，一般是https网站。用户可以通过一些特定的操作来访问应用主页了解更多应用信息
+    val autoUpdate: AutoUpdateInfo?, // 自动更新的相关配置
     var isSystemApp: Boolean = false, // 判断是recommend-app还是system-app
-    var iconPath: String = "" // 将icon转为实际路径
+    var iconPath: String = "", // 将icon转为实际路径
+    var isShowBadge: Boolean = false // 是否显示应用更新提醒，也就是左上角的小圆点
 )

@@ -2,10 +2,13 @@ package org.bfchain.libappmgr.ui.view
 
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -37,14 +40,29 @@ fun AppInfoView(appInfo: AppInfo) {
                 modifier = Modifier
                     .width(60.dp)
                     .height(60.dp)
+                    .clickable {
+
+                    }
             ) {
                 Image(
                     bitmap = BitmapFactory.decodeFile(appInfo.iconPath)?.asImageBitmap()
                         ?: ImageBitmap.imageResource(id = R.drawable.ic_launcher),
                     contentDescription = "icon",
                     contentScale = ContentScale.FillBounds,
-                    modifier = Modifier.clip(RoundedCornerShape(12.dp))
+                    modifier = Modifier
+                        .padding(2.dp)
+                        .clip(RoundedCornerShape(12.dp))
                 )
+
+                if (appInfo.isShowBadge) {
+                    Box(
+                        modifier = Modifier
+                            .clip(CircleShape)
+                            .size(12.dp)
+                            .background(Color.Red)
+                            .align(Alignment.TopEnd)
+                    )
+                }
             }
             Spacer(modifier = Modifier.height(4.dp))
             Box(
