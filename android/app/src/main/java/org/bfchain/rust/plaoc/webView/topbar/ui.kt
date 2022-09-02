@@ -61,6 +61,7 @@ fun DWebTopBar(
         actions = {
             if (topBarState.actions.size > 0) {
                 for (action in topBarState.actions) {
+                  action.icon.currentSource = action.icon.source;
                     IconButton(
                         onClick = {
                             jsUtil?.evalQueue { action.onClickCode }
@@ -80,6 +81,7 @@ fun DWebTopBar(
 
             @Composable
             override fun containerColor(scrollFraction: Float): State<Color> {
+//              Log.i(TAG,"backgroundColor:${topBarState.backgroundColor.value}")
               topBarState.backgroundColor.value = topBarState.backgroundColor.value.copy(topBarState.overlay.value?: 1F);
               return topBarState.backgroundColor
             }

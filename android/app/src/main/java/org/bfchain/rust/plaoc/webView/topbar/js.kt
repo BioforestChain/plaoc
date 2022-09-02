@@ -41,7 +41,7 @@ class TopBarFFI(
     @JavascriptInterface
     fun toggleOverlay(isOverlay: String): Float? {
         state.overlay.value = isOverlay.toFloat()
-        Log.i(TAG, "toggleOverlay:${state.overlay.value},${isOverlay}")
+//        Log.i(TAG, "toggleOverlay:${state.overlay.value},${isOverlay}")
         return state.overlay.value
     }
 
@@ -77,6 +77,9 @@ class TopBarFFI(
         val actionList = actionListJson.toData<List<TopBarAction>>(object :
             TypeToken<List<TopBarAction>>() {}.type)
         actionList.toCollection(state.actions)
+//      actionList.forEach{
+//        Log.i(TAG,"哈哈：${it}")
+//      }
     }
 
     @JavascriptInterface

@@ -56,7 +56,7 @@ fun DWebBottomBar(
               icon = {
                 DWebIcon(action.icon)
               },
-              alwaysShowLabel = action.alwaysShowLabel,
+              alwaysShowLabel = !action.alwaysShowLabel,
               label = if (action.label.isNotEmpty()) {
                 { Text(action.label) }
               } else {

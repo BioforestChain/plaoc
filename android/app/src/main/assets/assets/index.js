@@ -4898,11 +4898,11 @@ function convertToRGBAHex(color) {
     if (color.length === 9) {
       colorHex = color;
     } else {
-      if (color.length === 4 || color.length === 5) {
-        colorHex = colorHex.replace(/(.)/g, "$1$1");
-        color = colorHex;
+      color = color.substring(1);
+      if (color.length === 4 || color.length === 3) {
+        color = color.replace(/(.)/g, "$1$1");
       }
-      colorHex = color.padEnd(9, "F");
+      colorHex += color.padEnd(8, "F");
     }
   }
   return colorHex;
@@ -5072,7 +5072,6 @@ class BfcsBottomBar extends DwebPlugin {
   }
   async _init() {
     const height = await this.getHeight();
-    console.log("bottom_bar:", height);
     if (height) {
       this.setAttribute("height", `${height}`);
     } else {
@@ -5182,7 +5181,6 @@ class BfcsBottomBar extends DwebPlugin {
         colors.indicatorColor = convertToRGBAHex(
           childNode.getAttribute("indicator-color")
         );
-        console.log("1colorHex:", colors.indicatorColor);
       }
       this._actionList.push({
         icon,
@@ -6168,7 +6166,7 @@ const _export_sfc = (sfc, props) => {
   return target;
 };
 const HelloWorld = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["__scopeId", "data-v-e8b9485e"]]);
-const _hoisted_1 = /* @__PURE__ */ createStaticVNode('<div data-v-a101168c><a href="https://vitejs.dev" target="_blank" data-v-a101168c><img src="' + _imports_0 + '" class="logo" alt="Vite logo" data-v-a101168c></a><a href="https://vuejs.org/" target="_blank" data-v-a101168c><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-a101168c></a><a href="https://vuejs.org/" target="_blank" data-v-a101168c><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-a101168c></a><a href="https://vuejs.org/" target="_blank" data-v-a101168c><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-a101168c></a></div>', 1);
+const _hoisted_1 = /* @__PURE__ */ createStaticVNode('<div data-v-3b1b78d5><a href="https://vitejs.dev" target="_blank" data-v-3b1b78d5><img src="' + _imports_0 + '" class="logo" alt="Vite logo" data-v-3b1b78d5></a><a href="https://vuejs.org/" target="_blank" data-v-3b1b78d5><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-3b1b78d5></a><a href="https://vuejs.org/" target="_blank" data-v-3b1b78d5><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-3b1b78d5></a><a href="https://vuejs.org/" target="_blank" data-v-3b1b78d5><img src="' + _imports_1 + '" class="logo vue" alt="Vue logo" data-v-3b1b78d5></a></div>', 1);
 const _sfc_main = /* @__PURE__ */ defineComponent({
   __name: "App",
   setup(__props) {
@@ -6192,7 +6190,8 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         createVNode(_component_dweb_top_bar, {
           id: "topbar",
           title: "Ar \u626B\u96F7",
-          "background-color": "#000",
+          "background-color": "#eeee",
+          "foreground-color": "#000",
           overlay: "0.4"
         }, {
           default: withCtx(() => [
@@ -6218,7 +6217,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         createVNode(HelloWorld, { msg: unref(scannerData) }, null, 8, ["msg"]),
         createVNode(_component_dweb_bottom_bar, {
           id: "bottom_bar",
-          "background-color": "#D0BCFF00",
+          "background-color": "#D0BCFF",
           "foreground-color": "#1C1B1F",
           height: "70",
           overlay: "0.2"
@@ -6237,8 +6236,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                 createVNode(_component_dweb_bottom_bar_text, {
                   color: "#938F99",
                   "selected-color": "#1C1B1F",
-                  value: "\u571F\u5730",
-                  "hide-value": ""
+                  value: "\u571F\u5730"
                 })
               ]),
               _: 1
@@ -6270,8 +6268,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                 createVNode(_component_dweb_bottom_bar_text, {
                   color: "#938F99",
                   "selected-color": "#1C1B1F",
-                  value: "\u4E2A\u4EBA\u7A7A\u95F4",
-                  "hide-value": ""
+                  value: "\u4E2A\u4EBA\u7A7A\u95F4"
                 })
               ]),
               _: 1
@@ -6284,6 +6281,6 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
     };
   }
 });
-const App_vue_vue_type_style_index_0_scoped_a101168c_lang = "";
-const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["__scopeId", "data-v-a101168c"]]);
+const App_vue_vue_type_style_index_0_scoped_3b1b78d5_lang = "";
+const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["__scopeId", "data-v-3b1b78d5"]]);
 createApp(App).mount("#app");

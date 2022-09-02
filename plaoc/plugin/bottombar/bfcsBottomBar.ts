@@ -52,7 +52,6 @@ export class BfcsBottomBar extends DwebPlugin {
 
   private async _init() {
     const height = await this.getHeight();
-    console.log("bottom_bar:", height);
     if (height) {
       this.setAttribute("height", `${height}`);
     } else {
@@ -204,7 +203,6 @@ export class BfcsBottomBar extends DwebPlugin {
         colors.indicatorColor = convertToRGBAHex(
           childNode.getAttribute("indicator-color")!
         );
-      console.log("1colorHex:",colors.indicatorColor );
       }
       this._actionList.push({
         icon,
