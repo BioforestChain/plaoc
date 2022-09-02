@@ -34,13 +34,6 @@ fun DWebTopBar(
             IconButton(
                 onClick = { topBarState.doBack() },
                 modifier = Modifier
-//                        .pointerInteropFilter { event ->
-//                            Log.i(TAG, "filter NavigationIcon event $event")
-//                            true
-//                        }
-//                        .clickable {
-//                            Log.i(TAG, "Clicked NavigationIcon")
-//                        }
             ) {
                 Icon(Icons.Filled.ArrowBack, "backIcon")
             }
@@ -99,8 +92,8 @@ fun DWebTopBar(
         modifier = Modifier
 //                .graphicsLayer(
 //                    renderEffect = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) createBlurEffect(
-//                        25f,
-//                        25f,
+//                        5f,
+//                        5f,
 //                        Shader.TileMode.MIRROR
 //                    ).asComposeRenderEffect() else null
 //                )
@@ -108,6 +101,7 @@ fun DWebTopBar(
                 topBarState.height.value = coordinates.size.height / localDensity.density
             }
             .pointerInteropFilter { event ->
+              // 点击icon事件在这里触发
                 Log.i(TAG, "filter TopAppBar event $event")
 
                 // false 会穿透，在穿透后，返回按钮也能点击了
@@ -115,7 +109,10 @@ fun DWebTopBar(
                 false
             }
             .clickable {
+               // 点击top bar事件在这里触发
                 Log.i(TAG, "Clicked TopAppBar")
             }
     )
 }
+
+

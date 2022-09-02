@@ -15,8 +15,8 @@ const scanner = document.querySelector<OpenScanner>('dweb-scanner')!;
 </script>
 
 <template>
-    <dweb-top-bar id="topbar" title="Ar 扫雷" background-color="#eeee" foreground-color="#000"  overlay="0.4" >
-        <dweb-top-bar-button id="aaa">
+    <dweb-top-bar id="topbar" title="Ar 扫雷" background-color="#eeee"  foreground-color="#000"  overlay="0.4" >
+        <dweb-top-bar-button id="aaa" >
             <dweb-icon source="Filled.AddCircle" ></dweb-icon>
         </dweb-top-bar-button>
         <dweb-top-bar-button id="ccc">
