@@ -28,6 +28,7 @@ import org.bfchain.rust.plaoc.webView.DWebViewActivity
 import org.bfchain.rust.plaoc.webView.network.initMetaData
 import org.bfchain.rust.plaoc.webView.openDWebWindow
 import org.bfchain.rust.plaoc.webView.sendToJavaScript
+import org.bfchain.rust.plaoc.webkit.AdAndroidWebView
 import java.net.URL
 
 
@@ -45,6 +46,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // chromium-aw initialize
+        AdAndroidWebView.initialize(application)
+
         setContentView(R.layout.activity_main)
         callable_map[ExportNative.OpenScanner] = { openScannerActivity() }
         callable_map[ExportNative.OpenDWebView] = {

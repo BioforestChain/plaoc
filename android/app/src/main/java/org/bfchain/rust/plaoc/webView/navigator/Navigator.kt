@@ -6,11 +6,12 @@ import android.webkit.WebView
 import androidx.activity.ComponentActivity
 import androidx.navigation.NavController
 import org.bfchain.rust.plaoc.webView.openDWebWindow
+import org.bfchain.rust.plaoc.webkit.ChromiumWebView
 
 private const val TAG = "js/MyNav"
 
 class NavigatorFFI(
-    val webView: WebView,
+    val webView: ChromiumWebView,
     val activity: ComponentActivity,
     val navController: NavController
 ) {

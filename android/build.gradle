@@ -19,6 +19,10 @@ buildscript {
 
 }
 
+plugins {
+    id 'de.undercouch.download' version '4.1.1' apply false
+}
+
 
 task clean(type: Delete) {
     delete rootProject.buildDir

@@ -343,6 +343,7 @@ fun DWebView(
                         }
 
                     }
+                    Log.i(TAG, "chromeClient 执行")
                     MyWebChromeClient()
                 },
                 client = remember {
@@ -418,6 +419,7 @@ fun DWebView(
                             return super.shouldOverrideUrlLoading(view, request)
                         }
                     }
+                    Log.i(TAG, "client 执行")
                     MyWebViewClient()
                 },
                 modifier = Modifier.let { m ->
