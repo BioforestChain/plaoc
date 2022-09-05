@@ -2,16 +2,11 @@
 // This starter template is using Vue 3 <script setup> SFCs
 // Check out https://vuejs.org/api/sfc-script-setup.html#script-setup
 import HelloWorld from './components/HelloWorld.vue'
-import { IonFab, IonFabButton, IonFabList } from '@ionic/vue';
+import { ref } from 'vue';
 import { OpenScanner } from '@bfsx/plugin';
-import { ref,defineComponent } from 'vue';
-
-defineComponent({
-  components: { IonFab, IonFabButton, IonFabList }
-});
+import System_api from './view/system_api.vue';
 
 let scannerData = ref("DwebView-js ♻️ Deno-js");
-
 
 async function openScanner() {
 const scanner = document.querySelector<OpenScanner>('dweb-scanner')!;
@@ -28,18 +23,16 @@ function handerTopBar() {
 
 <template>
     <dweb-top-bar id="topbar" title="Ar 扫雷" background-color="#eeee"  foreground-color="#000"  overlay="0.4" >
-        <dweb-top-bar-button id="aaa" >
-            <dweb-icon source="Filled.AddCircle" @click="handerTopBar" ></dweb-icon>
+        <dweb-top-bar-button id="aaa" @click="handerTopBar" >
+            <dweb-icon source="Filled.AddCircle"  ></dweb-icon>
         </dweb-top-bar-button>
-        <dweb-top-bar-button id="ccc">
+        <dweb-top-bar-button id="ccc" >
             <dweb-icon source="https://objectjson.waterbang.top/test-vue3/vite.svg" type="AssetIcon"></dweb-icon>
         </dweb-top-bar-button>
     </dweb-top-bar>
   <div>
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
+  <HelloWorld :msg="scannerData" />
+     <a href="https://vuejs.org/" target="_blank">
       <img src="./assets/waterbang.png" class="logo vue" alt="Vue logo" />
     </a>
       <a href="https://vuejs.org/" target="_blank">
@@ -49,7 +42,8 @@ function handerTopBar() {
       <img src="./assets/waterbang.png" class="logo vue" alt="Vue logo" />
     </a>
   </div>
-  <HelloWorld :msg="scannerData" />
+<System_api></System_api>
+
      <dweb-bottom-bar id="bottom_bar" background-color="#D0BCFF" foreground-color="#1C1B1F"  height="70"  overlay="0.5" >
         <dweb-bottom-bar-button id="ddd" selected   >
             <dweb-bottom-bar-icon source="https://objectjson.waterbang.top/test-vue3/land.svg" un-source="https://objectjson.waterbang.top/test-vue3/land-not.svg"  type="AssetIcon"   ></dweb-bottom-bar-icon>
