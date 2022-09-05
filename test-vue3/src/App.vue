@@ -2,9 +2,17 @@
 // This starter template is using Vue 3 <script setup> SFCs
 // Check out https://vuejs.org/api/sfc-script-setup.html#script-setup
 import HelloWorld from './components/HelloWorld.vue'
+import { IonFab, IonFabButton, IonFabList } from '@ionic/vue';
 import { OpenScanner } from '@bfsx/plugin';
-import { ref } from 'vue';
+import { ref,defineComponent } from 'vue';
+
+defineComponent({
+  components: { IonFab, IonFabButton, IonFabList }
+});
+
 let scannerData = ref("DwebView-js ♻️ Deno-js");
+
+
 async function openScanner() {
 const scanner = document.querySelector<OpenScanner>('dweb-scanner')!;
   const iter = await scanner.openScanner()
@@ -12,12 +20,16 @@ const scanner = document.querySelector<OpenScanner>('dweb-scanner')!;
   scannerData.value = iter
 }
 
+function handerTopBar() {
+    console.log("我是topbar icon我被点击了")
+}
+
 </script>
 
 <template>
     <dweb-top-bar id="topbar" title="Ar 扫雷" background-color="#eeee"  foreground-color="#000"  overlay="0.4" >
         <dweb-top-bar-button id="aaa" >
-            <dweb-icon source="Filled.AddCircle" ></dweb-icon>
+            <dweb-icon source="Filled.AddCircle" @click="handerTopBar" ></dweb-icon>
         </dweb-top-bar-button>
         <dweb-top-bar-button id="ccc">
             <dweb-icon source="https://objectjson.waterbang.top/test-vue3/vite.svg" type="AssetIcon"></dweb-icon>
@@ -38,7 +50,7 @@ const scanner = document.querySelector<OpenScanner>('dweb-scanner')!;
     </a>
   </div>
   <HelloWorld :msg="scannerData" />
-     <dweb-bottom-bar id="bottom_bar" background-color="#D0BCFF" foreground-color="#1C1B1F"  height="70"  overlay="0.2" >
+     <dweb-bottom-bar id="bottom_bar" background-color="#D0BCFF" foreground-color="#1C1B1F"  height="70"  overlay="0.5" >
         <dweb-bottom-bar-button id="ddd" selected   >
             <dweb-bottom-bar-icon source="https://objectjson.waterbang.top/test-vue3/land.svg" un-source="https://objectjson.waterbang.top/test-vue3/land-not.svg"  type="AssetIcon"   ></dweb-bottom-bar-icon>
             <dweb-bottom-bar-text color="#938F99" selected-color="#1C1B1F"  value="土地" ></dweb-bottom-bar-text>
