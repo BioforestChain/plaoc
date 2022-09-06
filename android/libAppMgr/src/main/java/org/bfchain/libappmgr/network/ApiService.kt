@@ -1,12 +1,16 @@
 package org.bfchain.libappmgr.network
 
+import io.ktor.client.statement.*
 import org.bfchain.libappmgr.model.AppVersion
-import org.bfchain.libappmgr.network.base.ApiResult
-import retrofit2.http.GET
-import retrofit2.http.Path
+import org.bfchain.libappmgr.network.base.BaseResultData
 
 interface ApiService {
-    @GET("/{app}/appversion.json")
-    suspend fun getNewAppVersion(@Path("app") app: String): ApiResult<AppVersion>
 
+    suspend fun getAppVersion(path: String): BaseResultData<AppVersion>
+
+    suspend fun download(path: String): HttpResponse
+
+    companion object {
+        val instance = ApiServiceImpl(KtorManager.apiService)
+    }
 }

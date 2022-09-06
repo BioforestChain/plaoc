@@ -13,8 +13,7 @@ object JsonUtil {
      */
     fun getAppInfoFromLinkJson(content: String, type: FilesUtil.APP_DIR_TYPE): AppInfo? {
         try {
-            var gson = Gson()
-            var appInfo: AppInfo = gson.fromJson(content, AppInfo::class.java)
+            var appInfo: AppInfo = Gson().fromJson(content, AppInfo::class.java)
             appInfo.isSystemApp = when (type) {
                 FilesUtil.APP_DIR_TYPE.RememberApp -> false
                 FilesUtil.APP_DIR_TYPE.SystemApp -> true
@@ -46,9 +45,8 @@ object JsonUtil {
         type: FilesUtil.APP_DIR_TYPE
     ): List<AppInfo>? {
         try {
-            var gson = Gson()
             var appInfos: List<AppInfo> =
-                gson.fromJson(content, object : TypeToken<List<AppInfo>>() {}.type)
+                Gson().fromJson(content, object : TypeToken<List<AppInfo>>() {}.type)
             appInfos.forEach {
                 it.isSystemApp = when (type) {
                     FilesUtil.APP_DIR_TYPE.RememberApp -> false
@@ -60,5 +58,13 @@ object JsonUtil {
             Log.d(TAG, e.toString())
         }
         return null
+    }
+
+    fun <T> toJson(type: Class<T>, value: T?): String {
+        return Gson().toJson(value, type)
+    }
+
+    fun <T> fromJson(type: Class<T>, value: String): T? {
+        return Gson().fromJson(value, type)
     }
 }

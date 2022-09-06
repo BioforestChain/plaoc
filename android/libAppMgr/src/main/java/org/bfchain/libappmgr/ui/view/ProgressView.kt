@@ -22,7 +22,7 @@ fun ProgressCircular(progressValue: Float) {
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxWidth()
     ) {
-        Log.d("lin.huang", "progressValue->$progressValue")
+        Log.d("ProgressCircular", "progressValue->$progressValue")
         CircularProgressIndicator(
             progress = progressValue, color = Color.White
         )

@@ -6,6 +6,7 @@ buildscript {
     //ext.compose_version = "1.1.1"
     ext.kotlin_version = "1.6.21"
     ext.compose_version = "1.2.0-beta02"
+    ext.ktor_version = "2.1.0"
     addRepos(repositories)
     repositories {
         google()

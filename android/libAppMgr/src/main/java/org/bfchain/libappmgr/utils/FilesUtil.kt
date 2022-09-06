@@ -7,6 +7,7 @@ import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
+import java.util.*
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 
@@ -17,27 +18,34 @@ object FilesUtil {
     const val TAG: String = "FilesUtil"
     val simpleDateFormat = SimpleDateFormat("yyyyMMddhhmmss")
 
-    private val RememberApp: String = "remember-app" // 内置应用
-    private val SystemApp: String = "system-app" // 下载应用后
     private val DIR_BOOT: String = "boot" // 存放 link.json 数据
     private val DIR_SYS: String = "sys" // 存放 icon 信息等
     private val FILE_LINK_JSON: String = "link.json"
 
-    enum class APP_DIR_TYPE { RememberApp, SystemApp }
+    enum class APP_DIR_TYPE(val rootName: String) {
+        // 内置应用
+        RememberApp("remember-app"),
+
+        // 下载应用
+        SystemApp("system-app")
+    }
+
+    /**
+     * 获取app的根目录
+     */
+    private fun getAppRootDirectory(): String {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            AppContextUtil.sInstance!!.dataDir.absolutePath
+        } else {
+            AppContextUtil.sInstance!!.filesDir.absolutePath
+        }
+    }
 
     /**
      * 获取应用的根路径
      */
-    fun getAppDirectory(type: APP_DIR_TYPE): String {
-        var rootName = when (type) {
-            APP_DIR_TYPE.RememberApp -> RememberApp
-            APP_DIR_TYPE.SystemApp -> SystemApp
-        }
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            AppContextUtil.sInstance!!.dataDir.absolutePath + File.separator + rootName // 获取apk安装路径
-        } else {
-            AppContextUtil.sInstance!!.filesDir.absolutePath + File.separator + rootName // 获取apk安装目录下的files路径
-        }
+    fun getAppDirectory(appType: APP_DIR_TYPE): String {
+        return getAppRootDirectory() + File.separator + appType.rootName
     }
 
     /**
@@ -52,17 +60,20 @@ object FilesUtil {
      */
     fun getAppUpdateDirectory(appName: String): String {
         return getAppDirectory(APP_DIR_TYPE.RememberApp) + File.separator + appName +
-                File.separator + "tmp" + File.separator + "autoUpdate"
+                File.separator + "tmp" + File.separator + "autoUpdate" + File.separator +
+                simpleDateFormat.format(Date()) + ".json"
     }
 
     /**
      * 获取应用更新路径中最新文件
      */
-    fun getLastUpdateFile(appName: String): File? {
+    fun getLastUpdateFile(appName: String): String? {
         var directory = getAppUpdateDirectory(appName)
+        Log.d("lin.huang", "getLastUpdateFile->$directory")
         var file = File(directory)
         if (file.exists()) {
-            return file.listFiles().last()
+            Log.d("lin.huang", "getLastUpdateFile->${file.absolutePath}")
+            return getFileContent(file.listFiles().last().absolutePath)
         }
         return null
     }
@@ -170,7 +181,10 @@ object FilesUtil {
         var rootPath = getAppDirectory(APP_DIR_TYPE.RememberApp)
         var file = File(rootPath)
         file.deleteRecursively() // 第一次运行程序时，强制删除remember-app
-        copyFilesFassets(RememberApp, getAppDirectory(APP_DIR_TYPE.RememberApp))
+        copyFilesFassets(
+            APP_DIR_TYPE.RememberApp.rootName,
+            getAppDirectory(APP_DIR_TYPE.RememberApp)
+        )
     }
 
     /**

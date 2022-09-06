@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.bfchain.libappmgr.R
 import org.bfchain.libappmgr.model.AppInfo
+import org.bfchain.libappmgr.model.AutoUpdateInfo
 
 @Composable
 fun AppInfoView(appInfo: AppInfo) {
@@ -90,33 +91,10 @@ fun AppInfoGridView(appInfoList: List<AppInfo>) {
         columns = GridCells.Adaptive(minSize = 60.dp),
         contentPadding = PaddingValues(16.dp, 8.dp)
     ) {
-        /*item(span = {
-            // this上下文为LazyGridItemSpanScope
-            GridItemSpan(this.maxLineSpan)
-        }) {
-            // CategoryTitle(text = "Vegetables")
-            Text(text = "Vegetables")
-        }*/
-
         items(appInfoList) { item ->
             AppInfoView(appInfo = item)
         }
     }
-
-    /*LazyVerticalGrid(
-        //cells = GridCells.Adaptive(minSize = 100.dp),
-        cells = GridCells.Fixed(count = 5),
-        contentPadding = PaddingValues(16.dp, 8.dp)
-    ) {
-        items(appInfoList) {
-            AppInfoView(appInfo = it)
-        }
-    }*/
-    /*LazyColumn {
-        items(appInfoList) {
-            AppInfoView(appInfo = it)
-        }
-    }*/
 }
 
 @Preview
@@ -129,10 +107,10 @@ fun PreviewAppInfoView() {
                 version = "1.0.0",
                 bfsAppId = "bsf-app-" + i,
                 name = "name + " + i,
-                icon = "file:///sys/icon.png",
+                icon = "",
                 author = "",
                 homepage = "",
-                autoUpdate = null
+                autoUpdate = AutoUpdateInfo(1, 1, "xxx")
             )
         )
     }

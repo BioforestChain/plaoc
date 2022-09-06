@@ -56,11 +56,24 @@ dependencies {
 
     // 网络请求 Retrofit
     implementation 'com.google.code.gson:gson:2.9.1'
-    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    /*implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation "com.squareup.retrofit2:converter-gson:2.9.0"
-    implementation "com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.2"
+    implementation "com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.2"*/
+    // 使用moshi 替换 gson
+    //implementation 'com.squareup.moshi:moshi-kotlin:1.13.0'
+    //implementation 'com.squareup.moshi:moshi-kotlin-codegen:1.13.0'
 
     //ViewModel and livedata
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha07'
+
+    // ktor 网络请求模块
+    /*implementation "io.ktor:ktor-server-core:$ktor_version"
+    implementation "io.ktor:ktor-server-netty:$ktor_version"*/
+    implementation "io.ktor:ktor-client-core:$ktor_version"
+    implementation "io.ktor:ktor-client-cio:$ktor_version"
+    implementation "io.ktor:ktor-client-content-negotiation:$ktor_version"
+    //implementation "io.ktor:ktor-serialization-kotlinx-json:$ktor_version"
+    implementation("io.ktor:ktor-serialization-gson:$ktor_version")
+    implementation "io.ktor:ktor-client-logging:$ktor_version"
 }

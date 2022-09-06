@@ -13,14 +13,14 @@ import java.util.*
  *   maxAge: {number} 最大缓存时间，一般6小时更新一次。最快不能快于1分钟，否则按1分钟算。
  *    provider: {"generic"} 该更新的适配器信息，默认使用“通用适配器”
  *    url: {string} 自动更新的链接，一般是https开头，请求该链接可以获得以下“通用适配器”的字段：
- *    version: {string} 版本号
- *    files: 文件列表
- *        url: {string} 链接
- *        size: {number} 大小
- *        sha512: {string} 校验码
- *    releaseNotes: {string} 本次发布的信息，一般存放更新信息
- *    releaseName: {string} 本次发布的标题，用于展示更新信息时的标题
- *    releaseDate: {Date} 发布日期
+ *        version: {string} 版本号
+ *        files: 文件列表
+ *            url: {string} 链接
+ *            size: {number} 大小
+ *            sha512: {string} 校验码
+ *        releaseNotes: {string} 本次发布的信息，一般存放更新信息
+ *        releaseName: {string} 本次发布的标题，用于展示更新信息时的标题
+ *        releaseDate: {Date} 发布日期
  */
 
 data class FileInfo(
@@ -34,7 +34,7 @@ data class AppVersion(
     val files: List<FileInfo>, // 文件列表
     val releaseNotes: String, // 本次发布的信息，一般存放更新信息
     val releaseName: String, // 本次发布的标题，用于展示更新信息时的标题
-    val releaseDate: Date // 发布日期
+    val releaseDate: String // 发布日期
 )
 
 data class AutoUpdateInfo(
@@ -50,7 +50,7 @@ data class AppInfo(
     val icon: String, // 应用图标（没有不同主题的支持），一般是 file:///sys/icon.png
     val author: String, // 作者名称与TA的链接，用“,”进行分割，比如： ["kzf,kezhaofeng@bnqkl.cn,https://bnqkl.cn/developer/kzf"]
     val homepage: String = "", // 应用网络主页，一般是https网站。用户可以通过一些特定的操作来访问应用主页了解更多应用信息
-    val autoUpdate: AutoUpdateInfo?, // 自动更新的相关配置
+    val autoUpdate: AutoUpdateInfo, // 自动更新的相关配置
     var isSystemApp: Boolean = false, // 判断是recommend-app还是system-app
     var iconPath: String = "", // 将icon转为实际路径
     var isShowBadge: Boolean = false // 是否显示应用更新提醒，也就是左上角的小圆点

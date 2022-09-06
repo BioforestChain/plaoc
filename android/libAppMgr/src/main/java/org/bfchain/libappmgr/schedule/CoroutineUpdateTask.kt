@@ -2,8 +2,8 @@ package org.bfchain.libappmgr.schedule
 
 import android.util.Log
 import kotlinx.coroutines.*
-import org.bfchain.libappmgr.network.RetrofitManager
-import org.bfchain.libappmgr.ui.main.MainRepository
+import org.bfchain.libappmgr.network.base.AppVersionPath
+import org.bfchain.libappmgr.ui.main.MainViewModel
 import org.bfchain.libappmgr.utils.FilesUtil
 
 class CoroutineUpdateTask : UpdateTask {
@@ -16,20 +16,14 @@ class CoroutineUpdateTask : UpdateTask {
         scope.launch {
             var count = 1 // 用于判断软件运行分钟数，主要为了和应用信息中的maxAge做校验，确认是否需要更新
             while (isActive) {
-                Log.d("linge", "开始执行轮询->$count")
+                Log.d("CoroutineUpdateTask", "scheduleUpdate->$count")
                 try {
                     // Todo 开始执行轮询操作
                     FilesUtil.getAppInfoList().forEach { appInfo ->
-                        Log.d("linge", "enter->${appInfo.bfsAppId}, ${appInfo.autoUpdate}")
-                        if (count % appInfo.autoUpdate!!.maxAge == 0) {
-                            Log.d("linge", "enter->${appInfo.bfsAppId} -> maxAge")
-                            async {
-                                delay(1000)
-                                var savePath = FilesUtil.getAppUpdateDirectory(appInfo.bfsAppId)
-                                MainRepository(RetrofitManager.apiService)
-                                    .saveAppVersion(appInfo, savePath)
-                                Log.d("linge", "finish->$appInfo")
-                            }
+                        if (count % appInfo.autoUpdate.maxAge == 0) {
+                            var mainViewModel = MainViewModel()
+                            //mainViewModel.getAppVersionAndSave(appInfo.autoUpdate.url, savePath)
+                            mainViewModel.getAppVersionAndSave(appInfo)
                         }
                     }
                 } catch (e: Exception) {

@@ -18,7 +18,7 @@ class AppContextUtil {
                 var acThreadMethod =
                     acThreadClass.getMethod("currentActivityThread") ?: return null
 
-                acThreadMethod.isAccessible = true
+                acThreadMethod.isAccessible = true // 允许访问私有方法
 
                 var activityThread = acThreadMethod.invoke(null)
 

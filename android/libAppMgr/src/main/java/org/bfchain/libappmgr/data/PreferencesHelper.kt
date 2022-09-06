@@ -14,8 +14,7 @@ object PreferencesHelper {
     fun saveFirstState(isFirst: Boolean) =
         AppContextUtil.sInstance!!.saveBoolean(STATE_FIRST_LOADING, isFirst)
 
-    fun isFirstIn(context: Context) =
-        AppContextUtil.sInstance!!.getBoolean(STATE_FIRST_LOADING, true)
+    fun isFirstIn() = AppContextUtil.sInstance!!.getBoolean(STATE_FIRST_LOADING, true)
 
     /*fun saveUserId(context: Context, id: Int) = context.saveInteger(USER_KEY_ID, id)
 
