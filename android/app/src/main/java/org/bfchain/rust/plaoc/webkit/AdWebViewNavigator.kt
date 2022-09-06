@@ -1,6 +1,7 @@
 package org.bfchain.rust.plaoc.webkit
 
-import android.webkit.WebView
+//import android.webkit.WebView
+import com.tencent.smtt.sdk.WebView
 import androidx.compose.runtime.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

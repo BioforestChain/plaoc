@@ -5,7 +5,12 @@ import android.app.ActivityManager
 import android.os.Build
 import android.os.Message
 import android.util.Log
-import android.webkit.*
+//import android.webkit.*
+import com.tencent.smtt.sdk.WebView
+import com.tencent.smtt.export.external.interfaces.JsResult
+import com.tencent.smtt.export.external.interfaces.JsPromptResult
+import com.tencent.smtt.export.external.interfaces.WebResourceRequest
+import com.tencent.smtt.export.external.interfaces.WebResourceResponse
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler

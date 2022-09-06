@@ -1,8 +1,10 @@
 package org.bfchain.rust.plaoc.webView.network
 
 import android.util.Log
-import android.webkit.WebResourceRequest
-import android.webkit.WebResourceResponse
+//import android.webkit.WebResourceRequest
+//import android.webkit.WebResourceResponse
+import com.tencent.smtt.export.external.interfaces.WebResourceRequest
+import com.tencent.smtt.export.external.interfaces.WebResourceResponse
 import com.fasterxml.jackson.databind.DeserializationFeature
 import org.bfchain.rust.plaoc.*
 import org.bfchain.rust.plaoc.webView.urlscheme.CustomUrlScheme

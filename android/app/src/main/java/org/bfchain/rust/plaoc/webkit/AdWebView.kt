@@ -74,8 +74,8 @@ fun AdWebView(
                 settings.databaseEnabled = true
                 settings.safeBrowsingEnabled = true
                 settings.setGeolocationEnabled(true)
-                settings.allowFileAccessFromFileURLs = true
-                settings.allowUniversalAccessFromFileURLs = true
+//                settings.allowFileAccessFromFileURLs = true
+//                settings.allowUniversalAccessFromFileURLs = true
 
                 onCreated(this)
 

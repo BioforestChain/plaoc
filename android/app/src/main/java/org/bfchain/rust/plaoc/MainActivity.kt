@@ -7,7 +7,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
-import android.webkit.WebView
+//import android.webkit.WebView
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -20,6 +20,8 @@ import com.king.mlkit.vision.camera.CameraScan
 import com.king.mlkit.vision.camera.analyze.Analyzer.OnAnalyzeListener
 import com.king.mlkit.vision.camera.util.LogUtils
 import com.king.mlkit.vision.camera.util.PermissionUtils
+import com.tencent.smtt.export.external.TbsCoreSettings
+import com.tencent.smtt.sdk.QbSdk
 import org.bfchain.rust.plaoc.barcode.BarcodeScanningActivity
 import org.bfchain.rust.plaoc.barcode.MultipleQRCodeScanningActivity
 import org.bfchain.rust.plaoc.barcode.QRCodeScanningActivity
@@ -62,6 +64,16 @@ class MainActivity : AppCompatActivity() {
         // 启动Deno服务
         val deno = Intent(this, DenoService::class.java)
         startService(deno)
+
+        // 冷启动优化
+        var map = HashMap<String, Any>()
+        map[TbsCoreSettings.TBS_SETTINGS_USE_SPEEDY_CLASSLOADER] = true
+        map[TbsCoreSettings.TBS_SETTINGS_USE_DEXLOADER_SERVICE] = true
+        QbSdk.initTbsSettings(map)
+
+        // 初始化 x5
+        QbSdk.initX5Environment(this, null)
+        QbSdk.setDownloadWithoutWifi(true)
     }
 
     // 选择图片后回调到这

@@ -2,7 +2,8 @@ package org.bfchain.rust.plaoc.webView.navigator
 
 import android.util.Log
 import android.webkit.JavascriptInterface
-import android.webkit.WebView
+//import android.webkit.WebView
+import com.tencent.smtt.sdk.WebView
 import androidx.activity.ComponentActivity
 import androidx.navigation.NavController
 import org.bfchain.rust.plaoc.webView.openDWebWindow

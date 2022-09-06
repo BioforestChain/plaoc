@@ -2,7 +2,11 @@ package org.bfchain.rust.plaoc.webkit
 
 import android.graphics.Bitmap
 import android.util.Log
-import android.webkit.*
+//import android.webkit.*
+import com.tencent.smtt.sdk.WebViewClient
+import com.tencent.smtt.sdk.WebView
+import com.tencent.smtt.export.external.interfaces.WebResourceRequest
+import com.tencent.smtt.export.external.interfaces.WebResourceError
 
 /**
  * AccompanistWebViewClient

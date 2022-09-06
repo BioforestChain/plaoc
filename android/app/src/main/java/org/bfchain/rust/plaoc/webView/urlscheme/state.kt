@@ -1,9 +1,12 @@
 package org.bfchain.rust.plaoc.webView.urlscheme
 
 import android.content.res.AssetManager
-import android.webkit.MimeTypeMap
-import android.webkit.WebResourceRequest
-import android.webkit.WebResourceResponse
+//import android.webkit.MimeTypeMap
+//import android.webkit.WebResourceRequest
+//import android.webkit.WebResourceResponse
+import com.tencent.smtt.export.external.interfaces.WebResourceRequest
+import com.tencent.smtt.export.external.interfaces.WebResourceResponse
+import com.tencent.smtt.sdk.MimeTypeMap
 import androidx.compose.runtime.Stable
 import java.io.ByteArrayInputStream
 import java.io.InputStream

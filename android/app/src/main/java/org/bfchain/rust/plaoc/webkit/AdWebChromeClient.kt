@@ -3,12 +3,17 @@ package org.bfchain.rust.plaoc.webkit
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
+import android.os.Message
 import android.os.Process
 import android.util.Log
-import android.webkit.ConsoleMessage
-import android.webkit.ValueCallback
-import android.webkit.WebChromeClient
-import android.webkit.WebView
+//import android.webkit.ConsoleMessage
+//import android.webkit.ValueCallback
+//import android.webkit.WebChromeClient
+//import android.webkit.WebView
+import com.tencent.smtt.export.external.interfaces.ConsoleMessage
+import com.tencent.smtt.sdk.ValueCallback
+import com.tencent.smtt.sdk.WebChromeClient
+import com.tencent.smtt.sdk.WebView
 import org.bfchain.rust.plaoc.webkit.inputFile.AdFileInputHelper
 import org.bfchain.rust.plaoc.webkit.inputFile.InputFileOptions
 
@@ -90,7 +95,11 @@ open class AdWebChromeClient : WebChromeClient() {
         return true
     }
 
-    override fun onConsoleMessage(message: String, lineNumber: Int, sourceID: String) {
+//    override fun onConsoleMessage(message: String, lineNumber: Int, sourceID: String) {
+//        Log.d("MyApplication", "$message -- From line $lineNumber of $sourceID")
+//    }
+    fun onConsoleMessage(message: String, lineNumber: Int, sourceID: String) {
         Log.d("MyApplication", "$message -- From line $lineNumber of $sourceID")
     }
+
 }

@@ -16,8 +16,10 @@
 
 package org.bfchain.rust.plaoc.webkit
 
-import android.webkit.WebResourceError
-import android.webkit.WebResourceRequest
+//import android.webkit.WebResourceError
+//import android.webkit.WebResourceRequest
+import com.tencent.smtt.export.external.interfaces.WebResourceError
+import com.tencent.smtt.export.external.interfaces.WebResourceRequest
 import androidx.compose.runtime.Immutable
 
 

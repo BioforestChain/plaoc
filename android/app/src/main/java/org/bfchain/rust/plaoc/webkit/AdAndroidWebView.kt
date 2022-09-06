@@ -3,7 +3,8 @@ package org.bfchain.rust.plaoc.webkit
 import android.content.Context
 import android.graphics.Rect
 import android.view.*
-import android.webkit.WebView
+//import android.webkit.WebView
+import com.tencent.smtt.sdk.WebView
 import java.lang.Exception
 
 private const val TAG = "AdAndroidWebView"

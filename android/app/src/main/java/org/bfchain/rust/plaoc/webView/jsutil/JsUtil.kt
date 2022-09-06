@@ -1,6 +1,7 @@
 package org.bfchain.rust.plaoc.webView.jsutil
 
-import android.webkit.ValueCallback
+//import android.webkit.ValueCallback
+import com.tencent.smtt.sdk.ValueCallback
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.graphics.Color
 import com.google.gson.*

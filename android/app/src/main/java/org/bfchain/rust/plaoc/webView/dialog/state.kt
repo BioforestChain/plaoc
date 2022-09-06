@@ -1,8 +1,10 @@
 package org.bfchain.rust.plaoc.webView.dialog
 
 
-import android.webkit.JsPromptResult
-import android.webkit.JsResult
+//import android.webkit.JsPromptResult
+//import android.webkit.JsResult
+import com.tencent.smtt.export.external.interfaces.JsPromptResult
+import com.tencent.smtt.export.external.interfaces.JsResult
 import org.bfchain.rust.plaoc.webView.jsutil.JsUtil
 
 
