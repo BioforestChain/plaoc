@@ -23,39 +23,26 @@ async function onDwebPlugin() {
 
 </script>
 <template>
-   <dweb-status-bar id="status_bar" background-color="#EADDFF" bar-style="dark-content"></dweb-status-bar>
-    <!-- <dweb-keyboard id="key_board" overlay></dweb-keyboard>
+  <dweb-status-bar id="status_bar" background-color="#EADDFF" bar-style="dark-content"></dweb-status-bar>
+  <!-- <dweb-keyboard id="key_board" overlay></dweb-keyboard>
     <dweb-dialog-alert id="dda" title="alert" content="content">
         <dweb-dialog-button id="ddb">ok</dweb-dialog-button>
     </dweb-dialog-alert>
-    <dweb-dialog-prompt id="ddp" title="prompt" label="label" defaultValue="default">
-        <dweb-dialog-button id="ddpo" aria-label="cancel">ok</dweb-dialog-button>
-        <dweb-dialog-button id="ddpn" aria-label="confirm">No</dweb-dialog-button>
-    </dweb-dialog-prompt>
-    <dweb-dialog-confirm id="ddc" title="confirm" message="message">
-        <dweb-dialog-button id="ok" aria-label="confirm">ok</dweb-dialog-button>
-        <dweb-dialog-button id="no" aria-label="cancel">No</dweb-dialog-button>
-    </dweb-dialog-confirm>
-    <dweb-dialog-before-unload id="before_unload" title="test" message="before-unload">
-        <dweb-dialog-button id="buo">ok</dweb-dialog-button>
-        <dweb-dialog-button id="bun">No</dweb-dialog-button>
-    </dweb-dialog-before-unload> -->
-<dweb-messager id="dweb"></dweb-messager>
+   -->
+  <dweb-messager id="dweb"></dweb-messager>
   <h1>{{ msg }}</h1>
-    <div class="card">
+  <div class="card">
     <button type="button" @click="onDwebPlugin">webMessage消息</button>
     <p>
-     {{dwebPluginData}}
+      {{dwebPluginData}}
     </p>
   </div>
-  <div style="margin-top: 50px;">
-        <input id="toastMessage" type="text" placeholder="Toast message"/>
-    </div>
+  <div>
+    <input id="toastMessage" type="text" placeholder="Toast message" />
+  </div>
   <p>
     Check out
-    <a href="https://vuejs.org/guide/quick-start.html#local" target="_blank"
-      >create-vue</a
-    >, the official Vue + Vite starter
+    <a href="https://vuejs.org/guide/quick-start.html#local" target="_blank">create-vue</a>, the official Vue + Vite starter
   </p>
   <p>
     Install

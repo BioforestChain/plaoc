@@ -686,7 +686,7 @@ class DialogsFFI {
       resolve2();
     });
   }
-  openBeforeUnload(config2, confirmFunc, cancelFunc) {
+  openWarning(config2, confirmFunc, cancelFunc) {
     return new Promise((resolve2, reject) => {
       let cb = `((result)=>{
         if(result){
@@ -695,7 +695,7 @@ class DialogsFFI {
           ${cancelFunc != null ? cancelFunc : ""}
         }
       })`;
-      this._ffi.openBeforeUnload(JSON.stringify(config2), cb);
+      this._ffi.openWarning(JSON.stringify(config2), cb);
       resolve2();
     });
   }
@@ -704,11 +704,6 @@ class BfcsDialogs extends DwebPlugin {
   constructor() {
     super();
     this._ffi = new DialogsFFI();
-    this.setAttribute("did", (Math.random() * Date.now()).toFixed(0));
-  }
-  connectedCallback() {
-  }
-  disconnectedCallback() {
   }
   static get observedAttributes() {
     return ["visible"];
@@ -720,12 +715,13 @@ class BfcsDialogAlert extends BfcsDialogs {
   constructor() {
     super();
     this._observer = new MutationObserver(async (mutations) => {
-      if (this.hasAttribute("visible")) {
+      if (this.getAttribute("visible") === "true") {
         await this.openAlert();
       }
     });
   }
   connectedCallback() {
+    this.setAttribute("did", (Math.random() * Date.now()).toFixed(0));
     this._observer.observe(this, {
       subtree: true,
       childList: true,
@@ -743,14 +739,12 @@ class BfcsDialogAlert extends BfcsDialogs {
         content: "",
         confirmText: "",
         dismissOnBackPress: true,
-        dismissOnClickOutSide: false
+        dismissOnClickOutside: false
       };
       alertConfig.title = (_a = this.getAttribute("title")) != null ? _a : "";
       alertConfig.content = (_b = this.getAttribute("content")) != null ? _b : "";
-      alertConfig.dismissOnBackPress = this.hasAttribute("dismissOnBackPress") ? true : false;
-      alertConfig.dismissOnClickOutSide = this.hasAttribute(
-        "dismissOnClickOutSide"
-      ) ? true : false;
+      alertConfig.dismissOnBackPress = this.hasAttribute("disOnBackPress") ? true : false;
+      alertConfig.dismissOnClickOutside = this.hasAttribute("disOnClickOutside") ? true : false;
       const did = this.getAttribute("did");
       const childNode = this.querySelector("dweb-dialog-button");
       let bid = "";
@@ -759,14 +753,15 @@ class BfcsDialogAlert extends BfcsDialogs {
         bid = (_d = childNode.getAttribute("bid")) != null ? _d : "";
       }
       const cb = `document.querySelector('dweb-dialog-alert[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+      console.log("openAlert:", JSON.stringify(alertConfig));
       this._ffi.openAlert(alertConfig, cb);
       resolve2();
     });
   }
   async attributeChangedCallback(attrName, oldVal, newVal) {
-    if (attrName === "visible" && oldVal !== newVal) {
+    if (attrName === "visible" && newVal === true) {
       if (this.hasAttribute("visible")) {
-        this.setAttribute("visible", "");
+        this.setAttribute("visible", "true");
       } else {
         this.removeAttribute("visible");
       }
@@ -777,12 +772,13 @@ class BfcsDialogPrompt extends BfcsDialogs {
   constructor() {
     super();
     this._observer = new MutationObserver(async (mutations) => {
-      if (this.hasAttribute("visible")) {
+      if (this.getAttribute("visible") === "true") {
         await this.openPrompt();
       }
     });
   }
   connectedCallback() {
+    this.setAttribute("did", (Math.random() * Date.now()).toFixed(0));
     this._observer.observe(this, {
       subtree: true,
       childList: true,
@@ -802,14 +798,14 @@ class BfcsDialogPrompt extends BfcsDialogs {
         cancelText: "",
         defaultValue: "",
         dismissOnBackPress: true,
-        dismissOnClickOutSide: false
+        dismissOnClickOutside: false
       };
       promptConfig.title = (_a = this.getAttribute("title")) != null ? _a : "";
       promptConfig.label = (_b = this.getAttribute("label")) != null ? _b : "";
       promptConfig.defaultValue = (_c = this.getAttribute("defaultValue")) != null ? _c : "";
-      promptConfig.dismissOnBackPress = this.hasAttribute("dismissOnBackPress") ? true : false;
-      promptConfig.dismissOnClickOutSide = this.hasAttribute(
-        "dismissOnClickOutSide"
+      promptConfig.dismissOnBackPress = this.hasAttribute("disOnBackPress") ? true : false;
+      promptConfig.dismissOnClickOutside = this.hasAttribute(
+        "disOnClickOutside"
       ) ? true : false;
       const did = this.getAttribute("did");
       let confirmFunc = "";
@@ -842,9 +838,9 @@ class BfcsDialogPrompt extends BfcsDialogs {
     });
   }
   async attributeChangedCallback(attrName, oldVal, newVal) {
-    if (attrName === "visible" && oldVal !== newVal) {
+    if (attrName === "visible" && newVal === true) {
       if (this.hasAttribute("visible")) {
-        this.setAttribute("visible", "");
+        this.setAttribute("visible", "true");
       } else {
         this.removeAttribute("visible");
       }
@@ -855,12 +851,13 @@ class BfcsDialogConfirm extends BfcsDialogs {
   constructor() {
     super();
     this._observer = new MutationObserver(async (mutations) => {
-      if (this.hasAttribute("visible")) {
+      if (this.getAttribute("visible") === "true") {
         await this.openConfirm();
       }
     });
   }
   connectedCallback() {
+    this.setAttribute("did", (Math.random() * Date.now()).toFixed(0));
     this._observer.observe(this, {
       subtree: true,
       childList: true,
@@ -879,13 +876,13 @@ class BfcsDialogConfirm extends BfcsDialogs {
         confirmText: "",
         cancelText: "",
         dismissOnBackPress: true,
-        dismissOnClickOutSide: false
+        dismissOnClickOutside: false
       };
       confirmConfig.title = (_a = this.getAttribute("title")) != null ? _a : "";
       confirmConfig.message = (_b = this.getAttribute("message")) != null ? _b : "";
-      confirmConfig.dismissOnBackPress = this.hasAttribute("dismissOnBackPress") ? true : false;
-      confirmConfig.dismissOnClickOutSide = this.hasAttribute(
-        "dismissOnClickOutSide"
+      confirmConfig.dismissOnBackPress = this.hasAttribute("disOnBackPress") ? true : false;
+      confirmConfig.dismissOnClickOutside = this.hasAttribute(
+        "disOnClickOutside"
       ) ? true : false;
       const did = this.getAttribute("did");
       let confirmFunc = "";
@@ -918,25 +915,26 @@ class BfcsDialogConfirm extends BfcsDialogs {
     });
   }
   async attributeChangedCallback(attrName, oldVal, newVal) {
-    if (attrName === "visible" && oldVal !== newVal) {
+    if (attrName === "visible" && newVal === true) {
       if (this.hasAttribute("visible")) {
-        this.setAttribute("visible", "");
+        this.setAttribute("visible", "true");
       } else {
         this.removeAttribute("visible");
       }
     }
   }
 }
-class BfcsDialogBeforeUnload extends BfcsDialogs {
+class BfcsDialogWarning extends BfcsDialogs {
   constructor() {
     super();
     this._observer = new MutationObserver(async (mutations) => {
-      if (this.hasAttribute("visible")) {
-        await this.openBeforeUnload();
+      if (this.getAttribute("visible") === "true") {
+        await this.openWarning();
       }
     });
   }
   connectedCallback() {
+    this.setAttribute("did", (Math.random() * Date.now()).toFixed(0));
     this._observer.observe(this, {
       subtree: true,
       childList: true,
@@ -946,7 +944,7 @@ class BfcsDialogBeforeUnload extends BfcsDialogs {
   disconnectedCallback() {
     this._observer.disconnect();
   }
-  openBeforeUnload() {
+  openWarning() {
     return new Promise((resolve2, reject) => {
       var _a, _b;
       let confirmConfig = {
@@ -955,13 +953,13 @@ class BfcsDialogBeforeUnload extends BfcsDialogs {
         confirmText: "",
         cancelText: "",
         dismissOnBackPress: true,
-        dismissOnClickOutSide: false
+        dismissOnClickOutside: false
       };
       confirmConfig.title = (_a = this.getAttribute("title")) != null ? _a : "";
       confirmConfig.message = (_b = this.getAttribute("message")) != null ? _b : "";
-      confirmConfig.dismissOnBackPress = this.hasAttribute("dismissOnBackPress") ? true : false;
-      confirmConfig.dismissOnClickOutSide = this.hasAttribute(
-        "dismissOnClickOutSide"
+      confirmConfig.dismissOnBackPress = this.hasAttribute("disOnBackPress") ? true : false;
+      confirmConfig.dismissOnClickOutside = this.hasAttribute(
+        "disOnClickOutside"
       ) ? true : false;
       const did = this.getAttribute("did");
       let confirmFunc = "";
@@ -973,30 +971,30 @@ class BfcsDialogBeforeUnload extends BfcsDialogs {
           if (childNode.hasAttribute("aria-label")) {
             if (childNode.getAttribute("aria-label") === "confirm") {
               confirmConfig.confirmText = (_b2 = childNode.getAttribute("label")) != null ? _b2 : "";
-              confirmFunc = `document.querySelector('dweb-dialog-before-unload[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+              confirmFunc = `document.querySelector('dweb-dialog-warning[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
             } else {
               confirmConfig.cancelText = (_c = childNode.getAttribute("label")) != null ? _c : "";
-              cancelFunc = `document.querySelector('dweb-dialog-before-unload[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+              cancelFunc = `document.querySelector('dweb-dialog-warning[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
             }
           } else {
             if (index === 0) {
               confirmConfig.confirmText = (_d = childNode.getAttribute("label")) != null ? _d : "";
-              confirmFunc = `document.querySelector('dweb-dialog-before-unload[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+              confirmFunc = `document.querySelector('dweb-dialog-warning[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
             } else {
               confirmConfig.cancelText = (_e = childNode.getAttribute("label")) != null ? _e : "";
-              cancelFunc = `document.querySelector('dweb-dialog-before-unload[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+              cancelFunc = `document.querySelector('dweb-dialog-warning[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
             }
           }
         }
       );
-      this._ffi.openBeforeUnload(confirmConfig, confirmFunc, cancelFunc);
+      this._ffi.openWarning(confirmConfig, confirmFunc, cancelFunc);
       resolve2();
     });
   }
   async attributeChangedCallback(attrName, oldVal, newVal) {
-    if (attrName === "visible" && oldVal !== newVal) {
+    if (attrName === "visible" && newVal === true) {
       if (this.hasAttribute("visible")) {
-        this.setAttribute("visible", "");
+        this.setAttribute("visible", "true");
       } else {
         this.removeAttribute("visible");
       }
@@ -1021,7 +1019,7 @@ class BfcsDialogButton extends DwebPlugin {
 customElements.define("dweb-dialog-alert", BfcsDialogAlert);
 customElements.define("dweb-dialog-prompt", BfcsDialogPrompt);
 customElements.define("dweb-dialog-confirm", BfcsDialogConfirm);
-customElements.define("dweb-dialog-before-unload", BfcsDialogBeforeUnload);
+customElements.define("dweb-dialog-warning", BfcsDialogWarning);
 customElements.define("dweb-dialog-button", BfcsDialogButton);
 class BfspIcon extends DwebPlugin {
   constructor() {
@@ -1486,7 +1484,6 @@ customElements.define("dweb-top-bar", BfcsTopBar);
 customElements.define("dweb-top-bar-button", BfcsTopBarButton);
 const core = "";
 const normalize = "";
-const structure = "";
 const typography = "";
 const padding = "";
 const floatElements = "";
@@ -2766,6 +2763,12 @@ function setCurrentRenderingInstance(instance) {
   currentRenderingInstance = instance;
   currentScopeId = instance && instance.type.__scopeId || null;
   return prev;
+}
+function pushScopeId(id) {
+  currentScopeId = id;
+}
+function popScopeId() {
+  currentScopeId = null;
 }
 function withCtx(fn, ctx = currentRenderingInstance, isNonScopedSlot) {
   if (!ctx)
@@ -6287,9 +6290,33 @@ function normalizeContainer(container) {
   return container;
 }
 const _imports_0 = "data:image/png;base64,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";
-const _hoisted_1$1 = { class: "card" };
-const _hoisted_2$1 = /* @__PURE__ */ createStaticVNode('<div style="margin-top:50px;" data-v-e8b9485e><input id="toastMessage" type="text" placeholder="Toast message" data-v-e8b9485e></div><p data-v-e8b9485e> Check out <a href="https://vuejs.org/guide/quick-start.html#local" target="_blank" data-v-e8b9485e>create-vue</a>, the official Vue + Vite starter </p><p data-v-e8b9485e> Install <a href="https://github.com/johnsoncodehk/volar" target="_blank" data-v-e8b9485e>Volar</a> in your IDE for a better DX </p><p class="read-the-docs" data-v-e8b9485e>Click on the Vite and Vue logos to learn more</p>', 4);
-const _sfc_main$2 = /* @__PURE__ */ defineComponent({
+const _withScopeId$1 = (n) => (pushScopeId("data-v-1dc0316f"), n = n(), popScopeId(), n);
+const _hoisted_1$3 = { class: "card" };
+const _hoisted_2$3 = /* @__PURE__ */ _withScopeId$1(() => /* @__PURE__ */ createBaseVNode("div", null, [
+  /* @__PURE__ */ createBaseVNode("input", {
+    id: "toastMessage",
+    type: "text",
+    placeholder: "Toast message"
+  })
+], -1));
+const _hoisted_3$2 = /* @__PURE__ */ _withScopeId$1(() => /* @__PURE__ */ createBaseVNode("p", null, [
+  /* @__PURE__ */ createTextVNode(" Check out "),
+  /* @__PURE__ */ createBaseVNode("a", {
+    href: "https://vuejs.org/guide/quick-start.html#local",
+    target: "_blank"
+  }, "create-vue"),
+  /* @__PURE__ */ createTextVNode(", the official Vue + Vite starter ")
+], -1));
+const _hoisted_4$1 = /* @__PURE__ */ _withScopeId$1(() => /* @__PURE__ */ createBaseVNode("p", null, [
+  /* @__PURE__ */ createTextVNode(" Install "),
+  /* @__PURE__ */ createBaseVNode("a", {
+    href: "https://github.com/johnsoncodehk/volar",
+    target: "_blank"
+  }, "Volar"),
+  /* @__PURE__ */ createTextVNode(" in your IDE for a better DX ")
+], -1));
+const _hoisted_5$1 = /* @__PURE__ */ _withScopeId$1(() => /* @__PURE__ */ createBaseVNode("p", { class: "read-the-docs" }, "Click on the Vite and Vue logos to learn more", -1));
+const _sfc_main$4 = /* @__PURE__ */ defineComponent({
   __name: "HelloWorld",
   props: {
     msg: null
@@ -6314,19 +6341,22 @@ const _sfc_main$2 = /* @__PURE__ */ defineComponent({
         }),
         createVNode(_component_dweb_messager, { id: "dweb" }),
         createBaseVNode("h1", null, toDisplayString(__props.msg), 1),
-        createBaseVNode("div", _hoisted_1$1, [
+        createBaseVNode("div", _hoisted_1$3, [
           createBaseVNode("button", {
             type: "button",
             onClick: onDwebPlugin
           }, "webMessage\u6D88\u606F"),
           createBaseVNode("p", null, toDisplayString(unref(dwebPluginData)), 1)
         ]),
-        _hoisted_2$1
+        _hoisted_2$3,
+        _hoisted_3$2,
+        _hoisted_4$1,
+        _hoisted_5$1
       ], 64);
     };
   }
 });
-const HelloWorld_vue_vue_type_style_index_0_scoped_e8b9485e_lang = "";
+const HelloWorld_vue_vue_type_style_index_0_scoped_1dc0316f_lang = "";
 const _export_sfc = (sfc, props) => {
   const target = sfc.__vccOpts || sfc;
   for (const [key, val] of props) {
@@ -6334,7 +6364,7 @@ const _export_sfc = (sfc, props) => {
   }
   return target;
 };
-const HelloWorld = /* @__PURE__ */ _export_sfc(_sfc_main$2, [["__scopeId", "data-v-e8b9485e"]]);
+const HelloWorld = /* @__PURE__ */ _export_sfc(_sfc_main$4, [["__scopeId", "data-v-1dc0316f"]]);
 const scriptRel = "modulepreload";
 const assetsURL = function(dep) {
   return "/" + dep;
@@ -8401,7 +8431,7 @@ const getSvgContent$1 = (url, sanitize) => {
   return req;
 };
 const iconCss$1 = ":host{display:inline-block;width:1em;height:1em;contain:strict;fill:currentColor;-webkit-box-sizing:content-box !important;box-sizing:content-box !important}:host .ionicon{stroke:currentColor}.ionicon-fill-none{fill:none}.ionicon-stroke-width{stroke-width:32px;stroke-width:var(--ionicon-stroke-width, 32px)}.icon-inner,.ionicon,svg{display:block;height:100%;width:100%}:host(.flip-rtl) .icon-inner{-webkit-transform:scaleX(-1);transform:scaleX(-1)}:host(.icon-small){font-size:18px !important}:host(.icon-large){font-size:32px !important}:host(.ion-color){color:var(--ion-color-base) !important}:host(.ion-color-primary){--ion-color-base:var(--ion-color-primary, #3880ff)}:host(.ion-color-secondary){--ion-color-base:var(--ion-color-secondary, #0cd1e8)}:host(.ion-color-tertiary){--ion-color-base:var(--ion-color-tertiary, #f4a942)}:host(.ion-color-success){--ion-color-base:var(--ion-color-success, #10dc60)}:host(.ion-color-warning){--ion-color-base:var(--ion-color-warning, #ffce00)}:host(.ion-color-danger){--ion-color-base:var(--ion-color-danger, #f14141)}:host(.ion-color-light){--ion-color-base:var(--ion-color-light, #f4f5f8)}:host(.ion-color-medium){--ion-color-base:var(--ion-color-medium, #989aa2)}:host(.ion-color-dark){--ion-color-base:var(--ion-color-dark, #222428)}";
-const Icon$1 = /* @__PURE__ */ proxyCustomElement$1(class extends H$1 {
+const Icon$2 = /* @__PURE__ */ proxyCustomElement$1(class extends H$1 {
   constructor() {
     super();
     this.__registerHost();
@@ -8516,7 +8546,7 @@ function defineCustomElement$1A() {
     switch (tagName) {
       case "ion-icon":
         if (!customElements.get(tagName)) {
-          customElements.define(tagName, Icon$1);
+          customElements.define(tagName, Icon$2);
         }
         break;
     }
@@ -28687,7 +28717,7 @@ const getSvgContent = (url, sanitize) => {
   return req;
 };
 const iconCss = ":host{display:inline-block;width:1em;height:1em;contain:strict;fill:currentColor;-webkit-box-sizing:content-box !important;box-sizing:content-box !important}:host .ionicon{stroke:currentColor}.ionicon-fill-none{fill:none}.ionicon-stroke-width{stroke-width:32px;stroke-width:var(--ionicon-stroke-width, 32px)}.icon-inner,.ionicon,svg{display:block;height:100%;width:100%}:host(.flip-rtl) .icon-inner{-webkit-transform:scaleX(-1);transform:scaleX(-1)}:host(.icon-small){font-size:18px !important}:host(.icon-large){font-size:32px !important}:host(.ion-color){color:var(--ion-color-base) !important}:host(.ion-color-primary){--ion-color-base:var(--ion-color-primary, #3880ff)}:host(.ion-color-secondary){--ion-color-base:var(--ion-color-secondary, #0cd1e8)}:host(.ion-color-tertiary){--ion-color-base:var(--ion-color-tertiary, #f4a942)}:host(.ion-color-success){--ion-color-base:var(--ion-color-success, #10dc60)}:host(.ion-color-warning){--ion-color-base:var(--ion-color-warning, #ffce00)}:host(.ion-color-danger){--ion-color-base:var(--ion-color-danger, #f14141)}:host(.ion-color-light){--ion-color-base:var(--ion-color-light, #f4f5f8)}:host(.ion-color-medium){--ion-color-base:var(--ion-color-medium, #989aa2)}:host(.ion-color-dark){--ion-color-base:var(--ion-color-dark, #222428)}";
-const Icon = /* @__PURE__ */ proxyCustomElement(class extends H {
+const Icon$1 = /* @__PURE__ */ proxyCustomElement(class extends H {
   constructor() {
     super();
     this.__registerHost();
@@ -28793,7 +28823,7 @@ const createColorClasses = (color) => {
     [`ion-color-${color}`]: true
   } : null;
 };
-const IonIcon$1 = Icon;
+const IonIcon$1 = Icon$1;
 /*!
   * vue-router v4.1.5
   * (c) 2022 Eduardo San Martin Morote
@@ -31549,6 +31579,389 @@ const createController = (defineCustomElement2, oldController, useDelegate = fal
 /* @__PURE__ */ createController(defineCustomElement$7, loadingController);
 /* @__PURE__ */ createController(defineCustomElement$4, pickerController);
 /* @__PURE__ */ createController(defineCustomElement$2, toastController);
+const _hoisted_1$2 = /* @__PURE__ */ createBaseVNode("h2", null, "andrid/ios \u7CFB\u7EDFapi \u6D4B\u8BD5", -1);
+const _hoisted_2$2 = /* @__PURE__ */ createTextVNode("\u70B9\u6211\u9690\u85CF\u7CFB\u7EDFnavigation");
+const _sfc_main$3 = /* @__PURE__ */ defineComponent({
+  __name: "system_api",
+  setup(__props) {
+    defineComponent({
+      components: { IonFab, IonFabButton, IonFabList, IonButton, IonIcon }
+    });
+    return (_ctx, _cache) => {
+      return openBlock(), createElementBlock(Fragment, null, [
+        _hoisted_1$2,
+        createVNode(unref(IonButton), {
+          expand: "block",
+          fill: "outline"
+        }, {
+          default: withCtx(() => [
+            _hoisted_2$2
+          ]),
+          _: 1
+        })
+      ], 64);
+    };
+  }
+});
+const _hoisted_1$1 = /* @__PURE__ */ createBaseVNode("h2", null, "dialogs", -1);
+const _hoisted_2$1 = /* @__PURE__ */ createTextVNode("alert");
+const _hoisted_3$1 = /* @__PURE__ */ createTextVNode("prompt");
+const _hoisted_4 = /* @__PURE__ */ createTextVNode("confirm");
+const _hoisted_5 = /* @__PURE__ */ createTextVNode("warning");
+const _hoisted_6 = /* @__PURE__ */ createTextVNode("\u786E\u5B9A");
+const _hoisted_7 = /* @__PURE__ */ createTextVNode("\u62D2\u7EDD");
+const _hoisted_8 = /* @__PURE__ */ createTextVNode("11111111");
+const _hoisted_9 = /* @__PURE__ */ createTextVNode("No");
+const _hoisted_10 = /* @__PURE__ */ createTextVNode("ok");
+const _hoisted_11 = /* @__PURE__ */ createTextVNode("No");
+const _hoisted_12 = /* @__PURE__ */ createTextVNode("ok");
+const _sfc_main$2 = /* @__PURE__ */ defineComponent({
+  __name: "dialogs",
+  setup(__props) {
+    defineComponent({
+      components: { IonButton, IonIcon }
+    });
+    const visable = reactive({
+      alert: false,
+      prompt: false,
+      confirm: false,
+      warning: false
+    });
+    return (_ctx, _cache) => {
+      const _component_dweb_dialog_button = resolveComponent("dweb-dialog-button");
+      const _component_dweb_dialog_alert = resolveComponent("dweb-dialog-alert");
+      const _component_dweb_dialog_prompt = resolveComponent("dweb-dialog-prompt");
+      const _component_dweb_dialog_confirm = resolveComponent("dweb-dialog-confirm");
+      const _component_dweb_dialog_warning = resolveComponent("dweb-dialog-warning");
+      return openBlock(), createElementBlock(Fragment, null, [
+        _hoisted_1$1,
+        createVNode(unref(IonButton), {
+          color: "primary",
+          onClick: _cache[0] || (_cache[0] = ($event) => visable.alert = true)
+        }, {
+          default: withCtx(() => [
+            _hoisted_2$1
+          ]),
+          _: 1
+        }),
+        createVNode(unref(IonButton), {
+          color: "secondary",
+          onClick: _cache[1] || (_cache[1] = ($event) => visable.prompt = true)
+        }, {
+          default: withCtx(() => [
+            _hoisted_3$1
+          ]),
+          _: 1
+        }),
+        createVNode(unref(IonButton), {
+          color: "tertiary",
+          onClick: _cache[2] || (_cache[2] = ($event) => visable.confirm = true)
+        }, {
+          default: withCtx(() => [
+            _hoisted_4
+          ]),
+          _: 1
+        }),
+        createVNode(unref(IonButton), {
+          color: "warning",
+          onClick: _cache[3] || (_cache[3] = ($event) => visable.warning = true)
+        }, {
+          default: withCtx(() => [
+            _hoisted_5
+          ]),
+          _: 1
+        }),
+        createVNode(_component_dweb_dialog_alert, {
+          visible: visable.alert,
+          title: "810975",
+          content: "\u5BC6\u7801\u5FD8\u4E86\u600E\u4E48\u529E\uFF1F",
+          disOnClickOutside: "",
+          disOnBackPress: ""
+        }, {
+          default: withCtx(() => [
+            createVNode(_component_dweb_dialog_button, {
+              onClick: _cache[4] || (_cache[4] = ($event) => visable.alert = false)
+            }, {
+              default: withCtx(() => [
+                _hoisted_6
+              ]),
+              _: 1
+            })
+          ]),
+          _: 1
+        }, 8, ["visible"]),
+        createVNode(_component_dweb_dialog_prompt, {
+          visible: visable.prompt,
+          title: "prompt",
+          label: "\u6211\u662F\u63D0\u793A\u6587\u6848",
+          defaultValue: "\u62631\u9001\u706B\u9E92\u9E9F",
+          disOnClickOutside: "",
+          disOnBackPress: ""
+        }, {
+          default: withCtx(() => [
+            createVNode(_component_dweb_dialog_button, {
+              onClick: _cache[5] || (_cache[5] = ($event) => visable.prompt = false),
+              "aria-label": "cancel"
+            }, {
+              default: withCtx(() => [
+                _hoisted_7
+              ]),
+              _: 1
+            }),
+            createVNode(_component_dweb_dialog_button, {
+              onClick: _cache[6] || (_cache[6] = ($event) => visable.prompt = false),
+              "aria-label": "confirm"
+            }, {
+              default: withCtx(() => [
+                _hoisted_8
+              ]),
+              _: 1
+            })
+          ]),
+          _: 1
+        }, 8, ["visible"]),
+        createVNode(_component_dweb_dialog_confirm, {
+          visible: visable.confirm,
+          title: "confirm",
+          message: "\u5357\u6C34\u5317\u8C03",
+          disOnClickOutside: "",
+          disOnBackPress: ""
+        }, {
+          default: withCtx(() => [
+            createVNode(_component_dweb_dialog_button, {
+              onClick: _cache[7] || (_cache[7] = ($event) => visable.confirm = false),
+              "aria-label": "cancel"
+            }, {
+              default: withCtx(() => [
+                _hoisted_9
+              ]),
+              _: 1
+            }),
+            createVNode(_component_dweb_dialog_button, {
+              onClick: _cache[8] || (_cache[8] = ($event) => visable.confirm = false),
+              "aria-label": "confirm"
+            }, {
+              default: withCtx(() => [
+                _hoisted_10
+              ]),
+              _: 1
+            })
+          ]),
+          _: 1
+        }, 8, ["visible"]),
+        createVNode(_component_dweb_dialog_warning, {
+          visible: visable.warning,
+          title: "FBI warning",
+          message: "FBI open the door"
+        }, {
+          default: withCtx(() => [
+            createVNode(_component_dweb_dialog_button, {
+              onClick: _cache[9] || (_cache[9] = ($event) => visable.warning = false),
+              "aria-label": "cancel"
+            }, {
+              default: withCtx(() => [
+                _hoisted_11
+              ]),
+              _: 1
+            }),
+            createVNode(_component_dweb_dialog_button, {
+              onClick: _cache[10] || (_cache[10] = ($event) => visable.warning = false),
+              "aria-label": "confirm"
+            }, {
+              default: withCtx(() => [
+                _hoisted_12
+              ]),
+              _: 1
+            })
+          ]),
+          _: 1
+        }, 8, ["visible"])
+      ], 64);
+    };
+  }
+});
+const _sfc_main$1 = {};
+function _sfc_render(_ctx, _cache) {
+  return openBlock(), createElementBlock("h2", null, "icon");
+}
+const Icon = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["render", _sfc_render]]);
+const cartOutline = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' class='ionicon' viewBox='0 0 512 512'><title>Cart</title><circle cx='176' cy='416' r='16' stroke-linecap='round' stroke-linejoin='round' class='ionicon-fill-none ionicon-stroke-width'/><circle cx='400' cy='416' r='16' stroke-linecap='round' stroke-linejoin='round' class='ionicon-fill-none ionicon-stroke-width'/><path stroke-linecap='round' stroke-linejoin='round' d='M48 80h64l48 272h256' class='ionicon-fill-none ionicon-stroke-width'/><path d='M160 288h249.44a8 8 0 007.85-6.43l28.8-144a8 8 0 00-7.85-9.57H128' stroke-linecap='round' stroke-linejoin='round' class='ionicon-fill-none ionicon-stroke-width'/></svg>";
+const logoFacebook = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' class='ionicon' viewBox='0 0 512 512'><title>Logo Facebook</title><path d='M480 257.35c0-123.7-100.3-224-224-224s-224 100.3-224 224c0 111.8 81.9 204.47 189 221.29V322.12h-56.89v-64.77H221V208c0-56.13 33.45-87.16 84.61-87.16 24.51 0 50.15 4.38 50.15 4.38v55.13H327.5c-27.81 0-36.51 17.26-36.51 35v42h62.12l-9.92 64.77H291v156.54c107.1-16.81 189-109.48 189-221.31z' fill-rule='evenodd'/></svg>";
+const logoTwitter = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' class='ionicon' viewBox='0 0 512 512'><title>Logo Twitter</title><path d='M496 109.5a201.8 201.8 0 01-56.55 15.3 97.51 97.51 0 0043.33-53.6 197.74 197.74 0 01-62.56 23.5A99.14 99.14 0 00348.31 64c-54.42 0-98.46 43.4-98.46 96.9a93.21 93.21 0 002.54 22.1 280.7 280.7 0 01-203-101.3A95.69 95.69 0 0036 130.4c0 33.6 17.53 63.3 44 80.7A97.5 97.5 0 0135.22 199v1.2c0 47 34 86.1 79 95a100.76 100.76 0 01-25.94 3.4 94.38 94.38 0 01-18.51-1.8c12.51 38.5 48.92 66.5 92.05 67.3A199.59 199.59 0 0139.5 405.6a203 203 0 01-23.5-1.4A278.68 278.68 0 00166.74 448c181.36 0 280.44-147.7 280.44-275.8 0-4.2-.11-8.4-.31-12.5A198.48 198.48 0 00496 109.5z'/></svg>";
+const logoVimeo = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' class='ionicon' viewBox='0 0 512 512'><title>Logo Vimeo</title><path d='M476.9 114c-5-23.39-17.51-38.78-40.61-46.27s-64.92-4.5-94.12 16.79c-26.79 19.51-46.26 54.42-54 78.28a4 4 0 005.13 5c10.77-3.8 21.72-7.1 34-6.45 15 .8 24.51 12 24.91 25.29.3 9.79-.2 18.69-3.6 27.68-10.74 28.68-27.61 56.46-47.55 80.75a72.49 72.49 0 01-10 9.89c-10.21 8.29-18.81 6.1-25.41-5.2-5.4-9.29-9-18.88-12.2-29.08-12.4-39.67-16.81-80.84-23.81-121.52-3.3-19.48-7-39.77-18-56.86-11.6-17.79-28.61-24.58-50-22-14.7 1.8-36.91 17.49-47.81 26.39 0 0-56 46.87-81.82 71.35l21.2 27s17.91-12.49 27.51-18.29c5.7-3.39 12.4-4.09 17.2.2 4.51 3.9 9.61 9 12.31 14.1 5.7 10.69 11.2 21.88 14.7 33.37 13.2 44.27 25.51 88.64 37.81 133.22 6.3 22.78 13.9 44.17 28 63.55 19.31 26.59 39.61 32.68 70.92 21.49 25.41-9.09 46.61-26.18 66-43.87 33.11-30.18 59.12-65.36 85.52-101.14 20.41-27.67 37.31-55.67 51.41-86.95C478.5 179.74 484 147.26 476.9 114z'/></svg>";
+const _withScopeId = (n) => (pushScopeId("data-v-387462f6"), n = n(), popScopeId(), n);
+const _hoisted_1 = /* @__PURE__ */ _withScopeId(() => /* @__PURE__ */ createBaseVNode("div", { class: "topbar" }, null, -1));
+const _hoisted_2 = /* @__PURE__ */ createStaticVNode('<div data-v-387462f6><a href="https://vuejs.org/" target="_blank" data-v-387462f6><img src="' + _imports_0 + '" class="logo vue" alt="Vue logo" data-v-387462f6></a><a href="https://vuejs.org/" target="_blank" data-v-387462f6><img src="' + _imports_0 + '" class="logo vue" alt="Vue logo" data-v-387462f6></a><a href="https://vuejs.org/" target="_blank" data-v-387462f6><img src="' + _imports_0 + '" class="logo vue" alt="Vue logo" data-v-387462f6></a></div>', 1);
+const _hoisted_3 = /* @__PURE__ */ _withScopeId(() => /* @__PURE__ */ createBaseVNode("div", { class: "bottombar" }, null, -1));
+const _sfc_main = /* @__PURE__ */ defineComponent({
+  __name: "App",
+  setup(__props) {
+    defineComponent({
+      components: { IonFab, IonFabButton, IonFabList, IonIcon }
+    });
+    let scannerData = ref("DwebView-js \u267B\uFE0F Deno-js");
+    async function openScanner() {
+      const scanner = document.querySelector("dweb-scanner");
+      const iter = await scanner.openScanner();
+      console.log("scannerData.value = await scanner.openScanner() -->", JSON.stringify(iter));
+      scannerData.value = iter;
+    }
+    function handerTopBar() {
+      console.log("\u6211\u662Ftopbar icon\u6211\u88AB\u70B9\u51FB\u4E86");
+    }
+    function pop() {
+      console.log("\u5192\u6CE1");
+    }
+    return (_ctx, _cache) => {
+      const _component_dweb_icon = resolveComponent("dweb-icon");
+      const _component_dweb_top_bar_button = resolveComponent("dweb-top-bar-button");
+      const _component_dweb_top_bar = resolveComponent("dweb-top-bar");
+      const _component_dweb_bottom_bar_icon = resolveComponent("dweb-bottom-bar-icon");
+      const _component_dweb_bottom_bar_text = resolveComponent("dweb-bottom-bar-text");
+      const _component_dweb_bottom_bar_button = resolveComponent("dweb-bottom-bar-button");
+      const _component_dweb_bottom_bar = resolveComponent("dweb-bottom-bar");
+      const _component_dweb_scanner = resolveComponent("dweb-scanner");
+      return openBlock(), createElementBlock(Fragment, null, [
+        _hoisted_1,
+        createVNode(_component_dweb_top_bar, {
+          id: "topbar",
+          title: "Ar \u626B\u96F7",
+          "background-color": "#eeee",
+          "foreground-color": "#000",
+          overlay: "0.4"
+        }, {
+          default: withCtx(() => [
+            createVNode(_component_dweb_top_bar_button, {
+              id: "aaa",
+              onClick: handerTopBar
+            }, {
+              default: withCtx(() => [
+                createVNode(_component_dweb_icon, { source: "Filled.AddCircle" })
+              ]),
+              _: 1
+            }),
+            createVNode(unref(IonFab), {
+              vertical: "center",
+              horizontal: "end"
+            }, {
+              default: withCtx(() => [
+                createVNode(unref(IonFabButton), {
+                  size: "small",
+                  onClick: pop
+                }, {
+                  default: withCtx(() => [
+                    createVNode(unref(IonIcon), { icon: unref(cartOutline) }, null, 8, ["icon"])
+                  ]),
+                  _: 1
+                }),
+                createVNode(unref(IonFabList), null, {
+                  default: withCtx(() => [
+                    createVNode(unref(IonFabButton), { color: "light" }, {
+                      default: withCtx(() => [
+                        createVNode(unref(IonIcon), { icon: unref(logoFacebook) }, null, 8, ["icon"])
+                      ]),
+                      _: 1
+                    }),
+                    createVNode(unref(IonFabButton), { color: "light" }, {
+                      default: withCtx(() => [
+                        createVNode(unref(IonIcon), { icon: unref(logoTwitter) }, null, 8, ["icon"])
+                      ]),
+                      _: 1
+                    }),
+                    createVNode(unref(IonFabButton), { color: "light" }, {
+                      default: withCtx(() => [
+                        createVNode(unref(IonIcon), { icon: unref(logoVimeo) }, null, 8, ["icon"])
+                      ]),
+                      _: 1
+                    })
+                  ]),
+                  _: 1
+                })
+              ]),
+              _: 1
+            }),
+            createVNode(_component_dweb_top_bar_button, { id: "ccc" }, {
+              default: withCtx(() => [
+                createVNode(_component_dweb_icon, {
+                  source: "https://objectjson.waterbang.top/test-vue3/vite.svg",
+                  type: "AssetIcon"
+                })
+              ]),
+              _: 1
+            })
+          ]),
+          _: 1
+        }),
+        createVNode(HelloWorld, { msg: unref(scannerData) }, null, 8, ["msg"]),
+        _hoisted_2,
+        createVNode(_sfc_main$2),
+        createVNode(Icon),
+        createVNode(_sfc_main$3),
+        createVNode(_component_dweb_bottom_bar, {
+          id: "bottombar",
+          "background-color": "#D0BCFF",
+          "foreground-color": "#1C1B1F",
+          height: "70",
+          overlay: "0.2"
+        }, {
+          default: withCtx(() => [
+            createVNode(_component_dweb_bottom_bar_button, {
+              id: "ddd",
+              selected: ""
+            }, {
+              default: withCtx(() => [
+                createVNode(_component_dweb_bottom_bar_icon, {
+                  source: "https://objectjson.waterbang.top/test-vue3/land.svg",
+                  "un-source": "https://objectjson.waterbang.top/test-vue3/land-not.svg",
+                  type: "AssetIcon"
+                }),
+                createVNode(_component_dweb_bottom_bar_text, {
+                  color: "#938F99",
+                  "selected-color": "#1C1B1F",
+                  value: "\u571F\u5730"
+                })
+              ]),
+              _: 1
+            }),
+            createVNode(_component_dweb_bottom_bar_button, {
+              id: "eee",
+              onClick: openScanner,
+              diSelectable: ""
+            }, {
+              default: withCtx(() => [
+                createVNode(_component_dweb_bottom_bar_icon, {
+                  source: "https://objectjson.waterbang.top/test-vue3/scanner.svg",
+                  type: "AssetIcon"
+                }),
+                createVNode(_component_dweb_bottom_bar_text, { value: "\u626B\u7801" })
+              ]),
+              _: 1
+            }),
+            createVNode(_component_dweb_bottom_bar_button, { id: "fff" }, {
+              default: withCtx(() => [
+                createVNode(_component_dweb_bottom_bar_icon, {
+                  source: "https://objectjson.waterbang.top/test-vue3/home.svg",
+                  type: "AssetIcon"
+                }),
+                createVNode(_component_dweb_bottom_bar_text, {
+                  color: "#938F99",
+                  "selected-color": "#1C1B1F",
+                  value: "\u4E2A\u4EBA\u7A7A\u95F4"
+                })
+              ]),
+              _: 1
+            })
+          ]),
+          _: 1
+        }),
+        createVNode(_component_dweb_scanner, { channelId: "helloWorld" }),
+        _hoisted_3
+      ], 64);
+    };
+  }
+});
+const App_vue_vue_type_style_index_0_scoped_387462f6_lang = "";
+const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["__scopeId", "data-v-387462f6"]]);
 const createLocationHistory = () => {
   const locationHistory = [];
   const tabsHistory = {};
@@ -32117,160 +32530,13 @@ const createRouter = (opts) => {
   return router2;
 };
 const createWebHistory = (base) => createWebHistory$1(base);
-const _sfc_main$1 = {};
-function _sfc_render(_ctx, _cache) {
-  return openBlock(), createElementBlock("h2", null, "andrid/ios \u7CFB\u7EDFapi \u6D4B\u8BD5");
-}
-const system_api = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["render", _sfc_render]]);
 const routes = [
-  { path: "/system_api", component: system_api }
+  { path: "/system_api", name: "system_api", component: _sfc_main$3 }
 ];
 const router = createRouter({
   history: createWebHistory(),
   routes
 });
-const _hoisted_1 = /* @__PURE__ */ createTextVNode("\u524D\u5F80\u6D4B\u8BD5\u7CFB\u7EDFapi");
-const _hoisted_2 = /* @__PURE__ */ createStaticVNode('<a href="https://vuejs.org/" target="_blank" data-v-d8ca0e0b><img src="' + _imports_0 + '" class="logo vue" alt="Vue logo" data-v-d8ca0e0b></a><a href="https://vuejs.org/" target="_blank" data-v-d8ca0e0b><img src="' + _imports_0 + '" class="logo vue" alt="Vue logo" data-v-d8ca0e0b></a><a href="https://vuejs.org/" target="_blank" data-v-d8ca0e0b><img src="' + _imports_0 + '" class="logo vue" alt="Vue logo" data-v-d8ca0e0b></a>', 3);
-const _sfc_main = /* @__PURE__ */ defineComponent({
-  __name: "App",
-  setup(__props) {
-    defineComponent({
-      components: { IonFab, IonFabButton, IonFabList, IonButton, IonIcon }
-    });
-    let scannerData = ref("DwebView-js \u267B\uFE0F Deno-js");
-    async function openScanner() {
-      const scanner = document.querySelector("dweb-scanner");
-      const iter = await scanner.openScanner();
-      console.log("scannerData.value = await scanner.openScanner() -->", JSON.stringify(iter));
-      scannerData.value = iter;
-    }
-    function handerTopBar() {
-      console.log("\u6211\u662Ftopbar icon\u6211\u88AB\u70B9\u51FB\u4E86");
-    }
-    function goSystemTest() {
-      router.push("/system_api");
-    }
-    return (_ctx, _cache) => {
-      const _component_dweb_icon = resolveComponent("dweb-icon");
-      const _component_dweb_top_bar_button = resolveComponent("dweb-top-bar-button");
-      const _component_dweb_top_bar = resolveComponent("dweb-top-bar");
-      const _component_dweb_bottom_bar_icon = resolveComponent("dweb-bottom-bar-icon");
-      const _component_dweb_bottom_bar_text = resolveComponent("dweb-bottom-bar-text");
-      const _component_dweb_bottom_bar_button = resolveComponent("dweb-bottom-bar-button");
-      const _component_dweb_bottom_bar = resolveComponent("dweb-bottom-bar");
-      const _component_dweb_scanner = resolveComponent("dweb-scanner");
-      return openBlock(), createElementBlock(Fragment, null, [
-        createVNode(_component_dweb_top_bar, {
-          id: "topbar",
-          title: "Ar \u626B\u96F7",
-          "background-color": "#eeee",
-          "foreground-color": "#000",
-          overlay: "0.4"
-        }, {
-          default: withCtx(() => [
-            createVNode(_component_dweb_top_bar_button, {
-              id: "aaa",
-              onClick: handerTopBar
-            }, {
-              default: withCtx(() => [
-                createVNode(_component_dweb_icon, { source: "Filled.AddCircle" })
-              ]),
-              _: 1
-            }),
-            createVNode(_component_dweb_top_bar_button, { id: "ccc" }, {
-              default: withCtx(() => [
-                createVNode(_component_dweb_icon, {
-                  source: "https://objectjson.waterbang.top/test-vue3/vite.svg",
-                  type: "AssetIcon"
-                })
-              ]),
-              _: 1
-            })
-          ]),
-          _: 1
-        }),
-        createBaseVNode("div", null, [
-          createVNode(HelloWorld, { msg: unref(scannerData) }, null, 8, ["msg"]),
-          createVNode(unref(IonButton), {
-            expand: "block",
-            fill: "outline",
-            onClick: goSystemTest
-          }, {
-            default: withCtx(() => [
-              _hoisted_1
-            ]),
-            _: 1
-          }),
-          _hoisted_2
-        ]),
-        createVNode(_component_dweb_bottom_bar, {
-          id: "bottom_bar",
-          "background-color": "#D0BCFF",
-          "foreground-color": "#1C1B1F",
-          height: "70",
-          overlay: "0.5"
-        }, {
-          default: withCtx(() => [
-            createVNode(_component_dweb_bottom_bar_button, {
-              id: "ddd",
-              selected: ""
-            }, {
-              default: withCtx(() => [
-                createVNode(_component_dweb_bottom_bar_icon, {
-                  source: "https://objectjson.waterbang.top/test-vue3/land.svg",
-                  "un-source": "https://objectjson.waterbang.top/test-vue3/land-not.svg",
-                  type: "AssetIcon"
-                }),
-                createVNode(_component_dweb_bottom_bar_text, {
-                  color: "#938F99",
-                  "selected-color": "#1C1B1F",
-                  value: "\u571F\u5730"
-                })
-              ]),
-              _: 1
-            }),
-            createVNode(_component_dweb_bottom_bar_button, {
-              id: "eee",
-              onClick: openScanner,
-              diSelectable: ""
-            }, {
-              default: withCtx(() => [
-                createVNode(_component_dweb_bottom_bar_icon, {
-                  source: "https://objectjson.waterbang.top/test-vue3/scanner.svg",
-                  type: "AssetIcon"
-                }),
-                createVNode(_component_dweb_bottom_bar_text, { value: "\u626B\u7801" })
-              ]),
-              _: 1
-            }),
-            createVNode(_component_dweb_bottom_bar_button, {
-              id: "fff",
-              "indicator-color": "rgba(208,188,255,0)"
-            }, {
-              default: withCtx(() => [
-                createVNode(_component_dweb_bottom_bar_icon, {
-                  source: "https://objectjson.waterbang.top/test-vue3/home.svg",
-                  "un-source": "https://objectjson.waterbang.top/test-vue3/home-not.svg",
-                  type: "AssetIcon"
-                }),
-                createVNode(_component_dweb_bottom_bar_text, {
-                  color: "#938F99",
-                  "selected-color": "#1C1B1F",
-                  value: "\u4E2A\u4EBA\u7A7A\u95F4"
-                })
-              ]),
-              _: 1
-            })
-          ]),
-          _: 1
-        }),
-        createVNode(_component_dweb_scanner, { channelId: "helloWorld" })
-      ], 64);
-    };
-  }
-});
-const App_vue_vue_type_style_index_0_scoped_d8ca0e0b_lang = "";
-const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["__scopeId", "data-v-d8ca0e0b"]]);
 const app = createApp(App).use(IonicVue).use(router);
 router.isReady().then(() => {
   app.mount("#app");

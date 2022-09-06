@@ -178,7 +178,7 @@ fun DWebView(
             val jsConfirmConfig = remember {
                 mutableStateOf<JsConfirmConfiguration?>(null)
             }
-            val jsBeforeUnloadConfig = remember {
+            val jsWarningConfig = remember {
                 mutableStateOf<JsConfirmConfiguration?>(null)
             }
 
@@ -224,7 +224,7 @@ fun DWebView(
                         jsAlertConfig,
                         jsPromptConfig,
                         jsConfirmConfig,
-                        jsBeforeUnloadConfig
+                        jsWarningConfig
                     )
                     webView.addJavascriptInterface(dialogFFI, "native_dialog")
 
@@ -331,7 +331,7 @@ fun DWebView(
                             if (result == null) {
                                 return super.onJsBeforeUnload(view, url, message, result)
                             }
-                            jsBeforeUnloadConfig.value = JsConfirmConfiguration(
+                           jsWarningConfig.value = JsConfirmConfiguration(
                                 getJsDialogTitle(url, "提示您"),
                                 message ?: "",
                                 "离开",
@@ -457,7 +457,7 @@ fun DWebView(
             jsAlertConfig.value?.openAlertDialog { jsAlertConfig.value = null }
             jsPromptConfig.value?.openPromptDialog { jsPromptConfig.value = null }
             jsConfirmConfig.value?.openConfirmDialog { jsConfirmConfig.value = null }
-            jsBeforeUnloadConfig.value?.openBeforeUnloadDialog { jsBeforeUnloadConfig.value = null }
+            jsWarningConfig.value?.openWarningDialog { jsWarningConfig.value = null }
         },
         containerColor = Companion.Transparent,
       contentColor = Companion.Transparent
