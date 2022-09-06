@@ -29,7 +29,7 @@ class TopBarFFI(
     @JavascriptInterface
     fun toggleEnabled(isEnabled: BoolInt): Boolean {
         state.enabled.value = isEnabled.toBoolean { !state.enabled.value }
-        Log.i(TAG, "toggleEnabled:${state.enabled.value}")
+//        Log.i(TAG, "toggleEnabled:${state.enabled.value}")
         return state.enabled.value
     }
 

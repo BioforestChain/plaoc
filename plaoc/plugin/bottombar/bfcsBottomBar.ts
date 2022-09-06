@@ -140,7 +140,6 @@ export class BfcsBottomBar extends DwebPlugin {
     this._actionList = [];
     this.querySelectorAll("dweb-bottom-bar-button").forEach((childNode) => {
       let icon: Icon.IPlaocIcon = {
-        un_source:"",
         source: "",
         type: "NamedIcon" as Icon.IconType.NamedIcon,
       };
@@ -152,7 +151,6 @@ export class BfcsBottomBar extends DwebPlugin {
       if (childNode.querySelector("dweb-bottom-bar-icon")) {
         let $ = childNode.querySelector("dweb-bottom-bar-icon")!;
 
-         icon.un_source = $.getAttribute("un-source") ?? "";
         icon.source = $.getAttribute("source") ?? "";
         icon.type = $.hasAttribute("type")
           ? ($.getAttribute("type") as Icon.IconType)
@@ -175,12 +173,12 @@ export class BfcsBottomBar extends DwebPlugin {
       if (childNode.querySelector("dweb-bottom-bar-text")) {
         let $ = childNode.querySelector("dweb-bottom-bar-text")!;
 
-         if ($.hasAttribute("value")) {
+        if ($.hasAttribute("value")) {
           label = $.getAttribute("value")!
-         }
+        }
         // 是否一直显示文字，如果指定此值，则只有选择才会显示文字
-         alwaysShowLabel = ($.hasAttribute("hide-value")) ? true : false;
- 
+        alwaysShowLabel = ($.hasAttribute("hide-value")) ? true : false;
+
         if ($.hasAttribute("color")) {
           colors.textColor = convertToRGBAHex($?.getAttribute("color")!);
         }
@@ -210,7 +208,7 @@ export class BfcsBottomBar extends DwebPlugin {
         alwaysShowLabel,
         disabled,
         label,
-        selectable:diSelectable,
+        selectable: diSelectable,
         selected,
         colors: Object.keys(colors).length === 0 ? undefined : colors,
       });
@@ -225,7 +223,7 @@ export class BfcsBottomBar extends DwebPlugin {
       "background-color", // 背景色
       "foreground-color", // 前景色
       "overlay", // 是否开启bottombar遮罩。
-      "height", 
+      "height",
     ];
   }
 

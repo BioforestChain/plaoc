@@ -29,9 +29,7 @@ class DialogFFI(
 
     @JavascriptInterface
     fun openPrompt(config: DataString<JsPromptConfiguration>, cb: CallbackString) {
-      Log.i(TAG,"openPrompt:${config}")
         promptConfig.value = config.toData(JsPromptConfiguration::class.java).bindCallback({
-//          Log.i(TAG,"openPrompt1:${it}")
             cb.callJs("dialog_ffi-prompt", jsUtil, JsUtil.gson.toJson(it))
         }, {
           Log.i(TAG,"openPrompt2:${jsUtil}")
@@ -41,7 +39,6 @@ class DialogFFI(
 
     @JavascriptInterface
     fun openConfirm(config: DataString<JsConfirmConfiguration>, cb: CallbackString) {
-      Log.i(TAG,"openConfirm:${config}")
         confirmConfig.value = config.toData(JsConfirmConfiguration::class.java).bindCallback({
             cb.callJs("dialog_ffi-confirm", jsUtil, "true")
         }, {
@@ -51,7 +48,6 @@ class DialogFFI(
 
     @JavascriptInterface
     fun openWarning(config: DataString<JsConfirmConfiguration>, cb: CallbackString) {
-//      Log.i(TAG,"openWarring:${config}")
       warringConfig.value = config.toData(JsConfirmConfiguration::class.java).bindCallback({
             cb.callJs("dialog_ffi-warring", jsUtil, "true")
         }, {
