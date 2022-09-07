@@ -6,6 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.bfchain.rust.plaoc.chromium.WebView
 
 /**
  * Allows control over the navigation of a WebView from outside the composable. E.g. for performing
@@ -21,7 +22,7 @@ class AdWebViewNavigator(private val coroutineScope: CoroutineScope) {
     private val navigationEvents: MutableSharedFlow<NavigationEvent> = MutableSharedFlow()
 
     // Use Dispatchers.Main to ensure that the webview methods are called on UI thread
-    internal suspend fun ChromiumWebView.handleNavigationEvents(): Nothing = withContext(Dispatchers.Main) {
+    internal suspend fun WebView.handleNavigationEvents(): Nothing = withContext(Dispatchers.Main) {
         navigationEvents.collect { event ->
             when (event) {
                 NavigationEvent.BACK -> goBack()

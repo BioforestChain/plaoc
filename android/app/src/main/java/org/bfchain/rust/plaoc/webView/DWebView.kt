@@ -6,10 +6,8 @@ import android.os.Build
 import android.os.Message
 import android.util.Log
 import android.webkit.*
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -17,16 +15,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import org.bfchain.rust.plaoc.webView.bottombar.BottomBarFFI
 import org.bfchain.rust.plaoc.webView.bottombar.BottomBarState
@@ -46,6 +40,9 @@ import org.bfchain.rust.plaoc.webkit.*
 import java.net.URI
 import java.net.URL
 import kotlin.math.min
+import org.bfchain.rust.plaoc.chromium.WebView
+import org.chromium.android_webview.AwContentsClient.AwWebResourceRequest
+import org.chromium.components.embedder_support.util.WebResourceResponseInfo
 
 private const val TAG = "DWebView"
 
@@ -269,9 +266,9 @@ fun DWebView(
 
                         override fun onJsAlert(
                             view: WebView?,
-                            url: String?,
-                            message: String?,
-                            result: JsResult?
+                            url: String,
+                            message: String,
+                            result: JsResult
                         ): Boolean {
                             if (result == null) {
                                 return super.onJsAlert(view, url, message, result)
@@ -286,10 +283,10 @@ fun DWebView(
 
                         override fun onJsPrompt(
                             view: WebView?,
-                            url: String?,
-                            message: String?,
-                            defaultValue: String?,
-                            result: JsPromptResult?
+                            url: String,
+                            message: String,
+                            defaultValue: String,
+                            result: JsPromptResult
                         ): Boolean {
                             if (result == null) {
                                 return super.onJsPrompt(view, url, message, defaultValue, result)
@@ -306,9 +303,9 @@ fun DWebView(
 
                         override fun onJsConfirm(
                             view: WebView?,
-                            url: String?,
-                            message: String?,
-                            result: JsResult?
+                            url: String,
+                            message: String,
+                            result: JsResult
                         ): Boolean {
                             if (result == null) {
                                 return super.onJsConfirm(view, url, message, result)
@@ -324,9 +321,9 @@ fun DWebView(
 
                         override fun onJsBeforeUnload(
                             view: WebView?,
-                            url: String?,
-                            message: String?,
-                            result: JsResult?
+                            url: String,
+                            message: String,
+                            result: JsResult
                         ): Boolean {
                             if (result == null) {
                                 return super.onJsBeforeUnload(view, url, message, result)
@@ -355,8 +352,8 @@ fun DWebView(
                         @Override
                         override fun shouldInterceptRequest(
                             view: WebView?,
-                            request: WebResourceRequest?
-                        ): WebResourceResponse? {
+                            request: AwWebResourceRequest
+                        ): WebResourceResponseInfo? {
                             Log.i(ITAG, "Intercept Request: ${request?.url}")
                             if (request !== null) {
                                 // 这里出来的url全部都用是小写，俺觉得这是个bug
@@ -410,7 +407,7 @@ fun DWebView(
 
                         override fun shouldOverrideUrlLoading(
                             view: WebView?,
-                            request: WebResourceRequest?
+                            request: AwWebResourceRequest
                         ): Boolean {
                             Log.i(ITAG, "Override Url Loading: ${request?.url}")
                             if (request !== null && customUrlScheme.isCrossDomain(request)) {

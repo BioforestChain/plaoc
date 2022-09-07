@@ -1,11 +1,12 @@
 package org.bfchain.rust.plaoc.webView.network
 
 import android.util.Log
-import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import com.fasterxml.jackson.databind.DeserializationFeature
 import org.bfchain.rust.plaoc.*
 import org.bfchain.rust.plaoc.webView.urlscheme.CustomUrlScheme
+import org.chromium.android_webview.AwContentsClient
+import org.chromium.components.embedder_support.util.WebResourceResponseInfo
 import java.io.ByteArrayInputStream
 import java.net.HttpURLConnection
 import java.net.URL
@@ -29,8 +30,8 @@ var network_whitelist = "http://127.0.0.1"
  *  https://channelId.bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj.dweb/done
  */
 fun dataGateWay(
-    request: WebResourceRequest
-): WebResourceResponse {
+    request: AwContentsClient.AwWebResourceRequest
+): WebResourceResponseInfo {
     val url = request.url.toString().lowercase(Locale.ROOT)
     Log.i(TAG, " dataGateWay: $url")
     if (front_to_rear_map.contains(url)) {
@@ -39,13 +40,13 @@ fun dataGateWay(
         connection.requestMethod = request.method
         Log.i(TAG, " dataGateWay front_to_rear_map.contains: $trueUrl")
         Log.i(TAG, " dataGateWay connection.inputStream: ${connection.inputStream}")
-        return WebResourceResponse(
+        return WebResourceResponseInfo(
             "application/json",
             "utf-8",
             connection.inputStream
         )
     }
-    return WebResourceResponse(
+    return WebResourceResponseInfo(
         "application/json",
         "utf-8",
         ByteArrayInputStream("access denied".toByteArray())
@@ -54,8 +55,8 @@ fun dataGateWay(
 
 // 传递dwebView到deno的消息
 fun messageGateWay(
-    request: WebResourceRequest
-): WebResourceResponse {
+    request: AwContentsClient.AwWebResourceRequest
+): WebResourceResponseInfo {
     val url = request.url.toString().lowercase(Locale.ROOT)
     Log.i(TAG, " messageGateWay: $url")
     val byteData = url.substring(url.lastIndexOf("=") + 1)
@@ -69,7 +70,7 @@ fun messageGateWay(
 //    // 执行函数
 //    callable_map[funName]?.let { it -> it(handle.data) }
 
-    return WebResourceResponse(
+    return WebResourceResponseInfo(
         "application/json",
         "utf-8",
         ByteArrayInputStream("ok".toByteArray())
@@ -79,8 +80,8 @@ fun messageGateWay(
 // 视图文件拦截
 fun viewGateWay(
     customUrlScheme: CustomUrlScheme,
-    request: WebResourceRequest
-): WebResourceResponse {
+    request: AwContentsClient.AwWebResourceRequest
+): WebResourceResponseInfo {
     val url = request.url.toString().lowercase(Locale.ROOT)
     Log.i(TAG, " viewGateWay: ${request.url}")
 //    Log.i(TAG, " viewGateWay: ${front_to_rear_map.contains(url)}")
@@ -91,7 +92,7 @@ fun viewGateWay(
             if (trueUrl.startsWith("https") || trueUrl.startsWith("http")) {
                 val connection = URL(trueUrl).openConnection() as HttpURLConnection
                 connection.requestMethod = request.method
-                return WebResourceResponse(
+                return WebResourceResponseInfo(
                     "text/html",
                     "utf-8",
                     connection.inputStream
@@ -101,7 +102,7 @@ fun viewGateWay(
             return customUrlScheme.handleRequest(request, trueUrl)
         }
     }
-    return WebResourceResponse(
+    return WebResourceResponseInfo(
         "application/json",
         "utf-8",
         ByteArrayInputStream("access denied".toByteArray())

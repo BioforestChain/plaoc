@@ -11,10 +11,11 @@ import org.chromium.android_webview.shell.AwShellResourceProvider
 import org.chromium.base.CommandLine
 import org.chromium.base.ContextUtils
 import java.lang.Exception
+import org.bfchain.rust.plaoc.chromium.WebView
 
 private const val TAG = "AdAndroidWebView"
 
-class AdAndroidWebView(context: Context) : ChromiumWebView(context) {
+class AdAndroidWebView(context: Context) : WebView(context) {
     var adWebViewHook: AdWebViewHook? = null
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {

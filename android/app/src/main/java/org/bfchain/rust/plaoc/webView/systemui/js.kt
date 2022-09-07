@@ -3,7 +3,6 @@ package org.bfchain.rust.plaoc.webView.systemui
 
 import android.util.Log
 import android.webkit.JavascriptInterface
-import android.webkit.WebView
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.graphics.Color
 import androidx.core.graphics.Insets
@@ -13,14 +12,14 @@ import org.bfchain.rust.plaoc.webView.jsutil.*
 import org.bfchain.rust.plaoc.webView.systemui.js.VirtualKeyboardFFI
 import org.bfchain.rust.plaoc.webkit.AdWebViewHook
 import org.bfchain.rust.plaoc.webView.jsutil.DataString_From
-import org.bfchain.rust.plaoc.webkit.ChromiumWebView
+import org.bfchain.rust.plaoc.chromium.WebView
 
 
 private const val TAG = "SystemUiFFI"
 
 class SystemUiFFI(
     private val activity: ComponentActivity,
-    private val webView: ChromiumWebView,
+    private val webView: WebView,
     private val hook: AdWebViewHook,
     private val jsUtil: JsUtil,
     private val systemUIState: SystemUIState,
