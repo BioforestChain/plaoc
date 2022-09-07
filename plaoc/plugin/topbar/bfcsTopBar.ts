@@ -17,7 +17,7 @@ export class BfcsTopBar extends DwebPlugin {
 
     this._ffi = new TopBarFFI();
     this._observer = new MutationObserver(async (mutations) => {
-       await this.collectActions();
+      await this.collectActions();
     });
   }
 
@@ -26,7 +26,7 @@ export class BfcsTopBar extends DwebPlugin {
       subtree: true,
       childList: true,
       attributes: true,
-      attributeFilter: ["disabled", "type", "description", "size", "source","height"],
+      attributeFilter: ["disabled", "type", "description", "size", "source", "height"],
     });
 
     this._init();

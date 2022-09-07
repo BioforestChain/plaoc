@@ -175,7 +175,7 @@ class VirtualKeyboardFFI {
     return new Promise((resolve2, reject) => {
       setTimeout(() => {
         this._ffi.show();
-      }, 500);
+      }, 100);
       resolve2();
     });
   }
@@ -190,14 +190,14 @@ class BfcsKeyboard extends DwebPlugin {
   constructor() {
     super();
     this._ffi = new VirtualKeyboardFFI();
-    this._init();
   }
   connectedCallback() {
+    this._init();
   }
   disconnectedCallback() {
   }
   async _init() {
-    this.setAttribute("hidden", "");
+    this.setAttribute("hidden", "true");
   }
   async getKeyboardSafeArea() {
     const safeArea = await this._ffi.getKeyboardSafeArea();
@@ -216,12 +216,12 @@ class BfcsKeyboard extends DwebPlugin {
     return;
   }
   async showKeyboard() {
-    this.removeAttribute("hidden");
+    this.setAttribute("hidden", "false");
     await this._ffi.showKeyboard();
     return;
   }
   async hideKeyboard() {
-    this.setAttribute("hidden", "");
+    this.setAttribute("hidden", "true");
     await this._ffi.hideKeyboard();
     return;
   }
@@ -234,7 +234,10 @@ class BfcsKeyboard extends DwebPlugin {
         this._ffi.setKeyboardOverlay();
       }
     } else if (attrName === "hidden" && oldVal !== newVal) {
-      if (this.hasAttribute(attrName)) {
+      const bool = this.getAttribute("hidden");
+      if (bool == "false") {
+        this.showKeyboard();
+      } else {
         this.hideKeyboard();
       }
     }
@@ -6298,7 +6301,7 @@ const _hoisted_2$3 = /* @__PURE__ */ _withScopeId$1(() => /* @__PURE__ */ create
     placeholder: "Toast message"
   })
 ], -1));
-const _hoisted_3$2 = /* @__PURE__ */ _withScopeId$1(() => /* @__PURE__ */ createBaseVNode("p", null, [
+const _hoisted_3$3 = /* @__PURE__ */ _withScopeId$1(() => /* @__PURE__ */ createBaseVNode("p", null, [
   /* @__PURE__ */ createTextVNode(" Check out "),
   /* @__PURE__ */ createBaseVNode("a", {
     href: "https://vuejs.org/guide/quick-start.html#local",
@@ -6306,7 +6309,7 @@ const _hoisted_3$2 = /* @__PURE__ */ _withScopeId$1(() => /* @__PURE__ */ create
   }, "create-vue"),
   /* @__PURE__ */ createTextVNode(", the official Vue + Vite starter ")
 ], -1));
-const _hoisted_4$1 = /* @__PURE__ */ _withScopeId$1(() => /* @__PURE__ */ createBaseVNode("p", null, [
+const _hoisted_4$2 = /* @__PURE__ */ _withScopeId$1(() => /* @__PURE__ */ createBaseVNode("p", null, [
   /* @__PURE__ */ createTextVNode(" Install "),
   /* @__PURE__ */ createBaseVNode("a", {
     href: "https://github.com/johnsoncodehk/volar",
@@ -6341,8 +6344,8 @@ const _sfc_main$3 = /* @__PURE__ */ defineComponent({
           createBaseVNode("p", null, toDisplayString(unref(dwebPluginData)), 1)
         ]),
         _hoisted_2$3,
-        _hoisted_3$2,
-        _hoisted_4$1,
+        _hoisted_3$3,
+        _hoisted_4$2,
         _hoisted_5$1
       ], 64);
     };
@@ -31573,12 +31576,24 @@ const createController = (defineCustomElement2, oldController, useDelegate = fal
 /* @__PURE__ */ createController(defineCustomElement$2, toastController);
 const _hoisted_1$2 = /* @__PURE__ */ createBaseVNode("h2", null, "andrid/ios \u7CFB\u7EDFapi \u6D4B\u8BD5", -1);
 const _hoisted_2$2 = /* @__PURE__ */ createTextVNode("\u70B9\u6211\u9690\u85CF\u7CFB\u7EDFnavigation");
+const _hoisted_3$2 = /* @__PURE__ */ createTextVNode("\u70B9\u51FB\u5F00\u542F\u865A\u62DF\u952E\u76D8");
+const _hoisted_4$1 = /* @__PURE__ */ createTextVNode("Outline + Round");
 const _sfc_main$2 = /* @__PURE__ */ defineComponent({
   __name: "system_api",
   setup(__props) {
     defineComponent({
       components: { IonFab, IonFabButton, IonFabList, IonButton, IonIcon }
     });
+    onMounted(async () => {
+      console.log(" document.getElementById('key_board')=>", JSON.stringify(document.querySelector("dweb-keyboard")));
+    });
+    async function onShowKeyboard() {
+      const keyboard = document.getElementById("key_board");
+      keyboard == null ? void 0 : keyboard.showKeyboard();
+      console.log("getKeyboardSafeArea:", JSON.stringify(await keyboard.getKeyboardSafeArea()));
+      console.log("getKeyboardHeight:", await keyboard.getKeyboardHeight());
+      console.log("getKeyboardOverlay:", await keyboard.getKeyboardOverlay());
+    }
     return (_ctx, _cache) => {
       const _component_dweb_status_bar = resolveComponent("dweb-status-bar");
       const _component_dweb_keyboard = resolveComponent("dweb-keyboard");
@@ -31591,7 +31606,7 @@ const _sfc_main$2 = /* @__PURE__ */ defineComponent({
         }),
         createVNode(_component_dweb_keyboard, {
           id: "key_board",
-          overlay: ""
+          hidden: "true"
         }),
         createVNode(unref(IonButton), {
           expand: "block",
@@ -31599,6 +31614,25 @@ const _sfc_main$2 = /* @__PURE__ */ defineComponent({
         }, {
           default: withCtx(() => [
             _hoisted_2$2
+          ]),
+          _: 1
+        }),
+        createVNode(unref(IonButton), {
+          expand: "full",
+          fill: "outline",
+          onClick: onShowKeyboard
+        }, {
+          default: withCtx(() => [
+            _hoisted_3$2
+          ]),
+          _: 1
+        }),
+        createVNode(unref(IonButton), {
+          shape: "round",
+          fill: "outline"
+        }, {
+          default: withCtx(() => [
+            _hoisted_4$1
           ]),
           _: 1
         })

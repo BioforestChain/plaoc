@@ -9,15 +9,16 @@ export class BfcsKeyboard extends DwebPlugin {
     super();
 
     this._ffi = new VirtualKeyboardFFI();
+  }
+
+  connectedCallback() {
     this._init();
   }
 
-  connectedCallback() {}
-
-  disconnectedCallback() {}
+  disconnectedCallback() { }
 
   private async _init() {
-    this.setAttribute("hidden", "");
+    this.setAttribute("hidden", "true");
   }
 
   async getKeyboardSafeArea(): Promise<Keyboard.IKeyboardSafeArea> {
@@ -45,14 +46,13 @@ export class BfcsKeyboard extends DwebPlugin {
   }
 
   async showKeyboard(): Promise<void> {
-    this.removeAttribute("hidden");
+    this.setAttribute("hidden", "false");
     await this._ffi.showKeyboard();
-
     return;
   }
 
   async hideKeyboard(): Promise<void> {
-    this.setAttribute("hidden", "");
+    this.setAttribute("hidden", "true");
     await this._ffi.hideKeyboard();
 
     return;
@@ -73,7 +73,10 @@ export class BfcsKeyboard extends DwebPlugin {
         this._ffi.setKeyboardOverlay();
       }
     } else if (attrName === "hidden" && oldVal !== newVal) {
-      if (this.hasAttribute(attrName)) {
+      const bool = this.getAttribute('hidden');
+      if (bool == "false") {
+        this.showKeyboard()
+      } else {
         this.hideKeyboard();
       }
     }
