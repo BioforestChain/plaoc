@@ -4,7 +4,6 @@
 import HelloWorld from './components/HelloWorld.vue'
 import System_api from './view/system_api.vue';
 import Dialogs from './view/dialogs.vue';
-import Icon from './view/icon.vue';
 import { ref, defineComponent, reactive } from 'vue';
 import { OpenScanner } from '@bfsx/plugin';
 import { IonFab, IonFabButton, IonFabList,IonIcon } from '@ionic/vue';

@@ -1,14 +1,14 @@
 import { DwebPlugin } from "../native/dweb-plugin";
 export class BfspIcon extends DwebPlugin {
-  // private _icon: Plaoc.IPlaocIcon = { source: "", type: IconType.NamedIcon };
+  // private _icon: Icon.IPlaocIcon = { source: "", type: Icon.IconType.NamedIcon };
 
   constructor() {
     super();
   }
 
-  connectedCallback() {}
+  connectedCallback() { }
 
-  disconnectedCallback() {}
+  disconnectedCallback() { }
 
   static get observedAttributes() {
     return ["type", "description", "size", "source"];
@@ -17,8 +17,8 @@ export class BfspIcon extends DwebPlugin {
   attributeChangedCallback(attrName: string, oldVal: unknown, newVal: unknown) {
     // this._icon.source = this.getAttribute("source") ?? "";
     // this._icon.type = this.hasAttribute("type")
-    //   ? (this.getAttribute("type") as Plaoc.IconType)
-    //   : IconType.NamedIcon;
+    //   ? (this.getAttribute("type") as Icon.IconType)
+    //   : Icon.IconType.NamedIcon;
     // this._icon.description = this.getAttribute("description") ?? "";
     // this._icon.size = this.hasAttribute("size")
     //   ? (this.getAttribute("size") as unknown as number)

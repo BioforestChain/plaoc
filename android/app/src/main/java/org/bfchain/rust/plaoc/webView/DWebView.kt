@@ -432,7 +432,7 @@ fun DWebView(
                 Box(
                     contentAlignment = Alignment.TopCenter,
                     modifier = if (systemUIState.statusBar.overlay.value) {
-                        with(LocalDensity.current) {
+                      with(LocalDensity.current) {
                             Modifier.offset(y = WindowInsets.statusBars.getTop(this).toDp())
                         }
                     } else {

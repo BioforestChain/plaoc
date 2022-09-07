@@ -17,7 +17,8 @@ data class SystemUIState(
     val statusBar: StatusBarState,
     val navigationBar: NavigationBarState,
     val virtualKeyboard: VirtualKeyboardState,
-) {
+)
+{
     @Stable
     class StatusBarState(
         val overlay: MutableState<Boolean>,

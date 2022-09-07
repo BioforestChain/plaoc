@@ -10,10 +10,11 @@ defineComponent({
 
 <template>
   <h2>andrid/ios 系统api 测试</h2>
-  <ion-button expand="block" fill="outline" >点我隐藏系统navigation</ion-button>
+  <dweb-status-bar id="status_bar" background-color="rgba(100,100,100,0.5)" overlay></dweb-status-bar>
+  <dweb-keyboard id="key_board" overlay></dweb-keyboard>
+  <ion-button expand="block" fill="outline">点我隐藏系统navigation</ion-button>
 
 </template>
 
 <style scoped>
-
 </style>

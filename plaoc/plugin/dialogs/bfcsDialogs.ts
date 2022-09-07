@@ -79,7 +79,6 @@ export class BfcsDialogAlert extends BfcsDialogs {
       }
 
       const cb = `document.querySelector('dweb-dialog-alert[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
-      console.log("openAlert:", JSON.stringify(alertConfig))
       this._ffi.openAlert(alertConfig, cb);
 
       resolve();

@@ -9,7 +9,6 @@ function getToastMessage(data:string) {
 }
 let dwebPluginData = ref("dweb的数据");
 onMounted(async () => {
-  console.log("document.querySelector('dweb-status-bar')!=>", document.querySelector('dweb-status-bar'));
 })
 
 
@@ -23,12 +22,7 @@ async function onDwebPlugin() {
 
 </script>
 <template>
-  <dweb-status-bar id="status_bar" background-color="#EADDFF" bar-style="dark-content"></dweb-status-bar>
-  <!-- <dweb-keyboard id="key_board" overlay></dweb-keyboard>
-    <dweb-dialog-alert id="dda" title="alert" content="content">
-        <dweb-dialog-button id="ddb">ok</dweb-dialog-button>
-    </dweb-dialog-alert>
-   -->
+
   <dweb-messager id="dweb"></dweb-messager>
   <h1>{{ msg }}</h1>
   <div class="card">

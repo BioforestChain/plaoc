@@ -18,22 +18,7 @@ export class OpenScanner extends DwebPlugin {
     super();
   }
   async openScanner(): Promise<string> {
-    const ok = await this.onPolling("OpenScanner");
-    if (ok !== "ok") {
-      throw new Error("打开扫码失败！"); // todo 记录日志
-    }
-    let index = 1;
-    return new Promise(async (resolve, reject) => {
-      do {
-        const data = await this.onMesage().next();
-        if (data.done === false) {
-          resolve(data.value);
-          break;
-        }
-        index++;
-        await loop(500);
-      } while (index < 10);
-    });
+    return this.onPolling("OpenScanner");
   }
   // dom被删除的声明周期
   disconnectedCallback() {
@@ -41,8 +26,7 @@ export class OpenScanner extends DwebPlugin {
   }
 }
 
-const loop = (delay: number) =>
-  new Promise((resolve) => setTimeout(resolve, delay));
+
 
 /**
  * 服务端的用户如果想给全部的dweb-plugin发送广播，需要在evalJs调用dwebPlugin.dispatch

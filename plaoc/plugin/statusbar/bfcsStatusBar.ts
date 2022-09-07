@@ -14,11 +14,10 @@ export class BfcsStatusBar extends DwebPlugin {
   }
   /**每次将 Web 组件附加到 DOM 时，都会调用一次该 方法 */
   connectedCallback() {
-    console.log("statusBar初始化");
     this._init();
   }
   /**移除DOM添加的方法 */
-  disconnectedCallback() {}
+  disconnectedCallback() { }
 
   private async _init() {
     // const colorHex = await this.getStatusBarColor();
@@ -76,6 +75,7 @@ export class BfcsStatusBar extends DwebPlugin {
   static get observedAttributes() {
     return ["overlay", "hidden", "bar-style", "background-color"];
   }
+
   /**当自定义元素增加、删除、自身属性修改时，被调用。 */
   attributeChangedCallback(attrName: string, oldVal: unknown, newVal: unknown) {
     if (attrName === "overlay") {
