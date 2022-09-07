@@ -3,6 +3,7 @@ package org.bfchain.libappmgr.ui.main
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -13,16 +14,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.bfchain.libappmgr.data.PreferencesHelper
 import org.bfchain.libappmgr.model.AppInfo
+import org.bfchain.libappmgr.model.AppVersion
 import org.bfchain.libappmgr.model.AutoUpdateInfo
+import org.bfchain.libappmgr.network.base.IApiResult
 import org.bfchain.libappmgr.schedule.CoroutineUpdateTask
-import org.bfchain.libappmgr.ui.download.DownLoadView
+import org.bfchain.libappmgr.ui.download.DownLoadViewModel
 import org.bfchain.libappmgr.ui.theme.AppMgrTheme
 import org.bfchain.libappmgr.ui.view.AppInfoGridView
 import org.bfchain.libappmgr.utils.FilesUtil
+import java.io.File
 
 class MainActivity : ComponentActivity() {
 
@@ -41,9 +46,9 @@ class MainActivity : ComponentActivity() {
                         .fillMaxSize()
                         .background(MaterialTheme.colors.primary)
                 ) {
-                    Gretting(name = "Compose!!", this@MainActivity)
+                    //Gretting(name = "Compose!!", this@MainActivity)
                     // ProgressCircular( progressValue.value)
-                    // Test()
+                    Test()
                 }
             }
         }
@@ -84,31 +89,47 @@ fun Gretting(name: String, context: Context) {
 
 @Composable
 fun Test() {
-/*
     val downLoadViewModel: DownLoadViewModel = viewModel()
     downLoadViewModel.downloadAndSave(
-        "/bfs-app-1234567A.zip",
-        FilesUtil.getAppCacheDirectory() + File.separator + "zz.zip",
-        onSuccess = {
-            Log.d("MainActivity", "onSuccess->${it.name}")
-        },
-        onError = {
-            Log.d("MainActivity", "onError->${it.printStackTrace()}")
-        },
-        onProcess = { currentLength, length, process ->
-            Log.d("MainActivity", "onProcess->$currentLength, $length, $process")
+        url = "/bfs-app-1234567A.zip",
+        outputFile = FilesUtil.getAppCacheDirectory() + File.separator + "zz.zip",
+        apiResult = object : IApiResult<Nothing> {
+            override fun onPrepare() {
+                Log.d("MainActivity", "onPrepare.....")
+            }
+
+            override fun downloadSuccess(file: File) {
+                Log.d("MainActivity", "downloadSuccess.....${file.absolutePath}")
+            }
+
+            override fun downloadProgress(current: Long, total: Long, progress: Float) {
+                Log.d("MainActivity", "downloadProgress.....${current}, $total, $progress")
+            }
         }
     )
 
     var viewModel: MainViewModel = viewModel()
     viewModel.getAppVersionAndSave(
-        AppVersionPath,
-        FilesUtil.getAppCacheDirectory() + File.separator + "aaa.json",
-        onSuccess = {
-            Log.d("MainActivity", "onSuccess->$it")
-        },
-        onError = {
-            Log.d("MainActivity", "onError->$it")
+        appInfo = AppInfo(
+            "111",
+            "bfs-app-id",
+            "name",
+            "icon",
+            "author",
+            autoUpdate = AutoUpdateInfo(1, 2, "url")
+        ),
+        apiResult = object : IApiResult<AppVersion> {
+            override fun onPrepare() {
+                Log.d("MainActivity", "onPrepare.....")
+            }
+
+            override fun onError(errorCode: Int, errorMsg: String, exception: Throwable?) {
+                Log.d("MainActivity", "onError.....$errorCode, $errorMsg, $exception")
+            }
+
+            override fun onSuccess(errorCode: Int, errorMsg: String, data: AppVersion) {
+                Log.d("MainActivity", "onSuccess.....$errorCode, $errorMsg, $data")
+            }
         }
-    )*/
+    )
 }

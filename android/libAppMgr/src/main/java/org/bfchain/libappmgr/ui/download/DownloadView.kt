@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import org.bfchain.libappmgr.model.AppInfo
 import org.bfchain.libappmgr.model.AppVersion
+import org.bfchain.libappmgr.network.base.IApiResult
 import org.bfchain.libappmgr.ui.main.MainViewModel
 import org.bfchain.libappmgr.utils.FilesUtil
 import org.bfchain.libappmgr.utils.JsonUtil
@@ -20,10 +21,13 @@ fun DownLoadView(appInfo: AppInfo) {
 
     // 后台异步请求最新的版本信息，如果当前版本跟实际显示不一样，根据最新版本内容显示
     var mainViewModel: MainViewModel = viewModel()
-    mainViewModel.getAppVersionAndSave(appInfo, onSuccess = {
-        if (appVersion != null && it.version > appVersion!!.version) {
-            // 修改界面显示内容
-            appVersion = it
+    mainViewModel.getAppVersionAndSave(appInfo, apiResult = object : IApiResult<AppVersion> {
+        override fun onPrepare() {
+            // 显示默认界面
+        }
+
+        override fun onSuccess(errorCode: Int, errorMsg: String, data: AppVersion) {
+            // 显示加载后的界面
         }
     })
 

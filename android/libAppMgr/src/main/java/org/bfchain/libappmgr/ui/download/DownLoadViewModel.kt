@@ -1,6 +1,5 @@
 package org.bfchain.libappmgr.ui.download
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.ktor.client.statement.*
@@ -11,7 +10,9 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import org.bfchain.libappmgr.network.ApiService
-import org.bfchain.libappmgr.network.base.*
+import org.bfchain.libappmgr.network.base.ApiResultData
+import org.bfchain.libappmgr.network.base.IApiResult
+import org.bfchain.libappmgr.network.base.fold
 import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -20,15 +21,16 @@ import java.io.InputStream
 class DownLoadViewModel : ViewModel() {
 
     fun downloadAndSave(
-        path: String, outputFile: String,
-        onSuccess: _SUCCESS<File> = {},
+        url: String, outputFile: String, apiResult: IApiResult<Nothing>
+        /*onSuccess: _SUCCESS<File> = {},
         onError: _ERROR = {},
-        onProcess: _PROCESS = { _, _, _ -> }
+        onProcess: _PROCESS = { _, _, _ -> }*/
     ) {
         viewModelScope.launch {
             flow {
+                emit(ApiResultData.prepare())
                 try {
-                    val httpResponse = ApiService.instance.download(path)
+                    val httpResponse = ApiService.instance.download(url)
                     val length: Long = httpResponse.contentLength() ?: 0
                     val file = File(outputFile)
                     val outputStream = FileOutputStream(file)
@@ -44,7 +46,7 @@ class DownLoadViewModel : ViewModel() {
                         outputStream.write(buffer, 0, readLength)
                         currentLength += readLength
                         emit(
-                            BaseResultData.progress(
+                            ApiResultData.progress(
                                 currentLength = currentLength,
                                 length = length,
                                 process = currentLength.toFloat() / length.toFloat()
@@ -54,18 +56,24 @@ class DownLoadViewModel : ViewModel() {
                     bufferedInputStream.close()
                     outputStream.close()
                     inputStream.close()
-                    emit(BaseResultData.success(file))
+                    emit(ApiResultData.success(file))
                 } catch (e: Exception) {
-                    emit(BaseResultData.failure(e))
+                    emit(ApiResultData.failure(e))
                 }
             }.flowOn(Dispatchers.IO)
                 .collect {
                     it.fold(onFailure = { e ->
-                        e?.let { it1 -> onError(it1) }
+                        e?.let { it1 -> apiResult.onError(-1, "请求失败", it1) }
                     }, onSuccess = { file ->
-                        onSuccess(file)
+                        apiResult.downloadSuccess(file)
                     }, onLoading = { progress ->
-                        onProcess(progress.currentLength, progress.length, progress.process)
+                        apiResult.downloadProgress(
+                            progress.currentLength,
+                            progress.length,
+                            progress.process
+                        )
+                    }, onPrepare = {
+                        apiResult.onPrepare()
                     })
                 }
         }
