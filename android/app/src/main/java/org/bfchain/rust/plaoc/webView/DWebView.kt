@@ -9,7 +9,8 @@ import android.webkit.*
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -27,7 +28,6 @@ import org.bfchain.rust.plaoc.webView.bottombar.BottomBarState
 import org.bfchain.rust.plaoc.webView.bottombar.DWebBottomBar
 import org.bfchain.rust.plaoc.webView.dialog.*
 import org.bfchain.rust.plaoc.webView.jsutil.JsUtil
-import org.bfchain.rust.plaoc.webView.navigator.NavigatorFFI
 import org.bfchain.rust.plaoc.webView.network.*
 import org.bfchain.rust.plaoc.webView.systemui.SystemUIState
 import org.bfchain.rust.plaoc.webView.systemui.SystemUiFFI
@@ -140,7 +140,6 @@ fun DWebView(
         }
     }
     val topBarState = TopBarState.Default(presseBack)
-
     @Composable
     fun TopAppBar() {
         DWebTopBar(jsUtil, state, topBarState)
@@ -157,12 +156,12 @@ fun DWebView(
         modifier = modifier
             .padding(overlayPadding)
             .offset { overlayOffset },
-        topBar = { if (!topBarState.overlay.value and topBarState.enabled.value) TopAppBar() },
+         // 如果前端没有传递overlay,并且没有传递enabled
+        topBar = { if ((topBarState.overlay.value == 1F) and topBarState.enabled.value) TopAppBar() },
         bottomBar = {
-          Log.i("DwebView","bottomBarState.isEnabled:${ bottomBarState.isEnabled}, bottomBarState.overlay:${ bottomBarState.overlay.value}");
-          // 如果前端传递hidden，也就是bottomBarState.isEnabled等于true，则不显示bottom bar
-          if (!bottomBarState.overlay.value and bottomBarState.isEnabled) {
-            Log.i(TAG,"哈哈")
+           // Log.i("DwebView","bottomBarState.isEnabled:${ bottomBarState.isEnabled}, bottomBarState.overlay:${ bottomBarState.overlay.value}");
+          // 如果前端没有传递hidden，也就是bottomBarState.isEnabled等于true，则显示bottom bar
+          if ((bottomBarState.overlay.value == 1F) and bottomBarState.isEnabled) {
             BottomAppBar()
         } },
         content = { innerPadding ->
@@ -175,7 +174,7 @@ fun DWebView(
             val jsConfirmConfig = remember {
                 mutableStateOf<JsConfirmConfiguration?>(null)
             }
-            val jsBeforeUnloadConfig = remember {
+            val jsWarningConfig = remember {
                 mutableStateOf<JsConfirmConfiguration?>(null)
             }
 
@@ -194,8 +193,6 @@ fun DWebView(
                             callback
                         )
                     })
-                    val navigatorFFI = NavigatorFFI(webView, activity, navController)
-                    webView.addJavascriptInterface(navigatorFFI, "my_nav")
                     val systemUiFFI = SystemUiFFI(
                         activity,
                         webView,
@@ -203,8 +200,9 @@ fun DWebView(
                         jsUtil!!,
                         systemUIState,
                     )
+                  initUiFn(systemUiFFI)
 
-                    webView.addJavascriptInterface(systemUiFFI, "system_ui");
+                  webView.addJavascriptInterface(systemUiFFI, "system_ui");
                     webView.addJavascriptInterface(systemUiFFI.virtualKeyboard, "virtual_keyboard")
 
                     val topBarFFI = TopBarFFI(
@@ -221,7 +219,7 @@ fun DWebView(
                         jsAlertConfig,
                         jsPromptConfig,
                         jsConfirmConfig,
-                        jsBeforeUnloadConfig
+                        jsWarningConfig
                     )
                     webView.addJavascriptInterface(dialogFFI, "native_dialog")
 
@@ -328,7 +326,7 @@ fun DWebView(
                             if (result == null) {
                                 return super.onJsBeforeUnload(view, url, message, result)
                             }
-                            jsBeforeUnloadConfig.value = JsConfirmConfiguration(
+                           jsWarningConfig.value = JsConfirmConfiguration(
                                 getJsDialogTitle(url, "提示您"),
                                 message ?: "",
                                 "离开",
@@ -370,8 +368,13 @@ fun DWebView(
                                          * 下面这种实现方法会有安全问题（比如说一些.php,.jsp的提权），可能需要完善一下下面规则的健壮性。
                                          */
                                         val temp = url.substring(url.lastIndexOf("/") + 1)
+                                        //拦截转发到后端的事件
                                         if (temp.startsWith("poll")) {
                                             return messageGateWay(request)
+                                        }
+                                        //拦截设置ui的请求，代替JavascriptInterface
+                                        if (temp.startsWith("setUi")) {
+                                          return uiGateWay(request)
                                         }
                                         val suffixIndex = temp.lastIndexOf(".")
                                         // 只拦截数据文件,忽略资源文件
@@ -390,20 +393,6 @@ fun DWebView(
                             }
                             return super.shouldInterceptRequest(view, request)
                         }
-
-                        // API < 21
-//                        override fun shouldInterceptRequest(view: WebView?, url: String?): WebResourceResponse? {
-//                            if (url != null) {
-//                                if (!(url.startsWith("http://127.0.0.1") || url.startsWith(
-//                                        "https://unpkg.com"
-//                                    ))
-//                                ) {
-//                                    return super.shouldInterceptRequest(view,
-//                                        url.let { gateWay(it) })
-//                                }
-//                            }
-//                            return super.shouldInterceptRequest(view, url)
-//                        }
 
                         override fun shouldOverrideUrlLoading(
                             view: WebView?,
@@ -425,10 +414,11 @@ fun DWebView(
                     val layoutDirection = LocalLayoutDirection.current
                     var start = innerPadding.calculateStartPadding(layoutDirection)
                     var end = innerPadding.calculateEndPadding(layoutDirection)
-                    if (topBarState.overlay.value or !topBarState.enabled.value) {
+                    if ((topBarState.overlay.value != 1F) or !topBarState.enabled.value) {
                         top = 0.dp
                     }
-                    if (bottomBarState.overlay.value or !bottomBarState.isEnabled) {
+                    // 如果不显示bottomBar，即bottomBarState.isEnabled 为false
+                    if ((bottomBarState.overlay.value != 1F) or !bottomBarState.isEnabled) {
                         bottom = 0.dp
                     }
                     if ((top.value == 0F) and (bottom.value == 0F)) {
@@ -439,25 +429,25 @@ fun DWebView(
                 },
             )
 
-            if (topBarState.overlay.value and topBarState.enabled.value) {
+          // 如果前端传递了透明度属性，并且是需要显示的
+            if ((topBarState.overlay.value != 1F) and topBarState.enabled.value) {
                 Box(
                     contentAlignment = Alignment.TopCenter,
                     modifier = if (systemUIState.statusBar.overlay.value) {
-                        with(LocalDensity.current) {
+                      with(LocalDensity.current) {
                             Modifier.offset(y = WindowInsets.statusBars.getTop(this).toDp())
                         }
                     } else {
-                        Modifier
+                      Modifier
                     }
                 ) {
                     TopAppBar()
                 }
             }
-            if (bottomBarState.overlay.value and bottomBarState.isEnabled) {
-              Log.i("<{=．．．．(嘎~嘎~嘎~)","xx");
+            if ((bottomBarState.overlay.value != 1F) and bottomBarState.isEnabled) {
                 Box(
                     contentAlignment = Alignment.BottomCenter,
-                    modifier = Modifier.fillMaxSize().alpha(0.5f)
+                    modifier = Modifier.fillMaxSize()
                       .let {
                         it
                     }
@@ -469,7 +459,7 @@ fun DWebView(
             jsAlertConfig.value?.openAlertDialog { jsAlertConfig.value = null }
             jsPromptConfig.value?.openPromptDialog { jsPromptConfig.value = null }
             jsConfirmConfig.value?.openConfirmDialog { jsConfirmConfig.value = null }
-            jsBeforeUnloadConfig.value?.openBeforeUnloadDialog { jsBeforeUnloadConfig.value = null }
+            jsWarningConfig.value?.openWarningDialog { jsWarningConfig.value = null }
         },
         containerColor = Companion.Transparent,
       contentColor = Companion.Transparent

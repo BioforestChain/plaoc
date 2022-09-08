@@ -6,92 +6,107 @@
 2. Provide developers with application development on android, ios and desktop.
 3. In order to prepare for role-oriented programming and development of BFS assets, and to build community infrastructure for blockchain development.
 
-## 项目流程
+## 快速开始
+
+见文档：<https://bioforestchain.github.io/plaoc-docs/>,<https://docs.plaoc.com>
+
+### 项目流程
 
     dwebView-js-(fetch)->kotlin-(ffi)->rust-(op)->deno-js
     deno-js-(op)->rust-(ffi)->kotlin-(evaljs)->dwebView-js
 
-## 如何开发
+## 开发者指南
 
-### 如何在linux/amd64构建arm64
+首先需要构建一个动态链接库。
+
+### 构建动态链接库
+
+> waring 此处需要使用arm64架构的电脑构建，如苹果的M1芯片电脑。
+
+#### 在容器中如何在linux/amd64架构下构建arm64 架构的动态链接库
 
 下面的命令会起一个容器不要杀掉。
 
-    ```bash
-    docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-    docker buildx create --name multiarch --driver docker-container --use
-    docker buildx inspect --bootstrap
-    ```  
+```bash
+docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+docker buildx create --name multiarch --driver docker-container --use
+docker buildx inspect --bootstrap
+```  
 
-### docker编译so
+#### docker编译so
 
-    ```bash
-    # 如果不自己构建可以不运行这一句
-    docker buildx build --platform linux/arm64  -t waterbang/aarch64-linux-android:arm-ndk25-rust1.63.0 .
-    # 在plaoc根目录执行
-    docker run -it -v /Users/mac/Desktop/waterbang/project/plaoc/qemu-aarch64-static:/usr/bin/qemu-aarch64-static -v $(pwd):/plaoc  waterbang/aarch64-linux-android:arm-ndk25-rust1.63.0  /bin/bash
+```bash
+# 如果不自己构建可以不运行这一句
+docker buildx build --platform linux/arm64  -t waterbang/aarch64-linux-android:arm-ndk25-rust1.63.0 .
+# 在plaoc根目录执行
+docker run -it -v /Users/mac/Desktop/waterbang/project/plaoc/qemu-aarch64-static:/usr/bin/qemu-aarch64-static -v $(pwd):/plaoc  waterbang/aarch64-linux-android:arm-ndk25-rust1.63.0  /bin/bash
 
-    cd /plaoc/rust_lib
+cd /plaoc/rust_lib
 
-    RUST_BACKTRACE=1 cargo build -vv --target=aarch64-linux-android --release
-    ```
+RUST_BACKTRACE=1 cargo build -vv --target=aarch64-linux-android --release
+```
+
+> qemu在此处有bug，会吃掉虚拟机的所有内存和cpu。
 
 ### 测试（现在只提供vue3）
 
 如何测试
 
-    ```bash
-    # 前端
-    cd test-vue3
+```bash
+# 前端
+cd test-vue3
 
-    yarn install
+yarn install
 
-    # 后端
-    cd test-vue3/bfs-service
+# 后端
+cd test-vue3/bfs-service
 
-    bfsp init
+bfsp init
 
-    bfsp dev
+bfsp dev
 
-    # 前端上传到android
-    yarn build
+# 前端上传到android
+yarn build
 
-    # 后端上传到android
-    node test-vue3/bfs-service/copy.cjs
+# 后端上传到android
+node test-vue3/bfs-service/copy.cjs
 
-    #后续封装成.bfsa
-    ```
+#后续封装成.bfsa
+```
 
 ### plaoc
 
 BFS 启动
 
-    ```bash
-    cd plaoc
+```bash
+cd plaoc
 
-    bfsw init
+bfsw init
 
-    bfsw dev
-    ```
+bfsw dev
+```
 
 #### 前端包 @bfsx/plugin
 
-#### 后端包 @bfsx/core,@bfsx/metadata,@bfsx/plugin
+API见文档：<https://docs.plaoc.com>
 
-### deno-runtime
+#### 后端包 @bfsx/core,@bfsx/metadata
 
-首先要保证一下文件存在,点击下载[rusty_v8 v0.48.1](https://download.waterbang.top/s/vMFe?path=%2F)：
+API见文档：<https://docs.plaoc.com>
+
+### 如果修改了rust代码，需要重新编译
+
+首先要保证一下文件存在,点击下载[librusty_v8_release_aarch64-linux-android.a](https://github.com/waterbang/rusty_v8/releases),
+[librusty_v8_release_x86_64-apple-darwin.a](https://github.com/denoland/rusty_v8/releases)
 
 > 1. rust_lib/assets/rusty_v8_mirror/v0.48.1/librusty_v8_release_aarch64-linux-android.a
 > 2. rust_lib/assets/rusty_v8_mirror/v0.48.1/librusty_v8_release_x86_64-apple-darwin.a
 
-    ```bash
-    cd rust_lib
+```bash
+cd rust_lib
 
-    cargo build --target=aarch64-linux-android --release
-
-    cross build --target=aarch64-linux-android --release
-    ```
+cargo build --target=aarch64-linux-android --release
+```
 
 ### android
 

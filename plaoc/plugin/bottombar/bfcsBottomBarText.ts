@@ -5,7 +5,7 @@ export class BfcsBottomBarText extends DwebPlugin {
   }
 
   static get observedAttributes() {
-    return ["value","color", "selected-color"];
+    return ["value","color", "selected-color","hide-value"];
   }
 
 

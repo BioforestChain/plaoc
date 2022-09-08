@@ -14,7 +14,7 @@ export namespace TopBar {
     getEnabled(): boolean;
     toggleEnabled(isEnabled: number): void;
     getOverlay(): boolean;
-    toggleOverlay(isOverlay: number): void;
+    toggleOverlay(isOverlay: string): void;
     getTitle(): string;
     setTitle(title: string): void;
     hasTitle(): boolean;
@@ -115,7 +115,7 @@ export namespace TopBar {
     setHidden(): Promise<void>;
     getOverlay(): Promise<boolean>;
     toggleOverlay(): Promise<void>;
-    setOverlay(): Promise<void>;
+    setOverlay(alpha:string): Promise<void>;
     getTitle(): Promise<string>;
     setTitle(title: string): Promise<void>;
     hasTitle(): Promise<boolean>;

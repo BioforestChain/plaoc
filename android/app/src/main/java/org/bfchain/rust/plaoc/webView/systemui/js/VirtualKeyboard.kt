@@ -53,7 +53,8 @@ class VirtualKeyboardFFI(
             imeInsets: WindowInsets,
             isOverlayNavigationBar: Boolean,
             navigationBarInsets: WindowInsets
-        ) {
+        )
+        {
             val keyboardSafeArea = with(density) {
                 virtualKeyboardHeight = imeInsets.getBottom(density).toDp().value
 

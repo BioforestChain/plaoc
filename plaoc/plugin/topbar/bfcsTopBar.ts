@@ -17,7 +17,7 @@ export class BfcsTopBar extends DwebPlugin {
 
     this._ffi = new TopBarFFI();
     this._observer = new MutationObserver(async (mutations) => {
-       await this.collectActions();
+      await this.collectActions();
     });
   }
 
@@ -26,7 +26,7 @@ export class BfcsTopBar extends DwebPlugin {
       subtree: true,
       childList: true,
       attributes: true,
-      attributeFilter: ["disabled", "type", "description", "size", "source","height"],
+      attributeFilter: ["disabled", "type", "description", "size", "source", "height"],
     });
 
     this._init();
@@ -39,12 +39,6 @@ export class BfcsTopBar extends DwebPlugin {
   private async _init() {
     const height = await this.getHeight();
     this.setAttribute("height", `${height}`);
-
-    // const backgroundColor = await this.getBackgroundColor();
-    // this.setAttribute("background-color", backgroundColor);
-
-    // const foregroundColor = await this.getForegroundColor();
-    // this.setAttribute("foreground-color", foregroundColor);
   }
 
   async back(): Promise<void> {
@@ -183,7 +177,7 @@ export class BfcsTopBar extends DwebPlugin {
       await this.setForegroundColor(newVal as string);
     } else if (attrName === "overlay") {
       if (this.hasAttribute(attrName)) {
-        await this._ffi.setOverlay();
+        await this._ffi.setOverlay(newVal as string);
       }
     } else if (attrName === "hidden") {
       if (this.hasAttribute(attrName)) {

@@ -6,7 +6,7 @@ export namespace Dialogs {
     title: string;
     confirmText: string;
     dismissOnBackPress?: boolean;
-    dismissOnClickOutSide?: boolean;
+    dismissOnClickOutside?: boolean;
   }
 
   export interface IAlertConfig extends IBaseConfig {
@@ -42,7 +42,7 @@ export namespace Dialogs {
     openAlert(config: Data.DataString<IAlertConfig>, cb: string): void;
     openPrompt(config: Data.DataString<IPromptConfig>, cb: string): void;
     openConfirm(config: Data.DataString<IConfirmConfig>, cb: string): void;
-    openBeforeUnload(config: Data.DataString<IConfirmConfig>, cb: string): void;
+    openWarning(config: Data.DataString<IConfirmConfig>, cb: string): void;
   }
 
   export interface DialogsIosFFI {
@@ -55,7 +55,7 @@ export namespace Dialogs {
     openConfirm: {
       postMessage(config: Data.DataString<IConfirmConfigIOS>): void;
     };
-    openBeforeUnload: {
+    openWarning: {
       postMessage(config: Data.DataString<IConfirmConfigIOS>): void;
     };
   }
@@ -72,7 +72,7 @@ export namespace Dialogs {
       confirmFunc: string,
       cancelFunc?: string
     ): Promise<void>;
-    openBeforeUnload(
+    openWarning(
       config: IConfirmConfig,
       confirmFunc: string,
       cancelFunc?: string

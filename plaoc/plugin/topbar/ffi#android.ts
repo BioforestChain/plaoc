@@ -3,6 +3,7 @@ import { Color } from "../typings/types/color.type";
 import { getColorInt, getColorHex } from "./../util";
 import { TopBar } from "./bfcsTopBar.type";
 
+// 禁止传递float 因为不管传递什么，到android都会变0。
 export class TopBarFFI implements TopBar.ITopBarFFI {
   private _ffi: TopBar.TopBarAndroidFFI = (window as any).top_bar;
 
@@ -47,15 +48,15 @@ export class TopBarFFI implements TopBar.ITopBarFFI {
 
   toggleOverlay(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      this._ffi.toggleOverlay(0);
+      this._ffi.toggleOverlay(String(0));
 
       resolve();
     });
   }
 
-  setOverlay(): Promise<void> {
+  setOverlay(alpha:String): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      this._ffi.toggleOverlay(1);
+      this._ffi.toggleOverlay(String(alpha));
 
       resolve();
     });

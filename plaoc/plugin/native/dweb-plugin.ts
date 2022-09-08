@@ -1,3 +1,5 @@
+import { loop } from '../common'
+import { connectChannel } from '../common/network';
 /**
  * 所有的dweb-plugin需要继承这个类
  */
@@ -43,43 +45,51 @@ export class DwebPlugin extends HTMLElement {
     };
   }
   /**
-   * 发送请求get Kotlin 转发
+   * 
    * @param fun 操作函数
    * @param data 数据
    * @returns Promise<Ok>
    */
-  async onPolling(fun: string, data: string = `"''"`): Promise<string> {
-    const message = `{"function":"${fun}","data":${data},"channelId":"${this.channelId}"}`;
-    const buffer = new TextEncoder().encode(message);
-    return this.connectChannel(`/poll?data=${buffer}`);
+  async onPolling(fun: string, data: string = `"''"`, delay: number = 500): Promise<string> {
+    const ok = await this.createMessage(fun, data);
+    let index = 1;
+    return new Promise(async (resolve, reject) => {
+      if (ok !== "ok") {
+        reject(`${fun}操作失败`); // todo 记录日志
+      }
+      do {
+        const data = await this.onMesage().next();
+        if (data.done === false) {
+          resolve(data.value);
+          break;
+        }
+        index++;
+        await loop(delay);
+      } while (index < 10);
+    });
   }
   /**
-   * 请求kotlin 代理转发
-   * @param url
-   * @returns 直接返回ok
+   * 创建消息发送请求给 Kotlin 转发
+   * @param fun 操作函数
+   * @param data 数据 
+   * @returns Promise<Ok>
    */
-  async connectChannel(url: string) {
-    const response = await fetch(url, {
-      method: "GET", // dwebview 无法获取post的body
-      headers: {
-        "Access-Control-Allow-Origin": "*", // 客户端开放，不然会报cors
-        "Content-Type": "application/json",
-      },
-      mode: "cors",
-    });
-    const data = await response.text();
-    console.log(data);
-    return data;
+  async createMessage(fun: string, data: string = `"''"`): Promise<string> {
+    const message = `{"function":"${fun}","data":${data},"channelId":"${this.channelId}"}`;
+    const buffer = new TextEncoder().encode(message);
+    return connectChannel(`/poll?data=${buffer}`);
   }
+
   /**返回需要监听的属性 */
-//   static get observedAttributes() {
-//     return ["channelId"]; // 用来区分多个组件
-//   }
-//   /**当属性值改变的时候会调用 attributeChangedCallback 这个我 */
-//   attributeChangedCallback(name: string, oldValue: string, newValue: string) {
-//     console.log("channelId: ", name, oldValue, newValue);
-//     if (name === "channelId") {
-//       this.channelId = newValue;
-//     }
-//   }
+  //   static get observedAttributes() {
+  //     return ["channelId"]; // 用来区分多个组件
+  //   }
+  //   /**当属性值改变的时候会调用 attributeChangedCallback 这个我 */
+  //   attributeChangedCallback(name: string, oldValue: string, newValue: string) {
+  //     console.log("channelId: ", name, oldValue, newValue);
+  //     if (name === "channelId") {
+  //       this.channelId = newValue;
+  //     }
+  //   }
 }
+

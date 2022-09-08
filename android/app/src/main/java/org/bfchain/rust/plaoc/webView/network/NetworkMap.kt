@@ -1,11 +1,11 @@
 package org.bfchain.rust.plaoc.webView.network
 
 import android.util.Log
-import android.webkit.WebResourceResponse
+import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.DeserializationFeature
 import org.bfchain.rust.plaoc.*
 import org.bfchain.rust.plaoc.webView.urlscheme.CustomUrlScheme
-import org.chromium.android_webview.AwContentsClient
+import org.chromium.android_webview.AwContentsClient.AwWebResourceRequest
 import org.chromium.components.embedder_support.util.WebResourceResponseInfo
 import java.io.ByteArrayInputStream
 import java.net.HttpURLConnection
@@ -14,7 +14,6 @@ import java.util.*
 
 
 private const val TAG = "NetworkMap"
-
 // 这里是存储客户端的映射规则的，这样才知道需要如何转发给后端 <String,ImportMap>
 val front_to_rear_map = mutableMapOf<String, String>()
 var dWebView_host = ""
@@ -30,7 +29,7 @@ var network_whitelist = "http://127.0.0.1"
  *  https://channelId.bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj.dweb/done
  */
 fun dataGateWay(
-    request: AwContentsClient.AwWebResourceRequest
+    request: AwWebResourceRequest
 ): WebResourceResponseInfo {
     val url = request.url.toString().lowercase(Locale.ROOT)
     Log.i(TAG, " dataGateWay: $url")
@@ -55,7 +54,7 @@ fun dataGateWay(
 
 // 传递dwebView到deno的消息
 fun messageGateWay(
-    request: AwContentsClient.AwWebResourceRequest
+    request: AwWebResourceRequest
 ): WebResourceResponseInfo {
     val url = request.url.toString().lowercase(Locale.ROOT)
     Log.i(TAG, " messageGateWay: $url")
@@ -77,10 +76,37 @@ fun messageGateWay(
     )
 }
 
+// 转发给ui
+fun uiGateWay(
+  request: AwWebResourceRequest
+): WebResourceResponseInfo {
+  val url = request.url.toString().lowercase(Locale.ROOT)
+  val byteData = url.substring(url.lastIndexOf("=") + 1)
+  val stringData = String(hexStrToByteArray(byteData))
+  mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true)
+  mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true) //允许使用单引号
+  val handle = mapper.readValue(stringData, jsHandle::class.java)
+  Log.i(TAG, " uiGateWay: $handle")
+  val funName = ExportNativeUi.valueOf(handle.function);
+  // 执行函数
+  val result = call_ui_map[funName]?.let { it -> it(handle.data)
+  }?: return WebResourceResponseInfo(
+        "application/json",
+        "utf-8",
+        ByteArrayInputStream("0".toByteArray())
+      )
+  return WebResourceResponseInfo(
+    "application/json",
+    "utf-8",
+    ByteArrayInputStream(result.toString().toByteArray())
+  )
+}
+
+
 // 视图文件拦截
 fun viewGateWay(
     customUrlScheme: CustomUrlScheme,
-    request: AwContentsClient.AwWebResourceRequest
+    request: AwWebResourceRequest
 ): WebResourceResponseInfo {
     val url = request.url.toString().lowercase(Locale.ROOT)
     Log.i(TAG, " viewGateWay: ${request.url}")
@@ -105,7 +131,7 @@ fun viewGateWay(
     return WebResourceResponseInfo(
         "application/json",
         "utf-8",
-        ByteArrayInputStream("access denied".toByteArray())
+        ByteArrayInputStream("无权限，需要前往后端配置".toByteArray())
     )
 }
 

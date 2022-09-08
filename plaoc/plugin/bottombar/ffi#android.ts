@@ -37,15 +37,15 @@ export class BottomBarFFI implements BottomBar.IBottomBarFFI {
 
   toggleOverlay(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      this._ffi.toggleOverlay(0);
+      this._ffi.toggleOverlay("0");
 
       resolve();
     });
   }
 
-  setOverlay(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this._ffi.toggleOverlay(1);
+  setOverlay(alpha:string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this._ffi.toggleOverlay(alpha);
 
       resolve();
     });

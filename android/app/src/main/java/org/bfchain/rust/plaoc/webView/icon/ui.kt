@@ -38,12 +38,12 @@ fun DWebIcon(icon: DWebIcon, modifier: Modifier = Modifier) {
     }
     when (icon.type) {
         DWebIcon.IconType.NamedIcon -> IconByName(
-            name = icon.currentSource,
+            name = icon.source,
             contentDescription = icon.description,
             modifier = internal_modifier,
         )
         DWebIcon.IconType.AssetIcon -> {
-            val painter = rememberAsyncImagePainter(icon.currentSource, imageLoader = _getSvgLoader())
+            val painter = rememberAsyncImagePainter(icon.source, imageLoader = _getSvgLoader())
             Icon(
                 painter = painter,
                 contentDescription = icon.description,

@@ -29,19 +29,19 @@ class TopBarFFI(
     @JavascriptInterface
     fun toggleEnabled(isEnabled: BoolInt): Boolean {
         state.enabled.value = isEnabled.toBoolean { !state.enabled.value }
-        Log.i(TAG, "toggleEnabled:${state.enabled.value}")
+//        Log.i(TAG, "toggleEnabled:${state.enabled.value}")
         return state.enabled.value
     }
 
     @JavascriptInterface
-    fun getOverlay(): Boolean {
+    fun getOverlay(): Float? {
         return state.overlay.value
     }
 
     @JavascriptInterface
-    fun toggleOverlay(isOverlay: BoolInt): Boolean {
-        state.overlay.value = isOverlay.toBoolean { !state.overlay.value }
-        Log.i(TAG, "toggleOverlay:${state.overlay.value}")
+    fun toggleOverlay(isOverlay: String): Float? {
+        state.overlay.value = isOverlay.toFloat()
+//        Log.i(TAG, "toggleOverlay:${state.overlay.value},${isOverlay}")
         return state.overlay.value
     }
 
@@ -77,6 +77,9 @@ class TopBarFFI(
         val actionList = actionListJson.toData<List<TopBarAction>>(object :
             TypeToken<List<TopBarAction>>() {}.type)
         actionList.toCollection(state.actions)
+//      actionList.forEach{
+//        Log.i(TAG,"哈哈：${it}")
+//      }
     }
 
     @JavascriptInterface
