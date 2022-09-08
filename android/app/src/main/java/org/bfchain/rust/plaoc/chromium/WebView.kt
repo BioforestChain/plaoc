@@ -76,12 +76,12 @@ open class WebView: WebView {
 
                 override fun shouldOverrideUrlLoading(request: AwWebResourceRequest): Boolean {
                     Log.i("ChromiumWebView", "shouldOverrideUrlLoading")
-                    return request.let { cwebViewClient?.shouldOverrideUrlLoading(null, request) } ?: false
+                    return cwebViewClient?.shouldOverrideUrlLoading(null, request) ?: false
                 }
 
                 override fun shouldInterceptRequest(request: AwWebResourceRequest): WebResourceResponseInfo? {
                     Log.i("ChromiumWebView", "shouldInterceptRequest")
-                    return request.let { cwebViewClient?.shouldInterceptRequest(null, it) }
+                    return cwebViewClient?.shouldInterceptRequest(null, request)
                 }
             }
             , settings)
