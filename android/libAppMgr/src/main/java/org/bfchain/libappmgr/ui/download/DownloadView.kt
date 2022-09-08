@@ -15,7 +15,7 @@ fun DownLoadView(appInfo: AppInfo) {
     // 点击界面后，获取本地最新的版本信息
     var appVersion = JsonUtil.fromJson(
         AppVersion::class.java,
-        value = FilesUtil.getLastUpdateFile(appInfo.bfsAppId) ?: ""
+        value = FilesUtil.getLastUpdateContent(appInfo.bfsAppId) ?: ""
     )
     Log.d("DownLoadView", "DownLoadView->$appVersion")
 

@@ -2,7 +2,6 @@ package org.bfchain.libappmgr.schedule
 
 import android.util.Log
 import kotlinx.coroutines.*
-import org.bfchain.libappmgr.network.base.AppVersionPath
 import org.bfchain.libappmgr.ui.main.MainViewModel
 import org.bfchain.libappmgr.utils.FilesUtil
 
@@ -14,7 +13,7 @@ class CoroutineUpdateTask : UpdateTask {
         cancle()
         val scope = CoroutineScope(Dispatchers.IO)
         scope.launch {
-            var count = 1 // 用于判断软件运行分钟数，主要为了和应用信息中的maxAge做校验，确认是否需要更新
+            var count = 0 // 用于判断软件运行分钟数，主要为了和应用信息中的maxAge做校验，确认是否需要更新
             while (isActive) {
                 Log.d("CoroutineUpdateTask", "scheduleUpdate->$count")
                 try {
@@ -22,7 +21,6 @@ class CoroutineUpdateTask : UpdateTask {
                     FilesUtil.getAppInfoList().forEach { appInfo ->
                         if (count % appInfo.autoUpdate.maxAge == 0) {
                             var mainViewModel = MainViewModel()
-                            //mainViewModel.getAppVersionAndSave(appInfo.autoUpdate.url, savePath)
                             mainViewModel.getAppVersionAndSave(appInfo)
                         }
                     }

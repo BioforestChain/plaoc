@@ -35,6 +35,11 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         GlobalScope.launch {
+            // 判断是否是第一次加载软件，如果是，那么将assets中的remember-app拷贝到app目录下
+            if (PreferencesHelper.isFirstIn()) {
+                FilesUtil.copyAssetsToRememberAppDir()
+                PreferencesHelper.saveFirstState(false)
+            }
 
             CoroutineUpdateTask().scheduleUpdate(1000 * 60)
         }
@@ -46,9 +51,9 @@ class MainActivity : ComponentActivity() {
                         .fillMaxSize()
                         .background(MaterialTheme.colors.primary)
                 ) {
-                    //Gretting(name = "Compose!!", this@MainActivity)
+                    Gretting(name = "Compose!!", this@MainActivity)
                     // ProgressCircular( progressValue.value)
-                    Test()
+                    // Test()
                 }
             }
         }
@@ -64,27 +69,11 @@ fun Gretting(name: String, context: Context) {
     // Text(text = "Hello $name")
     var appInfoList: MutableList<AppInfo> = mutableStateListOf()
     LaunchedEffect(Unit) {
-        // 判断是否是第一次加载软件，如果是，那么将assets中的remember-app拷贝到app目录下
-        if (PreferencesHelper.isFirstIn()) {
-            FilesUtil.copyAssetsToRememberAppDir()
-            PreferencesHelper.saveFirstState(false)
-        }
         // 拷贝完成后，通过app目录下的remember-app和system-app获取最新列表数据
         appInfoList.clear()
         appInfoList.addAll(FilesUtil.getAppInfoList())
     }
     AppInfoGridView(appInfoList = appInfoList)
-
-    /*DownLoadView(
-        appInfo = AppInfo(
-            version = "xxx",
-            bfsAppId = "bfs-app-1234567A",
-            name = "name",
-            icon = "null",
-            author = "null",
-            autoUpdate = AutoUpdateInfo(3, 3, "xxxx")
-        )
-    )*/
 }
 
 @Composable

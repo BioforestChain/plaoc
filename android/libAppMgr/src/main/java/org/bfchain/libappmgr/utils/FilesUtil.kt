@@ -24,10 +24,10 @@ object FilesUtil {
 
     enum class APP_DIR_TYPE(val rootName: String) {
         // 内置应用
-        RememberApp("remember-app"),
+        RememberApp(rootName = "remember-app"),
 
         // 下载应用
-        SystemApp("system-app")
+        SystemApp(rootName = "system-app"),
     }
 
     /**
@@ -56,24 +56,46 @@ object FilesUtil {
     }
 
     /**
+     * 获取应用的缓存路径
+     */
+    fun getAppDownloadPath(): String {
+        return getAppCacheDirectory() + File.separator + simpleDateFormat.format(Date()) + ".bfsa"
+    }
+
+    /**
+     * 获取应用的解压路径
+     */
+    fun getAppUnzipPath(appInfo: AppInfo): String {
+        return getAppDirectory(APP_DIR_TYPE.SystemApp) + File.separator +
+                appInfo.bfsAppId + File.separator + "sys"
+    }
+
+    /**
      * 获取应用更新路径
      */
-    fun getAppUpdateDirectory(appName: String): String {
-        return getAppDirectory(APP_DIR_TYPE.RememberApp) + File.separator + appName +
-                File.separator + "tmp" + File.separator + "autoUpdate" + File.separator +
+    fun getAppVersionSaveFile(appName: String): String {
+        return getAppUpdateDirectory(appName) + File.separator +
                 simpleDateFormat.format(Date()) + ".json"
+    }
+
+    /**
+     * 获取应用更新路径
+     */
+    private fun getAppUpdateDirectory(appName: String): String {
+        return getAppDirectory(APP_DIR_TYPE.RememberApp) + File.separator + appName +
+                File.separator + "tmp" + File.separator + "autoUpdate"
     }
 
     /**
      * 获取应用更新路径中最新文件
      */
-    fun getLastUpdateFile(appName: String): String? {
+    fun getLastUpdateContent(appName: String): String? {
         var directory = getAppUpdateDirectory(appName)
-        Log.d("lin.huang", "getLastUpdateFile->$directory")
         var file = File(directory)
         if (file.exists()) {
-            Log.d("lin.huang", "getLastUpdateFile->${file.absolutePath}")
-            return getFileContent(file.listFiles().last().absolutePath)
+            return file.listFiles()?.let {
+                getFileContent(it.last().absolutePath)
+            } ?: null
         }
         return null
     }
@@ -271,7 +293,7 @@ object FilesUtil {
     }
 
     fun UnzipFile(zipFile: String, desDirectory: String) {
-        // Log.d(TAG, "UnzipFile zipFile->$zipFile, desDirectory->$desDirectory")
+        Log.d(TAG, "UnzipFile zipFile->$zipFile, desDirectory->$desDirectory")
         var fileZip = ZipFile(zipFile)
         var entries = fileZip.entries()
         File(desDirectory).mkdirs()

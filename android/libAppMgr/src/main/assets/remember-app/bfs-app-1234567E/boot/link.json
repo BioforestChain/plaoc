@@ -8,7 +8,7 @@
     "autoUpdate": {
         "maxAge": 5,
         "provider": 1,
-        "url": "https://www.bfs-app-5.com",
+        "url": "bfs-app-1234567E/appversion.json",
         "version": "1.0.1",
         "files": [{
             "url": "https://www.google.cn",

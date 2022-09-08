@@ -1,5 +1,6 @@
 package org.bfchain.libappmgr.ui.main
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
@@ -10,7 +11,6 @@ import org.bfchain.libappmgr.model.AppInfo
 import org.bfchain.libappmgr.model.AppVersion
 import org.bfchain.libappmgr.network.ApiService
 import org.bfchain.libappmgr.network.base.ApiResultData
-import org.bfchain.libappmgr.network.base.AppVersionPath
 import org.bfchain.libappmgr.network.base.IApiResult
 import org.bfchain.libappmgr.network.base.fold
 import org.bfchain.libappmgr.utils.FilesUtil
@@ -29,8 +29,9 @@ class MainViewModel : ViewModel() {
             flow {
                 emit(ApiResultData.prepare())
                 try {
-                    // emit(ApiService.instance.getAppVersion(appInfo.autoUpdate.url))
-                    emit(ApiService.instance.getAppVersion(AppVersionPath))
+                    Log.d("MainViewModel", "${appInfo.autoUpdate.url}")
+                    emit(ApiService.instance.getAppVersion(appInfo.autoUpdate.url))
+                    // emit(ApiService.instance.getAppVersion(AppVersionPath))
                 } catch (e: Exception) {
                     emit(ApiResultData.failure(e))
                 }
@@ -38,11 +39,12 @@ class MainViewModel : ViewModel() {
                 .collect {
                     it.fold(
                         onSuccess = { baseData ->
-                            //Log.d("MainViewModel", "appVersion->${baseData.data}")
+                            Log.d("MainViewModel", "baseData->${baseData}")
+                            Log.d("MainViewModel", "appVersion->${baseData.data}")
                             baseData.data?.let {
                                 // 将改内容存储到 remember-app/bfs-id-app/tmp/autoUpdate 中
                                 FilesUtil.writeFileContent(
-                                    FilesUtil.getAppUpdateDirectory(appInfo.bfsAppId),
+                                    FilesUtil.getAppVersionSaveFile(appInfo.bfsAppId),
                                     JsonUtil.toJson(AppVersion::class.java, baseData.data)
                                 )
                                 apiResult?.let {

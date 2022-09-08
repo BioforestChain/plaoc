@@ -32,6 +32,9 @@ class DownLoadViewModel : ViewModel() {
                 try {
                     val httpResponse = ApiService.instance.download(url)
                     val length: Long = httpResponse.contentLength() ?: 0
+                    if (length <= 0) {
+                        throw Exception("下载失败 -> $url")
+                    }
                     val file = File(outputFile)
                     val outputStream = FileOutputStream(file)
                     var currentLength: Long = 0
@@ -63,7 +66,7 @@ class DownLoadViewModel : ViewModel() {
             }.flowOn(Dispatchers.IO)
                 .collect {
                     it.fold(onFailure = { e ->
-                        e?.let { it1 -> apiResult.onError(-1, "请求失败", it1) }
+                        e?.let { it1 -> apiResult.onError(-1, it1.message!!, it1) }
                     }, onSuccess = { file ->
                         apiResult.downloadSuccess(file)
                     }, onLoading = { progress ->
