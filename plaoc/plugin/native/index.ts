@@ -14,11 +14,11 @@ export class DWebView extends DwebPlugin {
   constructor() {
     super();
   }
-  // 隐藏系统导航栏
+  /**隐藏系统导航栏 默认值false隐藏 */
   setNavigationBarVisible(isHide: boolean = false) {
     return netCallNative(NativeUI.SetNavigationBarVisible, isHide)
   }
-  // 获取系统导航栏颜色
+  /**获取系统导航栏颜色 */
   getNavigationBarVisible() {
     return netCallNative(NativeUI.GetNavigationBarVisible)
   }
@@ -32,6 +32,14 @@ export class DWebView extends DwebPlugin {
   setNavigationBarColor(color: string, darkIcons: boolean = false, isNavigationBarContrastEnforced: boolean = true) {
     const colorHex = hexToIntColor(color);
     return netCallNative(NativeUI.SetNavigationBarColor, { colorHex, darkIcons, isNavigationBarContrastEnforced })
+  }
+  /** 获取系统导航栏是否透明*/
+  getNavigationBarOverlay() {
+    return netCallNative(NativeUI.GetNavigationBarOverlay)
+  }
+  /**设置系统导航栏是否透明,默认值false为不透明 */
+  setNavigationBarOverlay(isOverlay: boolean = false) {
+    return netCallNative(NativeUI.SetNavigationBarOverlay, isOverlay)
   }
 }
 

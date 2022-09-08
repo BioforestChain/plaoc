@@ -14,4 +14,13 @@ enum class ExportNativeUi(val type: String) {
   SetNavigationBarVisible("setNavigationBarVisible"),
   SetNavigationBarColor("setNavigationBarColor"),
   GetNavigationBarVisible("getNavigationBarVisible"),
+  SetNavigationBarOverlay("setNavigationBarOverlay"),
+  GetNavigationBarOverlay("getNavigationBarOverlay"),
+  // Status Bar
+  SetStatusBarColor("setStatusBarColor"),
+  GetStatusBarStyle("getStatusBarStyle"),
+  GetStatusBarVisible("getStatusBarVisible"),
+  GetStatusBarOverlay("getStatusBarOverlay"),
+  SetStatusBarOverlay("setStatusBarOverlay"),
+  SetStatusBarVisible("setStatusBarVisible")
 }

@@ -22,14 +22,16 @@ async function onShowKeyboard() {
 function hideNavigation() {
     nav.setNavigationBarVisible(false)
 }
-
 async function getNavigationVisible() {
   console.log("getNavigationBarVisible=>",await nav.getNavigationBarVisible())
+  console.log("getNavigationBarOverlay=>",await nav.getNavigationBarOverlay())
 }
 function setNavigationBarColor() {
-  nav.setNavigationBarColor("#ffffff00",true,false)
+  nav.setNavigationBarColor("#ffb94f",true,false)
 }
-
+function setNavigationBarOverlay() {
+  nav.setNavigationBarOverlay(true)
+}
 </script>
 
 <template>
@@ -39,6 +41,7 @@ function setNavigationBarColor() {
   <dweb-view></dweb-view>
   <ion-button expand="block" fill="outline" @click="hideNavigation">点我隐藏系统navigation</ion-button>
   <ion-button expand="block" fill="outline" @click="getNavigationVisible">获取navigation颜色</ion-button>
+  <ion-button expand="block" fill="outline" @click="setNavigationBarOverlay">设置navigation透明</ion-button>
   <ion-button expand="block" fill="outline" @click="setNavigationBarColor">设置系统navigation颜色</ion-button>
   <ion-button expand="full" fill="outline" @click="onShowKeyboard">点击开启虚拟键盘</ion-button>
   <ion-button shape="round" fill="outline">Outline + Round</ion-button>

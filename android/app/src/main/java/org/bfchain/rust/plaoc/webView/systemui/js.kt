@@ -6,6 +6,7 @@ import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.core.graphics.Insets
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -36,51 +37,39 @@ class SystemUiFFI(
         hook.onTouchEvent = { false }
     }
 
-    /**
-     * 第一个参数是颜色HEX。第二个是图标颜色
-     */
-    @JavascriptInterface
+    /**第一个参数是颜色HEX。第二个是图标是否更期望于使用深色*/
     fun setStatusBarColor(
         colorHex: ColorInt,
-        darkIcons: BoolInt,
+        darkIcons: Boolean,
     ) {
         systemUIState.statusBar.apply {
             color.value = Color(colorHex)
-            isDarkIcons.value = darkIcons.toBooleanOrNull()
+            isDarkIcons.value = darkIcons
         }
     }
-  @JavascriptInterface
-  fun getStatusBarStyle(): Boolean? {
-    return systemUIState.statusBar.isDarkIcons.value
-  }
-
-    @JavascriptInterface
+    /** 获取状态栏是否更期望使用深色*/
+    fun getStatusBarStyle(): Boolean {
+      return systemUIState.statusBar.isDarkIcons.value?: (systemUIState.statusBar.color.value.luminance() > 0.5F)
+    }
+    /** 查看状态栏是否可见*/
     fun getStatusBarVisible(): Boolean {
         return systemUIState.statusBar.visible.value
     }
-
-    /**
-     * 设置0为透明
-     */
-    @JavascriptInterface
-    fun toggleStatusBarVisible(visible: BoolInt) {
-        systemUIState.statusBar.visible.value =
-            visible.toBoolean { !systemUIState.statusBar.visible.value }
+    /** 设置false为透明*/
+    fun setStatusBarVisible(visible: String) {
+        systemUIState.statusBar.visible.value = visible.toBoolean()
     }
-
-    @JavascriptInterface
+   /**获取状态栏是否透明的状态*/
     fun getStatusBarOverlay(): Boolean {
         return systemUIState.statusBar.overlay.value
     }
-
-    @JavascriptInterface
-    fun toggleStatusBarOverlay(isOverlay: BoolInt) {
-        systemUIState.statusBar.overlay.value =
-            isOverlay.toBoolean { !systemUIState.statusBar.overlay.value }
+    /**设置状态栏是否透明*/
+    fun setStatusBarOverlay(isOverlay: String) {
+        systemUIState.statusBar.overlay.value = isOverlay.toBoolean()
 //        Log.i(TAG, "isOverlayStatusBar.value:${systemUIState.statusBar.overlay.value}")
     }
 
-
+  /**设置系统导航栏颜色*/
     fun setNavigationBarColor(
         colorHex: ColorInt,
         darkIcons: Boolean,
@@ -93,27 +82,24 @@ class SystemUiFFI(
         }
       return true
     }
-
+  /**获取系统导航栏可见性*/
     fun getNavigationBarVisible(): Boolean {
         return systemUIState.navigationBar.visible.value
     }
-
+  /**设置系统导航栏是否隐藏*/
     fun setNavigationBarVisible(visible: String): Boolean {
         systemUIState.navigationBar.visible.value =
             visible.toBoolean()
       return true
     }
-
-
-    @JavascriptInterface
+  /**获取系统导航栏是否透明*/
     fun getNavigationBarOverlay(): Boolean {
         return systemUIState.navigationBar.overlay.value
     }
-
-    @JavascriptInterface
-    fun toggleNavigationBarOverlay(isOverlay: BoolInt) {
+  /**设置系统导航栏是否透明*/
+    fun setNavigationBarOverlay(isOverlay: String) {
         systemUIState.navigationBar.overlay.value =
-            isOverlay.toBoolean { !systemUIState.navigationBar.overlay.value }
+            isOverlay.toBoolean()
     }
 
 
