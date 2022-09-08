@@ -1,4 +1,5 @@
 import { loop } from '../common'
+import { connectChannel } from '../common/network';
 /**
  * 所有的dweb-plugin需要继承这个类
  */
@@ -76,26 +77,9 @@ export class DwebPlugin extends HTMLElement {
   async createMessage(fun: string, data: string = `"''"`): Promise<string> {
     const message = `{"function":"${fun}","data":${data},"channelId":"${this.channelId}"}`;
     const buffer = new TextEncoder().encode(message);
-    return this.connectChannel(`/poll?data=${buffer}`);
+    return connectChannel(`/poll?data=${buffer}`);
   }
-  /**
-   * 请求kotlin 代理转发
-   * @param url
-   * @returns 直接返回ok
-   */
-  async connectChannel(url: string) {
-    const response = await fetch(url, {
-      method: "GET", // dwebview 无法获取post的body
-      headers: {
-        "Access-Control-Allow-Origin": "*", // 客户端开放，不然会报cors
-        "Content-Type": "application/json",
-      },
-      mode: "cors",
-    });
-    const data = await response.text();
-    console.log(data);
-    return data;
-  }
+
   /**返回需要监听的属性 */
   //   static get observedAttributes() {
   //     return ["channelId"]; // 用来区分多个组件

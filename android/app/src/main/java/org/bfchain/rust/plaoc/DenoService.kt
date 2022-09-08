@@ -117,9 +117,9 @@ data class RustHandle(
 )
 
 data class jsHandle(
-    val function: Array<String> = arrayOf(""),
+    val function: String = "",
     val data: String = "",
-    val channelId: String = ""
+    val channelId: String? = ""
 )
 
 

@@ -25,7 +25,8 @@ data class SystemUIState(
         val color: MutableState<Color>,
         val isDarkIcons: MutableState<Boolean?>,
         val visible: MutableState<Boolean>,
-    ) {
+    )
+    {
         companion object {
 
             @Composable
@@ -95,7 +96,8 @@ data class SystemUIState(
         val isDarkIcons: MutableState<Boolean?>,
         val isContrastEnforced: MutableState<Boolean?>,
         val visible: MutableState<Boolean>,
-    ) {
+    )
+    {
         companion object {
 
             @Composable
@@ -118,7 +120,6 @@ data class SystemUIState(
                 val isDarkIcons = isColorChanged.rememberStateOf<Boolean?>(null)
                 val isContrastEnforced =
                     isColorChanged.rememberStateOf<Boolean?>(systemUiController.navigationBarDarkContentEnabled)
-
                 isColorChanged.effectChange {
                     Log.i(TAG, "Navigation Color Changed!")
                     SideEffect {
@@ -140,6 +141,7 @@ data class SystemUIState(
                 val visible =
                     isVisible.rememberStateOf(value = systemUiController.isNavigationBarVisible)
                 isVisible.effectChange {
+                  Log.i(TAG, "isNavigationBarVisible!")
                     SideEffect {
                         activity.runOnUiThread {
                             systemUiController.isNavigationBarVisible = visible.value
@@ -165,7 +167,8 @@ data class SystemUIState(
     @Stable
     class VirtualKeyboardState(
         val overlay: MutableState<Boolean>,
-    ) {
+    )
+    {
         companion object {
             @Composable
             fun Default(): VirtualKeyboardState {

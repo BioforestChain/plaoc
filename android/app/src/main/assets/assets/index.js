@@ -39,6 +39,23 @@
     fetch(link.href, fetchOpts);
   }
 })();
+async function netCallNative(fun, data = "") {
+  const message = `{"function":"${fun}","data":'${JSON.stringify(data)}'}`;
+  const buffer = new TextEncoder().encode(message);
+  return connectChannel(`/setUi?data=${buffer}`);
+}
+async function connectChannel(url) {
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Content-Type": "application/json"
+    },
+    mode: "cors"
+  });
+  const data = await response.text();
+  return data;
+}
 const loop = (delay) => new Promise((resolve2) => setTimeout(resolve2, delay));
 class DwebPlugin extends HTMLElement {
   constructor() {
@@ -97,21 +114,63 @@ class DwebPlugin extends HTMLElement {
   async createMessage(fun, data = `"''"`) {
     const message = `{"function":"${fun}","data":${data},"channelId":"${this.channelId}"}`;
     const buffer = new TextEncoder().encode(message);
-    return this.connectChannel(`/poll?data=${buffer}`);
+    return connectChannel(`/poll?data=${buffer}`);
   }
-  async connectChannel(url) {
-    const response = await fetch(url, {
-      method: "GET",
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Content-Type": "application/json"
-      },
-      mode: "cors"
-    });
-    const data = await response.text();
-    console.log(data);
-    return data;
+}
+var NativeHandle = /* @__PURE__ */ ((NativeHandle2) => {
+  NativeHandle2["OpenScanner"] = "OpenScanner";
+  return NativeHandle2;
+})(NativeHandle || {});
+var NativeUI = /* @__PURE__ */ ((NativeUI2) => {
+  NativeUI2["SetNavigationBarVisible"] = "SetNavigationBarVisible";
+  NativeUI2["GetNavigationBarVisible"] = "GetNavigationBarVisible";
+  NativeUI2["SetNavigationBarColor"] = "SetNavigationBarColor";
+  return NativeUI2;
+})(NativeUI || {});
+function getColorInt(color, alpha) {
+  return parseInt(color.replace("#", "0x"), 16) + (parseInt("0x" + alpha) << 24);
+}
+function getColorHex(color) {
+  let colorHex = new Uint32Array([color])[0].toString(16);
+  if (colorHex.length < 8) {
+    colorHex = "0".repeat(8 - colorHex.length) + colorHex;
   }
+  return "#" + colorHex.slice(2) + colorHex.slice(0, 2);
+}
+function convertToRGBAHex(color) {
+  let colorHex = "#";
+  if (color.startsWith("rgba(")) {
+    let colorArr = color.replace("rgba(", "").replace(")", "").split(",");
+    for (let [index, item] of colorArr.entries()) {
+      if (index === 3) {
+        item = `${parseFloat(item) * 255}`;
+      }
+      let itemHex = Math.round(parseFloat(item)).toString(16);
+      if (itemHex.length === 1) {
+        itemHex = "0" + itemHex;
+      }
+      colorHex += itemHex;
+    }
+  }
+  if (color.startsWith("#")) {
+    if (color.length === 9) {
+      colorHex = color;
+    } else {
+      color = color.substring(1);
+      if (color.length === 4 || color.length === 3) {
+        color = color.replace(/(.)/g, "$1$1");
+      }
+      colorHex += color.padEnd(8, "F");
+    }
+  }
+  return colorHex;
+}
+function hexToIntColor(color) {
+  color = convertToRGBAHex(color);
+  return getColorInt(
+    color.slice(0, -2),
+    color.slice(-2)
+  );
 }
 class DWebMessager extends DwebPlugin {
   constructor() {
@@ -122,13 +181,23 @@ class DWebView extends DwebPlugin {
   constructor() {
     super();
   }
+  setNavigationBarVisible(isHide = false) {
+    return netCallNative(NativeUI.SetNavigationBarVisible, isHide);
+  }
+  getNavigationBarVisible() {
+    return netCallNative(NativeUI.GetNavigationBarVisible);
+  }
+  setNavigationBarColor(color, darkIcons = false, isNavigationBarContrastEnforced = true) {
+    const colorHex = hexToIntColor(color);
+    return netCallNative(NativeUI.SetNavigationBarColor, { colorHex, darkIcons, isNavigationBarContrastEnforced });
+  }
 }
 class OpenScanner extends DwebPlugin {
   constructor() {
     super();
   }
   async openScanner() {
-    return this.onPolling("OpenScanner");
+    return this.onPolling(NativeHandle.OpenScanner);
   }
   disconnectedCallback() {
   }
@@ -244,44 +313,6 @@ class BfcsKeyboard extends DwebPlugin {
   }
 }
 customElements.define("dweb-keyboard", BfcsKeyboard);
-function getColorInt(color, alpha) {
-  return parseInt(color.replace("#", "0x"), 16) + (parseInt("0x" + alpha) << 24);
-}
-function getColorHex(color) {
-  let colorHex = new Uint32Array([color])[0].toString(16);
-  if (colorHex.length < 8) {
-    colorHex = "0".repeat(8 - colorHex.length) + colorHex;
-  }
-  return "#" + colorHex.slice(2) + colorHex.slice(0, 2);
-}
-function convertToRGBAHex(color) {
-  let colorHex = "#";
-  if (color.startsWith("rgba(")) {
-    let colorArr = color.replace("rgba(", "").replace(")", "").split(",");
-    for (let [index, item] of colorArr.entries()) {
-      if (index === 3) {
-        item = `${parseFloat(item) * 255}`;
-      }
-      let itemHex = Math.round(parseFloat(item)).toString(16);
-      if (itemHex.length === 1) {
-        itemHex = "0" + itemHex;
-      }
-      colorHex += itemHex;
-    }
-  }
-  if (color.startsWith("#")) {
-    if (color.length === 9) {
-      colorHex = color;
-    } else {
-      color = color.substring(1);
-      if (color.length === 4 || color.length === 3) {
-        color = color.replace(/(.)/g, "$1$1");
-      }
-      colorHex += color.padEnd(8, "F");
-    }
-  }
-  return colorHex;
-}
 class BottomBarFFI {
   constructor() {
     this._ffi = window.bottom_bar;
@@ -6317,7 +6348,7 @@ const _hoisted_4$2 = /* @__PURE__ */ _withScopeId$1(() => /* @__PURE__ */ create
   }, "Volar"),
   /* @__PURE__ */ createTextVNode(" in your IDE for a better DX ")
 ], -1));
-const _hoisted_5$1 = /* @__PURE__ */ _withScopeId$1(() => /* @__PURE__ */ createBaseVNode("p", { class: "read-the-docs" }, "Click on the Vite and Vue logos to learn more", -1));
+const _hoisted_5$2 = /* @__PURE__ */ _withScopeId$1(() => /* @__PURE__ */ createBaseVNode("p", { class: "read-the-docs" }, "Click on the Vite and Vue logos to learn more", -1));
 const _sfc_main$3 = /* @__PURE__ */ defineComponent({
   __name: "HelloWorld",
   props: {
@@ -6346,7 +6377,7 @@ const _sfc_main$3 = /* @__PURE__ */ defineComponent({
         _hoisted_2$3,
         _hoisted_3$3,
         _hoisted_4$2,
-        _hoisted_5$1
+        _hoisted_5$2
       ], 64);
     };
   }
@@ -31576,16 +31607,19 @@ const createController = (defineCustomElement2, oldController, useDelegate = fal
 /* @__PURE__ */ createController(defineCustomElement$2, toastController);
 const _hoisted_1$2 = /* @__PURE__ */ createBaseVNode("h2", null, "andrid/ios \u7CFB\u7EDFapi \u6D4B\u8BD5", -1);
 const _hoisted_2$2 = /* @__PURE__ */ createTextVNode("\u70B9\u6211\u9690\u85CF\u7CFB\u7EDFnavigation");
-const _hoisted_3$2 = /* @__PURE__ */ createTextVNode("\u70B9\u51FB\u5F00\u542F\u865A\u62DF\u952E\u76D8");
-const _hoisted_4$1 = /* @__PURE__ */ createTextVNode("Outline + Round");
+const _hoisted_3$2 = /* @__PURE__ */ createTextVNode("\u83B7\u53D6navigation\u989C\u8272");
+const _hoisted_4$1 = /* @__PURE__ */ createTextVNode("\u8BBE\u7F6E\u7CFB\u7EDFnavigation\u989C\u8272");
+const _hoisted_5$1 = /* @__PURE__ */ createTextVNode("\u70B9\u51FB\u5F00\u542F\u865A\u62DF\u952E\u76D8");
+const _hoisted_6$1 = /* @__PURE__ */ createTextVNode("Outline + Round");
 const _sfc_main$2 = /* @__PURE__ */ defineComponent({
   __name: "system_api",
   setup(__props) {
     defineComponent({
       components: { IonFab, IonFabButton, IonFabList, IonButton, IonIcon }
     });
+    let nav;
     onMounted(async () => {
-      console.log(" document.getElementById('key_board')=>", JSON.stringify(document.querySelector("dweb-keyboard")));
+      nav = document.querySelector("dweb-view");
     });
     async function onShowKeyboard() {
       const keyboard = document.getElementById("key_board");
@@ -31594,9 +31628,19 @@ const _sfc_main$2 = /* @__PURE__ */ defineComponent({
       console.log("getKeyboardHeight:", await keyboard.getKeyboardHeight());
       console.log("getKeyboardOverlay:", await keyboard.getKeyboardOverlay());
     }
+    function hideNavigation() {
+      nav.setNavigationBarVisible(false);
+    }
+    async function getNavigationVisible() {
+      console.log("getNavigationBarVisible=>", await nav.getNavigationBarVisible());
+    }
+    function setNavigationBarColor() {
+      nav.setNavigationBarColor("#ffffff00", false, false);
+    }
     return (_ctx, _cache) => {
       const _component_dweb_status_bar = resolveComponent("dweb-status-bar");
       const _component_dweb_keyboard = resolveComponent("dweb-keyboard");
+      const _component_dweb_view = resolveComponent("dweb-view");
       return openBlock(), createElementBlock(Fragment, null, [
         _hoisted_1$2,
         createVNode(_component_dweb_status_bar, {
@@ -31608,12 +31652,34 @@ const _sfc_main$2 = /* @__PURE__ */ defineComponent({
           id: "key_board",
           hidden: "true"
         }),
+        createVNode(_component_dweb_view),
         createVNode(unref(IonButton), {
           expand: "block",
-          fill: "outline"
+          fill: "outline",
+          onClick: hideNavigation
         }, {
           default: withCtx(() => [
             _hoisted_2$2
+          ]),
+          _: 1
+        }),
+        createVNode(unref(IonButton), {
+          expand: "block",
+          fill: "outline",
+          onClick: getNavigationVisible
+        }, {
+          default: withCtx(() => [
+            _hoisted_3$2
+          ]),
+          _: 1
+        }),
+        createVNode(unref(IonButton), {
+          expand: "block",
+          fill: "outline",
+          onClick: setNavigationBarColor
+        }, {
+          default: withCtx(() => [
+            _hoisted_4$1
           ]),
           _: 1
         }),
@@ -31623,7 +31689,7 @@ const _sfc_main$2 = /* @__PURE__ */ defineComponent({
           onClick: onShowKeyboard
         }, {
           default: withCtx(() => [
-            _hoisted_3$2
+            _hoisted_5$1
           ]),
           _: 1
         }),
@@ -31632,7 +31698,7 @@ const _sfc_main$2 = /* @__PURE__ */ defineComponent({
           fill: "outline"
         }, {
           default: withCtx(() => [
-            _hoisted_4$1
+            _hoisted_6$1
           ]),
           _: 1
         })

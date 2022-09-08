@@ -77,32 +77,31 @@ class SystemUiFFI(
     fun toggleStatusBarOverlay(isOverlay: BoolInt) {
         systemUIState.statusBar.overlay.value =
             isOverlay.toBoolean { !systemUIState.statusBar.overlay.value }
-        Log.i(TAG, "isOverlayStatusBar.value:${systemUIState.statusBar.overlay.value}")
+//        Log.i(TAG, "isOverlayStatusBar.value:${systemUIState.statusBar.overlay.value}")
     }
 
 
-    @JavascriptInterface
     fun setNavigationBarColor(
         colorHex: ColorInt,
-        darkIcons: BoolInt,
-        isNavigationBarContrastEnforced: BoolInt
-    ) {
+        darkIcons: Boolean,
+        isNavigationBarContrastEnforced: Boolean
+    ):Boolean {
         systemUIState.navigationBar.apply {
             color.value = Color(colorHex)
-            isDarkIcons.value = darkIcons.toBooleanOrNull()
-            isContrastEnforced.value = isNavigationBarContrastEnforced.toBooleanOrNull()
+            isDarkIcons.value = darkIcons
+            isContrastEnforced.value = isNavigationBarContrastEnforced
         }
+      return true
     }
 
-    @JavascriptInterface
     fun getNavigationBarVisible(): Boolean {
         return systemUIState.navigationBar.visible.value
     }
 
-    @JavascriptInterface
-    fun toggleNavigationBarVisible(visible: BoolInt) {
+    fun setNavigationBarVisible(visible: String): Boolean {
         systemUIState.navigationBar.visible.value =
-            visible.toBoolean { !systemUIState.navigationBar.visible.value }
+            visible.toBoolean()
+      return true
     }
 
 
