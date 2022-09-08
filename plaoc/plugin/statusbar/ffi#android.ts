@@ -6,7 +6,7 @@ import { StatusBar } from "./bfcsStatusBar.type";
 
 export class StatusBarFFI implements StatusBar.IStatusBarFFI {
   private _ffi: StatusBar.StatusBarAndroidFFI = (window as any).system_ui;
-  
+
   async setStatusBarColor(
     color?: Color.RGBAHex,
     barStyle?: StatusBar.StatusBarStyle

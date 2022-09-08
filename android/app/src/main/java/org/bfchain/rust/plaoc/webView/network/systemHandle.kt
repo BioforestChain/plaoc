@@ -12,6 +12,7 @@ private const val TAG = "systemHandle"
  * 初始化操作ui的请求
  */
 fun initUiFn(systemUiFFI:SystemUiFFI) {
+  /**Navigation*/
   call_ui_map[ExportNativeUi.SetNavigationBarVisible] = {
     systemUiFFI.setNavigationBarVisible(it)
   }
@@ -21,6 +22,29 @@ fun initUiFn(systemUiFFI:SystemUiFFI) {
   call_ui_map[ExportNativeUi.SetNavigationBarColor] = {
     val color = mapper.readValue(it, NavigationBarColor::class.java)
     systemUiFFI.setNavigationBarColor(color.colorHex,color.darkIcons,color.isNavigationBarContrastEnforced)
+  }
+  call_ui_map[ExportNativeUi.GetNavigationBarOverlay] = {
+    systemUiFFI.getNavigationBarOverlay()
+  }
+  call_ui_map[ExportNativeUi.SetNavigationBarOverlay] = {
+    systemUiFFI.setNavigationBarOverlay(it)
+  }
+  /**Status Bar*/
+  call_ui_map[ExportNativeUi.SetStatusBarColor] = {
+    val color = mapper.readValue(it, NavigationBarColor::class.java)
+    systemUiFFI.setStatusBarColor(color.colorHex,color.darkIcons)
+  }
+  call_ui_map[ExportNativeUi.GetStatusBarStyle] = {
+    systemUiFFI.getStatusBarStyle()
+  }
+  call_ui_map[ExportNativeUi.SetStatusBarOverlay] = {
+    systemUiFFI.setStatusBarOverlay(it)
+  }
+  call_ui_map[ExportNativeUi.GetStatusBarOverlay] = {
+    systemUiFFI.getStatusBarOverlay()
+  }
+  call_ui_map[ExportNativeUi.SetStatusBarVisible] = {
+    systemUiFFI.setStatusBarVisible(it)
   }
 }
 
