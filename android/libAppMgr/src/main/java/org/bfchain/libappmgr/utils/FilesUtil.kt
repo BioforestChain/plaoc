@@ -66,8 +66,9 @@ object FilesUtil {
      * 获取应用的解压路径
      */
     fun getAppUnzipPath(appInfo: AppInfo): String {
-        return getAppDirectory(APP_DIR_TYPE.SystemApp) + File.separator +
-                appInfo.bfsAppId + File.separator + "sys"
+        /*return getAppDirectory(APP_DIR_TYPE.SystemApp) + File.separator +
+                appInfo.bfsAppId + File.separator + "sys"*/
+        return getAppDirectory(APP_DIR_TYPE.SystemApp) + File.separator + appInfo.bfsAppId
     }
 
     /**

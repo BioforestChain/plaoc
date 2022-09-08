@@ -49,7 +49,7 @@ fun CustomAlertDialog(
     onConfirm: (() -> Unit)? = null,
     onCancel: (() -> Unit)? = null
 ) {
-    Log.d("Dialog.kt", "CustomAlertDialog enter")
+    Log.d("Dialog.kt", "CustomAlertDialog enter -> ${state.showDialog.value}")
     if (state.showDialog.value) {
         AlertDialog(
             modifier = Modifier.padding(20.dp),
@@ -81,7 +81,7 @@ fun CustomAlertDialog(
  */
 @Composable
 fun LoadingDialog(showDialog: MutableState<Boolean>, onCancel: (() -> Unit)? = null) {
-    Log.d("Dialog.kt", "LoadingDialog enter")
+    Log.d("Dialog.kt", "LoadingDialog enter -> ${showDialog.value}")
     if (showDialog.value) {
         Dialog(onDismissRequest = {
             showDialog.value = false
@@ -117,6 +117,7 @@ fun ProgressDialog(
     progress: MutableState<Float>,
     onCancel: (() -> Unit)? = null
 ) {
+    Log.d("Dialog.kt", "ProgressDialog enter -> ${showDialog.value}")
     if (showDialog.value) {
         Dialog(onDismissRequest = {}) {
             Box(
