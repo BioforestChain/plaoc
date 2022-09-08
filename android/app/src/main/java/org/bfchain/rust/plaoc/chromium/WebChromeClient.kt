@@ -415,7 +415,7 @@ open class WebChromeClient {
      *
      * @see FileChooserParams
      */
-    open fun onShowFileChooser(webView: WebView?, filePathCallback: Callback<Array<Uri>>, fileChooserParams: FileChooserParams): Boolean {
+    open fun onShowFileChooser(webView: WebView?, filePathCallback: ValueCallback<Array<Uri>>, fileChooserParams: FileChooserParams): Boolean {
         return false
     }
     open fun showFileChooser(webView: WebView?, filePathCallback: Callback<Array<String>>, fileChooserParams: FileChooserParamsImpl): Unit {}
