@@ -107,6 +107,13 @@ class AdAndroidWebView(context: Context) : WebView(context) {
             if (BuildConfig.DEBUG) {
                 AwDevToolsServer().setRemoteDebuggingEnabled(true)
             }
+
+            // 修复切换到后台后白屏
+            try {
+                AdAndroidWebView(application)
+            } catch (e: Exception) {
+                e.printStackTrace();
+            }
         }
     }
 }
