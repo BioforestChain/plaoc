@@ -6,35 +6,27 @@ import android.os.Build
 import android.os.Message
 import android.util.Log
 import android.webkit.*
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import org.bfchain.rust.plaoc.webView.bottombar.BottomBarFFI
 import org.bfchain.rust.plaoc.webView.bottombar.BottomBarState
 import org.bfchain.rust.plaoc.webView.bottombar.DWebBottomBar
 import org.bfchain.rust.plaoc.webView.dialog.*
 import org.bfchain.rust.plaoc.webView.jsutil.JsUtil
-import org.bfchain.rust.plaoc.webView.navigator.NavigatorFFI
 import org.bfchain.rust.plaoc.webView.network.*
 import org.bfchain.rust.plaoc.webView.systemui.SystemUIState
 import org.bfchain.rust.plaoc.webView.systemui.SystemUiFFI
@@ -163,7 +155,7 @@ fun DWebView(
          // 如果前端没有传递overlay,并且没有传递enabled
         topBar = { if ((topBarState.overlay.value == 1F) and topBarState.enabled.value) TopAppBar() },
         bottomBar = {
-          Log.i("DwebView","bottomBarState.isEnabled:${ bottomBarState.isEnabled}, bottomBarState.overlay:${ bottomBarState.overlay.value}");
+           // Log.i("DwebView","bottomBarState.isEnabled:${ bottomBarState.isEnabled}, bottomBarState.overlay:${ bottomBarState.overlay.value}");
           // 如果前端没有传递hidden，也就是bottomBarState.isEnabled等于true，则显示bottom bar
           if ((bottomBarState.overlay.value == 1F) and bottomBarState.isEnabled) {
             BottomAppBar()
@@ -178,7 +170,7 @@ fun DWebView(
             val jsConfirmConfig = remember {
                 mutableStateOf<JsConfirmConfiguration?>(null)
             }
-            val jsBeforeUnloadConfig = remember {
+            val jsWarningConfig = remember {
                 mutableStateOf<JsConfirmConfiguration?>(null)
             }
 
@@ -197,8 +189,6 @@ fun DWebView(
                             callback
                         )
                     })
-                    val navigatorFFI = NavigatorFFI(webView, activity, navController)
-                    webView.addJavascriptInterface(navigatorFFI, "my_nav")
                     val systemUiFFI = SystemUiFFI(
                         activity,
                         webView,
@@ -206,8 +196,9 @@ fun DWebView(
                         jsUtil!!,
                         systemUIState,
                     )
+                  initUiFn(systemUiFFI)
 
-                    webView.addJavascriptInterface(systemUiFFI, "system_ui");
+                  webView.addJavascriptInterface(systemUiFFI, "system_ui");
                     webView.addJavascriptInterface(systemUiFFI.virtualKeyboard, "virtual_keyboard")
 
                     val topBarFFI = TopBarFFI(
@@ -224,7 +215,7 @@ fun DWebView(
                         jsAlertConfig,
                         jsPromptConfig,
                         jsConfirmConfig,
-                        jsBeforeUnloadConfig
+                        jsWarningConfig
                     )
                     webView.addJavascriptInterface(dialogFFI, "native_dialog")
 
@@ -331,7 +322,7 @@ fun DWebView(
                             if (result == null) {
                                 return super.onJsBeforeUnload(view, url, message, result)
                             }
-                            jsBeforeUnloadConfig.value = JsConfirmConfiguration(
+                           jsWarningConfig.value = JsConfirmConfiguration(
                                 getJsDialogTitle(url, "提示您"),
                                 message ?: "",
                                 "离开",
@@ -372,8 +363,13 @@ fun DWebView(
                                          * 下面这种实现方法会有安全问题（比如说一些.php,.jsp的提权），可能需要完善一下下面规则的健壮性。
                                          */
                                         val temp = url.substring(url.lastIndexOf("/") + 1)
+                                        //拦截转发到后端的事件
                                         if (temp.startsWith("poll")) {
                                             return messageGateWay(request)
+                                        }
+                                        //拦截设置ui的请求，代替JavascriptInterface
+                                        if (temp.startsWith("setUi")) {
+                                          return uiGateWay(request)
                                         }
                                         val suffixIndex = temp.lastIndexOf(".")
                                         // 只拦截数据文件,忽略资源文件
@@ -432,7 +428,7 @@ fun DWebView(
                 Box(
                     contentAlignment = Alignment.TopCenter,
                     modifier = if (systemUIState.statusBar.overlay.value) {
-                        with(LocalDensity.current) {
+                      with(LocalDensity.current) {
                             Modifier.offset(y = WindowInsets.statusBars.getTop(this).toDp())
                         }
                     } else {
@@ -457,7 +453,7 @@ fun DWebView(
             jsAlertConfig.value?.openAlertDialog { jsAlertConfig.value = null }
             jsPromptConfig.value?.openPromptDialog { jsPromptConfig.value = null }
             jsConfirmConfig.value?.openConfirmDialog { jsConfirmConfig.value = null }
-            jsBeforeUnloadConfig.value?.openBeforeUnloadDialog { jsBeforeUnloadConfig.value = null }
+            jsWarningConfig.value?.openWarningDialog { jsWarningConfig.value = null }
         },
         containerColor = Companion.Transparent,
       contentColor = Companion.Transparent

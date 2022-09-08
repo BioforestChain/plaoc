@@ -21,7 +21,7 @@ export const metaData: MetaData = {
     enter: "index.html",
   },
   //  这里配置的白名单将不被拦截
-  whitelist: ["https://unpkg.com","https://cn.vitejs.dev"],
+  whitelist: ["https://unpkg.com", "https://cn.vitejs.dev"],
   // 定义路由，这里与enter是完全独立的存在。
   // 外部可以使用 admin.DWEB_ID.bfchain/routeA 来传入参数
   dwebview: {

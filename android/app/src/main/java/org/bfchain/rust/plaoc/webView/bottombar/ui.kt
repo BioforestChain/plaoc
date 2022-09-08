@@ -42,16 +42,6 @@ fun DWebBottomBar(
           }
 
           bottomBarState.actions.forEachIndexed { index, action ->
-            // 如果传递了un_source，使用双图片切换
-            if (!action.icon.un_source.isNullOrEmpty()) {
-              if (selectedItem != index) {
-                action.icon.currentSource = action.icon.un_source.toString();
-              } else {
-                action.icon.currentSource = action.icon.source
-              }
-            } else {
-              action.icon.currentSource = action.icon.source
-            }
             NavigationBarItem(
               icon = {
                 DWebIcon(action.icon)

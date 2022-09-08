@@ -1,5 +1,8 @@
 /// <reference lib="dom" />
+import { netCallNative } from "../common/network";
 import { DwebPlugin } from "./dweb-plugin";
+import { NativeUI, NativeHandle } from '../common/nativeHandle';
+import { hexToIntColor } from "./../util";
 
 export class DWebMessager extends DwebPlugin {
   constructor() {
@@ -11,29 +14,34 @@ export class DWebView extends DwebPlugin {
   constructor() {
     super();
   }
+  // 隐藏系统导航栏
+  setNavigationBarVisible(isHide: boolean = false) {
+    return netCallNative(NativeUI.SetNavigationBarVisible, isHide)
+  }
+  // 获取系统导航栏颜色
+  getNavigationBarVisible() {
+    return netCallNative(NativeUI.GetNavigationBarVisible)
+  }
+  /**
+   * 设置导航栏颜色
+   * @param color 设置颜色
+   * @param darkIcons 是否更期望使用深色效果
+   * @param isNavigationBarContrastEnforced 在系统背景高度透明的时候导航栏是否应该增强对比度，android仅支持：API 29+
+   * @returns Promise<true>
+   */
+  setNavigationBarColor(color: string, darkIcons: boolean = false, isNavigationBarContrastEnforced: boolean = true) {
+    const colorHex = hexToIntColor(color);
+    return netCallNative(NativeUI.SetNavigationBarColor, { colorHex, darkIcons, isNavigationBarContrastEnforced })
+  }
 }
 
 export class OpenScanner extends DwebPlugin {
   constructor() {
     super();
   }
+  // 打开扫码
   async openScanner(): Promise<string> {
-    const ok = await this.onPolling("OpenScanner");
-    if (ok !== "ok") {
-      throw new Error("打开扫码失败！"); // todo 记录日志
-    }
-    let index = 1;
-    return new Promise(async (resolve, reject) => {
-      do {
-        const data = await this.onMesage().next();
-        if (data.done === false) {
-          resolve(data.value);
-          break;
-        }
-        index++;
-        await loop(500);
-      } while (index < 10);
-    });
+    return this.onPolling(NativeHandle.OpenScanner);
   }
   // dom被删除的声明周期
   disconnectedCallback() {
@@ -41,8 +49,7 @@ export class OpenScanner extends DwebPlugin {
   }
 }
 
-const loop = (delay: number) =>
-  new Promise((resolve) => setTimeout(resolve, delay));
+
 
 /**
  * 服务端的用户如果想给全部的dweb-plugin发送广播，需要在evalJs调用dwebPlugin.dispatch

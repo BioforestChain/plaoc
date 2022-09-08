@@ -3,6 +3,7 @@ package org.bfchain.rust.plaoc.webView.network
 import android.util.Log
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
+import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.DeserializationFeature
 import org.bfchain.rust.plaoc.*
 import org.bfchain.rust.plaoc.webView.urlscheme.CustomUrlScheme
@@ -13,7 +14,6 @@ import java.util.*
 
 
 private const val TAG = "NetworkMap"
-
 // 这里是存储客户端的映射规则的，这样才知道需要如何转发给后端 <String,ImportMap>
 val front_to_rear_map = mutableMapOf<String, String>()
 var dWebView_host = ""
@@ -60,21 +60,39 @@ fun messageGateWay(
     Log.i(TAG, " messageGateWay: $url")
     val byteData = url.substring(url.lastIndexOf("=") + 1)
     DenoService().backDataToRust(hexStrToByteArray(byteData))// 通知
-
-//    val stringData = String(hexStrToByteArray(byteData))
-//    mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true)
-//    mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true) //允许使用单引号
-//    val handle = mapper.readValue(stringData, jsHandle::class.java)
-//    val funName = (handle.function[0]).toString()
-//    // 执行函数
-//    callable_map[funName]?.let { it -> it(handle.data) }
-
     return WebResourceResponse(
         "application/json",
         "utf-8",
         ByteArrayInputStream("ok".toByteArray())
     )
 }
+
+// 转发给ui
+fun uiGateWay(
+  request: WebResourceRequest
+): WebResourceResponse {
+  val url = request.url.toString().lowercase(Locale.ROOT)
+  val byteData = url.substring(url.lastIndexOf("=") + 1)
+  val stringData = String(hexStrToByteArray(byteData))
+  mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true)
+  mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true) //允许使用单引号
+  val handle = mapper.readValue(stringData, jsHandle::class.java)
+  Log.i(TAG, " uiGateWay: $handle")
+  val funName = ExportNativeUi.valueOf(handle.function);
+  // 执行函数
+  val result = call_ui_map[funName]?.let { it -> it(handle.data)
+  }?: return WebResourceResponse(
+        "application/json",
+        "utf-8",
+        ByteArrayInputStream("0".toByteArray())
+      )
+  return WebResourceResponse(
+    "application/json",
+    "utf-8",
+    ByteArrayInputStream(result.toString().toByteArray())
+  )
+}
+
 
 // 视图文件拦截
 fun viewGateWay(
@@ -104,7 +122,7 @@ fun viewGateWay(
     return WebResourceResponse(
         "application/json",
         "utf-8",
-        ByteArrayInputStream("access denied".toByteArray())
+        ByteArrayInputStream("无权限，需要前往后端配置".toByteArray())
     )
 }
 

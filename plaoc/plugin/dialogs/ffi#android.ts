@@ -51,7 +51,7 @@ export class DialogsFFI implements Dialogs.IDialogsFFI {
     });
   }
 
-  openBeforeUnload(
+  openWarning(
     config: Dialogs.IConfirmConfig,
     confirmFunc: string,
     cancelFunc?: string
@@ -65,7 +65,7 @@ export class DialogsFFI implements Dialogs.IDialogsFFI {
         }
       })`;
 
-      this._ffi.openBeforeUnload(JSON.stringify(config), cb);
+      this._ffi.openWarning(JSON.stringify(config), cb);
 
       resolve();
     });

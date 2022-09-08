@@ -50,7 +50,7 @@ export class VirtualKeyboardFFI implements Keyboard.IVirtualKeyboardFFI {
     return new Promise<void>((resolve, reject) => {
       setTimeout(() => {
         this._ffi.show();
-      }, 500);
+      }, 100);
 
       resolve();
     });

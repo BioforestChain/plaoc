@@ -9,3 +9,9 @@ enum class ExportNative(val type: String) {
     EvalJsRuntime("evalJsRuntime"),
 }
 
+enum class ExportNativeUi(val type: String) {
+  // Navigation
+  SetNavigationBarVisible("setNavigationBarVisible"),
+  SetNavigationBarColor("setNavigationBarColor"),
+  GetNavigationBarVisible("getNavigationBarVisible"),
+}

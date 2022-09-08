@@ -12,7 +12,8 @@ data class JsAlertConfiguration(
     val confirmText: String,
     val dismissOnBackPress: Boolean,
     val dismissOnClickOutside: Boolean,
-) {
+)
+{
     companion object {
         operator fun invoke(
             title: String,
@@ -61,8 +62,8 @@ data class JsPromptConfiguration(
     val confirmText: String,
     val cancelText: String,
     val dismissOnBackPress: Boolean = true,
-    val dismissOnClickOutside: Boolean = false,
-) {
+    val dismissOnClickOutside: Boolean = false)
+{
     companion object {
         operator fun invoke(
             title: String,
@@ -87,7 +88,7 @@ data class JsPromptConfiguration(
                 val jsonObject = json.asJsonObject
                 JsPromptConfiguration(
                     jsonObject["title"]?.asString ?: "",
-                    jsonObject["content"]?.asString ?: "",
+                    jsonObject["label"]?.asString ?: "",
                     jsonObject["defaultValue"]?.asString ?: "",
                     jsonObject["confirmText"]?.asString ?: "",
                     jsonObject["cancelText"]?.asString ?: "",
@@ -119,18 +120,19 @@ data class JsConfirmConfiguration(
     val cancelText: String,
     val dismissOnBackPress: Boolean = true,
     val dismissOnClickOutside: Boolean = false,
-) {
+)
+{
     companion object {
         operator fun invoke(
             title: String,
-            label: String,
+            message: String,
             confirmText: String,
             cancelText: String,
             dismissOnBackPress: Boolean? = null,
             dismissOnClickOutside: Boolean? = null,
         ) = JsConfirmConfiguration(
             title,
-            label,
+            message,
             confirmText,
             cancelText,
             dismissOnBackPress ?: true,
@@ -142,7 +144,7 @@ data class JsConfirmConfiguration(
                 val jsonObject = json.asJsonObject
                 JsConfirmConfiguration(
                     jsonObject["title"]?.asString ?: "",
-                    jsonObject["content"]?.asString ?: "",
+                    jsonObject["message"]?.asString ?: "",
                     jsonObject["confirmText"]?.asString ?: "",
                     jsonObject["cancelText"]?.asString ?: "",
                     jsonObject["dismissOnBackPress"]?.asBoolean,

@@ -5,13 +5,10 @@ import android.Manifest
 import android.content.Intent
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Log
 import android.view.View
-import android.webkit.WebView
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.gms.common.util.JsonUtils
 import com.google.mlkit.vision.barcode.Barcode
 import com.king.app.dialog.AppDialog
 import com.king.app.dialog.AppDialogConfig
@@ -20,11 +17,8 @@ import com.king.mlkit.vision.camera.CameraScan
 import com.king.mlkit.vision.camera.analyze.Analyzer.OnAnalyzeListener
 import com.king.mlkit.vision.camera.util.LogUtils
 import com.king.mlkit.vision.camera.util.PermissionUtils
-import org.bfchain.rust.plaoc.barcode.BarcodeScanningActivity
-import org.bfchain.rust.plaoc.barcode.MultipleQRCodeScanningActivity
 import org.bfchain.rust.plaoc.barcode.QRCodeScanningActivity
 import org.bfchain.rust.plaoc.lib.drawRect
-import org.bfchain.rust.plaoc.webView.DWebViewActivity
 import org.bfchain.rust.plaoc.webView.network.initMetaData
 import org.bfchain.rust.plaoc.webView.openDWebWindow
 import org.bfchain.rust.plaoc.webView.sendToJavaScript
@@ -46,22 +40,25 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        callable_map[ExportNative.OpenScanner] = { openScannerActivity() }
-        callable_map[ExportNative.OpenDWebView] = {
-            openDWebViewActivity(it)
-        }
-        callable_map[ExportNative.InitMetaData] = {
-            initMetaData(it)
-        }
-        callable_map[ExportNative.DenoRuntime] = {
-            DenoService().denoRuntime(this.assets, it)
-        }
-        callable_map[ExportNative.EvalJsRuntime] =
-            { sendToJavaScript(it) }
-
+        this.initSystemFn()
         // 启动Deno服务
         val deno = Intent(this, DenoService::class.java)
         startService(deno)
+    }
+    // 初始化系统函数
+    private fun initSystemFn() {
+      callable_map[ExportNative.OpenScanner] = { openScannerActivity() }
+      callable_map[ExportNative.OpenDWebView] = {
+        openDWebViewActivity(it)
+      }
+      callable_map[ExportNative.InitMetaData] = {
+        initMetaData(it)
+      }
+      callable_map[ExportNative.DenoRuntime] = {
+        DenoService().denoRuntime(this.assets, it)
+      }
+      callable_map[ExportNative.EvalJsRuntime] =
+        { sendToJavaScript(it) }
     }
 
     // 选择图片后回调到这
@@ -178,17 +175,16 @@ class MainActivity : AppCompatActivity() {
         startActivityForResult(pickIntent, REQUEST_CODE_PHOTO)
     }
 
-    fun openScannerActivity() {
+    private fun openScannerActivity() {
         startActivityForResult(
             Intent(this, QRCodeScanningActivity::class.java),
             REQUEST_CODE_SCAN_CODE
         )
     }
 
-    fun openDWebViewActivity(url: String) {
+    private fun openDWebViewActivity(url: String) {
         // 存储一下host，用来判断是远程的还是本地的
         val host = URL(url).host
-//        dWebView_host = host.lowercase(Locale.ROOT) // 为了适配一下DwebView拦截出来都是小写
         LogUtils.d("启动了DWebView:$url，host为： $host")
         openDWebWindow(
             activity = getContext(),

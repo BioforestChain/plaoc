@@ -63,7 +63,7 @@ class BottomBarFFI(
     @JavascriptInterface
     fun setActions(actionListJson: DataString<List<BottomBarAction>>) {
         state.actions.clear()
-//      Log.i(TAG, "actionListJson:${actionListJson}")
+      Log.i(TAG, "actionListJson:${actionListJson}")
       val actionList = actionListJson.toData<List<BottomBarAction>>(object :
             TypeToken<List<BottomBarAction>>() {}.type)
         actionList.toCollection(state.actions)

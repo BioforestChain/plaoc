@@ -22,7 +22,7 @@ export function getColorHex(color: number): Color.RGBAHex {
 }
 
 // 将rgba(r, b, g, a)或#rrbbggaa或#rgba转为#rrbbggaa 十六进制
-export function convertToRGBAHex(color: string):Color.RGBAHex {
+export function convertToRGBAHex(color: string): Color.RGBAHex {
   let colorHex = "#";
 
   if (color.startsWith("rgba(")) {
@@ -49,11 +49,23 @@ export function convertToRGBAHex(color: string):Color.RGBAHex {
       color = color.substring(1);
       // 如果是 #f71 或者#f72e这种格式的话,转换为5字符格式
       if (color.length === 4 || color.length === 3) {
-         color = color.replace(/(.)/g, '$1$1');
+        color = color.replace(/(.)/g, '$1$1');
       }
       // 填充成9字符格式，不然android无法渲染
       colorHex += color.padEnd(8, "F");
     }
   }
   return colorHex as Color.RGBAHex;
+}
+
+/**
+ * 把颜色转换为int类型
+ * @param color 
+ */
+export function hexToIntColor(color: string): number {
+  color = convertToRGBAHex(color);
+  return getColorInt(
+    color.slice(0, -2) as Color.RGBHex,
+    color.slice(-2) as Color.AlphaValueHex
+  );
 }

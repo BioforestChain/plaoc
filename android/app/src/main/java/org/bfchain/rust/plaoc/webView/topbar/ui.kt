@@ -54,7 +54,6 @@ fun DWebTopBar(
         actions = {
             if (topBarState.actions.size > 0) {
                 for (action in topBarState.actions) {
-                  action.icon.currentSource = action.icon.source;
                     IconButton(
                         onClick = {
                             jsUtil?.evalQueue { action.onClickCode }

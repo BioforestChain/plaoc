@@ -1,6 +1,7 @@
 package org.bfchain.rust.plaoc.webView.dialog
 
 
+import android.util.Log
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Notifications
@@ -102,7 +103,7 @@ fun JsConfirmConfiguration.openConfirmDialog(requestDismiss: () -> Unit) {
 }
 
 @Composable
-fun JsConfirmConfiguration.openBeforeUnloadDialog(requestDismiss: () -> Unit) {
+fun JsConfirmConfiguration.openWarningDialog(requestDismiss: () -> Unit) {
     val config = this
     val submitConfirm = {
         this.onConfirm()
@@ -113,7 +114,7 @@ fun JsConfirmConfiguration.openBeforeUnloadDialog(requestDismiss: () -> Unit) {
         requestDismiss()
     }
     AlertDialog(
-        icon = { Icon(Icons.Filled.Warning, contentDescription = "Before Unload") },
+        icon = { Icon(Icons.Filled.Warning, contentDescription = "warning") }, // 图片和无障碍服务
         onDismissRequest = cancelConfirm,
         title = { Text(text = config.title) },
         text = { Text(text = config.message) },
