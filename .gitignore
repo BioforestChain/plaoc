@@ -12,15 +12,17 @@
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
 .DS_Store
-/build
 /captures
 .externalNativeBuild
 .bfsw
 .bfsp
 .cxx
 local.properties
-/test-vue3/build
+**build
+deno
 /plaoc/yarn-error.log
+
+android/app/src/main/assets/*
 
 rust_lib/assets/rusty_v8_mirror/
 /Plaoc-Android

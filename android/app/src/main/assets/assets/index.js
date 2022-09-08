@@ -31635,7 +31635,7 @@ const _sfc_main$2 = /* @__PURE__ */ defineComponent({
       console.log("getNavigationBarVisible=>", await nav.getNavigationBarVisible());
     }
     function setNavigationBarColor() {
-      nav.setNavigationBarColor("#ffffff00", false, false);
+      nav.setNavigationBarColor("#ffffff00", true, false);
     }
     return (_ctx, _cache) => {
       const _component_dweb_status_bar = resolveComponent("dweb-status-bar");
