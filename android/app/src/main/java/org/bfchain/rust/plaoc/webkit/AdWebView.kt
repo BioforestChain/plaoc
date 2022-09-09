@@ -68,8 +68,7 @@ fun AdWebView(
         factory = { context ->
             AdAndroidWebView(context).apply {
                 settings.javaScriptEnabled = true
-                // 关闭多窗口，才可以打开页面内超链接
-                settings.setSupportMultipleWindows(false)
+                settings.setSupportMultipleWindows(true)
                 settings.allowFileAccess = true
                 settings.javaScriptCanOpenWindowsAutomatically = true
                 settings.domStorageEnabled = true

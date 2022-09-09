@@ -1,5 +1,7 @@
 package org.bfchain.rust.plaoc.chromium
 
+//import android.webkit.WebChromeClient
+//import android.webkit.WebViewClient
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Picture
@@ -7,17 +9,15 @@ import android.os.Message
 import android.util.AttributeSet
 import android.util.Log
 import android.webkit.DownloadListener
-//import android.webkit.WebChromeClient
 import android.webkit.WebView
-//import android.webkit.WebViewClient
 import android.widget.LinearLayout
 import org.chromium.android_webview.*
 import org.chromium.android_webview.test.AwTestContainerView
 import org.chromium.android_webview.test.NullContentsClient
 import org.chromium.base.Callback
 import org.chromium.components.embedder_support.util.WebResourceResponseInfo
-import org.chromium.content_public.browser.ContentViewStatics
 import org.chromium.content.browser.LauncherThread
+import org.chromium.content_public.browser.ContentViewStatics
 
 
 open class WebView: WebView {
@@ -62,6 +62,8 @@ open class WebView: WebView {
             domStorageEnabled = true
         }
 
+        val mWebView = this;
+
         awContents = AwContents(
             awBrowserContext,
             awTestContainerView,
@@ -69,18 +71,19 @@ open class WebView: WebView {
             awTestContainerView.internalAccessDelegate,
             awTestContainerView.nativeDrawFunctorFactory,
             object: NullContentsClient() {
+                override fun onCreateWindow(isDialog: Boolean, isUserGesture: Boolean): Boolean {
+                    return cwebChromeClient?.onCreateWindow(mWebView, isDialog, isUserGesture, null) ?: false
+                }
+
                 override fun onPageFinished(url: String) {
-                    Log.i("ChromiumWebView", "onPageFinished")
                     cwebViewClient?.onPageFinished(null, url)
                 }
 
                 override fun shouldOverrideUrlLoading(request: AwWebResourceRequest): Boolean {
-                    Log.i("ChromiumWebView", "shouldOverrideUrlLoading")
                     return cwebViewClient?.shouldOverrideUrlLoading(null, request) ?: false
                 }
 
                 override fun shouldInterceptRequest(request: AwWebResourceRequest): WebResourceResponseInfo? {
-                    Log.i("ChromiumWebView", "shouldInterceptRequest")
                     return cwebViewClient?.shouldInterceptRequest(null, request)
                 }
             }

@@ -233,15 +233,17 @@ fun DWebView(
                             isUserGesture: Boolean,
                             resultMsg: Message?
                         ): Boolean {
-                            if (view != null) {
+                            view?.let {
                                 val href = view.handler.obtainMessage()
                                 view.requestFocusNodeHref(href)
                                 val url = href.data.getString("url")
-                                if (url != null) {
+
+                                url?.let {
                                     openDWebWindow(activity = activity, url = url)
                                     return true
                                 }
                             }
+
                             return super.onCreateWindow(view, isDialog, isUserGesture, resultMsg)
                         }
 
