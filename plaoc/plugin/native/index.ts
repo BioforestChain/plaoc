@@ -33,11 +33,11 @@ export class DWebView extends DwebPlugin {
     const colorHex = hexToIntColor(color);
     return netCallNative(NativeUI.SetNavigationBarColor, { colorHex, darkIcons, isNavigationBarContrastEnforced })
   }
-  /** 获取系统导航栏是否透明*/
+  /** 获取系统导航栏是否覆盖内容*/
   getNavigationBarOverlay() {
     return netCallNative(NativeUI.GetNavigationBarOverlay)
   }
-  /**设置系统导航栏是否透明,默认值false为不透明 */
+  /**设置系统导航栏是否覆盖内容,默认值false为不覆盖 */
   setNavigationBarOverlay(isOverlay: boolean = false) {
     return netCallNative(NativeUI.SetNavigationBarOverlay, isOverlay)
   }

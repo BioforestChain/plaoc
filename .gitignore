@@ -19,7 +19,6 @@
 .cxx
 local.properties
 **build
-deno
 /plaoc/yarn-error.log
 
 android/app/src/main/assets/*

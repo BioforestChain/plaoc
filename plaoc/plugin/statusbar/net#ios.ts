@@ -3,6 +3,13 @@ import { Color } from "../typings/types/color.type";
 import { StatusBar } from "./bfcsStatusBar.type";
 
 export class StatusBarFFI implements StatusBar.IStatusBarFFI {
+
+  setStatusBarVisible(isVer: boolean): Promise<boolean> {
+    throw new Error("Method not implemented.");
+  }
+  getStatusBarIsDark(): Promise<StatusBar.StatusBarStyle> {
+    throw new Error("Method not implemented.");
+  }
   private _ffi = (window as any).webkit
     .messageHandlers as StatusBar.StatusBarIosFFI;
 
@@ -53,14 +60,14 @@ export class StatusBarFFI implements StatusBar.IStatusBarFFI {
     return;
   }
 
-  async setStatusBarHidden(): Promise<void> {
+  async setStatusBarHidden(): Promise<boolean> {
     const isVisible = await this.getStatusBarVisible();
 
     if (isVisible) {
       await this.toggleStatusBarVisible();
     }
 
-    return;
+    return isVisible;
   }
 
   async getStatusBarOverlay(): Promise<boolean> {
@@ -77,14 +84,14 @@ export class StatusBarFFI implements StatusBar.IStatusBarFFI {
     return;
   }
 
-  async setStatusBarOverlay(): Promise<void> {
+  async setStatusBarOverlay(): Promise<boolean> {
     const overlay = await this.getStatusBarOverlay();
 
     if (!overlay) {
       await this.toggleStatusBarOverlay();
     }
 
-    return;
+    return overlay;
   }
 
   async getStatusBarStyle(): Promise<StatusBar.StatusBarStyle> {

@@ -4,13 +4,13 @@
  * @param url 
  * @returns 
  */
-export async function netCallNative(fun: string, data: TNative = ""): Promise<string> {
+export async function netCallNative(fun: string, data: TNative = ""): Promise<TNative> {
   const message = `{"function":"${fun}","data":'${JSON.stringify(data)}'}`;
   const buffer = new TextEncoder().encode(message);
   return connectChannel(`/setUi?data=${buffer}`);
 }
 
-type TNative = boolean | object | string;
+type TNative = boolean | object | string | number;
 
 /**
    * 请求kotlin 代理转发
