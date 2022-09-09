@@ -4,7 +4,7 @@
  * @param url 
  * @returns 
  */
-export async function netCallNative(fun: string, data: TNative = ""): Promise<TNative> {
+export async function netCallNative(fun: string, data: TNative = ""): Promise<any> {
   const message = `{"function":"${fun}","data":'${JSON.stringify(data)}'}`;
   const buffer = new TextEncoder().encode(message);
   return connectChannel(`/setUi?data=${buffer}`);

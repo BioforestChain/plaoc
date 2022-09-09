@@ -12,7 +12,7 @@ export namespace Keyboard {
     getSafeArea(): Data.DataString<IKeyboardSafeArea>;
     getHeight(): number;
     getOverlay(): boolean;
-    toggleOverlay(isOverlay: number): void;
+    toggleOverlay(isOverlay: number): boolean;
     show(): void;
     hide(): void;
   }
@@ -41,8 +41,8 @@ export namespace Keyboard {
     getKeyboardHeight(): Promise<number>;
     getKeyboardOverlay(): Promise<boolean>;
     toggleKeyboardOverlay(): Promise<void>;
-    setKeyboardOverlay(): Promise<void>;
-    showKeyboard(): Promise<void>;
-    hideKeyboard(): Promise<void>;
+    setKeyboardOverlay(): Promise<boolean>;
+    showKeyboard(): Promise<boolean>;
+    hideKeyboard(): Promise<boolean>;
   }
 }

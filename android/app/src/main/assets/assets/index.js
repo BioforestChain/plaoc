@@ -134,6 +134,12 @@ var NativeUI = /* @__PURE__ */ ((NativeUI2) => {
   NativeUI2["GetStatusBarOverlay"] = "GetStatusBarOverlay";
   NativeUI2["SetStatusBarOverlay"] = "SetStatusBarOverlay";
   NativeUI2["SetStatusBarVisible"] = "SetStatusBarVisible";
+  NativeUI2["GetSafeArea"] = "GetSafeArea";
+  NativeUI2["GetHeight"] = "GetHeight";
+  NativeUI2["GetOverlay"] = "GetOverlay";
+  NativeUI2["SetOverlay"] = "SetOverlay";
+  NativeUI2["Show"] = "Show";
+  NativeUI2["Hide"] = "Hide";
   return NativeUI2;
 })(NativeUI || {});
 function getColorInt(color, alpha) {
@@ -221,53 +227,39 @@ customElements.define("dweb-messager", DWebMessager);
 customElements.define("dweb-view", DWebView);
 customElements.define("dweb-scanner", OpenScanner);
 class VirtualKeyboardFFI {
-  constructor() {
-    this._ffi = window.virtual_keyboard;
+  async getKeyboardSafeArea() {
+    const safeArea = await netCallNative(NativeUI.GetSafeArea);
+    return JSON.parse(safeArea);
   }
-  getKeyboardSafeArea() {
-    return new Promise((resolve2, reject) => {
-      const safeArea = JSON.parse(this._ffi.getSafeArea());
-      resolve2(safeArea);
-    });
+  async getKeyboardHeight() {
+    const height = await netCallNative(NativeUI.GetHeight);
+    return parseFloat(height);
   }
-  getKeyboardHeight() {
-    return new Promise((resolve2, reject) => {
-      const height = this._ffi.getHeight();
-      resolve2(height);
-    });
+  async getKeyboardOverlay() {
+    const overlay = await netCallNative(NativeUI.GetOverlay);
+    return overlay;
   }
-  getKeyboardOverlay() {
-    return new Promise((resolve2, reject) => {
-      const overlay = this._ffi.getOverlay();
-      resolve2(overlay);
-    });
-  }
-  toggleKeyboardOverlay() {
-    return new Promise((resolve2, reject) => {
-      this._ffi.toggleOverlay(0);
-      resolve2();
-    });
+  async toggleKeyboardOverlay(isOver = true) {
+    const overlay = await netCallNative(NativeUI.SetOverlay, isOver);
+    return overlay;
   }
   async setKeyboardOverlay() {
     const overlay = await this.getKeyboardOverlay();
     if (!overlay) {
-      await this.toggleKeyboardOverlay();
+      await this.toggleKeyboardOverlay(true);
     }
-    return;
+    return overlay;
   }
   showKeyboard() {
-    return new Promise((resolve2, reject) => {
-      setTimeout(() => {
-        this._ffi.show();
+    return new Promise(async (resolve2, reject) => {
+      setTimeout(async () => {
+        const isShow = await netCallNative(NativeUI.Show);
+        resolve2(isShow);
       }, 100);
-      resolve2();
     });
   }
-  hideKeyboard() {
-    return new Promise((resolve2, reject) => {
-      this._ffi.hide();
-      resolve2();
-    });
+  async hideKeyboard() {
+    return await netCallNative(NativeUI.Hide);
   }
 }
 class BfcsKeyboard extends DwebPlugin {
@@ -295,19 +287,17 @@ class BfcsKeyboard extends DwebPlugin {
     const overlay = await this._ffi.getKeyboardOverlay();
     return overlay;
   }
-  async toggleKeyboardOverlay() {
+  async setKeyboardOverlay() {
     await this._ffi.toggleKeyboardOverlay();
     return;
   }
   async showKeyboard() {
     this.setAttribute("hidden", "false");
-    await this._ffi.showKeyboard();
-    return;
+    return await this._ffi.showKeyboard();
   }
   async hideKeyboard() {
     this.setAttribute("hidden", "true");
-    await this._ffi.hideKeyboard();
-    return;
+    return await this._ffi.hideKeyboard();
   }
   static get observedAttributes() {
     return ["overlay", "hidden"];
@@ -1100,17 +1090,17 @@ class StatusBarFFI {
     }
     if (!barStyle) {
       let isDarkIcons = await netCallNative(NativeUI.GetStatusBarIsDark);
-      darkIcons = isDarkIcons ? 1 : 0;
+      darkIcons = isDarkIcons;
     } else {
       switch (barStyle) {
         case "light-content":
-          darkIcons = -1;
+          darkIcons = false;
           break;
         case "dark-content":
-          darkIcons = 1;
+          darkIcons = true;
           break;
         default:
-          darkIcons = 0;
+          darkIcons = false;
       }
     }
     netCallNative(NativeUI.SetStatusBarColor, { colorHex, darkIcons });
@@ -1142,7 +1132,6 @@ class StatusBarFFI {
   }
   async setStatusBarOverlay(isOverlay) {
     const isOver = await netCallNative(NativeUI.SetStatusBarOverlay, isOverlay);
-    console.log("setStatusBarOverlay:", isOver);
     return Boolean(isOver);
   }
   async getStatusBarIsDark() {
@@ -1192,7 +1181,6 @@ class BfcsStatusBar extends DwebPlugin {
   }
   async setStatusBarOverlay(isOver = false) {
     const overlay = await this._ffi.setStatusBarOverlay(isOver);
-    console.log("setStatusBarOverlay:", overlay);
     return overlay;
   }
   async getStatusBarIsDark() {
@@ -31651,6 +31639,7 @@ const _sfc_main$2 = /* @__PURE__ */ defineComponent({
         createVNode(_component_dweb_status_bar, {
           id: "status_bar",
           "background-color": "rgba(133,100,100,0.5)",
+          hidden: "",
           overlay: ""
         }),
         createVNode(_component_dweb_keyboard, {

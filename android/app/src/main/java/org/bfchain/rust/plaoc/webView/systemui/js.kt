@@ -46,7 +46,7 @@ class SystemUiFFI(
         }
       return true
     }
-  /** 获取状态栏背景颜色色*/
+  /** 获取状态栏背景颜色*/
   fun getStatusBarColor(): ColorInt {
     val color = systemUIState.statusBar.color.value;
     val colorInt = android.graphics.Color.argb(color.alpha, color.red, color.green, color.blue);

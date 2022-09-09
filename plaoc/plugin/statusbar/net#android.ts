@@ -13,7 +13,7 @@ export class StatusBarFFI implements StatusBar.IStatusBarFFI {
     barStyle?: StatusBar.StatusBarStyle
   ): Promise<void> {
     let colorHex: number;
-    let darkIcons: StatusBar.StatusBarAndroidStyle;
+    let darkIcons: boolean;
 
     if (!color) {
       const stringColor = await netCallNative(NativeUI.GetStatusBarColor)
@@ -27,17 +27,17 @@ export class StatusBarFFI implements StatusBar.IStatusBarFFI {
 
     if (!barStyle) {
       let isDarkIcons = await netCallNative(NativeUI.GetStatusBarIsDark)
-      darkIcons = isDarkIcons ? 1 : 0;
+      darkIcons = isDarkIcons
     } else {
       switch (barStyle) {
         case "light-content":
-          darkIcons = -1;
+          darkIcons = false;
           break;
         case "dark-content":
-          darkIcons = 1;
+          darkIcons = true;
           break;
         default:
-          darkIcons = 0;
+          darkIcons = false;
       }
     }
     netCallNative(NativeUI.SetStatusBarColor, { colorHex, darkIcons })

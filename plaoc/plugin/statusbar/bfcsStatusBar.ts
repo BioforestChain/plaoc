@@ -24,7 +24,12 @@ export class BfcsStatusBar extends DwebPlugin {
     const barStyle = await this.getStatusBarIsDark();
     this.setAttribute("bar-style", barStyle);
   }
-
+  /**
+   * 设置状态栏颜色
+   * @param color string
+   * @param barStyle enum(light-content,dark-content)
+   * @returns 
+   */
   async setStatusBarColor(
     color?: string,
     barStyle?: StatusBar.StatusBarStyle
@@ -33,35 +38,33 @@ export class BfcsStatusBar extends DwebPlugin {
     await this._ffi.setStatusBarColor(colorHex, barStyle);
     return;
   }
-
+  /**获取状态栏颜色 */
   async getStatusBarColor(): Promise<Color.RGBAHex> {
     const colorHex = await this._ffi.getStatusBarColor();
     return colorHex;
   }
-
+  /**查看状态栏是否可见 */
   async getStatusBarVisible(): Promise<boolean> {
     const isVisible = await this._ffi.getStatusBarVisible();
     return isVisible;
   }
-
+  /**设置状态栏是否可见 */
   async setStatusBarVisible(isVer: boolean = true): Promise<boolean> {
     return await this._ffi.setStatusBarVisible(isVer);
   }
-
+  /**查看状态栏是否覆盖内容 */
   async getStatusBarOverlay(): Promise<boolean> {
     let overlay = await this._ffi.getStatusBarOverlay();
-
     return overlay;
   }
-
+  /**设置状态栏是否覆盖内容 */
   async setStatusBarOverlay(isOver: boolean = false): Promise<boolean> {
     const overlay = await this._ffi.setStatusBarOverlay(isOver);
     return overlay
   }
-
+  /**获取状态栏是否更偏向于使用黑色效果 */
   async getStatusBarIsDark(): Promise<StatusBar.StatusBarStyle> {
     const barStyle = await this._ffi.getStatusBarIsDark();
-
     return barStyle;
   }
 

@@ -198,9 +198,6 @@ fun DWebView(
                     )
                   initUiFn(systemUiFFI)
 
-                  webView.addJavascriptInterface(systemUiFFI, "system_ui");
-                    webView.addJavascriptInterface(systemUiFFI.virtualKeyboard, "virtual_keyboard")
-
                     val topBarFFI = TopBarFFI(
                         topBarState,
                     )
