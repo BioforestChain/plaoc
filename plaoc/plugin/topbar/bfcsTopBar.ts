@@ -1,11 +1,10 @@
-import { convertToRGBAHex } from "./../util";
-
-import { TopBarFFI } from "./ffi";
+import { TopBarFFI } from "./net";
 import { TopBar } from "./bfcsTopBar.type";
 import "../typings";
 import { Icon } from "../icon/bfspIcon.type";
 import { Color } from "../typings/types/color.type";
 import { DwebPlugin } from "../native/dweb-plugin";
+import { convertToRGBAHex } from "./../util";
 
 export class BfcsTopBar extends DwebPlugin {
   private _ffi: TopBar.ITopBarFFI;
@@ -26,7 +25,14 @@ export class BfcsTopBar extends DwebPlugin {
       subtree: true,
       childList: true,
       attributes: true,
-      attributeFilter: ["disabled", "type", "description", "size", "source", "height"],
+      attributeFilter: [
+        "disabled",
+        "type",
+        "description",
+        "size",
+        "source",
+        "height",
+      ],
     });
 
     this._init();
@@ -37,85 +43,85 @@ export class BfcsTopBar extends DwebPlugin {
   }
 
   private async _init() {
-    const height = await this.getHeight();
+    const height = await this.getTopBarHeight();
     this.setAttribute("height", `${height}`);
   }
 
-  async back(): Promise<void> {
-    await this._ffi.back();
+  async topBarNavigationBack(): Promise<void> {
+    await this._ffi.topBarNavigationBack();
     return;
   }
 
-  async toggleEnabled(): Promise<void> {
-    await this._ffi.toggleEnabled();
+  async setTopBarEnabled(isEnabled: boolean): Promise<void> {
+    await this._ffi.setTopBarEnabled(isEnabled);
     return;
   }
 
-  async getEnabled(): Promise<boolean> {
-    const isEnabled = await this._ffi.getEnabled();
+  async getTopBarEnabled(): Promise<boolean> {
+    const isEnabled = await this._ffi.getTopBarEnabled();
     return isEnabled;
   }
 
-  async getTitle(): Promise<string> {
-    const title = await this._ffi.getTitle();
+  async getTopBarTitle(): Promise<string> {
+    const title = await this._ffi.getTopBarTitle();
     return title;
   }
 
-  async setTitle(title: string): Promise<void> {
-    await this._ffi.setTitle(title);
+  async setTopBarTitle(title: string): Promise<void> {
+    await this._ffi.setTopBarTitle(title);
     return;
   }
 
-  async hasTitle(): Promise<boolean> {
-    const has = await this._ffi.hasTitle();
+  async hasTopBarTitle(): Promise<boolean> {
+    const has = await this._ffi.hasTopBarTitle();
     return has;
   }
 
-  async getOverlay(): Promise<boolean> {
-    const overlay = await this._ffi.getOverlay();
+  async getTopBarOverlay(): Promise<boolean> {
+    const overlay = await this._ffi.getTopBarOverlay();
     return overlay;
   }
 
-  async toggleOverlay(): Promise<void> {
-    await this._ffi.toggleOverlay();
+  async setTopBarOverlay(alpha: string): Promise<void> {
+    await this._ffi.setTopBarOverlay(alpha);
     return;
   }
 
-  async getHeight(): Promise<number> {
-    const height = await this._ffi.getHeight();
+  async getTopBarHeight(): Promise<number> {
+    const height = await this._ffi.getTopBarHeight();
     return height;
   }
 
-  async getBackgroundColor(): Promise<Color.RGBAHex> {
-    const color = await this._ffi.getBackgroundColor();
+  async getTopBarBackgroundColor(): Promise<Color.RGBAHex> {
+    const color = await this._ffi.getTopBarBackgroundColor();
     return color;
   }
 
-  async setBackgroundColor(color: string): Promise<void> {
+  async setTopBarBackgroundColor(color: string): Promise<void> {
     const colorHex = convertToRGBAHex(color);
-    await this._ffi.setBackgroundColor(colorHex);
+    await this._ffi.setTopBarBackgroundColor(colorHex);
 
     return;
   }
 
-  async getForegroundColor(): Promise<Color.RGBAHex> {
-    const color = await this._ffi.getForegroundColor();
+  async getTopBarForegroundColor(): Promise<Color.RGBAHex> {
+    const color = await this._ffi.getTopBarForegroundColor();
     return color;
   }
 
-  async setForegroundColor(color: string): Promise<void> {
+  async setTopBarForegroundColor(color: string): Promise<void> {
     const colorHex = convertToRGBAHex(color);
-    await this._ffi.setForegroundColor(colorHex);
+    await this._ffi.setTopBarForegroundColor(colorHex);
     return;
   }
 
-  async getActions(): Promise<TopBar.TopBarItem[]> {
-    this._actionList = await this._ffi.getActions();
+  async getTopBarActions(): Promise<TopBar.TopBarItem[]> {
+    this._actionList = await this._ffi.getTopBarActions();
     return this._actionList;
   }
 
-  async setActions(): Promise<void> {
-    await this._ffi.setActions(this._actionList);
+  async setTopBarActions(): Promise<void> {
+    await this._ffi.setTopBarActions(this._actionList);
     return;
   }
 
@@ -147,7 +153,7 @@ export class BfcsTopBar extends DwebPlugin {
       this._actionList.push({ icon, onClickCode, disabled });
     });
 
-    await this.setActions();
+    await this.setTopBarActions();
   }
 
   static get observedAttributes() {
@@ -170,18 +176,18 @@ export class BfcsTopBar extends DwebPlugin {
     }
 
     if (attrName === "title") {
-      await this.setTitle(newVal as string);
+      await this.setTopBarTitle(newVal as string);
     } else if (attrName === "background-color") {
-      await this.setBackgroundColor(newVal as string);
+      await this.setTopBarBackgroundColor(newVal as string);
     } else if (attrName === "foreground-color") {
-      await this.setForegroundColor(newVal as string);
+      await this.setTopBarForegroundColor(newVal as string);
     } else if (attrName === "overlay") {
       if (this.hasAttribute(attrName)) {
-        await this._ffi.setOverlay(newVal as string);
+        await this._ffi.setTopBarOverlay(newVal as string);
       }
     } else if (attrName === "hidden") {
       if (this.hasAttribute(attrName)) {
-        await this._ffi.setHidden();
+        await this._ffi.setTopBarHidden();
       }
     }
   }

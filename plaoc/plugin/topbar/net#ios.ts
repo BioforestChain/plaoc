@@ -98,9 +98,8 @@ export class TopBarFFI implements TopBar.ITopBarFFI {
   }
 
   async getBackgroundColor(): Promise<Color.RGBAHex> {
-    const colorHex: Color.RGBAHex = await this._ffi.getNaviBackgroundColor.postMessage(
-      null
-    );
+    const colorHex: Color.RGBAHex =
+      await this._ffi.getNaviBackgroundColor.postMessage(null);
 
     // 返回值：#ffffff00
     return colorHex;
@@ -115,9 +114,8 @@ export class TopBarFFI implements TopBar.ITopBarFFI {
   }
 
   async getForegroundColor(): Promise<Color.RGBAHex> {
-    const colorHex: Color.RGBAHex = await this._ffi.getNaviForegroundColor.postMessage(
-      null
-    );
+    const colorHex: Color.RGBAHex =
+      await this._ffi.getNaviForegroundColor.postMessage(null);
 
     return colorHex;
   }

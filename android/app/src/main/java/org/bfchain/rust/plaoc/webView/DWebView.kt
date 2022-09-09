@@ -205,6 +205,8 @@ fun DWebView(
                     val topBarFFI = TopBarFFI(
                         topBarState,
                     )
+
+                  initTopBarFn(topBarFFI)
                     webView.addJavascriptInterface(topBarFFI, "top_bar")
 
 

@@ -24,6 +24,7 @@ enum class ExportNativeUi(val type: String) {
   SetStatusBarVisible("setStatusBarVisible"),
   GetStatusBarOverlay("getStatusBarOverlay"),
   SetStatusBarOverlay("setStatusBarOverlay"),
+
   // keyboard
   GetSafeArea("getSafeArea"),
   GetHeight("getHeight"),
@@ -31,5 +32,24 @@ enum class ExportNativeUi(val type: String) {
   SetOverlay("setOverlay"),
   Show("show"),
   Hide("hide"),
+
+
+
+  // Top Bar
+  TopBarNavigationBack("topBarNavigationBack"),
+  GetTopBarEnabled("getTopBarEnabled"),
+  SetTopBarEnabled("setTopBarEnabled"),
+  GetTopBarOverlay("getTopBarOverlay"),
+  SetTopBarOverlay("setTopBarOverlay"),
+  GetTopBarTitle("getTopBarTitle"),
+  SetTopBarTitle("setTopBarTitle"),
+  HasTopBarTitle("hasTopBarTitle"),
+  GetTopBarHeight("getTopBarHeight"),
+  GetTopBarActions("getTopBarActions"),
+  SetTopBarActions("setTopBarActions"),
+  GetTopBarBackgroundColor("getTopBarBackgroundColor"),
+  SetTopBarBackgroundColor("setTopBarBackgroundColor"),
+  GetTopBarForegroundColor("getTopBarForegroundColor"),
+  SetTopBarForegroundColor("setTopBarForegroundColor"),
 
 }

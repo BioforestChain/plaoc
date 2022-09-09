@@ -5,7 +5,8 @@ export default defineConfig((info) => {
     exports: {
       ".": "./index.ts",
     },
-    profiles: ["android", "ios", "desktop", "default"],
+    // profiles: ["android", "ios", "desktop", "default"],
+    profiles: ["android"],
     packageJson: {
       license: "MIT",
       author: "@bfchain",
