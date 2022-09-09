@@ -5,6 +5,7 @@ import org.bfchain.rust.plaoc.ExportNativeUi
 import org.bfchain.rust.plaoc.mapper
 import org.bfchain.rust.plaoc.webView.jsutil.ColorInt
 import org.bfchain.rust.plaoc.webView.systemui.SystemUiFFI
+import org.bfchain.rust.plaoc.webView.topbar.TopBarFFI
 
 val call_ui_map = mutableMapOf<ExportNativeUi, (data: String) -> Any>()
 private const val TAG = "systemHandle"
@@ -73,12 +74,62 @@ fun initUiFn(systemUiFFI:SystemUiFFI) {
   }
 }
 
-
 data class NavigationBarColor(
   val colorHex: ColorInt = 16777215,
   val darkIcons: Boolean = true,
   val isNavigationBarContrastEnforced: Boolean = true
 )
+
+/**
+ * 初始化操作TopBar ui的请求
+ */
+fun initTopBarFn(topBarFFI: TopBarFFI) {
+  call_ui_map[ExportNativeUi.TopBarNavigationBack] = {
+    topBarFFI.topBarNavigationBack()
+  }
+  call_ui_map[ExportNativeUi.GetTopBarEnabled] = {
+    topBarFFI.getTopBarEnabled()
+  }
+  call_ui_map[ExportNativeUi.SetTopBarEnabled] = {
+    topBarFFI.setTopBarEnabled(it.toBoolean())
+  }
+  call_ui_map[ExportNativeUi.GetTopBarOverlay] = {
+    topBarFFI.getTopBarOverlay()!!
+  }
+  call_ui_map[ExportNativeUi.SetTopBarOverlay] = {
+    topBarFFI.setTopBarOverlay(it)!!
+  }
+  call_ui_map[ExportNativeUi.GetTopBarTitle] = {
+    topBarFFI.getTopBarTitle()
+  }
+  call_ui_map[ExportNativeUi.SetTopBarTitle] = {
+    topBarFFI.setTopBarTitle(it)
+  }
+  call_ui_map[ExportNativeUi.HasTopBarTitle] = {
+    topBarFFI.hasTopBarTitle()
+  }
+  call_ui_map[ExportNativeUi.GetTopBarHeight] = {
+    topBarFFI.getTopBarHeight()
+  }
+  call_ui_map[ExportNativeUi.GetTopBarActions] = {
+    topBarFFI.getTopBarActions()
+  }
+  call_ui_map[ExportNativeUi.SetTopBarActions] = {
+    topBarFFI.setTopBarActions(it)
+  }
+  call_ui_map[ExportNativeUi.GetTopBarBackgroundColor] = {
+    topBarFFI.getTopBarBackgroundColor()
+  }
+  call_ui_map[ExportNativeUi.SetTopBarBackgroundColor] = {
+    topBarFFI.setTopBarBackgroundColor(it.toInt())
+  }
+  call_ui_map[ExportNativeUi.GetTopBarForegroundColor] = {
+    topBarFFI.getTopBarForegroundColor()
+  }
+  call_ui_map[ExportNativeUi.SetTopBarForegroundColor] = {
+    topBarFFI.setTopBarForegroundColor(it.toInt())
+  }
+}
 
 
 

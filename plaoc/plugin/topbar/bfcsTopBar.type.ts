@@ -10,21 +10,21 @@ export namespace TopBar {
   }
 
   export interface TopBarAndroidFFI {
-    back(): void;
-    getEnabled(): boolean;
-    toggleEnabled(isEnabled: number): void;
-    getOverlay(): boolean;
-    toggleOverlay(isOverlay: string): void;
-    getTitle(): string;
-    setTitle(title: string): void;
-    hasTitle(): boolean;
-    getHeight(): number;
-    getActions(): Data.DataString<TopBarItem[]>;
-    setActions(actionList: Data.DataString<TopBarItem[]>): void;
-    getBackgroundColor(): number;
-    setBackgroundColor(color: number): void;
-    getForegroundColor(): number;
-    setForegroundColor(color: number): void;
+    topBarNavigationBack(): void;
+    getTopBarEnabled(): boolean;
+    setTopBarEnabled(isEnabled: number): void;
+    getTopBarOverlay(): boolean;
+    setTopBarOverlay(alpha: string): void;
+    getTopBarTitle(): string;
+    setTopBarTitle(title: string): void;
+    hasTopBarTitle(): boolean;
+    getTopBarHeight(): number;
+    getTopBarActions(): Data.DataString<TopBarItem[]>;
+    setTopBarActions(actionList: Data.DataString<TopBarItem[]>): void;
+    getTopBarBackgroundColor(): number;
+    setTopBarBackgroundColor(color: number): void;
+    getTopBarForegroundColor(): number;
+    setTopBarForegroundColor(color: number): void;
   }
 
   export interface TopBarIosFFI {
@@ -109,22 +109,21 @@ export namespace TopBar {
   }
 
   export interface ITopBarFFI {
-    back(): Promise<void>;
-    getEnabled(): Promise<boolean>;
-    toggleEnabled(): Promise<void>;
-    setHidden(): Promise<void>;
-    getOverlay(): Promise<boolean>;
-    toggleOverlay(): Promise<void>;
-    setOverlay(alpha:string): Promise<void>;
-    getTitle(): Promise<string>;
-    setTitle(title: string): Promise<void>;
-    hasTitle(): Promise<boolean>;
-    getHeight(): Promise<number>;
-    getActions(): Promise<TopBarItem[]>;
-    setActions(actionList: TopBarItem[]): Promise<void>;
-    getBackgroundColor(): Promise<Color.RGBAHex>;
-    setBackgroundColor(color: Color.RGBAHex): Promise<void>;
-    getForegroundColor(): Promise<Color.RGBAHex>;
-    setForegroundColor(color: Color.RGBAHex): Promise<void>;
+    topBarNavigationBack(): Promise<void>;
+    getTopBarEnabled(): Promise<boolean>;
+    setTopBarEnabled(isEnabled: boolean): Promise<void>;
+    setTopBarHidden(): Promise<void>;
+    getTopBarOverlay(): Promise<boolean>;
+    setTopBarOverlay(alpha: string): Promise<void>;
+    getTopBarTitle(): Promise<string>;
+    setTopBarTitle(title: string): Promise<void>;
+    hasTopBarTitle(): Promise<boolean>;
+    getTopBarHeight(): Promise<number>;
+    getTopBarActions(): Promise<TopBarItem[]>;
+    setTopBarActions(actionList: TopBarItem[]): Promise<void>;
+    getTopBarBackgroundColor(): Promise<Color.RGBAHex>;
+    setTopBarBackgroundColor(color: Color.RGBAHex): Promise<void>;
+    getTopBarForegroundColor(): Promise<Color.RGBAHex>;
+    setTopBarForegroundColor(color: Color.RGBAHex): Promise<void>;
   }
 }

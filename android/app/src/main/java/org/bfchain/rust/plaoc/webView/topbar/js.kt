@@ -17,62 +17,62 @@ class TopBarFFI(
 ) {
 
     @JavascriptInterface
-    fun back() {
+    fun topBarNavigationBack() {
         state.doBack()
     }
 
     @JavascriptInterface
-    fun getEnabled(): Boolean {
+    fun getTopBarEnabled(): Boolean {
         return state.enabled.value
     }
 
     @JavascriptInterface
-    fun toggleEnabled(isEnabled: BoolInt): Boolean {
-        state.enabled.value = isEnabled.toBoolean { !state.enabled.value }
+    fun setTopBarEnabled(isEnabled: Boolean): Boolean {
+        state.enabled.value = isEnabled
 //        Log.i(TAG, "toggleEnabled:${state.enabled.value}")
         return state.enabled.value
     }
 
     @JavascriptInterface
-    fun getOverlay(): Float? {
+    fun getTopBarOverlay(): Float? {
         return state.overlay.value
     }
 
     @JavascriptInterface
-    fun toggleOverlay(isOverlay: String): Float? {
+    fun setTopBarOverlay(isOverlay: String): Float? {
         state.overlay.value = isOverlay.toFloat()
 //        Log.i(TAG, "toggleOverlay:${state.overlay.value},${isOverlay}")
         return state.overlay.value
     }
 
     @JavascriptInterface
-    fun getTitle(): String {
+    fun getTopBarTitle(): String {
         return state.title.value ?: ""
     }
 
     @JavascriptInterface
-    fun hasTitle(): Boolean {
+    fun hasTopBarTitle(): Boolean {
         return state.title.value != null
     }
 
     @JavascriptInterface
-    fun setTitle(str: String) {
+    fun setTopBarTitle(str: String) {
         state.title.value = str
     }
 
 
     @JavascriptInterface
-    fun getHeight(): Float {
+    fun getTopBarHeight(): Float {
         return state.height.value
     }
 
     @JavascriptInterface
-    fun getActions(): DataString<List<TopBarAction>> {
+    fun getTopBarActions(): DataString<List<TopBarAction>> {
         return DataString_From(state.actions)//.map { action -> toDataString(action) }
     }
 
     @JavascriptInterface
-    fun setActions(actionListJson: DataString<List<TopBarAction>>) {
+    fun setTopBarActions(actionListJson: DataString<List<TopBarAction>>) {
         state.actions.clear()
         val actionList = actionListJson.toData<List<TopBarAction>>(object :
             TypeToken<List<TopBarAction>>() {}.type)
@@ -83,22 +83,22 @@ class TopBarFFI(
     }
 
     @JavascriptInterface
-    fun getBackgroundColor(): Int {
+    fun getTopBarBackgroundColor(): Int {
         return state.backgroundColor.value.toArgb()
     }
 
     @JavascriptInterface
-    fun setBackgroundColor(color: ColorInt) {
+    fun setTopBarBackgroundColor(color: ColorInt) {
         state.backgroundColor.value = Color(color)
     }
 
     @JavascriptInterface
-    fun getForegroundColor(): Int {
+    fun getTopBarForegroundColor(): Int {
         return state.foregroundColor.value.toArgb()
     }
 
     @JavascriptInterface
-    fun setForegroundColor(color: ColorInt) {
+    fun setTopBarForegroundColor(color: ColorInt) {
         state.foregroundColor.value = Color(color)
     }
 

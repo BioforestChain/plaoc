@@ -140,6 +140,45 @@ var NativeUI = /* @__PURE__ */ ((NativeUI2) => {
   NativeUI2["SetOverlay"] = "SetOverlay";
   NativeUI2["Show"] = "Show";
   NativeUI2["Hide"] = "Hide";
+  NativeUI2["TopBarNavigationBack"] = "TopBarNavigationBack";
+  NativeUI2["GetTopBarEnabled"] = "GetTopBarEnabled";
+  NativeUI2["SetTopBarEnabled"] = "SetTopBarEnabled";
+  NativeUI2["GetTopBarOverlay"] = "GetTopBarOverlay";
+  NativeUI2["SetTopBarOverlay"] = "SetTopBarOverlay";
+  NativeUI2["GetTopBarTitle"] = "GetTopBarTitle";
+  NativeUI2["SetTopBarTitle"] = "SetTopBarTitle";
+  NativeUI2["HasTopBarTitle"] = "HasTopBarTitle";
+  NativeUI2["GetTopBarHeight"] = "GetTopBarHeight";
+  NativeUI2["GetTopBarActions"] = "GetTopBarActions";
+  NativeUI2["SetTopBarActions"] = "SetTopBarActions";
+  NativeUI2["GetTopBarBackgroundColor"] = "GetTopBarBackgroundColor";
+  NativeUI2["SetTopBarBackgroundColor"] = "SetTopBarBackgroundColor";
+  NativeUI2["GetTopBarForegroundColor"] = "GetTopBarForegroundColor";
+  NativeUI2["SetTopBarForegroundColor"] = "SetTopBarForegroundColor";
+<<<<<<< HEAD
+  NativeUI2["GetSafeArea"] = "GetSafeArea";
+  NativeUI2["GetHeight"] = "GetHeight";
+  NativeUI2["GetOverlay"] = "GetOverlay";
+  NativeUI2["SetOverlay"] = "SetOverlay";
+  NativeUI2["Show"] = "Show";
+  NativeUI2["Hide"] = "Hide";
+=======
+  NativeUI2["TopBarNavigationBack"] = "TopBarNavigationBack";
+  NativeUI2["GetTopBarEnabled"] = "GetTopBarEnabled";
+  NativeUI2["SetTopBarEnabled"] = "SetTopBarEnabled";
+  NativeUI2["GetTopBarOverlay"] = "GetTopBarOverlay";
+  NativeUI2["SetTopBarOverlay"] = "SetTopBarOverlay";
+  NativeUI2["GetTopBarTitle"] = "GetTopBarTitle";
+  NativeUI2["SetTopBarTitle"] = "SetTopBarTitle";
+  NativeUI2["HasTopBarTitle"] = "HasTopBarTitle";
+  NativeUI2["GetTopBarHeight"] = "GetTopBarHeight";
+  NativeUI2["GetTopBarActions"] = "GetTopBarActions";
+  NativeUI2["SetTopBarActions"] = "SetTopBarActions";
+  NativeUI2["GetTopBarBackgroundColor"] = "GetTopBarBackgroundColor";
+  NativeUI2["SetTopBarBackgroundColor"] = "SetTopBarBackgroundColor";
+  NativeUI2["GetTopBarForegroundColor"] = "GetTopBarForegroundColor";
+  NativeUI2["SetTopBarForegroundColor"] = "SetTopBarForegroundColor";
+>>>>>>> 2a64b8c (:recycle: 修改topbar fetch方式)
   return NativeUI2;
 })(NativeUI || {});
 function getColorInt(color, alpha) {
@@ -182,10 +221,7 @@ function convertToRGBAHex(color) {
 }
 function hexToIntColor(color) {
   color = convertToRGBAHex(color);
-  return getColorInt(
-    color.slice(0, -2),
-    color.slice(-2)
-  );
+  return getColorInt(color.slice(0, -2), color.slice(-2));
 }
 class DWebMessager extends DwebPlugin {
   constructor() {
@@ -379,10 +415,7 @@ class BottomBarFFI {
   }
   setBackgroundColor(color) {
     return new Promise(async (resolve2, reject) => {
-      const colorHex = getColorInt(
-        color.slice(0, -2),
-        color.slice(-2)
-      );
+      const colorHex = getColorInt(color.slice(0, -2), color.slice(-2));
       this._ffi.setBackgroundColor(colorHex);
       resolve2();
     });
@@ -396,10 +429,7 @@ class BottomBarFFI {
   }
   setForegroundColor(color) {
     return new Promise((resolve2, reject) => {
-      const colorHex = getColorInt(
-        color.slice(0, -2),
-        color.slice(-2)
-      );
+      const colorHex = getColorInt(color.slice(0, -2), color.slice(-2));
       this._ffi.setForegroundColor(colorHex);
       resolve2();
     });
@@ -433,9 +463,7 @@ class BottomBarFFI {
             if (typeof color === "string") {
               let colorRGBA = convertToRGBAHex(color).replace("#", "0x");
               let colorARGB = colorRGBA.slice(0, 2) + colorRGBA.slice(-2) + colorRGBA.slice(2, -2);
-              item.colors[key] = parseInt(
-                colorARGB
-              );
+              item.colors[key] = parseInt(colorARGB);
             }
           }
         }
@@ -561,9 +589,7 @@ class BfcsBottomBar extends DwebPlugin {
           colors.iconColor = convertToRGBAHex($.getAttribute("color"));
         }
         if ($.hasAttribute("selected-color")) {
-          colors.iconColorSelected = convertToRGBAHex(
-            $.getAttribute("selected-color")
-          );
+          colors.iconColorSelected = convertToRGBAHex($.getAttribute("selected-color"));
         }
       }
       if (childNode.querySelector("dweb-bottom-bar-text")) {
@@ -576,9 +602,7 @@ class BfcsBottomBar extends DwebPlugin {
           colors.textColor = convertToRGBAHex($ == null ? void 0 : $.getAttribute("color"));
         }
         if ($.hasAttribute("selected-color")) {
-          colors.textColorSelected = convertToRGBAHex(
-            $.getAttribute("selected-color")
-          );
+          colors.textColorSelected = convertToRGBAHex($.getAttribute("selected-color"));
         }
       }
       const bid = childNode.getAttribute("bid");
@@ -587,9 +611,7 @@ class BfcsBottomBar extends DwebPlugin {
       const selected = childNode.hasAttribute("selected") ? true : false;
       const diSelectable = childNode.hasAttribute("diSelectable") ? false : true;
       if (childNode.hasAttribute("indicator-color")) {
-        colors.indicatorColor = convertToRGBAHex(
-          childNode.getAttribute("indicator-color")
-        );
+        colors.indicatorColor = convertToRGBAHex(childNode.getAttribute("indicator-color"));
       }
       this._actionList.push({
         icon,
@@ -843,35 +865,31 @@ class BfcsDialogPrompt extends BfcsDialogs {
       promptConfig.label = (_b = this.getAttribute("label")) != null ? _b : "";
       promptConfig.defaultValue = (_c = this.getAttribute("defaultValue")) != null ? _c : "";
       promptConfig.dismissOnBackPress = this.hasAttribute("disOnBackPress") ? true : false;
-      promptConfig.dismissOnClickOutside = this.hasAttribute(
-        "disOnClickOutside"
-      ) ? true : false;
+      promptConfig.dismissOnClickOutside = this.hasAttribute("disOnClickOutside") ? true : false;
       const did = this.getAttribute("did");
       let confirmFunc = "";
       let cancelFunc = "";
-      this.querySelectorAll("dweb-dialog-button").forEach(
-        (childNode, index) => {
-          var _a2, _b2, _c2, _d, _e;
-          const bid = (_a2 = childNode.getAttribute("bid")) != null ? _a2 : "";
-          if (childNode.hasAttribute("aria-label")) {
-            if (childNode.getAttribute("aria-label") === "confirm") {
-              promptConfig.confirmText = (_b2 = childNode.getAttribute("label")) != null ? _b2 : "";
-              confirmFunc = `document.querySelector('dweb-dialog-prompt[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
-            } else {
-              promptConfig.cancelText = (_c2 = childNode.getAttribute("label")) != null ? _c2 : "";
-              cancelFunc = `document.querySelector('dweb-dialog-prompt[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
-            }
+      this.querySelectorAll("dweb-dialog-button").forEach((childNode, index) => {
+        var _a2, _b2, _c2, _d, _e;
+        const bid = (_a2 = childNode.getAttribute("bid")) != null ? _a2 : "";
+        if (childNode.hasAttribute("aria-label")) {
+          if (childNode.getAttribute("aria-label") === "confirm") {
+            promptConfig.confirmText = (_b2 = childNode.getAttribute("label")) != null ? _b2 : "";
+            confirmFunc = `document.querySelector('dweb-dialog-prompt[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
           } else {
-            if (index === 0) {
-              promptConfig.confirmText = (_d = childNode.getAttribute("label")) != null ? _d : "";
-              confirmFunc = `document.querySelector('dweb-dialog-prompt[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
-            } else {
-              promptConfig.cancelText = (_e = childNode.getAttribute("label")) != null ? _e : "";
-              cancelFunc = `document.querySelector('dweb-dialog-prompt[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
-            }
+            promptConfig.cancelText = (_c2 = childNode.getAttribute("label")) != null ? _c2 : "";
+            cancelFunc = `document.querySelector('dweb-dialog-prompt[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+          }
+        } else {
+          if (index === 0) {
+            promptConfig.confirmText = (_d = childNode.getAttribute("label")) != null ? _d : "";
+            confirmFunc = `document.querySelector('dweb-dialog-prompt[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+          } else {
+            promptConfig.cancelText = (_e = childNode.getAttribute("label")) != null ? _e : "";
+            cancelFunc = `document.querySelector('dweb-dialog-prompt[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
           }
         }
-      );
+      });
       this._ffi.openPrompt(promptConfig, confirmFunc, cancelFunc);
       resolve2();
     });
@@ -920,35 +938,31 @@ class BfcsDialogConfirm extends BfcsDialogs {
       confirmConfig.title = (_a = this.getAttribute("title")) != null ? _a : "";
       confirmConfig.message = (_b = this.getAttribute("message")) != null ? _b : "";
       confirmConfig.dismissOnBackPress = this.hasAttribute("disOnBackPress") ? true : false;
-      confirmConfig.dismissOnClickOutside = this.hasAttribute(
-        "disOnClickOutside"
-      ) ? true : false;
+      confirmConfig.dismissOnClickOutside = this.hasAttribute("disOnClickOutside") ? true : false;
       const did = this.getAttribute("did");
       let confirmFunc = "";
       let cancelFunc = "";
-      this.querySelectorAll("dweb-dialog-button").forEach(
-        (childNode, index) => {
-          var _a2, _b2, _c, _d, _e;
-          const bid = (_a2 = childNode.getAttribute("bid")) != null ? _a2 : "";
-          if (childNode.hasAttribute("aria-label")) {
-            if (childNode.getAttribute("aria-label") === "confirm") {
-              confirmConfig.confirmText = (_b2 = childNode.getAttribute("label")) != null ? _b2 : "";
-              confirmFunc = `document.querySelector('dweb-dialog-confirm[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
-            } else {
-              confirmConfig.cancelText = (_c = childNode.getAttribute("label")) != null ? _c : "";
-              cancelFunc = `document.querySelector('dweb-dialog-confirm[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
-            }
+      this.querySelectorAll("dweb-dialog-button").forEach((childNode, index) => {
+        var _a2, _b2, _c, _d, _e;
+        const bid = (_a2 = childNode.getAttribute("bid")) != null ? _a2 : "";
+        if (childNode.hasAttribute("aria-label")) {
+          if (childNode.getAttribute("aria-label") === "confirm") {
+            confirmConfig.confirmText = (_b2 = childNode.getAttribute("label")) != null ? _b2 : "";
+            confirmFunc = `document.querySelector('dweb-dialog-confirm[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
           } else {
-            if (index === 0) {
-              confirmConfig.confirmText = (_d = childNode.getAttribute("label")) != null ? _d : "";
-              confirmFunc = `document.querySelector('dweb-dialog-confirm[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
-            } else {
-              confirmConfig.cancelText = (_e = childNode.getAttribute("label")) != null ? _e : "";
-              cancelFunc = `document.querySelector('dweb-dialog-confirm[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
-            }
+            confirmConfig.cancelText = (_c = childNode.getAttribute("label")) != null ? _c : "";
+            cancelFunc = `document.querySelector('dweb-dialog-confirm[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+          }
+        } else {
+          if (index === 0) {
+            confirmConfig.confirmText = (_d = childNode.getAttribute("label")) != null ? _d : "";
+            confirmFunc = `document.querySelector('dweb-dialog-confirm[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+          } else {
+            confirmConfig.cancelText = (_e = childNode.getAttribute("label")) != null ? _e : "";
+            cancelFunc = `document.querySelector('dweb-dialog-confirm[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
           }
         }
-      );
+      });
       this._ffi.openConfirm(confirmConfig, confirmFunc, cancelFunc);
       resolve2();
     });
@@ -997,35 +1011,31 @@ class BfcsDialogWarning extends BfcsDialogs {
       confirmConfig.title = (_a = this.getAttribute("title")) != null ? _a : "";
       confirmConfig.message = (_b = this.getAttribute("message")) != null ? _b : "";
       confirmConfig.dismissOnBackPress = this.hasAttribute("disOnBackPress") ? true : false;
-      confirmConfig.dismissOnClickOutside = this.hasAttribute(
-        "disOnClickOutside"
-      ) ? true : false;
+      confirmConfig.dismissOnClickOutside = this.hasAttribute("disOnClickOutside") ? true : false;
       const did = this.getAttribute("did");
       let confirmFunc = "";
       let cancelFunc = "";
-      this.querySelectorAll("dweb-dialog-button").forEach(
-        (childNode, index) => {
-          var _a2, _b2, _c, _d, _e;
-          const bid = (_a2 = childNode.getAttribute("bid")) != null ? _a2 : "";
-          if (childNode.hasAttribute("aria-label")) {
-            if (childNode.getAttribute("aria-label") === "confirm") {
-              confirmConfig.confirmText = (_b2 = childNode.getAttribute("label")) != null ? _b2 : "";
-              confirmFunc = `document.querySelector('dweb-dialog-warning[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
-            } else {
-              confirmConfig.cancelText = (_c = childNode.getAttribute("label")) != null ? _c : "";
-              cancelFunc = `document.querySelector('dweb-dialog-warning[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
-            }
+      this.querySelectorAll("dweb-dialog-button").forEach((childNode, index) => {
+        var _a2, _b2, _c, _d, _e;
+        const bid = (_a2 = childNode.getAttribute("bid")) != null ? _a2 : "";
+        if (childNode.hasAttribute("aria-label")) {
+          if (childNode.getAttribute("aria-label") === "confirm") {
+            confirmConfig.confirmText = (_b2 = childNode.getAttribute("label")) != null ? _b2 : "";
+            confirmFunc = `document.querySelector('dweb-dialog-warning[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
           } else {
-            if (index === 0) {
-              confirmConfig.confirmText = (_d = childNode.getAttribute("label")) != null ? _d : "";
-              confirmFunc = `document.querySelector('dweb-dialog-warning[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
-            } else {
-              confirmConfig.cancelText = (_e = childNode.getAttribute("label")) != null ? _e : "";
-              cancelFunc = `document.querySelector('dweb-dialog-warning[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
-            }
+            confirmConfig.cancelText = (_c = childNode.getAttribute("label")) != null ? _c : "";
+            cancelFunc = `document.querySelector('dweb-dialog-warning[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+          }
+        } else {
+          if (index === 0) {
+            confirmConfig.confirmText = (_d = childNode.getAttribute("label")) != null ? _d : "";
+            confirmFunc = `document.querySelector('dweb-dialog-warning[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+          } else {
+            confirmConfig.cancelText = (_e = childNode.getAttribute("label")) != null ? _e : "";
+            cancelFunc = `document.querySelector('dweb-dialog-warning[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
           }
         }
-      );
+      });
       this._ffi.openWarning(confirmConfig, confirmFunc, cancelFunc);
       resolve2();
     });
@@ -1083,10 +1093,7 @@ class StatusBarFFI {
       const stringColor = await netCallNative(NativeUI.GetStatusBarColor);
       colorHex = Number(stringColor);
     } else {
-      colorHex = getColorInt(
-        color.slice(0, -2),
-        color.slice(-2)
-      );
+      colorHex = getColorInt(color.slice(0, -2), color.slice(-2));
     }
     if (!barStyle) {
       let isDarkIcons = await netCallNative(NativeUI.GetStatusBarIsDark);
@@ -1202,10 +1209,7 @@ class BfcsStatusBar extends DwebPlugin {
       }
     } else if (attrName === "bar-style") {
       if (this.hasAttribute(attrName)) {
-        this.setStatusBarColor(
-          (_a = this.getAttribute("background-color")) != null ? _a : "",
-          newVal ? newVal : void 0
-        );
+        this.setStatusBarColor((_a = this.getAttribute("background-color")) != null ? _a : "", newVal ? newVal : void 0);
       }
     } else if (attrName === "background-color") {
       if (this.hasAttribute(attrName)) {
@@ -1217,121 +1221,76 @@ class BfcsStatusBar extends DwebPlugin {
 }
 customElements.define("dweb-status-bar", BfcsStatusBar);
 class TopBarFFI {
-  constructor() {
-    this._ffi = window.top_bar;
+  async topBarNavigationBack() {
+    await netCallNative(NativeUI.TopBarNavigationBack);
+    return;
   }
-  back() {
-    return new Promise((resolve2, reject) => {
-      this._ffi.back();
-      resolve2();
-    });
+  async getTopBarEnabled() {
+    const isEnabled = await netCallNative(NativeUI.GetTopBarEnabled);
+    return Boolean(isEnabled);
   }
-  getEnabled() {
-    return new Promise((resolve2, reject) => {
-      const isEnabled = this._ffi.getEnabled();
-      resolve2(isEnabled);
-    });
+  async setTopBarEnabled(isEnabled) {
+    await netCallNative(NativeUI.SetTopBarEnabled, isEnabled);
+    return;
   }
-  toggleEnabled() {
-    return new Promise((resolve2, reject) => {
-      this._ffi.toggleEnabled(0);
-      resolve2();
-    });
-  }
-  async setHidden() {
-    const isEnabled = await this.getEnabled();
+  async setTopBarHidden() {
+    const isEnabled = await this.getTopBarEnabled();
     if (isEnabled) {
-      this.toggleEnabled();
+      await this.setTopBarEnabled(false);
     }
     return;
   }
-  getOverlay() {
-    return new Promise((resolve2, reject) => {
-      const isOverlay = this._ffi.getOverlay();
-      resolve2(isOverlay);
-    });
+  async getTopBarOverlay() {
+    const isOverlay = await netCallNative(NativeUI.GetTopBarOverlay);
+    return Boolean(isOverlay);
   }
-  toggleOverlay() {
-    return new Promise((resolve2, reject) => {
-      this._ffi.toggleOverlay(String(0));
-      resolve2();
-    });
+  async setTopBarOverlay(alpha) {
+    await netCallNative(NativeUI.SetTopBarOverlay, alpha);
+    return;
   }
-  setOverlay(alpha) {
-    return new Promise((resolve2, reject) => {
-      this._ffi.toggleOverlay(String(alpha));
-      resolve2();
-    });
+  async getTopBarTitle() {
+    const title = await netCallNative(NativeUI.GetTopBarTitle);
+    return title.toString();
   }
-  getTitle() {
-    return new Promise((resolve2, reject) => {
-      const title = this._ffi.getTitle();
-      resolve2(title);
-    });
+  async setTopBarTitle(title) {
+    await netCallNative(NativeUI.SetTopBarTitle, title);
+    return;
   }
-  setTitle(title) {
-    return new Promise((resolve2, reject) => {
-      this._ffi.setTitle(title);
-      resolve2();
-    });
+  async hasTopBarTitle() {
+    const has2 = await netCallNative(NativeUI.HasTopBarTitle);
+    return Boolean(has2);
   }
-  hasTitle() {
-    return new Promise((resolve2, reject) => {
-      const hasTitle = this._ffi.hasTitle();
-      resolve2(hasTitle);
-    });
+  async getTopBarHeight() {
+    const height = await netCallNative(NativeUI.GetTopBarHeight);
+    return Number(height);
   }
-  getHeight() {
-    return new Promise((resolve2, reject) => {
-      const height = this._ffi.getHeight();
-      resolve2(height);
-    });
+  async getTopBarActions() {
+    const actionList = await netCallNative(NativeUI.GetTopBarActions);
+    return JSON.parse(actionList);
   }
-  getActions() {
-    return new Promise((resolve2, reject) => {
-      const actionList = JSON.parse(this._ffi.getActions());
-      resolve2(actionList);
-    });
+  async setTopBarActions(actionList) {
+    await netCallNative(NativeUI.SetTopBarActions, JSON.stringify(actionList));
+    return;
   }
-  setActions(actionList) {
-    return new Promise((resolve2, reject) => {
-      this._ffi.setActions(JSON.stringify(actionList));
-      resolve2();
-    });
+  async getTopBarBackgroundColor() {
+    const stringColor = await netCallNative(NativeUI.GetTopBarBackgroundColor);
+    const colorHex = getColorHex(parseFloat(stringColor));
+    return colorHex;
   }
-  getBackgroundColor() {
-    return new Promise((resolve2, reject) => {
-      const color = this._ffi.getBackgroundColor();
-      const colorHex = getColorHex(color);
-      resolve2(colorHex);
-    });
+  async setTopBarBackgroundColor(color) {
+    const colorHex = hexToIntColor(color);
+    await netCallNative(NativeUI.SetTopBarBackgroundColor, colorHex);
+    return;
   }
-  setBackgroundColor(color) {
-    return new Promise(async (resolve2, reject) => {
-      const colorHex = getColorInt(
-        color.slice(0, -2),
-        color.slice(-2)
-      );
-      this._ffi.setBackgroundColor(colorHex);
-      resolve2();
-    });
+  async getTopBarForegroundColor() {
+    const stringColor = await netCallNative(NativeUI.GetTopBarForegroundColor);
+    const colorHex = getColorHex(parseFloat(stringColor));
+    return colorHex;
   }
-  getForegroundColor() {
-    return new Promise((resolve2, reject) => {
-      const color = this._ffi.getForegroundColor();
-      const colorHex = getColorHex(color);
-      resolve2(colorHex);
-    });
-  }
-  setForegroundColor(color) {
-    return new Promise((resolve2, reject) => {
-      const colorHex = getColorInt(
-        color.slice(0, -2),
-        color.slice(-2)
-      );
-      this._ffi.setForegroundColor(colorHex);
-      resolve2();
-    });
+  async setTopBarForegroundColor(color) {
+    const colorHex = hexToIntColor(color);
+    await netCallNative(NativeUI.SetTopBarForegroundColor, colorHex);
+    return;
   }
 }
 class BfcsTopBar extends DwebPlugin {
@@ -1340,7 +1299,6 @@ class BfcsTopBar extends DwebPlugin {
     this._actionList = [];
     this._ffi = new TopBarFFI();
     this._observer = new MutationObserver(async (mutations) => {
-      await this.collectActions();
     });
   }
   connectedCallback() {
@@ -1348,7 +1306,14 @@ class BfcsTopBar extends DwebPlugin {
       subtree: true,
       childList: true,
       attributes: true,
-      attributeFilter: ["disabled", "type", "description", "size", "source", "height"]
+      attributeFilter: [
+        "disabled",
+        "type",
+        "description",
+        "size",
+        "source",
+        "height"
+      ]
     });
     this._init();
   }
@@ -1356,69 +1321,69 @@ class BfcsTopBar extends DwebPlugin {
     this._observer.disconnect();
   }
   async _init() {
-    const height = await this.getHeight();
+    const height = await this.getTopBarHeight();
     this.setAttribute("height", `${height}`);
   }
-  async back() {
-    await this._ffi.back();
+  async topBarNavigationBack() {
+    await this._ffi.topBarNavigationBack();
     return;
   }
-  async toggleEnabled() {
-    await this._ffi.toggleEnabled();
+  async setTopBarEnabled(isEnabled) {
+    await this._ffi.setTopBarEnabled(isEnabled);
     return;
   }
-  async getEnabled() {
-    const isEnabled = await this._ffi.getEnabled();
+  async getTopBarEnabled() {
+    const isEnabled = await this._ffi.getTopBarEnabled();
     return isEnabled;
   }
-  async getTitle() {
-    const title = await this._ffi.getTitle();
+  async getTopBarTitle() {
+    const title = await this._ffi.getTopBarTitle();
     return title;
   }
-  async setTitle(title) {
-    await this._ffi.setTitle(title);
+  async setTopBarTitle(title) {
+    await this._ffi.setTopBarTitle(title);
     return;
   }
-  async hasTitle() {
-    const has2 = await this._ffi.hasTitle();
+  async hasTopBarTitle() {
+    const has2 = await this._ffi.hasTopBarTitle();
     return has2;
   }
-  async getOverlay() {
-    const overlay = await this._ffi.getOverlay();
+  async getTopBarOverlay() {
+    const overlay = await this._ffi.getTopBarOverlay();
     return overlay;
   }
-  async toggleOverlay() {
-    await this._ffi.toggleOverlay();
+  async setTopBarOverlay(alpha) {
+    await this._ffi.setTopBarOverlay(alpha);
     return;
   }
-  async getHeight() {
-    const height = await this._ffi.getHeight();
+  async getTopBarHeight() {
+    const height = await this._ffi.getTopBarHeight();
     return height;
   }
-  async getBackgroundColor() {
-    const color = await this._ffi.getBackgroundColor();
+  async getTopBarBackgroundColor() {
+    const color = await this._ffi.getTopBarBackgroundColor();
     return color;
   }
-  async setBackgroundColor(color) {
+  async setTopBarBackgroundColor(color) {
     const colorHex = convertToRGBAHex(color);
-    await this._ffi.setBackgroundColor(colorHex);
+    await this._ffi.setTopBarBackgroundColor(colorHex);
     return;
   }
-  async getForegroundColor() {
-    const color = await this._ffi.getForegroundColor();
+  async getTopBarForegroundColor() {
+    const color = await this._ffi.getTopBarForegroundColor();
     return color;
   }
-  async setForegroundColor(color) {
+  async setTopBarForegroundColor(color) {
     const colorHex = convertToRGBAHex(color);
-    await this._ffi.setForegroundColor(colorHex);
+    await this._ffi.setTopBarForegroundColor(colorHex);
     return;
   }
-  async getActions() {
-    this._actionList = await this._ffi.getActions();
+  async getTopBarActions() {
+    this._actionList = await this._ffi.getTopBarActions();
     return this._actionList;
   }
-  async setActions() {
-    await this._ffi.setActions(this._actionList);
+  async setTopBarActions() {
+    await this._ffi.setTopBarActions(this._actionList);
     return;
   }
   async collectActions() {
@@ -1441,7 +1406,7 @@ class BfcsTopBar extends DwebPlugin {
       const disabled = childNode.hasAttribute("disabled") ? true : false;
       this._actionList.push({ icon, onClickCode, disabled });
     });
-    await this.setActions();
+    await this.setTopBarActions();
   }
   static get observedAttributes() {
     return [
@@ -1457,18 +1422,18 @@ class BfcsTopBar extends DwebPlugin {
       return;
     }
     if (attrName === "title") {
-      await this.setTitle(newVal);
+      await this.setTopBarTitle(newVal);
     } else if (attrName === "background-color") {
-      await this.setBackgroundColor(newVal);
+      await this.setTopBarBackgroundColor(newVal);
     } else if (attrName === "foreground-color") {
-      await this.setForegroundColor(newVal);
+      await this.setTopBarForegroundColor(newVal);
     } else if (attrName === "overlay") {
       if (this.hasAttribute(attrName)) {
-        await this._ffi.setOverlay(newVal);
+        await this._ffi.setTopBarOverlay(newVal);
       }
     } else if (attrName === "hidden") {
       if (this.hasAttribute(attrName)) {
-        await this._ffi.setHidden();
+        await this._ffi.setTopBarHidden();
       }
     }
   }
@@ -31892,9 +31857,9 @@ const cartOutline = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/
 const logoFacebook = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' class='ionicon' viewBox='0 0 512 512'><title>Logo Facebook</title><path d='M480 257.35c0-123.7-100.3-224-224-224s-224 100.3-224 224c0 111.8 81.9 204.47 189 221.29V322.12h-56.89v-64.77H221V208c0-56.13 33.45-87.16 84.61-87.16 24.51 0 50.15 4.38 50.15 4.38v55.13H327.5c-27.81 0-36.51 17.26-36.51 35v42h62.12l-9.92 64.77H291v156.54c107.1-16.81 189-109.48 189-221.31z' fill-rule='evenodd'/></svg>";
 const logoTwitter = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' class='ionicon' viewBox='0 0 512 512'><title>Logo Twitter</title><path d='M496 109.5a201.8 201.8 0 01-56.55 15.3 97.51 97.51 0 0043.33-53.6 197.74 197.74 0 01-62.56 23.5A99.14 99.14 0 00348.31 64c-54.42 0-98.46 43.4-98.46 96.9a93.21 93.21 0 002.54 22.1 280.7 280.7 0 01-203-101.3A95.69 95.69 0 0036 130.4c0 33.6 17.53 63.3 44 80.7A97.5 97.5 0 0135.22 199v1.2c0 47 34 86.1 79 95a100.76 100.76 0 01-25.94 3.4 94.38 94.38 0 01-18.51-1.8c12.51 38.5 48.92 66.5 92.05 67.3A199.59 199.59 0 0139.5 405.6a203 203 0 01-23.5-1.4A278.68 278.68 0 00166.74 448c181.36 0 280.44-147.7 280.44-275.8 0-4.2-.11-8.4-.31-12.5A198.48 198.48 0 00496 109.5z'/></svg>";
 const logoVimeo = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' class='ionicon' viewBox='0 0 512 512'><title>Logo Vimeo</title><path d='M476.9 114c-5-23.39-17.51-38.78-40.61-46.27s-64.92-4.5-94.12 16.79c-26.79 19.51-46.26 54.42-54 78.28a4 4 0 005.13 5c10.77-3.8 21.72-7.1 34-6.45 15 .8 24.51 12 24.91 25.29.3 9.79-.2 18.69-3.6 27.68-10.74 28.68-27.61 56.46-47.55 80.75a72.49 72.49 0 01-10 9.89c-10.21 8.29-18.81 6.1-25.41-5.2-5.4-9.29-9-18.88-12.2-29.08-12.4-39.67-16.81-80.84-23.81-121.52-3.3-19.48-7-39.77-18-56.86-11.6-17.79-28.61-24.58-50-22-14.7 1.8-36.91 17.49-47.81 26.39 0 0-56 46.87-81.82 71.35l21.2 27s17.91-12.49 27.51-18.29c5.7-3.39 12.4-4.09 17.2.2 4.51 3.9 9.61 9 12.31 14.1 5.7 10.69 11.2 21.88 14.7 33.37 13.2 44.27 25.51 88.64 37.81 133.22 6.3 22.78 13.9 44.17 28 63.55 19.31 26.59 39.61 32.68 70.92 21.49 25.41-9.09 46.61-26.18 66-43.87 33.11-30.18 59.12-65.36 85.52-101.14 20.41-27.67 37.31-55.67 51.41-86.95C478.5 179.74 484 147.26 476.9 114z'/></svg>";
-const _withScopeId = (n) => (pushScopeId("data-v-5fd6b7c6"), n = n(), popScopeId(), n);
+const _withScopeId = (n) => (pushScopeId("data-v-61be0c26"), n = n(), popScopeId(), n);
 const _hoisted_1 = /* @__PURE__ */ _withScopeId(() => /* @__PURE__ */ createBaseVNode("div", { class: "topbar" }, null, -1));
-const _hoisted_2 = /* @__PURE__ */ createStaticVNode('<div data-v-5fd6b7c6><a href="https://vuejs.org/" target="_blank" data-v-5fd6b7c6><img src="' + _imports_0 + '" class="logo vue" alt="Vue logo" data-v-5fd6b7c6></a><a href="https://vuejs.org/" target="_blank" data-v-5fd6b7c6><img src="' + _imports_0 + '" class="logo vue" alt="Vue logo" data-v-5fd6b7c6></a><a href="https://vuejs.org/" target="_blank" data-v-5fd6b7c6><img src="' + _imports_0 + '" class="logo vue" alt="Vue logo" data-v-5fd6b7c6></a></div>', 1);
+const _hoisted_2 = /* @__PURE__ */ createStaticVNode('<div data-v-61be0c26><a href="https://vuejs.org/" target="_blank" data-v-61be0c26><img src="' + _imports_0 + '" class="logo vue" alt="Vue logo" data-v-61be0c26></a><a href="https://vuejs.org/" target="_blank" data-v-61be0c26><img src="' + _imports_0 + '" class="logo vue" alt="Vue logo" data-v-61be0c26></a><a href="https://vuejs.org/" target="_blank" data-v-61be0c26><img src="' + _imports_0 + '" class="logo vue" alt="Vue logo" data-v-61be0c26></a></div>', 1);
 const _hoisted_3 = /* @__PURE__ */ _withScopeId(() => /* @__PURE__ */ createBaseVNode("div", { class: "bottombar" }, null, -1));
 const _sfc_main = /* @__PURE__ */ defineComponent({
   __name: "App",
@@ -31908,9 +31873,6 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
       const iter = await scanner.openScanner();
       console.log("scannerData.value = await scanner.openScanner() -->", JSON.stringify(iter));
       scannerData.value = iter;
-    }
-    function handerTopBar() {
-      console.log("\u6211\u662Ftopbar icon\u6211\u88AB\u70B9\u51FB\u4E86");
     }
     function pop() {
       console.log("\u5192\u6CE1");
@@ -31931,8 +31893,6 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
       }
     }
     return (_ctx, _cache) => {
-      const _component_dweb_icon = resolveComponent("dweb-icon");
-      const _component_dweb_top_bar_button = resolveComponent("dweb-top-bar-button");
       const _component_dweb_top_bar = resolveComponent("dweb-top-bar");
       const _component_Icon = resolveComponent("Icon");
       const _component_dweb_bottom_bar_icon = resolveComponent("dweb-bottom-bar-icon");
@@ -31984,32 +31944,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         }),
         createVNode(_component_dweb_top_bar, {
           id: "topbar",
-          title: "Ar \u626B\u96F7",
-          "background-color": "#eeee",
-          "foreground-color": "#000",
-          overlay: "0.4"
-        }, {
-          default: withCtx(() => [
-            createVNode(_component_dweb_top_bar_button, {
-              id: "aaa",
-              onClick: handerTopBar
-            }, {
-              default: withCtx(() => [
-                createVNode(_component_dweb_icon, { source: "Filled.AddCircle" })
-              ]),
-              _: 1
-            }),
-            createVNode(_component_dweb_top_bar_button, { id: "ccc" }, {
-              default: withCtx(() => [
-                createVNode(_component_dweb_icon, {
-                  source: "https://objectjson.waterbang.top/test-vue3/vite.svg",
-                  type: "AssetIcon"
-                })
-              ]),
-              _: 1
-            })
-          ]),
-          _: 1
+          title: "A"
         }),
         createVNode(HelloWorld, { msg: unref(scannerData) }, null, 8, ["msg"]),
         _hoisted_2,
@@ -32082,8 +32017,8 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
     };
   }
 });
-const App_vue_vue_type_style_index_0_scoped_5fd6b7c6_lang = "";
-const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["__scopeId", "data-v-5fd6b7c6"]]);
+const App_vue_vue_type_style_index_0_scoped_61be0c26_lang = "";
+const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["__scopeId", "data-v-61be0c26"]]);
 const createLocationHistory = () => {
   const locationHistory = [];
   const tabsHistory = {};

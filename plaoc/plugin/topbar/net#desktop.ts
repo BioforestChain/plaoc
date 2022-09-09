@@ -10,9 +10,9 @@ export class TopBarFFI implements TopBar.ITopBarFFI {
   private _ffi: TopBar.TopBarDesktopFFI;
 
   constructor() {
-    this._ffi = (document.querySelector(
+    this._ffi = document.querySelector(
       "dweb-communication"
-    ) as unknown) as TopBar.TopBarDesktopFFI;
+    ) as unknown as TopBar.TopBarDesktopFFI;
   }
 
   back(): Promise<void> {
