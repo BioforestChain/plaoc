@@ -36,17 +36,15 @@ export class BfcsStatusBar extends DwebPlugin {
 
   async getStatusBarColor(): Promise<Color.RGBAHex> {
     const colorHex = await this._ffi.getStatusBarColor();
-
     return colorHex;
   }
 
   async getStatusBarVisible(): Promise<boolean> {
     const isVisible = await this._ffi.getStatusBarVisible();
-
     return isVisible;
   }
 
-  async toggleStatusBarVisible(isVer: boolean = true): Promise<boolean> {
+  async setStatusBarVisible(isVer: boolean = true): Promise<boolean> {
     return await this._ffi.setStatusBarVisible(isVer);
   }
 
@@ -57,7 +55,8 @@ export class BfcsStatusBar extends DwebPlugin {
   }
 
   async setStatusBarOverlay(isOver: boolean = false): Promise<boolean> {
-    return await this._ffi.setStatusBarOverlay(isOver);
+    const overlay = await this._ffi.setStatusBarOverlay(isOver);
+    return overlay
   }
 
   async getStatusBarIsDark(): Promise<StatusBar.StatusBarStyle> {
