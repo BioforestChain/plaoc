@@ -1118,9 +1118,7 @@ class StatusBarFFI {
   }
   async getStatusBarColor() {
     const stringColor = await netCallNative(NativeUI.GetStatusBarColor);
-    console.log("getStatusBarColor:", stringColor, parseFloat(stringColor));
     const colorHex = getColorHex(parseFloat(stringColor));
-    console.log("getStatusBarColor:", colorHex);
     return colorHex;
   }
   async getStatusBarVisible() {
@@ -1185,7 +1183,7 @@ class BfcsStatusBar extends DwebPlugin {
     const isVisible = await this._ffi.getStatusBarVisible();
     return isVisible;
   }
-  async toggleStatusBarVisible(isVer = true) {
+  async setStatusBarVisible(isVer = true) {
     return await this._ffi.setStatusBarVisible(isVer);
   }
   async getStatusBarOverlay() {
@@ -1193,7 +1191,9 @@ class BfcsStatusBar extends DwebPlugin {
     return overlay;
   }
   async setStatusBarOverlay(isOver = false) {
-    return await this._ffi.setStatusBarOverlay(isOver);
+    const overlay = await this._ffi.setStatusBarOverlay(isOver);
+    console.log("setStatusBarOverlay:", overlay);
+    return overlay;
   }
   async getStatusBarIsDark() {
     const barStyle = await this._ffi.getStatusBarIsDark();

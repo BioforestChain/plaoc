@@ -39,19 +39,17 @@ class SystemUiFFI(
     }
 
     /**第一个参数是颜色HEX。第二个是图标是否更期望于使用深色*/
-    fun setStatusBarColor(
-        colorHex: ColorInt,
-        darkIcons: Boolean,
-    ) {
+    fun setStatusBarColor( colorHex: ColorInt, darkIcons: Boolean):Boolean {
         systemUIState.statusBar.apply {
             color.value = Color(colorHex)
             isDarkIcons.value = darkIcons
         }
+      return true
     }
   /** 获取状态栏背景颜色色*/
   fun getStatusBarColor(): ColorInt {
-    val colorInt = android.graphics.Color.argb(systemUIState.statusBar.color.value.alpha, systemUIState.statusBar.color.value.red, systemUIState.statusBar.color.value.green, systemUIState.statusBar.color.value.blue);
-    Log.i("xxxx","systemUIState.statusBar.color.value:${systemUIState.statusBar.color.value}")
+    val color = systemUIState.statusBar.color.value;
+    val colorInt = android.graphics.Color.argb(color.alpha, color.red, color.green, color.blue);
     return colorInt
   }
     /** 获取状态栏是否更期望使用深色*/
@@ -63,17 +61,19 @@ class SystemUiFFI(
         return systemUIState.statusBar.visible.value
     }
     /** 设置false为透明*/
-    fun setStatusBarVisible(visible: String) {
+    fun setStatusBarVisible(visible: String):Boolean {
         systemUIState.statusBar.visible.value = visible.toBoolean()
+      return visible.toBoolean()
     }
    /**获取状态栏是否透明的状态*/
     fun getStatusBarOverlay(): Boolean {
         return systemUIState.statusBar.overlay.value
     }
     /**设置状态栏是否透明*/
-    fun setStatusBarOverlay(isOverlay: String) {
+    fun setStatusBarOverlay(isOverlay: String):Boolean {
         systemUIState.statusBar.overlay.value = isOverlay.toBoolean()
 //        Log.i(TAG, "isOverlayStatusBar.value:${systemUIState.statusBar.overlay.value}")
+      return true
     }
 
   /**设置系统导航栏颜色*/
@@ -104,9 +104,10 @@ class SystemUiFFI(
         return systemUIState.navigationBar.overlay.value
     }
   /**设置系统导航栏是否透明*/
-    fun setNavigationBarOverlay(isOverlay: String) {
+    fun setNavigationBarOverlay(isOverlay: String):Boolean {
         systemUIState.navigationBar.overlay.value =
             isOverlay.toBoolean()
+    return isOverlay.toBoolean()
     }
 
 

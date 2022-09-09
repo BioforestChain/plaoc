@@ -75,7 +75,6 @@ export class StatusBarFFI implements StatusBar.IStatusBarFFI {
 
   async setStatusBarOverlay(isOverlay: boolean): Promise<boolean> {
     const isOver = await netCallNative(NativeUI.SetStatusBarOverlay, isOverlay)
-    console.log("setStatusBarOverlay:", isOver)
     return Boolean(isOver);
   }
 
