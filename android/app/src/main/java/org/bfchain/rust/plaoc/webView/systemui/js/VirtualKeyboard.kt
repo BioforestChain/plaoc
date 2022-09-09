@@ -113,44 +113,40 @@ class VirtualKeyboardFFI(
 
         }
     }
-
-    @JavascriptInterface
+    /**获取安全区域*/
     fun getSafeArea(): DataString<KeyboardSafeArea> {
         return DataString_From(preKeyboardSafeArea)
     }
 
-    @JavascriptInterface
     fun getHeight(): Float {
         return virtualKeyboardHeight
     }
 
-    @JavascriptInterface
     fun getOverlay(): Boolean {
         return overlay.value
     }
-
-    @JavascriptInterface
-    fun toggleOverlay(isOverlay: BoolInt): Boolean {
-        overlay.value = isOverlay.toBoolean { !overlay.value }
-        Log.i(TAG, "toggleOverlay:${overlay.value}")
+     /**设置是否覆盖内容*/
+    fun setOverlay(isOverlay: String): Boolean {
+        overlay.value = isOverlay.toBoolean()
+        Log.i(TAG, "toggleOverlay:${isOverlay}")
         return overlay.value
     }
 
     private val imm by lazy { activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager }
 
-    @JavascriptInterface
-    fun show() {
+    fun show():Boolean {
         activity.runOnUiThread {
             if (view.requestFocus()) {
                 imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
             }
         }
+      return true;
     }
 
-    @JavascriptInterface
-    fun hide() {
+    fun hide():Boolean {
         activity.runOnUiThread {
             imm.hideSoftInputFromWindow(view.windowToken, 0)
         }
+      return true;
     }
 }

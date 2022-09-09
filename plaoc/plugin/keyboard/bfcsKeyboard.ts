@@ -1,4 +1,4 @@
-import { VirtualKeyboardFFI } from "./ffi";
+import { VirtualKeyboardFFI } from "./net";
 import { Keyboard } from "./bfcsKeyboard.type";
 import { DwebPlugin } from '../native/dweb-plugin';
 
@@ -20,42 +20,35 @@ export class BfcsKeyboard extends DwebPlugin {
   private async _init() {
     this.setAttribute("hidden", "true");
   }
-
+  /**获取键盘安全区域 */
   async getKeyboardSafeArea(): Promise<Keyboard.IKeyboardSafeArea> {
     const safeArea = await this._ffi.getKeyboardSafeArea();
-
     return safeArea;
   }
-
+  /**获取键盘高度 */
   async getKeyboardHeight(): Promise<number> {
     const height = await this._ffi.getKeyboardHeight();
-
     return height;
   }
-
+  /**获取键盘是否覆盖了内容 */
   async getKeyboardOverlay(): Promise<boolean> {
     const overlay = await this._ffi.getKeyboardOverlay();
-
     return overlay;
   }
-
-  async toggleKeyboardOverlay(): Promise<void> {
+  /**获取键盘高度 */
+  async setKeyboardOverlay(): Promise<void> {
     await this._ffi.toggleKeyboardOverlay();
-
     return;
   }
-
-  async showKeyboard(): Promise<void> {
+  /**显示键盘 */
+  async showKeyboard(): Promise<boolean> {
     this.setAttribute("hidden", "false");
-    await this._ffi.showKeyboard();
-    return;
+    return await this._ffi.showKeyboard();
   }
-
-  async hideKeyboard(): Promise<void> {
+  /**隐藏键盘 */
+  async hideKeyboard(): Promise<boolean> {
     this.setAttribute("hidden", "true");
-    await this._ffi.hideKeyboard();
-
-    return;
+    return await this._ffi.hideKeyboard();
   }
 
   /**

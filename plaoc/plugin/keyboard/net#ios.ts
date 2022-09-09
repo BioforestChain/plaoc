@@ -30,25 +30,25 @@ export class VirtualKeyboardFFI implements Keyboard.IVirtualKeyboardFFI {
     return;
   }
 
-  setKeyboardOverlay(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
+  setKeyboardOverlay(): Promise<boolean> {
+    return new Promise<boolean>((resolve, reject) => {
       this._ffi.setKeyboardOverlay.postMessage("1");
 
-      resolve();
+      resolve(true);
     });
   }
 
-  showKeyboard(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
+  showKeyboard(): Promise<boolean> {
+    return new Promise((resolve, reject) => {
       return;
     });
   }
 
-  hideKeyboard(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
+  hideKeyboard(): Promise<boolean> {
+    return new Promise((resolve, reject) => {
       this._ffi.hideKeyboard.postMessage(null);
 
-      resolve();
+      resolve(true);
     });
   }
 }

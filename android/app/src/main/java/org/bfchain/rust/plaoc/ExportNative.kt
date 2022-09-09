@@ -24,4 +24,12 @@ enum class ExportNativeUi(val type: String) {
   SetStatusBarVisible("setStatusBarVisible"),
   GetStatusBarOverlay("getStatusBarOverlay"),
   SetStatusBarOverlay("setStatusBarOverlay"),
+  // keyboard
+  GetSafeArea("getSafeArea"),
+  GetHeight("getHeight"),
+  GetOverlay("getOverlay"),
+  SetOverlay("setOverlay"),
+  Show("show"),
+  Hide("hide"),
+
 }

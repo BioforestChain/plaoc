@@ -19,5 +19,12 @@ export enum NativeUI {
   GetStatusBarVisible = "GetStatusBarVisible",
   GetStatusBarOverlay = "GetStatusBarOverlay",
   SetStatusBarOverlay = "SetStatusBarOverlay",
-  SetStatusBarVisible = "SetStatusBarVisible"
+  SetStatusBarVisible = "SetStatusBarVisible",
+  // keyboard
+  GetSafeArea = "GetSafeArea",
+  GetHeight = "GetHeight",
+  GetOverlay = "GetOverlay",
+  SetOverlay = "SetOverlay",
+  Show = "Show",
+  Hide = "Hide"
 }
