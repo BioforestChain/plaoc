@@ -30,12 +30,15 @@ fun initUiFn(systemUiFFI:SystemUiFFI) {
     systemUiFFI.setNavigationBarOverlay(it)
   }
   /**Status Bar*/
+  call_ui_map[ExportNativeUi.GetStatusBarColor] = {
+    systemUiFFI.getStatusBarColor()
+  }
   call_ui_map[ExportNativeUi.SetStatusBarColor] = {
     val color = mapper.readValue(it, NavigationBarColor::class.java)
     systemUiFFI.setStatusBarColor(color.colorHex,color.darkIcons)
   }
-  call_ui_map[ExportNativeUi.GetStatusBarStyle] = {
-    systemUiFFI.getStatusBarStyle()
+  call_ui_map[ExportNativeUi.GetStatusBarIsDark] = {
+    systemUiFFI.getStatusBarIsDark()
   }
   call_ui_map[ExportNativeUi.SetStatusBarOverlay] = {
     systemUiFFI.setStatusBarOverlay(it)
@@ -45,6 +48,9 @@ fun initUiFn(systemUiFFI:SystemUiFFI) {
   }
   call_ui_map[ExportNativeUi.SetStatusBarVisible] = {
     systemUiFFI.setStatusBarVisible(it)
+  }
+  call_ui_map[ExportNativeUi.GetStatusBarVisible] = {
+    systemUiFFI.getStatusBarVisible()
   }
 }
 

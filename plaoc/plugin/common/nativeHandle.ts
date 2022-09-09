@@ -3,6 +3,8 @@ export enum NativeHandle {
 }
 
 
+
+
 export enum NativeUI {
   // Navigation
   SetNavigationBarVisible = "SetNavigationBarVisible",
@@ -12,7 +14,10 @@ export enum NativeUI {
   GetNavigationBarOverlay = "GetNavigationBarOverlay",
   // Status Bar
   SetStatusBarColor = "SetStatusBarColor",
-  GetStatusBarStyle = "GetStatusBarStyle",
+  GetStatusBarColor = "GetStatusBarColor",
+  GetStatusBarIsDark = "GetStatusBarIsDark",
   GetStatusBarVisible = "GetStatusBarVisible",
   GetStatusBarOverlay = "GetStatusBarOverlay",
+  SetStatusBarOverlay = "SetStatusBarOverlay",
+  SetStatusBarVisible = "SetStatusBarVisible"
 }

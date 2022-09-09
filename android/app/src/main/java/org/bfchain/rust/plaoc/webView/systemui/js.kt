@@ -6,6 +6,7 @@ import android.webkit.JavascriptInterface
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.graphics.toArgb
 import androidx.core.graphics.Insets
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -47,8 +48,14 @@ class SystemUiFFI(
             isDarkIcons.value = darkIcons
         }
     }
+  /** 获取状态栏背景颜色色*/
+  fun getStatusBarColor(): ColorInt {
+    val colorInt = android.graphics.Color.argb(systemUIState.statusBar.color.value.alpha, systemUIState.statusBar.color.value.red, systemUIState.statusBar.color.value.green, systemUIState.statusBar.color.value.blue);
+    Log.i("xxxx","systemUIState.statusBar.color.value:${systemUIState.statusBar.color.value}")
+    return colorInt
+  }
     /** 获取状态栏是否更期望使用深色*/
-    fun getStatusBarStyle(): Boolean {
+    fun getStatusBarIsDark(): Boolean {
       return systemUIState.statusBar.isDarkIcons.value?: (systemUIState.statusBar.color.value.luminance() > 0.5F)
     }
     /** 查看状态栏是否可见*/

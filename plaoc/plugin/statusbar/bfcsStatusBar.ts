@@ -1,6 +1,6 @@
 import { convertToRGBAHex } from "./../util";
 import { DwebPlugin } from "../native/dweb-plugin";
-import { StatusBarFFI } from "./ffi";
+import { StatusBarFFI } from "./net";
 import { StatusBar } from "./bfcsStatusBar.type";
 import "../typings";
 import { Color } from "../typings/types/color.type";
@@ -20,9 +20,8 @@ export class BfcsStatusBar extends DwebPlugin {
   disconnectedCallback() { }
 
   private async _init() {
-    // const colorHex = await this.getStatusBarColor();
     // this.setAttribute("background-color", colorHex);
-    const barStyle = await this.getStatusBarStyle();
+    const barStyle = await this.getStatusBarIsDark();
     this.setAttribute("bar-style", barStyle);
   }
 
@@ -32,7 +31,6 @@ export class BfcsStatusBar extends DwebPlugin {
   ): Promise<void> {
     const colorHex = convertToRGBAHex(color ?? "");
     await this._ffi.setStatusBarColor(colorHex, barStyle);
-
     return;
   }
 
@@ -48,10 +46,8 @@ export class BfcsStatusBar extends DwebPlugin {
     return isVisible;
   }
 
-  async toggleStatusBarVisible(): Promise<void> {
-    await this._ffi.toggleStatusBarVisible();
-
-    return;
+  async toggleStatusBarVisible(isVer: boolean = true): Promise<boolean> {
+    return await this._ffi.setStatusBarVisible(isVer);
   }
 
   async getStatusBarOverlay(): Promise<boolean> {
@@ -60,14 +56,12 @@ export class BfcsStatusBar extends DwebPlugin {
     return overlay;
   }
 
-  async toggleStatusBarOverlay(): Promise<void> {
-    await this._ffi.toggleStatusBarOverlay();
-
-    return;
+  async setStatusBarOverlay(isOver: boolean = false): Promise<boolean> {
+    return await this._ffi.setStatusBarOverlay(isOver);
   }
 
-  async getStatusBarStyle(): Promise<StatusBar.StatusBarStyle> {
-    const barStyle = await this._ffi.getStatusBarStyle();
+  async getStatusBarIsDark(): Promise<StatusBar.StatusBarStyle> {
+    const barStyle = await this._ffi.getStatusBarIsDark();
 
     return barStyle;
   }
@@ -80,7 +74,7 @@ export class BfcsStatusBar extends DwebPlugin {
   attributeChangedCallback(attrName: string, oldVal: unknown, newVal: unknown) {
     if (attrName === "overlay") {
       if (this.hasAttribute(attrName)) {
-        this._ffi.setStatusBarOverlay();
+        this._ffi.setStatusBarOverlay(true);
       }
     } else if (attrName === "hidden") {
       if (this.hasAttribute(attrName)) {

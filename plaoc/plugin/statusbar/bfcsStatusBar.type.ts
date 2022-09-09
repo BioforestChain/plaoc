@@ -43,6 +43,7 @@ export namespace StatusBar {
 
   // desktop-dev端ffi
   export interface StatusBarDesktopFFI {
+    getStatusBarIsDark(): unknown;
     setStatusbarBackgroundColor(
       scopedValue: Color.ColorFormatType | undefined,
       globalValue?: Color.ColorFormatType
@@ -51,12 +52,12 @@ export namespace StatusBar {
     setStatusbarOverlay(
       scopedValue: boolean | undefined,
       globalValue?: boolean
-    ): Promise<void>;
+    ): Promise<boolean>;
     getStatusbarOverlay(): Promise<boolean>;
     setStatusbarHidden(
       scopedValue: boolean | undefined,
       globalValue?: boolean
-    ): Promise<void>;
+    ): Promise<boolean>;
     getStatusbarHidden(): Promise<boolean>;
     setStatusbarStyle(
       scopedValue: StatusBarStyle | undefined,
@@ -73,12 +74,11 @@ export namespace StatusBar {
     ): Promise<void>;
     getStatusBarColor(): Promise<Color.RGBAHex>;
     getStatusBarVisible(): Promise<boolean>;
-    toggleStatusBarVisible(): Promise<void>;
-    setStatusBarHidden(): Promise<void>;
+    setStatusBarVisible(isVer: boolean): Promise<boolean>;
+    setStatusBarHidden(): Promise<boolean>;
     getStatusBarOverlay(): Promise<boolean>;
-    toggleStatusBarOverlay(): Promise<void>;
-    setStatusBarOverlay(): Promise<void>;
-    getStatusBarStyle(): Promise<StatusBarStyle>;
+    setStatusBarOverlay(isOver: boolean): Promise<boolean>;
+    getStatusBarIsDark(): Promise<StatusBarStyle>;
   }
 
   // default:	默认的样式（IOS 为白底黑字、Android 为黑底白字、Desktop-dev同Android）

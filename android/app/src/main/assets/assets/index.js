@@ -125,6 +125,15 @@ var NativeUI = /* @__PURE__ */ ((NativeUI2) => {
   NativeUI2["SetNavigationBarVisible"] = "SetNavigationBarVisible";
   NativeUI2["GetNavigationBarVisible"] = "GetNavigationBarVisible";
   NativeUI2["SetNavigationBarColor"] = "SetNavigationBarColor";
+  NativeUI2["SetNavigationBarOverlay"] = "SetNavigationBarOverlay";
+  NativeUI2["GetNavigationBarOverlay"] = "GetNavigationBarOverlay";
+  NativeUI2["SetStatusBarColor"] = "SetStatusBarColor";
+  NativeUI2["GetStatusBarColor"] = "GetStatusBarColor";
+  NativeUI2["GetStatusBarIsDark"] = "GetStatusBarIsDark";
+  NativeUI2["GetStatusBarVisible"] = "GetStatusBarVisible";
+  NativeUI2["GetStatusBarOverlay"] = "GetStatusBarOverlay";
+  NativeUI2["SetStatusBarOverlay"] = "SetStatusBarOverlay";
+  NativeUI2["SetStatusBarVisible"] = "SetStatusBarVisible";
   return NativeUI2;
 })(NativeUI || {});
 function getColorInt(color, alpha) {
@@ -190,6 +199,12 @@ class DWebView extends DwebPlugin {
   setNavigationBarColor(color, darkIcons = false, isNavigationBarContrastEnforced = true) {
     const colorHex = hexToIntColor(color);
     return netCallNative(NativeUI.SetNavigationBarColor, { colorHex, darkIcons, isNavigationBarContrastEnforced });
+  }
+  getNavigationBarOverlay() {
+    return netCallNative(NativeUI.GetNavigationBarOverlay);
+  }
+  setNavigationBarOverlay(isOverlay = false) {
+    return netCallNative(NativeUI.SetNavigationBarOverlay, isOverlay);
   }
 }
 class OpenScanner extends DwebPlugin {
@@ -1071,14 +1086,12 @@ class BfspIcon extends DwebPlugin {
 }
 customElements.define("dweb-icon", BfspIcon);
 class StatusBarFFI {
-  constructor() {
-    this._ffi = window.system_ui;
-  }
   async setStatusBarColor(color, barStyle) {
     let colorHex;
     let darkIcons;
     if (!color) {
-      colorHex = this._ffi.getStatusBarColor();
+      const stringColor = await netCallNative(NativeUI.GetStatusBarColor);
+      colorHex = Number(stringColor);
     } else {
       colorHex = getColorInt(
         color.slice(0, -2),
@@ -1086,7 +1099,7 @@ class StatusBarFFI {
       );
     }
     if (!barStyle) {
-      let isDarkIcons = await this.getStatusBarStyle();
+      let isDarkIcons = await netCallNative(NativeUI.GetStatusBarIsDark);
       darkIcons = isDarkIcons ? 1 : 0;
     } else {
       switch (barStyle) {
@@ -1100,64 +1113,49 @@ class StatusBarFFI {
           darkIcons = 0;
       }
     }
-    this._ffi.setStatusBarColor(colorHex, darkIcons);
+    netCallNative(NativeUI.SetStatusBarColor, { colorHex, darkIcons });
     return;
   }
-  getStatusBarColor() {
-    return new Promise((resolve2, reject) => {
-      const color = this._ffi.getStatusBarColor();
-      const colorHex = getColorHex(color);
-      resolve2(colorHex);
-    });
+  async getStatusBarColor() {
+    const stringColor = await netCallNative(NativeUI.GetStatusBarColor);
+    console.log("getStatusBarColor:", stringColor, parseFloat(stringColor));
+    const colorHex = getColorHex(parseFloat(stringColor));
+    console.log("getStatusBarColor:", colorHex);
+    return colorHex;
   }
-  getStatusBarVisible() {
-    return new Promise((resolve2, reject) => {
-      const isVisible = this._ffi.getStatusBarVisible();
-      resolve2(isVisible);
-    });
+  async getStatusBarVisible() {
+    const isVisible = await netCallNative(NativeUI.GetStatusBarVisible);
+    return Boolean(isVisible);
   }
-  toggleStatusBarVisible() {
-    return new Promise((resolve2, reject) => {
-      this._ffi.toggleStatusBarVisible(0);
-      resolve2();
-    });
+  async setStatusBarVisible(isVer) {
+    const stringVisible = await netCallNative(NativeUI.SetStatusBarVisible, isVer);
+    return Boolean(stringVisible);
   }
   async setStatusBarHidden() {
     const isVisible = await this.getStatusBarVisible();
     if (isVisible) {
-      await this.toggleStatusBarVisible();
+      await this.setStatusBarVisible(false);
     }
-    return;
+    return isVisible;
   }
-  getStatusBarOverlay() {
-    return new Promise((resolve2, reject) => {
-      const overlay = this._ffi.getStatusBarOverlay();
-      resolve2(overlay);
-    });
+  async getStatusBarOverlay() {
+    const stringOverlay = await netCallNative(NativeUI.GetStatusBarOverlay);
+    return Boolean(stringOverlay);
   }
-  toggleStatusBarOverlay() {
-    return new Promise((resolve2, reject) => {
-      this._ffi.toggleStatusBarOverlay(0);
-      resolve2();
-    });
+  async setStatusBarOverlay(isOverlay) {
+    const isOver = await netCallNative(NativeUI.SetStatusBarOverlay, isOverlay);
+    console.log("setStatusBarOverlay:", isOver);
+    return Boolean(isOver);
   }
-  setStatusBarOverlay() {
-    return new Promise((resolve2, reject) => {
-      this._ffi.toggleStatusBarOverlay(1);
-      resolve2();
-    });
-  }
-  getStatusBarStyle() {
-    return new Promise((resolve2, reject) => {
-      const isDarkIcons = this._ffi.getStatusBarStyle();
-      let barStyle;
-      if (isDarkIcons) {
-        barStyle = "dark-content";
-      } else {
-        barStyle = "light-content";
-      }
-      resolve2(barStyle);
-    });
+  async getStatusBarIsDark() {
+    const isDarkIcons = await netCallNative(NativeUI.GetStatusBarIsDark);
+    let barStyle;
+    if (isDarkIcons) {
+      barStyle = "dark-content";
+    } else {
+      barStyle = "light-content";
+    }
+    return barStyle;
   }
 }
 class BfcsStatusBar extends DwebPlugin {
@@ -1171,7 +1169,7 @@ class BfcsStatusBar extends DwebPlugin {
   disconnectedCallback() {
   }
   async _init() {
-    const barStyle = await this.getStatusBarStyle();
+    const barStyle = await this.getStatusBarIsDark();
     this.setAttribute("bar-style", barStyle);
   }
   async setStatusBarColor(color, barStyle) {
@@ -1187,20 +1185,18 @@ class BfcsStatusBar extends DwebPlugin {
     const isVisible = await this._ffi.getStatusBarVisible();
     return isVisible;
   }
-  async toggleStatusBarVisible() {
-    await this._ffi.toggleStatusBarVisible();
-    return;
+  async toggleStatusBarVisible(isVer = true) {
+    return await this._ffi.setStatusBarVisible(isVer);
   }
   async getStatusBarOverlay() {
     let overlay = await this._ffi.getStatusBarOverlay();
     return overlay;
   }
-  async toggleStatusBarOverlay() {
-    await this._ffi.toggleStatusBarOverlay();
-    return;
+  async setStatusBarOverlay(isOver = false) {
+    return await this._ffi.setStatusBarOverlay(isOver);
   }
-  async getStatusBarStyle() {
-    const barStyle = await this._ffi.getStatusBarStyle();
+  async getStatusBarIsDark() {
+    const barStyle = await this._ffi.getStatusBarIsDark();
     return barStyle;
   }
   static get observedAttributes() {
@@ -1210,7 +1206,7 @@ class BfcsStatusBar extends DwebPlugin {
     var _a;
     if (attrName === "overlay") {
       if (this.hasAttribute(attrName)) {
-        this._ffi.setStatusBarOverlay();
+        this._ffi.setStatusBarOverlay(true);
       }
     } else if (attrName === "hidden") {
       if (this.hasAttribute(attrName)) {
@@ -31608,9 +31604,10 @@ const createController = (defineCustomElement2, oldController, useDelegate = fal
 const _hoisted_1$2 = /* @__PURE__ */ createBaseVNode("h2", null, "andrid/ios \u7CFB\u7EDFapi \u6D4B\u8BD5", -1);
 const _hoisted_2$2 = /* @__PURE__ */ createTextVNode("\u70B9\u6211\u9690\u85CF\u7CFB\u7EDFnavigation");
 const _hoisted_3$2 = /* @__PURE__ */ createTextVNode("\u83B7\u53D6navigation\u989C\u8272");
-const _hoisted_4$1 = /* @__PURE__ */ createTextVNode("\u8BBE\u7F6E\u7CFB\u7EDFnavigation\u989C\u8272");
-const _hoisted_5$1 = /* @__PURE__ */ createTextVNode("\u70B9\u51FB\u5F00\u542F\u865A\u62DF\u952E\u76D8");
-const _hoisted_6$1 = /* @__PURE__ */ createTextVNode("Outline + Round");
+const _hoisted_4$1 = /* @__PURE__ */ createTextVNode("\u8BBE\u7F6Enavigation\u900F\u660E");
+const _hoisted_5$1 = /* @__PURE__ */ createTextVNode("\u8BBE\u7F6E\u7CFB\u7EDFnavigation\u989C\u8272");
+const _hoisted_6$1 = /* @__PURE__ */ createTextVNode("\u70B9\u51FB\u5F00\u542F\u865A\u62DF\u952E\u76D8");
+const _hoisted_7$1 = /* @__PURE__ */ createTextVNode("\u70B9\u51FB\u83B7\u53D6\u72B6\u6001\u680F\u989C\u8272");
 const _sfc_main$2 = /* @__PURE__ */ defineComponent({
   __name: "system_api",
   setup(__props) {
@@ -31633,9 +31630,17 @@ const _sfc_main$2 = /* @__PURE__ */ defineComponent({
     }
     async function getNavigationVisible() {
       console.log("getNavigationBarVisible=>", await nav.getNavigationBarVisible());
+      console.log("getNavigationBarOverlay=>", await nav.getNavigationBarOverlay());
     }
     function setNavigationBarColor() {
-      nav.setNavigationBarColor("#ffffff00", true, false);
+      nav.setNavigationBarColor("#ffb94f", true, false);
+    }
+    function setNavigationBarOverlay() {
+      nav.setNavigationBarOverlay(true);
+    }
+    function getStatusBarColor() {
+      const status = document.querySelector("dweb-status-bar");
+      status == null ? void 0 : status.getStatusBarColor();
     }
     return (_ctx, _cache) => {
       const _component_dweb_status_bar = resolveComponent("dweb-status-bar");
@@ -31645,7 +31650,7 @@ const _sfc_main$2 = /* @__PURE__ */ defineComponent({
         _hoisted_1$2,
         createVNode(_component_dweb_status_bar, {
           id: "status_bar",
-          "background-color": "rgba(100,100,100,0.5)",
+          "background-color": "rgba(133,100,100,0.5)",
           overlay: ""
         }),
         createVNode(_component_dweb_keyboard, {
@@ -31676,10 +31681,20 @@ const _sfc_main$2 = /* @__PURE__ */ defineComponent({
         createVNode(unref(IonButton), {
           expand: "block",
           fill: "outline",
-          onClick: setNavigationBarColor
+          onClick: setNavigationBarOverlay
         }, {
           default: withCtx(() => [
             _hoisted_4$1
+          ]),
+          _: 1
+        }),
+        createVNode(unref(IonButton), {
+          expand: "block",
+          fill: "outline",
+          onClick: setNavigationBarColor
+        }, {
+          default: withCtx(() => [
+            _hoisted_5$1
           ]),
           _: 1
         }),
@@ -31689,16 +31704,17 @@ const _sfc_main$2 = /* @__PURE__ */ defineComponent({
           onClick: onShowKeyboard
         }, {
           default: withCtx(() => [
-            _hoisted_5$1
+            _hoisted_6$1
           ]),
           _: 1
         }),
         createVNode(unref(IonButton), {
           shape: "round",
-          fill: "outline"
+          fill: "outline",
+          onClick: getStatusBarColor
         }, {
           default: withCtx(() => [
-            _hoisted_6$1
+            _hoisted_7$1
           ]),
           _: 1
         })

@@ -15,6 +15,12 @@ export class StatusBarFFI implements StatusBar.IStatusBarFFI {
       "dweb-communication"
     ) as unknown) as StatusBar.StatusBarDesktopFFI;
   }
+  setStatusBarVisible(isVer: boolean): Promise<boolean> {
+    throw new Error("Method not implemented.");
+  }
+  getStatusBarIsDark(): Promise<StatusBar.StatusBarStyle> {
+    throw new Error("Method not implemented.");
+  }
 
   async setStatusBarColor(
     color?: Color.RGBAHex,
@@ -53,10 +59,8 @@ export class StatusBarFFI implements StatusBar.IStatusBarFFI {
     return;
   }
 
-  async setStatusBarHidden(): Promise<void> {
-    await this._ffi.setStatusbarHidden(true);
-
-    return;
+  async setStatusBarHidden(): Promise<boolean> {
+    return await this._ffi.setStatusbarHidden(true);
   }
 
   async getStatusBarOverlay(): Promise<boolean> {
@@ -73,10 +77,8 @@ export class StatusBarFFI implements StatusBar.IStatusBarFFI {
     return;
   }
 
-  async setStatusBarOverlay(): Promise<void> {
-    await this._ffi.setStatusbarOverlay(true);
-
-    return;
+  async setStatusBarOverlay(): Promise<boolean> {
+    return await this._ffi.setStatusbarOverlay(true);
   }
 
   async getStatusBarStyle(): Promise<StatusBar.StatusBarStyle> {
