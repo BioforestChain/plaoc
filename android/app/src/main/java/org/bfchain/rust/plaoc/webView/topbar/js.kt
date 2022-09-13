@@ -1,11 +1,13 @@
 package org.bfchain.rust.plaoc.webView.topbar
 
 import android.util.Log
-import android.webkit.JavascriptInterface
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.google.gson.JsonDeserializer
 import com.google.gson.reflect.TypeToken
+import org.bfchain.rust.plaoc.jsHandle
+import org.bfchain.rust.plaoc.mapper
 import org.bfchain.rust.plaoc.webView.icon.DWebIcon
 import org.bfchain.rust.plaoc.webView.jsutil.*
 
@@ -16,64 +18,52 @@ class TopBarFFI(
     val state: TopBarState,
 ) {
 
-    @JavascriptInterface
-    fun topBarNavigationBack() {
+    fun topBarNavigationBack():Boolean {
         state.doBack()
+      return true
     }
 
-    @JavascriptInterface
     fun getTopBarEnabled(): Boolean {
         return state.enabled.value
     }
 
-    @JavascriptInterface
     fun setTopBarEnabled(isEnabled: Boolean): Boolean {
         state.enabled.value = isEnabled
 //        Log.i(TAG, "toggleEnabled:${state.enabled.value}")
         return state.enabled.value
     }
 
-    @JavascriptInterface
     fun getTopBarOverlay(): Float? {
         return state.overlay.value
     }
-
-    @JavascriptInterface
+    /**设置透明度*/
     fun setTopBarOverlay(isOverlay: String): Float? {
-        state.overlay.value = isOverlay.toFloat()
-//        Log.i(TAG, "toggleOverlay:${state.overlay.value},${isOverlay}")
-        return state.overlay.value
+//      Log.i(TAG, "toggleOverlay:${state.overlay.value},${isOverlay}")
+      state.overlay.value = isOverlay.toFloat()
+      return state.overlay.value
     }
 
-    @JavascriptInterface
     fun getTopBarTitle(): String {
         return state.title.value ?: ""
     }
-
-    @JavascriptInterface
     fun hasTopBarTitle(): Boolean {
         return state.title.value != null
     }
 
-    @JavascriptInterface
     fun setTopBarTitle(str: String) {
-        state.title.value = str
+        state.title.value = str.replace("\"", "");
     }
-
-
-    @JavascriptInterface
     fun getTopBarHeight(): Float {
         return state.height.value
     }
 
-    @JavascriptInterface
     fun getTopBarActions(): DataString<List<TopBarAction>> {
         return DataString_From(state.actions)//.map { action -> toDataString(action) }
     }
 
-    @JavascriptInterface
     fun setTopBarActions(actionListJson: DataString<List<TopBarAction>>) {
         state.actions.clear()
+//      Log.i(TAG,"actionListJson:${actionListJson}")
         val actionList = actionListJson.toData<List<TopBarAction>>(object :
             TypeToken<List<TopBarAction>>() {}.type)
         actionList.toCollection(state.actions)
@@ -82,22 +72,16 @@ class TopBarFFI(
 //      }
     }
 
-    @JavascriptInterface
     fun getTopBarBackgroundColor(): Int {
         return state.backgroundColor.value.toArgb()
     }
 
-    @JavascriptInterface
     fun setTopBarBackgroundColor(color: ColorInt) {
         state.backgroundColor.value = Color(color)
     }
-
-    @JavascriptInterface
     fun getTopBarForegroundColor(): Int {
         return state.foregroundColor.value.toArgb()
     }
-
-    @JavascriptInterface
     fun setTopBarForegroundColor(color: ColorInt) {
         state.foregroundColor.value = Color(color)
     }

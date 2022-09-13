@@ -346,7 +346,7 @@ fun DWebView(
                             view: WebView?,
                             request: WebResourceRequest?
                         ): WebResourceResponse? {
-                            Log.i(ITAG, "Intercept Request: ${request?.url}")
+//                            Log.i(ITAG, "Intercept Request: ${request?.url}")
                             if (request !== null) {
                                 // 这里出来的url全部都用是小写，俺觉得这是个bug
                                 val url = request.url.toString()

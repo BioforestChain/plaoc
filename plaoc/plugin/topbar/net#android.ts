@@ -7,21 +7,17 @@ import { TopBar } from "./bfcsTopBar.type";
 
 // 禁止传递float 因为不管传递什么，到android都会变0。
 export class TopBarFFI implements TopBar.ITopBarFFI {
-  async topBarNavigationBack(): Promise<void> {
-    await netCallNative(NativeUI.TopBarNavigationBack);
-
-    return;
+  async topBarNavigationBack(): Promise<boolean> {
+    return await netCallNative(NativeUI.TopBarNavigationBack);
   }
 
   async getTopBarEnabled(): Promise<boolean> {
     const isEnabled = await netCallNative(NativeUI.GetTopBarEnabled);
-
     return Boolean(isEnabled);
   }
 
   async setTopBarEnabled(isEnabled: boolean): Promise<void> {
     await netCallNative(NativeUI.SetTopBarEnabled, isEnabled);
-
     return;
   }
 
@@ -42,26 +38,23 @@ export class TopBarFFI implements TopBar.ITopBarFFI {
   }
 
   async setTopBarOverlay(alpha: string): Promise<void> {
-    await netCallNative(NativeUI.SetTopBarOverlay, alpha);
+    await netCallNative(NativeUI.SetTopBarOverlay, Number(alpha));
 
     return;
   }
 
   async getTopBarTitle(): Promise<string> {
     const title = await netCallNative(NativeUI.GetTopBarTitle);
-
     return title.toString();
   }
 
   async setTopBarTitle(title: string): Promise<void> {
     await netCallNative(NativeUI.SetTopBarTitle, title);
-
     return;
   }
 
   async hasTopBarTitle(): Promise<boolean> {
     const has = await netCallNative(NativeUI.HasTopBarTitle);
-
     return Boolean(has);
   }
 
@@ -80,8 +73,7 @@ export class TopBarFFI implements TopBar.ITopBarFFI {
   }
 
   async setTopBarActions(actionList: TopBar.TopBarItem[]): Promise<void> {
-    await netCallNative(NativeUI.SetTopBarActions, JSON.stringify(actionList));
-
+    await netCallNative(NativeUI.SetTopBarActions, actionList);
     return;
   }
 

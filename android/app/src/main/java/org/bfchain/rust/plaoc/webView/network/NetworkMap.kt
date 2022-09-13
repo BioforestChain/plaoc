@@ -5,7 +5,10 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.DeserializationFeature
-import org.bfchain.rust.plaoc.*
+import org.bfchain.rust.plaoc.DenoService
+import org.bfchain.rust.plaoc.ExportNativeUi
+import org.bfchain.rust.plaoc.jsHandle
+import org.bfchain.rust.plaoc.mapper
 import org.bfchain.rust.plaoc.webView.urlscheme.CustomUrlScheme
 import java.io.ByteArrayInputStream
 import java.net.HttpURLConnection
@@ -74,10 +77,9 @@ fun uiGateWay(
   val url = request.url.toString().lowercase(Locale.ROOT)
   val byteData = url.substring(url.lastIndexOf("=") + 1)
   val stringData = String(hexStrToByteArray(byteData))
-  mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true)
-  mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true) //允许使用单引号
+  Log.i(TAG, " uiGateWay: $stringData")
+  mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true) // 允许使用单引号包裹字符串
   val handle = mapper.readValue(stringData, jsHandle::class.java)
-  Log.i(TAG, " uiGateWay: $handle")
   val funName = ExportNativeUi.valueOf(handle.function);
   // 执行函数
   val result = call_ui_map[funName]?.let { it -> it(handle.data)
@@ -174,7 +176,7 @@ fun hexStrToByteArray(str: String): ByteArray {
     val currentStr = str.split(",")
     val byteArray = ByteArray(currentStr.size)
     for (i in byteArray.indices) {
-        byteArray[i] = currentStr[i].toByte()
+        byteArray[i] = currentStr[i].toInt().toByte()
     }
     return byteArray
 }

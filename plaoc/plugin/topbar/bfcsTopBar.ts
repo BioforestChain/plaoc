@@ -46,69 +46,88 @@ export class BfcsTopBar extends DwebPlugin {
     const height = await this.getTopBarHeight();
     this.setAttribute("height", `${height}`);
   }
-
-  async topBarNavigationBack(): Promise<void> {
-    await this._ffi.topBarNavigationBack();
-    return;
+  /**返回上一级 */
+  async topBarNavigationBack(): Promise<boolean> {
+    return await this._ffi.topBarNavigationBack();;
   }
-
+  /**
+   * 设置是否可点击
+   * @param isEnabled boolean
+   * @returns 
+   */
   async setTopBarEnabled(isEnabled: boolean): Promise<void> {
     await this._ffi.setTopBarEnabled(isEnabled);
     return;
   }
-
+  /**获取是否可点击的状态 */
   async getTopBarEnabled(): Promise<boolean> {
     const isEnabled = await this._ffi.getTopBarEnabled();
     return isEnabled;
   }
-
+  /**获取标题 */
   async getTopBarTitle(): Promise<string> {
     const title = await this._ffi.getTopBarTitle();
     return title;
   }
-
+  /**
+   * 设置状态栏标题 
+   * @param title string
+   * @returns 
+   */
   async setTopBarTitle(title: string): Promise<void> {
     await this._ffi.setTopBarTitle(title);
     return;
   }
-
+  /**查看是否设置了标题 */
   async hasTopBarTitle(): Promise<boolean> {
     const has = await this._ffi.hasTopBarTitle();
     return has;
   }
-
+  /**获取状态栏的透明度 */
   async getTopBarOverlay(): Promise<boolean> {
     const overlay = await this._ffi.getTopBarOverlay();
     return overlay;
   }
-
+  /**
+   * 设置状态栏的透明度
+   * @param alpha 
+   * @returns 
+   */
   async setTopBarOverlay(alpha: string): Promise<void> {
     await this._ffi.setTopBarOverlay(alpha);
     return;
   }
-
+  /**获取状态栏高度 */
   async getTopBarHeight(): Promise<number> {
     const height = await this._ffi.getTopBarHeight();
     return height;
   }
-
+  /**获取状态栏背景颜色 */
   async getTopBarBackgroundColor(): Promise<Color.RGBAHex> {
     const color = await this._ffi.getTopBarBackgroundColor();
     return color;
   }
-
+  /**
+   * 设置状态栏背景颜色
+   * @param color 
+   * @returns 
+   */
   async setTopBarBackgroundColor(color: string): Promise<void> {
     const colorHex = convertToRGBAHex(color);
     await this._ffi.setTopBarBackgroundColor(colorHex);
 
     return;
   }
-
+  /**获取状态栏文字和图标颜色 */
   async getTopBarForegroundColor(): Promise<Color.RGBAHex> {
     const color = await this._ffi.getTopBarForegroundColor();
     return color;
   }
-
+  /**
+   * 设置状态栏文字和图标颜色
+   * @param color 
+   * @returns 
+   */
   async setTopBarForegroundColor(color: string): Promise<void> {
     const colorHex = convertToRGBAHex(color);
     await this._ffi.setTopBarForegroundColor(colorHex);
@@ -150,9 +169,8 @@ export class BfcsTopBar extends DwebPlugin {
       const bid = childNode.getAttribute("bid");
       const onClickCode = `document.querySelector('dweb-top-bar-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
       const disabled = childNode.hasAttribute("disabled") ? true : false;
-      this._actionList.push({ icon, onClickCode, disabled });
+      this._actionList.push({ icon, onClickCode: onClickCode, disabled });
     });
-
     await this.setTopBarActions();
   }
 
