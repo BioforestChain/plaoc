@@ -22,25 +22,20 @@ private const val TAG = "BottomBarFFI"
 class BottomBarFFI(
     private val state: BottomBarState,
 ) {
-    @JavascriptInterface
     fun getEnabled() = state.isEnabled
 
    // 控制是否隐藏bottom bar, 此方法如果不传不会调用，一传肯定是true，也就是不显示bottom bar
-    @JavascriptInterface
-    fun toggleEnabled(isEnabledBool: Boolean): Boolean? {
+    fun setEnabled(isEnabledBool: Boolean): Boolean? {
         state.enabled.value = !isEnabledBool
         return getEnabled()
     }
 
-    @JavascriptInterface
     fun getOverlay(): Float {
         return state.overlay.value?: 1F
     }
     // 控制是开启bottom bar 遮罩。
-    @JavascriptInterface
-    fun toggleOverlay(isOverlay: String): Float {
-        state.overlay.value = isOverlay.toFloat()
-//        Log.i(TAG, "toggleOverlay:${state.overlay.value}")
+    fun setOverlay(isOverlay: String): Float {
+      state.overlay.value = isOverlay.toFloat()
         return state.overlay.value ?: 1F
     }
 

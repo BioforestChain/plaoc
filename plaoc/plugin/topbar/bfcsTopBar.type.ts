@@ -109,7 +109,7 @@ export namespace TopBar {
   }
 
   export interface ITopBarFFI {
-    topBarNavigationBack(): Promise<void>;
+    topBarNavigationBack(): Promise<boolean>;
     getTopBarEnabled(): Promise<boolean>;
     setTopBarEnabled(isEnabled: boolean): Promise<void>;
     setTopBarHidden(): Promise<void>;

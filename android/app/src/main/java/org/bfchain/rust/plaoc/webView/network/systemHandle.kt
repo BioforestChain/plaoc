@@ -54,22 +54,22 @@ fun initUiFn(systemUiFFI:SystemUiFFI) {
     systemUiFFI.getStatusBarVisible()
   }
   /**keyboard*/
-  call_ui_map[ExportNativeUi.GetSafeArea] = {
+  call_ui_map[ExportNativeUi.GetKeyBoardSafeArea] = {
     systemUiFFI.virtualKeyboard.getSafeArea()
   }
-  call_ui_map[ExportNativeUi.GetHeight] = {
+  call_ui_map[ExportNativeUi.GetKeyBoardHeight] = {
     systemUiFFI.virtualKeyboard.getHeight()
   }
-  call_ui_map[ExportNativeUi.GetOverlay] = {
+  call_ui_map[ExportNativeUi.GetKeyBoardOverlay] = {
     systemUiFFI.virtualKeyboard.getOverlay()
   }
-  call_ui_map[ExportNativeUi.SetOverlay] = {
+  call_ui_map[ExportNativeUi.SetKeyBoardOverlay] = {
     systemUiFFI.virtualKeyboard.setOverlay(it)
   }
-  call_ui_map[ExportNativeUi.Show] = {
+  call_ui_map[ExportNativeUi.ShowKeyBoard] = {
     systemUiFFI.virtualKeyboard.show()
   }
-  call_ui_map[ExportNativeUi.Hide] = {
+  call_ui_map[ExportNativeUi.HideKeyBoard] = {
     systemUiFFI.virtualKeyboard.hide()
   }
 }

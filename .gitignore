@@ -21,7 +21,7 @@ local.properties
 **build
 /plaoc/yarn-error.log
 
-android/app/src/main/assets/*
+android/app/src/main/assets
 
 rust_lib/assets/rusty_v8_mirror/
 /Plaoc-Android
