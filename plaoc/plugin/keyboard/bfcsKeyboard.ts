@@ -12,14 +12,10 @@ export class BfcsKeyboard extends DwebPlugin {
   }
 
   connectedCallback() {
-    this._init();
   }
 
   disconnectedCallback() { }
 
-  private async _init() {
-    this.setAttribute("hidden", "");
-  }
   /**获取键盘安全区域 */
   async getKeyboardSafeArea(): Promise<Keyboard.IKeyboardSafeArea> {
     const safeArea = await this._ffi.getKeyboardSafeArea();
@@ -42,12 +38,12 @@ export class BfcsKeyboard extends DwebPlugin {
   }
   /**显示键盘 */
   async showKeyboard(): Promise<boolean> {
-    this.setAttribute("hidden", "");
+    this.removeAttribute("hidden");
     return await this._ffi.showKeyboard();
   }
   /**隐藏键盘 */
   async hideKeyboard(): Promise<boolean> {
-    this.removeAttribute("hidden");
+    this.setAttribute("hidden", "");
     return await this._ffi.hideKeyboard();
   }
 
@@ -66,11 +62,10 @@ export class BfcsKeyboard extends DwebPlugin {
         this._ffi.setKeyboardOverlay();
       }
     } else if (attrName === "hidden" && oldVal !== newVal) {
-      const bool = this.hasAttribute('hidden') ? true : false;
-      if (bool == false) {
-        this.showKeyboard()
-      } else {
+      if (this.hasAttribute(attrName)) {
         this.hideKeyboard();
+      } else {
+        this.showKeyboard()
       }
     }
   }

@@ -4,8 +4,6 @@ import { Color } from "../typings/types/color.type";
 import { getColorInt, getColorHex, convertToRGBAHex } from "../util";
 import { BottomBar } from "./bfcsBottomBar.type";
 export class BottomBarFFI implements BottomBar.IBottomBarFFI {
-  private _ffi: BottomBar.BottomBarAndroidFFI = (window as any).bottom_bar;
-
   async getHidden(): Promise<boolean> {
     return await netCallNative(NativeUI.GetBottomBarEnabled);
   }

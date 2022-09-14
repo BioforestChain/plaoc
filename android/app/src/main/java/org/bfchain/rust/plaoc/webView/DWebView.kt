@@ -196,26 +196,21 @@ fun DWebView(
                         jsUtil!!,
                         systemUIState,
                     )
-                  initSystemUiFn(systemUiFFI)
-
-                    val topBarFFI = TopBarFFI(
-                        topBarState,
-                    )
-
-                  initTopBarFn(topBarFFI)
-
+                    initSystemUiFn(systemUiFFI)
+                      val topBarFFI = TopBarFFI(
+                          topBarState,
+                      )
+                    initTopBarFn(topBarFFI)
                     val bottomBarFFI = BottomBarFFI(bottomBarState)
-                  initBottomFn(bottomBarFFI)
-
-                    val dialogFFI = DialogFFI(
-                        jsUtil!!,
-                        jsAlertConfig,
-                        jsPromptConfig,
-                        jsConfirmConfig,
-                        jsWarningConfig
-                    )
-                    webView.addJavascriptInterface(dialogFFI, "native_dialog")
-
+                    initBottomFn(bottomBarFFI)
+                      val dialogFFI = DialogFFI(
+                          jsUtil!!,
+                          jsAlertConfig,
+                          jsPromptConfig,
+                          jsConfirmConfig,
+                          jsWarningConfig
+                      )
+                    initDialogFn(dialogFFI);
                     onCreated(webView)
                 },
                 chromeClient = remember {

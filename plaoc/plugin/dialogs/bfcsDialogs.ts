@@ -1,4 +1,4 @@
-import { DialogsFFI } from "./ffi";
+import { DialogsFFI } from "./net";
 import { DwebPlugin } from "../native/dweb-plugin";
 import { Dialogs } from "./bfcsDialogs.type";
 
@@ -71,6 +71,7 @@ export class BfcsDialogAlert extends BfcsDialogs {
         : false;
 
       const did = this.getAttribute("did");
+
       const childNode = this.querySelector("dweb-dialog-button");
       let bid: string = "";
       if (childNode) {
