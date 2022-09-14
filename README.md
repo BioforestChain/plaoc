@@ -122,12 +122,12 @@ cargo build --target=aarch64-linux-android --release
 ### 目前规划
 
     [😃] 前端和后端使用二进制互传数据
-    [🥳] 修改 webComponent 的 javascriptinterface 注入的方式
+    [😃] 修改 webComponent 的 javascriptinterface 注入的方式
     [🥳] 更改webview为Chrome内核。
-    [❌] 封装系统级服务，编写基础测试代码。
-    [❌] 封装文件系统，权限系统和网络系统
-    [❌] 规范多个 DwebView 之间数据互动的标准
-    [❌] 规范多个 后端服务（deno-js）的数据互动标准
+    [🥳] 封装系统级服务，编写基础测试代码。
+    [🥳] 封装文件系统，权限系统和网络系统
+    [🥳] 规范多个 DwebView 之间数据互动的标准
+    [🥳] 规范多个 后端服务（deno-js）的数据互动标准
     [❌] 迁移碳元域
     [❌] 封装.bfsa 文件，实现应用安装到设备。
     [❌] 优化代码的封装，契合面向角色编程。
