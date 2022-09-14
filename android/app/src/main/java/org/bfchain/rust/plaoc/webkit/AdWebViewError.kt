@@ -19,6 +19,8 @@ package org.bfchain.rust.plaoc.webkit
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import androidx.compose.runtime.Immutable
+import org.chromium.android_webview.AwContentsClient.AwWebResourceRequest
+import org.chromium.android_webview.AwContentsClient.AwWebResourceError
 
 
 /**
@@ -29,9 +31,9 @@ data class AdWebViewError(
     /**
      * The request the error came from.
      */
-    val request: WebResourceRequest?,
+    val request: AwWebResourceRequest?,
     /**
      * The error that was reported.
      */
-    val error: WebResourceError
+    val error: AwWebResourceError
 )

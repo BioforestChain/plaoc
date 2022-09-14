@@ -1,12 +1,11 @@
 package org.bfchain.rust.plaoc.webView.jsutil
 
-import android.util.Log
-import android.webkit.ValueCallback
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.graphics.Color
 import com.google.gson.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
+import org.chromium.base.Callback
 import java.lang.reflect.Type
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicReference
@@ -17,7 +16,7 @@ import kotlin.reflect.KProperty
 
 class JsUtil(
     val activity: ComponentActivity,
-    val evaluateJavascript: (code: String, callback: ValueCallback<String>) -> Unit
+    val evaluateJavascript: (code: String, callback: Callback<String>) -> Unit
 ) {
 
     suspend fun eval(code: String): String {

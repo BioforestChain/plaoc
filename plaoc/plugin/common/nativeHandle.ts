@@ -58,6 +58,5 @@ export enum NativeUI {
   OpenDialogAlert = "OpenDialogAlert",
   OpenDialogPrompt = "OpenDialogPrompt",
   OpenDialogConfirm = "OpenDialogConfirm",
-  OpenDialogWarning = "OpenDialogWarning"
-
+  OpenDialogWarning = "OpenDialogWarning",
 }

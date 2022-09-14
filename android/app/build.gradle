@@ -1,6 +1,7 @@
 plugins {
   id("com.android.application")
   id("org.jetbrains.kotlin.android")
+  id("de.undercouch.download")
 }
 
 android {
@@ -57,6 +58,11 @@ android {
     resources {
       excludes += "/META-INF/{AL2.0,LGPL2.1}"
     }
+  }
+
+  // Do not compress chromium-aw resources.
+  aaptOptions {
+      noCompress("bin", "dat", "pak")
   }
 }
 
@@ -120,6 +126,9 @@ dependencies {
   implementation("com.squareup.retrofit2:retrofit:2.6.2")
   implementation("com.squareup.retrofit2:converter-gson:2.6.2")
   // endregion
+
+  // chromium-aw aar文件引入
+  implementation(files('src/main/libs/93.0.4577.82-1/chromium-aw-release.aar'))
 }
 
 
@@ -164,3 +173,5 @@ archTriplets.each { arch, target ->
   }
   clean.dependsOn "clean-${arch}"
 }
+
+

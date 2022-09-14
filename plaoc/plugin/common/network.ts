@@ -1,12 +1,14 @@
-
 /**
  *  发送请求到netive设置ui
- * @param url 
- * @returns 
+ * @param url
+ * @returns
  */
-export async function netCallNative(fun: string, data: TNative = ""): Promise<any> {
+export async function netCallNative(
+  fun: string,
+  data: TNative = ""
+): Promise<any> {
   if (data instanceof Object) {
-    data = JSON.stringify(data) // stringify 两次转义一下双引号
+    data = JSON.stringify(data); // stringify 两次转义一下双引号
   }
   const message = `{"function":"${fun}","data":${JSON.stringify(data)}}`;
   const buffer = new TextEncoder().encode(message);
@@ -16,10 +18,10 @@ export async function netCallNative(fun: string, data: TNative = ""): Promise<an
 type TNative = boolean | object | string | number;
 
 /**
-   * 请求kotlin 代理转发
-   * @param url
-   * @returns 直接返回ok
-   */
+ * 请求kotlin 代理转发
+ * @param url
+ * @returns 直接返回ok
+ */
 
 export async function connectChannel(url: string) {
   const response = await fetch(url, {

@@ -23,6 +23,7 @@ import org.bfchain.rust.plaoc.lib.drawRect
 import org.bfchain.rust.plaoc.webView.network.initMetaData
 import org.bfchain.rust.plaoc.webView.openDWebWindow
 import org.bfchain.rust.plaoc.webView.sendToJavaScript
+import org.bfchain.rust.plaoc.webkit.AdAndroidWebView
 import java.net.URL
 
 
@@ -40,6 +41,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // chromium-aw initialize
+        AdAndroidWebView.initialize(application)
+
         setContentView(R.layout.activity_main)
         this.initSystemFn()
         // 启动Deno服务

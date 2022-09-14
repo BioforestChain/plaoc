@@ -65,7 +65,8 @@ class DWebViewActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         ALL.add(this)
-        WebView.setWebContentsDebuggingEnabled(true)// 开启调试
+//        WebView.setWebContentsDebuggingEnabled(true)// 开启调试
+
         // 设置装饰视图是否应适合WindowInsetsCompat(Describes a set of insets for window content.)
         WindowCompat.setDecorFitsSystemWindows(window, false)
         val activity = this
@@ -106,7 +107,7 @@ private fun NavFun(activity: ComponentActivity) {
                 })
             ) { entry ->
                 // 请求文件路径
-                var urlStr = entry.arguments?.getString("url")
+                val urlStr = entry.arguments?.getString("url")
                     .let { it -> URLDecoder.decode(it, "UTF-8") }
 
 
@@ -135,7 +136,7 @@ private fun NavFun(activity: ComponentActivity) {
 
 
 fun openDWebWindow(activity: ComponentActivity, url: String) {
-    var intent = Intent(activity.applicationContext, DWebViewActivity::class.java).also {
+    val intent = Intent(activity.applicationContext, DWebViewActivity::class.java).also {
         it.data = Uri.parse("https://" + URLEncoder.encode(url, "UTF-8"))
     }
     activity.startActivity(intent)

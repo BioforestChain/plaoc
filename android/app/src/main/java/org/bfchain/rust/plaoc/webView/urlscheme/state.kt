@@ -1,10 +1,13 @@
 package org.bfchain.rust.plaoc.webView.urlscheme
 
 import android.content.res.AssetManager
+import android.net.Uri
 import android.webkit.MimeTypeMap
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import androidx.compose.runtime.Stable
+import org.chromium.android_webview.AwContentsClient.AwWebResourceRequest
+import org.chromium.components.embedder_support.util.WebResourceResponseInfo
 import java.io.ByteArrayInputStream
 import java.io.InputStream
 import java.net.URI
@@ -72,12 +75,12 @@ class CustomUrlScheme(
     /**
      * @TODO 增加跨域白名单的配置功能
      */
-    fun isCrossDomain(req: WebResourceRequest) =
-        req.url.scheme == scheme && req.url.host != host
+    fun isCrossDomain(req: AwWebResourceRequest) =
+        Uri.parse(req.url).scheme == scheme && Uri.parse(req.url).host != host
 
 
-    fun handleRequest(req: WebResourceRequest, url: String): WebResourceResponse {
-        val urlExt = req.url.lastPathSegment?.let { filename ->
+    fun handleRequest(req: AwWebResourceRequest, url: String): WebResourceResponseInfo {
+        val urlExt = req.url?.let { filename ->
             Path(filename).extension
         } ?: ""
         val urlMimeType = getMimeTypeFromExtension(urlExt)
@@ -91,18 +94,18 @@ class CustomUrlScheme(
             headers = req.requestHeaders,
             method = req.method,
             isRedirect = req.isRedirect,
-            isForMainFrame = req.isForMainFrame,
+            isForMainFrame = req.isMainFrame,
         )
 //        Log.d(TAG, "handleRequest urlMimeType: $urlMimeType")
 //        Log.d(TAG, "handleRequest urlExt: $urlExt")
 //        Log.d(TAG, "handleRequest url: ${req.url}")
 //        Log.d(TAG, "handleRequest urlState url: $urlEncoding")
         val responseBodyStream = requestHandler.onHttpRequest(urlState)
-            ?: return WebResourceResponse(
-                urlMimeType, urlEncoding, 404, "Resource No Found", mapOf(),
-                nullInputStream
+            ?: return WebResourceResponseInfo(
+                urlMimeType, urlEncoding, nullInputStream, 404, "Resource No Found", mapOf(),
+
             )
-        return WebResourceResponse(urlMimeType, urlEncoding, responseBodyStream)
+        return WebResourceResponseInfo(urlMimeType, urlEncoding, responseBodyStream)
     }
 
 }

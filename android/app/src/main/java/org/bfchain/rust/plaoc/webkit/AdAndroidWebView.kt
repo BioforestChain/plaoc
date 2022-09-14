@@ -1,10 +1,17 @@
 package org.bfchain.rust.plaoc.webkit
 
+import android.app.Application
 import android.content.Context
 import android.graphics.Rect
 import android.view.*
-import android.webkit.WebView
+import org.chromium.android_webview.AwBrowserProcess
+import org.chromium.android_webview.AwDevToolsServer
+import org.chromium.android_webview.BuildConfig
+import org.chromium.android_webview.shell.AwShellResourceProvider
+import org.chromium.base.CommandLine
+import org.chromium.base.ContextUtils
 import java.lang.Exception
+import org.bfchain.rust.plaoc.chromium.WebView
 
 private const val TAG = "AdAndroidWebView"
 
@@ -86,5 +93,28 @@ class AdAndroidWebView(context: Context) : WebView(context) {
         return super.startActionMode(myCallback, type)
     }
 
+    companion object {
+        private val COMMAND =
+            arrayOf("")
+
+        fun initialize(application: Application) {
+            AwShellResourceProvider.registerResources(application)
+            CommandLine.init(COMMAND)
+            ContextUtils.initApplicationContext(application)
+            AwBrowserProcess.loadLibrary("bfs")
+            AwBrowserProcess.start()
+
+            if (BuildConfig.DEBUG) {
+                AwDevToolsServer().setRemoteDebuggingEnabled(true)
+            }
+
+            // 修复切换到后台后白屏
+            try {
+                AdAndroidWebView(application)
+            } catch (e: Exception) {
+                e.printStackTrace();
+            }
+        }
+    }
 }
 
