@@ -15,14 +15,15 @@ export class BottomBarFFI implements BottomBar.IBottomBarFFI {
     ) as unknown) as BottomBar.BottomBarDesktopFFI;
   }
 
-  async getEnabled(): Promise<boolean> {
+
+  async getHidden(): Promise<boolean> {
     const isHidden = await this._ffi.getBottombarHidden();
 
     return !isHidden;
   }
 
   async toggleEnabled(): Promise<void> {
-    const isEnabled = await this.getEnabled();
+    const isEnabled = await this.getHidden();
 
     await this._ffi.setBottombarHidden(isEnabled);
 
@@ -35,24 +36,15 @@ export class BottomBarFFI implements BottomBar.IBottomBarFFI {
     return;
   }
 
-  async getOverlay(): Promise<boolean> {
+  async getOverlay(): Promise<number> {
     const isOverlay = await this._ffi.getBottombarOverlay();
 
     return isOverlay;
   }
 
-  async toggleOverlay(): Promise<void> {
-    const isOverlay = await this.getOverlay();
 
-    await this._ffi.setBottombarOverlay(!isOverlay);
-
-    return;
-  }
-
-  async setOverlay(): Promise<void> {
-    await this._ffi.setBottombarOverlay(true);
-
-    return;
+  async setOverlay(alpha: string): Promise<number> {
+    return await this._ffi.setBottombarOverlay(alpha);
   }
 
   async getHeight(): Promise<number> {

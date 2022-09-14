@@ -2,19 +2,21 @@ import "../typings";
 import { Color } from "../typings/types/color.type";
 import { convertToRGBAHex } from "../util";
 import { BottomBar } from "./bfcsBottomBar.type";
+import { NativeUI } from "../common/nativeHandle";
+import { netCallNative } from "../common/network";
 
 export class BottomBarFFI implements BottomBar.IBottomBarFFI {
   private _ffi = (window as any).webkit
     .messageHandlers as BottomBar.BottomBarIosFFI;
 
-  async getEnabled(): Promise<boolean> {
+  async getHidden(): Promise<boolean> {
     const isHidden = await this._ffi.getBottomBarEnabled.postMessage(null);
 
     return !isHidden;
   }
 
   async toggleEnabled(): Promise<void> {
-    const isEnabled = await this.getEnabled();
+    const isEnabled = await this.getHidden();
 
     this._ffi.hiddenBottomView.postMessage(isEnabled ? "1" : "0");
 
@@ -29,7 +31,7 @@ export class BottomBarFFI implements BottomBar.IBottomBarFFI {
     });
   }
 
-  async getOverlay(): Promise<boolean> {
+  async getOverlay(): Promise<number> {
     const overlay = await this._ffi.getBottomBarOverlay.postMessage(null);
 
     return overlay;
@@ -43,12 +45,8 @@ export class BottomBarFFI implements BottomBar.IBottomBarFFI {
     return;
   }
 
-  setOverlay(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this._ffi.updateBottomViewOverlay.postMessage(1);
-
-      resolve();
-    });
+  async setOverlay(alpha: string): Promise<number> {
+    return await netCallNative(NativeUI.SetBottomBarOverlay, alpha);
   }
 
   async getHeight(): Promise<number> {

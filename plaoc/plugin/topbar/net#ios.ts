@@ -1,130 +1,111 @@
 import "../typings";
 import { Color } from "../typings/types/color.type";
 import { TopBar } from "./bfcsTopBar.type";
+import { NativeUI } from "../common/nativeHandle";
+import { netCallNative } from "../common/network";
+import { getColorHex, hexToIntColor } from "../util";
 
 export class TopBarFFI implements TopBar.ITopBarFFI {
-  private _ffi = (window as any).webkit.messageHandlers as TopBar.TopBarIosFFI;
 
-  back() {
-    return new Promise<void>((resolve, reject) => {
-      this._ffi.back.postMessage(null);
-
-      resolve();
-    });
+  async topBarNavigationBack(): Promise<boolean> {
+    return await netCallNative(NativeUI.TopBarNavigationBack);
   }
 
-  async getEnabled(): Promise<boolean> {
-    const isHidden = await this._ffi.getNaviEnabled.postMessage(null);
-
-    return !isHidden;
+  async getTopBarEnabled(): Promise<boolean> {
+    const isEnabled = await netCallNative(NativeUI.GetTopBarEnabled);
+    return Boolean(isEnabled);
   }
 
-  async toggleEnabled(): Promise<void> {
-    const isEnabled = await this.getEnabled();
+  async setTopBarEnabled(isEnabled: boolean): Promise<void> {
+    await netCallNative(NativeUI.SetTopBarEnabled, isEnabled);
+    return;
+  }
 
-    this._ffi.hiddenNaviBar.postMessage(isEnabled ? "1" : "0");
+  async setTopBarHidden(): Promise<void> {
+    const isEnabled = await this.getTopBarEnabled();
+
+    if (isEnabled) {
+      await this.setTopBarEnabled(false);
+    }
 
     return;
   }
 
-  setHidden(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this._ffi.hiddenNaviBar.postMessage("1");
+  async getTopBarOverlay(): Promise<boolean> {
+    const isOverlay = await netCallNative(NativeUI.GetTopBarOverlay);
 
-      resolve();
-    });
+    return Boolean(isOverlay);
   }
 
-  async getOverlay(): Promise<boolean> {
-    const overlay = await this._ffi.getNaviOverlay.postMessage(null);
-
-    return overlay === 1;
-  }
-
-  async toggleOverlay(): Promise<void> {
-    const overlay = await this.getOverlay();
-
-    this._ffi.updateNaviBarOverlay.postMessage(overlay ? 0 : 1);
+  async setTopBarOverlay(alpha: string): Promise<void> {
+    await netCallNative(NativeUI.SetTopBarOverlay, Number(alpha));
 
     return;
   }
 
-  setOverlay(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this._ffi.updateNaviBarOverlay.postMessage(1);
-
-      resolve();
-    });
+  async getTopBarTitle(): Promise<string> {
+    const title = await netCallNative(NativeUI.GetTopBarTitle);
+    return title.toString();
   }
 
-  async getTitle(): Promise<string> {
-    const title = await this._ffi.getNaviTitle.postMessage(null);
-
-    return title;
+  async setTopBarTitle(title: string): Promise<void> {
+    await netCallNative(NativeUI.SetTopBarTitle, title);
+    return;
   }
 
-  setTitle(title: string): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this._ffi.updateTitle.postMessage(title);
-
-      resolve();
-    });
+  async hasTopBarTitle(): Promise<boolean> {
+    const has = await netCallNative(NativeUI.HasTopBarTitle);
+    return Boolean(has);
   }
 
-  async hasTitle(): Promise<boolean> {
-    const has = await this._ffi.hasNaviTitle.postMessage(null);
+  async getTopBarHeight(): Promise<number> {
+    const height = await netCallNative(NativeUI.GetTopBarHeight);
 
-    return has;
+    return Number(height);
   }
 
-  async getHeight(): Promise<number> {
-    const height = await this._ffi.naviHeight.postMessage(null);
-
-    return height;
-  }
-
-  async getActions(): Promise<TopBar.TopBarItem[]> {
-    const actionList = await this._ffi.getNaviActions.postMessage(null);
+  async getTopBarActions(): Promise<TopBar.TopBarItem[]> {
+    const actionList = (await netCallNative(
+      NativeUI.GetTopBarActions
+    )) as string;
 
     return JSON.parse(actionList);
   }
 
-  setActions(actionList: TopBar.TopBarItem[]): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this._ffi.customNaviActions.postMessage(JSON.stringify(actionList));
-
-      resolve();
-    });
+  async setTopBarActions(actionList: TopBar.TopBarItem[]): Promise<void> {
+    await netCallNative(NativeUI.SetTopBarActions, actionList);
+    return;
   }
 
-  async getBackgroundColor(): Promise<Color.RGBAHex> {
-    const colorHex: Color.RGBAHex =
-      await this._ffi.getNaviBackgroundColor.postMessage(null);
-
-    // 返回值：#ffffff00
-    return colorHex;
-  }
-
-  async setBackgroundColor(color: Color.RGBAHex): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this._ffi.updateNaviBarBackgroundColor.postMessage(color);
-
-      resolve();
-    });
-  }
-
-  async getForegroundColor(): Promise<Color.RGBAHex> {
-    const colorHex: Color.RGBAHex =
-      await this._ffi.getNaviForegroundColor.postMessage(null);
+  async getTopBarBackgroundColor(): Promise<Color.RGBAHex> {
+    const stringColor = (await netCallNative(
+      NativeUI.GetTopBarBackgroundColor
+    )) as string;
+    const colorHex = getColorHex(parseFloat(stringColor));
 
     return colorHex;
   }
 
-  async setForegroundColor(color: Color.RGBAHex): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this._ffi.updateNaviBarTintColor.postMessage(color);
+  async setTopBarBackgroundColor(color: Color.RGBAHex): Promise<void> {
+    const colorHex = hexToIntColor(color);
+    await netCallNative(NativeUI.SetTopBarBackgroundColor, colorHex);
 
-      resolve();
-    });
+    return;
+  }
+
+  async getTopBarForegroundColor(): Promise<Color.RGBAHex> {
+    const stringColor = (await netCallNative(
+      NativeUI.GetTopBarForegroundColor
+    )) as string;
+    const colorHex = getColorHex(parseFloat(stringColor));
+
+    return colorHex;
+  }
+
+  async setTopBarForegroundColor(color: Color.RGBAHex): Promise<void> {
+    const colorHex = hexToIntColor(color);
+    await netCallNative(NativeUI.SetTopBarForegroundColor, colorHex);
+
+    return;
   }
 }

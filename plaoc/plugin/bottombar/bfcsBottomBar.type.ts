@@ -25,7 +25,7 @@ export namespace BottomBar {
       postMessage(hidden: string): void;
     };
     getBottomBarOverlay: {
-      postMessage(noValue: null): Promise<boolean>;
+      postMessage(noValue: null): Promise<number>;
     };
     updateBottomViewOverlay: {
       postMessage(overlay: number): void;
@@ -63,10 +63,10 @@ export namespace BottomBar {
     ): Promise<void>;
     getBottombarHidden(): Promise<boolean>;
     setBottombarOverlay(
-      scopedValue: boolean | undefined,
+      scopedValue: string | undefined,
       globalValue?: boolean
-    ): Promise<void>;
-    getBottombarOverlay(): Promise<boolean>;
+    ): Promise<number>;
+    getBottombarOverlay(): Promise<number>;
     setBottombarHeight(
       scopedValue: string | undefined,
       globalValue?: string

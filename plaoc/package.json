@@ -6,6 +6,7 @@
     "./core",
     "./plugin",
     "./metadata",
+    "./vfs",
     "./typings"
   ]
 }
