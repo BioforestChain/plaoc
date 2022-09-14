@@ -77,7 +77,7 @@ fun uiGateWay(
   val url = request.url.toString().lowercase(Locale.ROOT)
   val byteData = url.substring(url.lastIndexOf("=") + 1)
   val stringData = String(hexStrToByteArray(byteData))
-  Log.i(TAG, " uiGateWay: $stringData")
+//  Log.i(TAG, " uiGateWay: $stringData")
   mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true) // 允许使用单引号包裹字符串
   val handle = mapper.readValue(stringData, jsHandle::class.java)
   val funName = ExportNativeUi.valueOf(handle.function);

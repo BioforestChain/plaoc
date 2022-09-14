@@ -47,14 +47,15 @@ export class OpenScanner extends DwebPlugin {
   constructor() {
     super();
   }
-  // 打开扫码
-  async openScanner(): Promise<string> {
-    return this.onPolling(NativeHandle.OpenScanner);
+  // 打开二维码扫码
+  async openQrCodeScanner(): Promise<string> {
+    return this.onPolling(NativeHandle.OpenQrScanner);
   }
-  // dom被删除的声明周期
-  disconnectedCallback() {
-    // this.onClose();
+  // 打开条形码扫码
+  async openBarCodeScanner(): Promise<string> {
+    return this.onPolling(NativeHandle.BarcodeScanner);
   }
+
 }
 
 

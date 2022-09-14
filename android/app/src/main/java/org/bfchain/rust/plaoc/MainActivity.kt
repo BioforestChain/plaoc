@@ -17,6 +17,7 @@ import com.king.mlkit.vision.camera.CameraScan
 import com.king.mlkit.vision.camera.analyze.Analyzer.OnAnalyzeListener
 import com.king.mlkit.vision.camera.util.LogUtils
 import com.king.mlkit.vision.camera.util.PermissionUtils
+import org.bfchain.rust.plaoc.barcode.BarcodeScanningActivity
 import org.bfchain.rust.plaoc.barcode.QRCodeScanningActivity
 import org.bfchain.rust.plaoc.lib.drawRect
 import org.bfchain.rust.plaoc.webView.network.initMetaData
@@ -47,7 +48,8 @@ class MainActivity : AppCompatActivity() {
     }
     // 初始化系统函数
     private fun initSystemFn() {
-      callable_map[ExportNative.OpenScanner] = { openScannerActivity() }
+      callable_map[ExportNative.OpenQrScanner] = { openScannerActivity() }
+      callable_map[ExportNative.BarcodeScanner] = { openBarCodeScannerActivity() }
       callable_map[ExportNative.OpenDWebView] = {
         openDWebViewActivity(it)
       }
@@ -142,12 +144,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // 启动activity
-    private fun startActivity(cls: Class<*>) {
-        startActivity(Intent(this, cls))
-    }
-
-    // 相册的二维码
+  // 相册的二维码
     private fun pickPhotoClicked(isQRCode: Boolean) {
         this.isQRCode = isQRCode
         if (PermissionUtils.checkPermission(
@@ -174,7 +171,14 @@ class MainActivity : AppCompatActivity() {
         pickIntent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*")
         startActivityForResult(pickIntent, REQUEST_CODE_PHOTO)
     }
-
+  // 打开条形码（现在这里的效果是不断扫二维码,还需要修改）
+    private fun openBarCodeScannerActivity() {
+    startActivityForResult(
+      Intent(this, BarcodeScanningActivity::class.java),
+        REQUEST_CODE_SCAN_CODE
+      )
+    }
+  // 打开二维码
     private fun openScannerActivity() {
         startActivityForResult(
             Intent(this, QRCodeScanningActivity::class.java),

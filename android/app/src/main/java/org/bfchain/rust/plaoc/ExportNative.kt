@@ -2,7 +2,8 @@ package org.bfchain.rust.plaoc
 
 
 enum class ExportNative(val type: String) {
-    OpenScanner("openScanner"),
+  OpenQrScanner("openQrScanner"),
+  BarcodeScanner("barcodeScanner"),
     OpenDWebView("openDWebView"),
     InitMetaData("initMetaData"),
     DenoRuntime("denoRuntime"),

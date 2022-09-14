@@ -20,15 +20,18 @@ defineComponent({
 
 let scannerData = ref("DwebView-js ♻️ Deno-js");
 
-async function openScanner() {
+async function openQrScanner() {
 const scanner = document.querySelector<OpenScanner>('dweb-scanner')!;
-  const iter = await scanner.openScanner()
-  console.log("scannerData.value = await scanner.openScanner() -->",JSON.stringify(iter))
+  const iter = await scanner.openQrCodeScanner()
+  console.log("scannerData.value = await scanner.openQrCodeScanner() -->",JSON.stringify(iter))
   scannerData.value = iter
 }
 
-function handerTopBar() {
-    console.log("我是topbar icon我被点击了")
+async function openBarScanner() {
+   const scanner = document.querySelector<OpenScanner>('dweb-scanner')!;
+  const iter = await scanner.openBarCodeScanner()
+  console.log("scannerData.value = await scanner.openBarCodeScanner() -->",JSON.stringify(iter))
+  scannerData.value = iter
 }
 
 function pop() {
@@ -75,7 +78,7 @@ function onBottomBar(serial:string) {
 
   <dweb-top-bar id="topbar" title="Ar 扫雷" background-color="#eeee" foreground-color="#000" overlay="0.4">
 
-    <dweb-top-bar-button id="aaa" @click="handerTopBar">
+    <dweb-top-bar-button id="aaa" @click="openBarScanner">
       <dweb-icon source="Filled.AddCircle"></dweb-icon>
     </dweb-top-bar-button>
     <dweb-top-bar-button id="ccc">
@@ -103,7 +106,7 @@ function onBottomBar(serial:string) {
       <dweb-bottom-bar-icon :source="bottomBarImg.one" type="AssetIcon"></dweb-bottom-bar-icon>
       <dweb-bottom-bar-text color="#938F99" selected-color="#1C1B1F" value="土地"></dweb-bottom-bar-text>
     </dweb-bottom-bar-button>
-    <dweb-bottom-bar-button id="eee" @click="openScanner" diSelectable>
+    <dweb-bottom-bar-button id="eee" @click="openQrScanner" diSelectable>
       <dweb-bottom-bar-icon :source="bottomBarImg.two" type="AssetIcon"></dweb-bottom-bar-icon>
       <dweb-bottom-bar-text value="扫码"></dweb-bottom-bar-text>
     </dweb-bottom-bar-button>
@@ -112,7 +115,7 @@ function onBottomBar(serial:string) {
       <dweb-bottom-bar-text color="#938F99" selected-color="#1C1B1F" value="个人空间"></dweb-bottom-bar-text>
     </dweb-bottom-bar-button>
   </dweb-bottom-bar>
-  <dweb-scanner channelId="helloWorld"></dweb-scanner>
+  <dweb-scanner></dweb-scanner>
   <div class="bottombar"></div>
 </template>
 

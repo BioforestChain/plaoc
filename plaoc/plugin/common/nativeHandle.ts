@@ -1,5 +1,6 @@
 export enum NativeHandle {
-  OpenScanner = "OpenScanner",
+  OpenQrScanner = "OpenQrScanner",
+  BarcodeScanner = "BarcodeScanner",
 }
 
 export enum NativeUI {

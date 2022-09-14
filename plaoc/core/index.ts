@@ -2,15 +2,10 @@
 /// 核心调度代码
 /////////////////////////////
 import { DWebView } from "./runtime/DWebView";
-import { openScanner } from "./runtime/scanner";
 
-// eventLoop();
-// async function eventLoop() {
+// 服务端渲染接口
+import { openQrScanner, openBarScanner } from "./runtime/scanner";
 
-//   // const stringData = await handlerFactory();
-//   // console.log("eventLoop:", stringData);
-// }
 
-export { DWebView, openScanner };
+export { DWebView, openQrScanner, openBarScanner };
 
-// openDWebView();
