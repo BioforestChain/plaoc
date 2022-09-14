@@ -4,7 +4,11 @@ import android.util.Log
 import org.bfchain.rust.plaoc.ExportNativeUi
 import org.bfchain.rust.plaoc.mapper
 import org.bfchain.rust.plaoc.webView.bottombar.BottomBarFFI
+import org.bfchain.rust.plaoc.webView.dialog.DialogFFI
+import org.bfchain.rust.plaoc.webView.dialog.JsAlertConfiguration
+import org.bfchain.rust.plaoc.webView.jsutil.CallbackString
 import org.bfchain.rust.plaoc.webView.jsutil.ColorInt
+import org.bfchain.rust.plaoc.webView.jsutil.DataString
 import org.bfchain.rust.plaoc.webView.systemui.SystemUiFFI
 import org.bfchain.rust.plaoc.webView.topbar.TopBarFFI
 
@@ -172,5 +176,29 @@ fun initBottomFn(bottomBarFFI: BottomBarFFI) {
     bottomBarFFI.setForegroundColor(it.toInt())
   }
 }
+/**
+ * 初始化Dialog ui的请求
+ */
+fun initDialogFn(dialogFFI:DialogFFI) {
+  call_ui_map[ExportNativeUi.OpenDialogAlert] = {
+    val alert = mapper.readValue(it, OpenDialog::class.java)
+    dialogFFI.openAlert(alert.config,alert.cb)
+  }
+  call_ui_map[ExportNativeUi.OpenDialogConfirm] = {
+    val alert = mapper.readValue(it, OpenDialog::class.java)
+    dialogFFI.openConfirm(alert.config,alert.cb)
+  }
+  call_ui_map[ExportNativeUi.OpenDialogPrompt] = {
+    val alert = mapper.readValue(it, OpenDialog::class.java)
+    dialogFFI.openPrompt(alert.config,alert.cb)
+  }
+  call_ui_map[ExportNativeUi.OpenDialogWarning] = {
+    val alert = mapper.readValue(it, OpenDialog::class.java)
+    dialogFFI.openWarning(alert.config,alert.cb)
+  }
+}
 
-
+data class OpenDialog(
+  val config: DataString<JsAlertConfiguration> = "",
+  val cb: CallbackString = "",
+)

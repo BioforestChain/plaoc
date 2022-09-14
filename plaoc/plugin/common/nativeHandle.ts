@@ -52,6 +52,11 @@ export enum NativeUI {
   GetBottomBarBackgroundColor = "GetBottomBarBackgroundColor",
   SetBottomBarBackgroundColor = "SetBottomBarBackgroundColor",
   GetBottomBarForegroundColor = "GetBottomBarForegroundColor",
-  SetBottomBarForegroundColor = "SetBottomBarForegroundColor"
+  SetBottomBarForegroundColor = "SetBottomBarForegroundColor",
+  // Dialog
+  OpenDialogAlert = "OpenDialogAlert",
+  OpenDialogPrompt = "OpenDialogPrompt",
+  OpenDialogConfirm = "OpenDialogConfirm",
+  OpenDialogWarning = "OpenDialogWarning"
 
 }

@@ -59,5 +59,10 @@ enum class ExportNativeUi(val type: String) {
   GetBottomBarBackgroundColor("getBottomBarBackgroundColor"),
   SetBottomBarBackgroundColor("setBottomBarBackgroundColor"),
   GetBottomBarForegroundColor("getBottomBarForegroundColor"),
-  SetBottomBarForegroundColor("setBottomBarForegroundColor")
+  SetBottomBarForegroundColor("setBottomBarForegroundColor"),
+  // Dialog
+  OpenDialogAlert("openDialogAlert"),
+  OpenDialogPrompt("openDialogPrompt"),
+  OpenDialogConfirm("openDialogConfirm"),
+  OpenDialogWarning("openDialogWarning")
 }
