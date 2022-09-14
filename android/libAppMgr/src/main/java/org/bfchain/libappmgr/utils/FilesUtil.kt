@@ -2,7 +2,8 @@ package org.bfchain.libappmgr.utils
 
 import android.os.Build
 import android.util.Log
-import org.bfchain.libappmgr.model.AppInfo
+import org.bfchain.libappmgr.entity.AppInfo
+import org.bfchain.libappmgr.entity.DAppInfo
 import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -21,6 +22,7 @@ object FilesUtil {
   private val DIR_BOOT: String = "boot" // 存放 link.json 数据
   private val DIR_SYS: String = "sys" // 存放 icon 信息等
   private val FILE_LINK_JSON: String = "link.json"
+  private val FILE_BFSA_META_JSON: String = "bfsa-metadata.json"
 
   enum class APP_DIR_TYPE(val rootName: String) {
     // 内置应用
@@ -173,6 +175,7 @@ object FilesUtil {
    * @param filename
    */
   fun getFileContent(filename: String): String? {
+    // Log.d("FilesUtil", "getFileContent filename->$filename")
     var file = File(filename)
     if (!file.exists()) {
       return null
@@ -319,6 +322,15 @@ object FilesUtil {
       }
     }
     return appInfoList
+  }
+
+  /**
+   * 获取DAppInfo的版本信息
+   */
+  fun getDAppInfo(appInfo: AppInfo): DAppInfo? {
+    val path = getAppDirectory(APP_DIR_TYPE.SystemApp) + File.separator + appInfo.bfsAppId +
+      File.separator + DIR_BOOT + File.separator + FILE_BFSA_META_JSON
+    return JsonUtil.getDAppInfoFromBFSA(getFileContent(path))
   }
 
   /**

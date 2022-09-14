@@ -17,27 +17,41 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import org.bfchain.libappmgr.entity.AppVersion
 
 data class AlertDialogState(
-    var showDialog: MutableState<Boolean> = mutableStateOf(false),
-    var title: MutableState<String> = mutableStateOf("提示"),
-    var content: MutableState<String> = mutableStateOf("内容"),
-    var confirmText: MutableState<String> = mutableStateOf("确定"),
-    var dismissText: MutableState<String> = mutableStateOf("取消")
+  var showDialog: MutableState<Boolean> = mutableStateOf(false),
+  var title: MutableState<String> = mutableStateOf("提示"),
+  var content: MutableState<String> = mutableStateOf("内容"),
+  var confirmText: MutableState<String> = mutableStateOf("确定"),
+  var dismissText: MutableState<String> = mutableStateOf("取消")
 )
 
 fun AlertDialogState.changeState(
-    showDialog: Boolean? = null,
-    title: String? = null,
-    content: String? = null,
-    confirmText: String? = null,
-    dismissText: String? = null
+  showDialog: Boolean? = null,
+  title: String? = null,
+  content: String? = null,
+  confirmText: String? = null,
+  dismissText: String? = null
 ) {
-    this.showDialog.value = showDialog?.let { it } ?: this.showDialog.value
-    this.title.value = title?.let { it } ?: this.title.value
-    this.content.value = content?.let { it } ?: this.content.value
-    this.confirmText.value = confirmText?.let { it } ?: this.confirmText.value
-    this.dismissText.value = dismissText?.let { it } ?: this.dismissText.value
+  this.showDialog.value = showDialog?.let { it } ?: this.showDialog.value
+  this.title.value = title?.let { it } ?: this.title.value
+  this.content.value = content?.let { it } ?: this.content.value
+  this.confirmText.value = confirmText?.let { it } ?: this.confirmText.value
+  this.dismissText.value = dismissText?.let { it } ?: this.dismissText.value
+}
+
+fun AlertDialogState.changeStateNewVersion(
+  showDialog: Boolean? = null,
+  appVersion: AppVersion? = null,
+  confirmText: String? = null
+) {
+  this.showDialog.value = showDialog?.let { it } ?: this.showDialog.value
+  this.title.value = "版本更新提醒"
+  this.content.value =
+    appVersion?.let { "版本信息：${it.version}\n更新内容：${it.releaseNotes}" } ?: "暂无版本信息"
+  this.confirmText.value = confirmText?.let { it } ?: "下载"
+  this.dismissText.value = "取消"
 }
 
 /**
@@ -45,35 +59,35 @@ fun AlertDialogState.changeState(
  */
 @Composable
 fun CustomAlertDialog(
-    state: AlertDialogState,
-    onConfirm: (() -> Unit)? = null,
-    onCancel: (() -> Unit)? = null
+  state: AlertDialogState,
+  onConfirm: (() -> Unit)? = null,
+  onCancel: (() -> Unit)? = null
 ) {
-    Log.d("Dialog.kt", "CustomAlertDialog enter -> ${state.showDialog.value}")
-    if (state.showDialog.value) {
-        AlertDialog(
-            modifier = Modifier.padding(20.dp),
-            onDismissRequest = { state.showDialog.value = false }, // 点击对话框周围空白部分
-            title = {
-                Text(text = state.title.value)
-            },
-            text = { Text(text = state.content.value) },
-            confirmButton = {
-                TextButton(onClick = {
-                    onConfirm?.let { onConfirm() } // 回调通知点击了确认按钮
-                }) {
-                    Text(text = state.confirmText.value)
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = {
-                    state.showDialog.value = false
-                    onCancel?.let { onCancel() }
-                }) {
-                    Text(text = state.dismissText.value)
-                }
-            })
-    }
+  Log.d("Dialog.kt", "CustomAlertDialog enter -> ${state.showDialog.value}")
+  if (state.showDialog.value) {
+    AlertDialog(
+      modifier = Modifier.padding(20.dp),
+      onDismissRequest = { state.showDialog.value = false }, // 点击对话框周围空白部分
+      title = {
+        Text(text = state.title.value)
+      },
+      text = { Text(text = state.content.value) },
+      confirmButton = {
+        TextButton(onClick = {
+          onConfirm?.let { onConfirm() } // 回调通知点击了确认按钮
+        }) {
+          Text(text = state.confirmText.value)
+        }
+      },
+      dismissButton = {
+        TextButton(onClick = {
+          state.showDialog.value = false
+          onCancel?.let { onCancel() }
+        }) {
+          Text(text = state.dismissText.value)
+        }
+      })
+  }
 }
 
 /**
@@ -81,67 +95,67 @@ fun CustomAlertDialog(
  */
 @Composable
 fun LoadingDialog(showDialog: MutableState<Boolean>, onCancel: (() -> Unit)? = null) {
-    Log.d("Dialog.kt", "LoadingDialog enter -> ${showDialog.value}")
-    if (showDialog.value) {
-        Dialog(onDismissRequest = {
-            showDialog.value = false
-            onCancel?.let { onCancel() }
-        }) {
-            Box(
-                modifier = Modifier
-                    .height(120.dp)
-                    .fillMaxWidth()
-                    .padding(20.dp)
-                    .clip(RoundedCornerShape(6.dp))
-                    .background(Color.White)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .padding(10.dp)
-                        .align(Alignment.CenterStart),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // 左边显示 加载动画，右边显示“正在加载中，请稍后..."
-                    CircularProgressIndicator()
-                    Spacer(modifier = Modifier.width(22.dp))
-                    Text(text = "正在加载中，请稍后...")
-                }
-            }
+  Log.d("Dialog.kt", "LoadingDialog enter -> ${showDialog.value}")
+  if (showDialog.value) {
+    Dialog(onDismissRequest = {
+      showDialog.value = false
+      onCancel?.let { onCancel() }
+    }) {
+      Box(
+        modifier = Modifier
+          .height(120.dp)
+          .fillMaxWidth()
+          .padding(20.dp)
+          .clip(RoundedCornerShape(6.dp))
+          .background(Color.White)
+      ) {
+        Row(
+          modifier = Modifier
+            .padding(10.dp)
+            .align(Alignment.CenterStart),
+          verticalAlignment = Alignment.CenterVertically
+        ) {
+          // 左边显示 加载动画，右边显示“正在加载中，请稍后..."
+          CircularProgressIndicator()
+          Spacer(modifier = Modifier.width(22.dp))
+          Text(text = "正在加载中，请稍后...")
         }
+      }
     }
+  }
 }
 
 @Composable
 fun ProgressDialog(
-    showDialog: MutableState<Boolean>,
-    progress: MutableState<Float>,
-    onCancel: (() -> Unit)? = null
+  showDialog: MutableState<Boolean>,
+  progress: MutableState<Float>,
+  onCancel: (() -> Unit)? = null
 ) {
-    Log.d("Dialog.kt", "ProgressDialog enter -> ${showDialog.value}")
-    if (showDialog.value) {
-        Dialog(onDismissRequest = {}) {
-            Box(
-                modifier = Modifier
-                    .height(120.dp)
-                    .fillMaxWidth()
-                    .padding(20.dp)
-                    .clip(RoundedCornerShape(6.dp))
-                    .background(Color.White)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .padding(10.dp)
-                        .align(Alignment.CenterStart),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // 左边显示 加载动画，右边显示“正在加载中，请稍后..."
-                    CircularProgressIndicator(progress = progress.value)
-                    Spacer(modifier = Modifier.width(18.dp))
-                    var pp = String.format("%d", (progress.value * 100).toInt())
-                    Text(text = "正在加载中，请稍后...$pp %")
-                }
-            }
+  Log.d("Dialog.kt", "ProgressDialog enter -> ${showDialog.value}")
+  if (showDialog.value) {
+    Dialog(onDismissRequest = {}) {
+      Box(
+        modifier = Modifier
+          .height(120.dp)
+          .fillMaxWidth()
+          .padding(20.dp)
+          .clip(RoundedCornerShape(6.dp))
+          .background(Color.White)
+      ) {
+        Row(
+          modifier = Modifier
+            .padding(10.dp)
+            .align(Alignment.CenterStart),
+          verticalAlignment = Alignment.CenterVertically
+        ) {
+          // 左边显示 加载动画，右边显示“正在加载中，请稍后..."
+          CircularProgressIndicator(progress = progress.value)
+          Spacer(modifier = Modifier.width(18.dp))
+          var pp = String.format("%d", (progress.value * 100).toInt())
+          Text(text = "正在加载中，请稍后...$pp %")
         }
+      }
     }
+  }
 }
 

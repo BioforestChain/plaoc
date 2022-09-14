@@ -26,9 +26,9 @@ object KtorManager {
       level = LogLevel.ALL
     }
     install(HttpTimeout) {
-      connectTimeoutMillis = 10000
+      connectTimeoutMillis = 5000
       requestTimeoutMillis = 100000
-      socketTimeoutMillis = 100000
+      //socketTimeoutMillis = 100000
     }
   }
 }

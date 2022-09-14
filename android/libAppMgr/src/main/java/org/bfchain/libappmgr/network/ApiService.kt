@@ -1,7 +1,7 @@
 package org.bfchain.libappmgr.network
 
 import io.ktor.client.statement.*
-import org.bfchain.libappmgr.model.AppVersion
+import org.bfchain.libappmgr.entity.AppVersion
 import org.bfchain.libappmgr.network.base.ApiResultData
 import org.bfchain.libappmgr.network.base.BaseData
 import java.io.File

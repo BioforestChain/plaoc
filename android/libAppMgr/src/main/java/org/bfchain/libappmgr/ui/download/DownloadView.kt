@@ -3,8 +3,8 @@ package org.bfchain.libappmgr.ui.download
 import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
-import org.bfchain.libappmgr.model.AppInfo
-import org.bfchain.libappmgr.model.AppVersion
+import org.bfchain.libappmgr.entity.AppInfo
+import org.bfchain.libappmgr.entity.AppVersion
 import org.bfchain.libappmgr.network.base.IApiResult
 import org.bfchain.libappmgr.ui.main.MainViewModel
 import org.bfchain.libappmgr.utils.FilesUtil

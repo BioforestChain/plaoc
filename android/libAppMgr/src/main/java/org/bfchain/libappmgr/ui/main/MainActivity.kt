@@ -18,9 +18,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.bfchain.libappmgr.data.PreferencesHelper
-import org.bfchain.libappmgr.model.AppInfo
-import org.bfchain.libappmgr.model.AppVersion
-import org.bfchain.libappmgr.model.AutoUpdateInfo
+import org.bfchain.libappmgr.entity.AppInfo
+import org.bfchain.libappmgr.entity.AppVersion
+import org.bfchain.libappmgr.entity.AutoUpdateInfo
 import org.bfchain.libappmgr.network.base.IApiResult
 import org.bfchain.libappmgr.schedule.CoroutineUpdateTask
 import org.bfchain.libappmgr.ui.download.DownLoadViewModel

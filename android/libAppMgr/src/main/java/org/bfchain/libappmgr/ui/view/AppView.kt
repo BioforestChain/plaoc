@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -30,9 +31,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
 import org.bfchain.libappmgr.R
-import org.bfchain.libappmgr.model.AppInfo
-import org.bfchain.libappmgr.model.AppVersion
-import org.bfchain.libappmgr.model.AutoUpdateInfo
+import org.bfchain.libappmgr.entity.AppInfo
+import org.bfchain.libappmgr.entity.AppVersion
+import org.bfchain.libappmgr.entity.AutoUpdateInfo
 import org.bfchain.libappmgr.network.base.IApiResult
 import org.bfchain.libappmgr.ui.download.DownLoadViewModel
 import org.bfchain.libappmgr.ui.main.MainViewModel
@@ -105,7 +106,7 @@ fun AppInfoView(
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
-fun AppInfoView(appInfo: AppInfo, onOpenApp: ((appInfo: AppInfo) -> Unit)? = null) {
+fun AppInfoView(appInfo: AppInfo, onOpenApp: ((url: String) -> Unit)? = null) {
   var coroutineScope = rememberCoroutineScope()
   var vmMain: MainViewModel = viewModel()
   var vmDown: DownLoadViewModel = viewModel()
@@ -124,51 +125,55 @@ fun AppInfoView(appInfo: AppInfo, onOpenApp: ((appInfo: AppInfo) -> Unit)? = nul
       downloadDialogState.changeState(showDialog = true)
       var requestFinish = false
       coroutineScope.launch {
-        var version =
-          FilesUtil
-            .getLastUpdateContent(appInfo)
-            ?.let {
-              Log.d("AppView", "it->$it")
-              JsonUtil.fromJson(AppVersion::class.java, it)
-            }
+        var version = FilesUtil.getLastUpdateContent(appInfo)?.let {
+          Log.d("AppView", "it->$it")
+          JsonUtil.fromJson(AppVersion::class.java, it)
+        }
         if (!requestFinish) {
           appVersion = version
-          downloadDialogState.changeState(
-            title = appVersion?.releaseName ?: "更新版本",
-            content = appVersion?.releaseNotes ?: "暂无版本信息",
-            confirmText = "下载"
-          )
+          downloadDialogState.changeStateNewVersion(appVersion = appVersion)
         }
       }
       vmMain.getAppVersionAndSave(appInfo, object : IApiResult<AppVersion> {
         override fun onSuccess(errorCode: Int, errorMsg: String, data: AppVersion) {
           requestFinish = true
           appVersion = data
-          downloadDialogState.changeState(
-            title = data.releaseName,
-            content = data.releaseNotes,
-            confirmText = "下载"
-          )
+          downloadDialogState.changeStateNewVersion(appVersion = appVersion)
         }
       })
     } else {
-      Toast.makeText(
-        AppContextUtil.sInstance, "直接打开应用-->${appInfo.name}", Toast.LENGTH_SHORT
-      ).show()
-      onOpenApp?.let { onOpenApp(appInfo) }
-      // 打开应用后仍然需要判断是否有最新版本
-      
+      // 1.打开应用
+      var dappInfo = FilesUtil.getDAppInfo(appInfo)
+      dappInfo?.let { dApp ->
+        onOpenApp?.let { onOpenApp(dApp.enter.main) } // 回调dweb请求的地址
+        Toast.makeText(
+          AppContextUtil.sInstance, "直接打开应用-->${dApp.enter.main}", Toast.LENGTH_SHORT
+        ).show()
+      }
+      vmMain.getAppVersion(appInfo, object : IApiResult<AppVersion> {
+        override fun onSuccess(errorCode: Int, errorMsg: String, data: AppVersion) {
+          // 请求成功后，比对获取的版本号和当前版本号
+          if (dappInfo == null || hasNewVersion(dappInfo.version, data.version)) {
+            appVersion = data
+            downloadDialogState.changeStateNewVersion(showDialog = true, appVersion = appVersion)
+          }
+        }
+      })
     }
   })
   // 显示提示对话框
   CustomAlertDialog(downloadDialogState, onConfirm = {
-    if (downloadType == DownloadType.Complete) {
+    if (downloadType == DownloadType.Fail) {
       downloadDialogState.changeState(showDialog = false)
       downloadType = DownloadType.Init
+    } else if (downloadType == DownloadType.Complete) {
+      downloadDialogState.changeState(showDialog = false)
+      downloadType = DownloadType.Init
+      var url = getDAppInfoUrl(appInfo)
       Toast.makeText(
-        AppContextUtil.sInstance, "直接打开应用-->${appInfo.name}", Toast.LENGTH_SHORT
+        AppContextUtil.sInstance, "直接打开应用-->${appInfo.name} url->$url", Toast.LENGTH_SHORT
       ).show()
-      onOpenApp?.let { onOpenApp(appInfo) }
+      onOpenApp?.let { onOpenApp(url) }
     } else if (appVersion != null && appVersion!!.files.isNotEmpty()) {
       // 调用下载操作
       downloadDialogState.changeState(showDialog = false)
@@ -234,7 +239,7 @@ fun AppInfoView(appInfo: AppInfo, onOpenApp: ((appInfo: AppInfo) -> Unit)? = nul
 }
 
 @Composable
-fun AppInfoGridView(appInfoList: List<AppInfo>, onOpenApp: ((appInfo: AppInfo) -> Unit)? = null) {
+fun AppInfoGridView(appInfoList: List<AppInfo>, onOpenApp: ((url: String) -> Unit)? = null) {
   LazyVerticalGrid(
     columns = GridCells.Adaptive(minSize = 60.dp),
     contentPadding = PaddingValues(16.dp, 8.dp)
@@ -263,4 +268,24 @@ fun PreviewAppInfoView() {
     )
   }
   AppInfoGridView(appInfoList = list)
+}
+
+private fun getDAppInfoUrl(appInfo: AppInfo): String {
+  return FilesUtil.getDAppInfo(appInfo)?.let { it.enter.main } ?: ""
+}
+
+private fun hasNewVersion(cur: String, net: String): Boolean {
+  var curArray = cur.split(".")
+  var netArray = net.split(".")
+  var minSize = when (curArray.size > netArray.size) {
+    true -> netArray.size
+    false -> curArray.size
+  }
+  for (i in (0..minSize)) {
+    if (curArray[i].toInt() < netArray[i].toInt()) {
+      return true
+    }
+  }
+  if (curArray.size < netArray.size) return true
+  return false
 }
