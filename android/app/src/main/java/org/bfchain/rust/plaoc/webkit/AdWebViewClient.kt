@@ -3,10 +3,6 @@ package org.bfchain.rust.plaoc.webkit
 import android.graphics.Bitmap
 import android.util.Log
 import android.webkit.*
-import org.bfchain.rust.plaoc.chromium.WebView
-import org.bfchain.rust.plaoc.chromium.WebViewClient
-import org.chromium.android_webview.AwContentsClient.AwWebResourceError
-import org.chromium.android_webview.AwContentsClient.AwWebResourceRequest
 
 /**
  * AccompanistWebViewClient
@@ -59,24 +55,23 @@ open class AdWebViewClient : WebViewClient() {
 
     override fun onReceivedError(
         view: WebView?,
-        request: AwWebResourceRequest,
-        error: AwWebResourceError
+        request: WebResourceRequest?,
+        error: WebResourceError?
     ) {
         super.onReceivedError(view, request, error)
-        state.errorsForCurrentRequest.add(AdWebViewError(request, error))
-//        if (error != null) {
-//            state.errorsForCurrentRequest.add(AdWebViewError(request, error))
-//        } else
-//            Log.d("AdWebViewClient", "$request -- error $error")
+        if (error != null) {
+            state.errorsForCurrentRequest.add(AdWebViewError(request, error))
+        } else
+            Log.d("AdWebViewClient", "$request -- error $error")
     }
 
     override fun shouldOverrideUrlLoading(
         view: WebView?,
-        request: AwWebResourceRequest
+        request: WebResourceRequest?
     ): Boolean {
         // Override all url loads to make the single source of truth
         // of the URL the state holder Url
-        request.let {
+        request?.let {
             state.content = state.content.withUrl(it.url.toString())
         }
         return true

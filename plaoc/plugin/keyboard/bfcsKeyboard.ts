@@ -1,6 +1,6 @@
 import { VirtualKeyboardFFI } from "./net";
 import { Keyboard } from "./bfcsKeyboard.type";
-import { DwebPlugin } from "../native/dweb-plugin";
+import { DwebPlugin } from '../native/dweb-plugin';
 
 export class BfcsKeyboard extends DwebPlugin {
   private _ffi: Keyboard.IVirtualKeyboardFFI;
@@ -11,9 +11,10 @@ export class BfcsKeyboard extends DwebPlugin {
     this._ffi = new VirtualKeyboardFFI();
   }
 
-  connectedCallback() {}
+  connectedCallback() {
+  }
 
-  disconnectedCallback() {}
+  disconnectedCallback() { }
 
   /**获取键盘安全区域 */
   async getKeyboardSafeArea(): Promise<Keyboard.IKeyboardSafeArea> {
@@ -64,7 +65,7 @@ export class BfcsKeyboard extends DwebPlugin {
       if (this.hasAttribute(attrName)) {
         this.hideKeyboard();
       } else {
-        this.showKeyboard();
+        this.showKeyboard()
       }
     }
   }

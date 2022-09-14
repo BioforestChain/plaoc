@@ -1,6 +1,8 @@
 package org.bfchain.rust.plaoc.webView.network
 
 import android.util.Log
+import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.DeserializationFeature
 import org.bfchain.rust.plaoc.DenoService
@@ -8,8 +10,6 @@ import org.bfchain.rust.plaoc.ExportNativeUi
 import org.bfchain.rust.plaoc.jsHandle
 import org.bfchain.rust.plaoc.mapper
 import org.bfchain.rust.plaoc.webView.urlscheme.CustomUrlScheme
-import org.chromium.android_webview.AwContentsClient.AwWebResourceRequest
-import org.chromium.components.embedder_support.util.WebResourceResponseInfo
 import java.io.ByteArrayInputStream
 import java.net.HttpURLConnection
 import java.net.URL
@@ -32,8 +32,8 @@ var network_whitelist = "http://127.0.0.1"
  *  https://channelId.bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj.dweb/done
  */
 fun dataGateWay(
-    request: AwWebResourceRequest
-): WebResourceResponseInfo {
+    request: WebResourceRequest
+): WebResourceResponse {
     val url = request.url.toString().lowercase(Locale.ROOT)
     Log.i(TAG, " dataGateWay: $url")
     if (front_to_rear_map.contains(url)) {
@@ -42,13 +42,13 @@ fun dataGateWay(
         connection.requestMethod = request.method
         Log.i(TAG, " dataGateWay front_to_rear_map.contains: $trueUrl")
         Log.i(TAG, " dataGateWay connection.inputStream: ${connection.inputStream}")
-        return WebResourceResponseInfo(
+        return WebResourceResponse(
             "application/json",
             "utf-8",
             connection.inputStream
         )
     }
-    return WebResourceResponseInfo(
+    return WebResourceResponse(
         "application/json",
         "utf-8",
         ByteArrayInputStream("access denied".toByteArray())
@@ -57,22 +57,13 @@ fun dataGateWay(
 
 // 传递dwebView到deno的消息
 fun messageGateWay(
-    request: AwWebResourceRequest
-): WebResourceResponseInfo {
-    val url = request.url
+    request: WebResourceRequest
+): WebResourceResponse {
+    val url = request.url.toString().lowercase(Locale.ROOT)
     Log.i(TAG, " messageGateWay: $url")
     val byteData = url.substring(url.lastIndexOf("=") + 1)
     DenoService().backDataToRust(hexStrToByteArray(byteData))// 通知
-
-//    val stringData = String(hexStrToByteArray(byteData))
-//    mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true)
-//    mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true) //允许使用单引号
-//    val handle = mapper.readValue(stringData, jsHandle::class.java)
-//    val funName = (handle.function[0]).toString()
-//    // 执行函数
-//    callable_map[funName]?.let { it -> it(handle.data) }
-
-    return WebResourceResponseInfo(
+    return WebResourceResponse(
         "application/json",
         "utf-8",
         ByteArrayInputStream("ok".toByteArray())
@@ -81,9 +72,9 @@ fun messageGateWay(
 
 // 转发给ui
 fun uiGateWay(
-  request: AwWebResourceRequest
-): WebResourceResponseInfo {
-  val url = request.url
+  request: WebResourceRequest
+): WebResourceResponse {
+  val url = request.url.toString().lowercase(Locale.ROOT)
   val byteData = url.substring(url.lastIndexOf("=") + 1)
   val stringData = String(hexStrToByteArray(byteData))
 //  Log.i(TAG, " uiGateWay: $stringData")
@@ -92,12 +83,12 @@ fun uiGateWay(
   val funName = ExportNativeUi.valueOf(handle.function);
   // 执行函数
   val result = call_ui_map[funName]?.let { it -> it(handle.data)
-  }?: return WebResourceResponseInfo(
+  }?: return WebResourceResponse(
         "application/json",
         "utf-8",
         ByteArrayInputStream("0".toByteArray())
       )
-  return WebResourceResponseInfo(
+  return WebResourceResponse(
     "application/json",
     "utf-8",
     ByteArrayInputStream(result.toString().toByteArray())
@@ -108,9 +99,9 @@ fun uiGateWay(
 // 视图文件拦截
 fun viewGateWay(
     customUrlScheme: CustomUrlScheme,
-    request: AwWebResourceRequest
-): WebResourceResponseInfo {
-    val url = request.url
+    request: WebResourceRequest
+): WebResourceResponse {
+    val url = request.url.toString().lowercase(Locale.ROOT)
     Log.i(TAG, " viewGateWay: ${request.url}")
 //    Log.i(TAG, " viewGateWay: ${front_to_rear_map.contains(url)}")
     if (front_to_rear_map.contains(url)) {
@@ -120,7 +111,7 @@ fun viewGateWay(
             if (trueUrl.startsWith("https") || trueUrl.startsWith("http")) {
                 val connection = URL(trueUrl).openConnection() as HttpURLConnection
                 connection.requestMethod = request.method
-                return WebResourceResponseInfo(
+                return WebResourceResponse(
                     "text/html",
                     "utf-8",
                     connection.inputStream
@@ -130,7 +121,7 @@ fun viewGateWay(
             return customUrlScheme.handleRequest(request, trueUrl)
         }
     }
-    return WebResourceResponseInfo(
+    return WebResourceResponse(
         "application/json",
         "utf-8",
         ByteArrayInputStream("无权限，需要前往后端配置".toByteArray())
@@ -142,7 +133,7 @@ fun initMetaData(metaData: String) {
     val metaJson =
         mapper.readValue(metaData, UserMetaData::class.java)
     // 设置域名
-    dWebView_host = metaJson.baseUrl
+    dWebView_host = metaJson.baseUrl.lowercase(Locale.ROOT)
     // 设置路由
     for (importMap in metaJson.dwebview.importmap) {
         front_to_rear_map[resolveUrl(importMap.url)] = importMap.response

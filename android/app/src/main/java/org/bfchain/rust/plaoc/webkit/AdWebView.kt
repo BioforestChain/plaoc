@@ -16,7 +16,6 @@
 
 package org.bfchain.rust.plaoc.webkit
 
-import android.app.Application
 import android.view.ViewGroup
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.*
@@ -93,8 +92,8 @@ fun AdWebView(
                 chromeClient.state = state
                 chromeClient.fileInputHelper = fileInputHelper
 
-                setWebChromeClient(chromeClient)
-                setWebViewClient(client)
+                webChromeClient = chromeClient
+                webViewClient = client
             }.also { webView = it }
         },
         modifier = modifier
@@ -103,7 +102,7 @@ fun AdWebView(
             is AdWebContent.Url -> {
                 val url = content.url
 
-                if (url.isNotEmpty() && url != view.getUrl()) {
+                if (url.isNotEmpty() && url != view.url) {
                     view.loadUrl(url, content.additionalHttpHeaders.toMutableMap())
                 }
             }

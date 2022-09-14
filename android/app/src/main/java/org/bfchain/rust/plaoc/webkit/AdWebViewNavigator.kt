@@ -1,12 +1,12 @@
 package org.bfchain.rust.plaoc.webkit
 
+import android.webkit.WebView
 import androidx.compose.runtime.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.bfchain.rust.plaoc.chromium.WebView
 
 /**
  * Allows control over the navigation of a WebView from outside the composable. E.g. for performing

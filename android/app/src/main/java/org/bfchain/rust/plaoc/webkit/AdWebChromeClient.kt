@@ -1,20 +1,16 @@
 package org.bfchain.rust.plaoc.webkit
 
-//import android.webkit.WebChromeClient
-//import android.webkit.WebView
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Process
 import android.util.Log
+import android.webkit.ConsoleMessage
 import android.webkit.ValueCallback
-import org.bfchain.rust.plaoc.chromium.WebChromeClient
-import org.bfchain.rust.plaoc.chromium.WebView
+import android.webkit.WebChromeClient
+import android.webkit.WebView
 import org.bfchain.rust.plaoc.webkit.inputFile.AdFileInputHelper
 import org.bfchain.rust.plaoc.webkit.inputFile.InputFileOptions
-import org.chromium.android_webview.AwConsoleMessage
-import org.chromium.android_webview.AwContentsClient.FileChooserParamsImpl
-import org.chromium.base.Callback
 
 /**
  * AccompanistWebChromeClient
@@ -46,38 +42,25 @@ open class AdWebChromeClient : WebChromeClient() {
         state.loadingState = AdLoadingState.Loading(newProgress / 100.0f)
     }
 
-    override fun showFileChooser(
+    override fun onShowFileChooser(
         webView: WebView?,
-        filePathCallback: Callback<Array<String>>,
-        fileChooserParams: FileChooserParamsImpl
-    ) {
-//        super.showFileChooser(webView, filePathCallback, fileChooserParams)
-
-        val callbackAdapter: ValueCallback<Array<Uri>> = object : ValueCallback<Array<Uri>> {
-            private var mCompleted = false
-            override fun onReceiveValue(uriList: Array<Uri>) {
-                check(!mCompleted) { "showFileChooser result was already called" }
-                mCompleted = true
-                val s = arrayOf<String>()
-                for (i in uriList.indices) {
-                    s[i] = uriList[i].toString()
-                }
-                filePathCallback.onResult(s)
-            }
-        }
+        filePathCallback: ValueCallback<Array<Uri>>?,
+        fileChooserParams: FileChooserParams?
+    ): Boolean {
+//        return super.onShowFileChooser(webView, filePathCallback, fileChooserParams)
 
         var multiple = false
         var capture = false
         val accept = mutableListOf<String>()
 
-        fileChooserParams.let { params ->
+        fileChooserParams?.let { params ->
             capture = params.isCaptureEnabled
-            multiple = params.mode == android.webkit.WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE
+            multiple = params.mode == WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE
             accept.addAll(params.acceptTypes)
         }
 
         val launchFileInput = {
-            fileInputHelper.filePathCallback = callbackAdapter
+            fileInputHelper.filePathCallback = filePathCallback
             val options =
                 InputFileOptions(accept = accept, multiple = multiple, capture = capture)
             fileInputHelper.inputFileLauncher.launch(options)
@@ -86,7 +69,7 @@ open class AdWebChromeClient : WebChromeClient() {
         if (capture && PackageManager.PERMISSION_GRANTED != webView?.context?.checkPermission(
                 android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
                 Process.myPid(), Process.myUid()
-            )
+            ) ?: return false/*cancel*/
         ) {
             fileInputHelper.requestPermissionCallback = ValueCallback {
                 launchFileInput()
@@ -95,51 +78,13 @@ open class AdWebChromeClient : WebChromeClient() {
         } else {
             launchFileInput()
         }
+
+
+        return true
     }
 
-//    override fun showFileChooser(
-//        webView: WebView?,
-//        filePathCallback: Callback<Array<Uri>>,
-//        fileChooserParams: FileChooserParamsImpl
-//    ) {
-////        return super.onShowFileChooser(webView, filePathCallback, fileChooserParams)
-//
-//        var multiple = false
-//        var capture = false
-//        val accept = mutableListOf<String>()
-//
-//        fileChooserParams.let { params ->
-//            capture = params.isCaptureEnabled
-//            multiple = params.mode == android.webkit.WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE
-//            accept.addAll(params.acceptTypes)
-//        }
-//
-//        val launchFileInput = {
-//            fileInputHelper.filePathCallback = filePathCallback
-//            val options =
-//                InputFileOptions(accept = accept, multiple = multiple, capture = capture)
-//            fileInputHelper.inputFileLauncher.launch(options)
-//        }
-//
-//        if (capture && PackageManager.PERMISSION_GRANTED != webView?.context?.checkPermission(
-//                android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
-//                Process.myPid(), Process.myUid()
-//            ) ?: return false/*cancel*/
-//        ) {
-//            fileInputHelper.requestPermissionCallback = ValueCallback {
-//                launchFileInput()
-//            }
-//            fileInputHelper.requestPermissionLauncher.launch(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
-//        } else {
-//            launchFileInput()
-//        }
-//
-//
-//        return true
-//    }
-
-    override fun onConsoleMessage(consoleMessage: AwConsoleMessage): Boolean {
-        consoleMessage.apply {
+    override fun onConsoleMessage(consoleMessage: ConsoleMessage?): Boolean {
+        consoleMessage?.apply {
             Log.d("WebChromeClient", "${message()} -- From line ${lineNumber()} of ${sourceId()}")
         }
         return true
