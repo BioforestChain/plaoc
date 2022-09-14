@@ -83,8 +83,6 @@ open class AdWebChromeClient : WebChromeClient() {
             fileInputHelper.inputFileLauncher.launch(options)
         }
 
-        launchFileInput()
-
         if (capture && PackageManager.PERMISSION_GRANTED != webView?.context?.checkPermission(
                 android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
                 Process.myPid(), Process.myUid()

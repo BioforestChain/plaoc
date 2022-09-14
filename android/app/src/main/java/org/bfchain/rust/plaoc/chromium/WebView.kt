@@ -75,16 +75,26 @@ open class WebView: WebView {
                     return cwebChromeClient?.onCreateWindow(mWebView, isDialog, isUserGesture, null) ?: false
                 }
 
+                // chromium接收跳转链接标题
+                override fun onReceivedTitle(title: String?) {
+                    cwebChromeClient?.onReceivedTitle(mWebView, title)
+                }
+
+                // chromium接收跳转链接icon
+                override fun onReceivedIcon(bitmap: Bitmap?) {
+                    cwebChromeClient?.onReceivedIcon(mWebView, bitmap)
+                }
+
                 override fun onPageFinished(url: String) {
-                    cwebViewClient?.onPageFinished(null, url)
+                    cwebViewClient?.onPageFinished(mWebView, url)
                 }
 
                 override fun shouldOverrideUrlLoading(request: AwWebResourceRequest): Boolean {
-                    return cwebViewClient?.shouldOverrideUrlLoading(null, request) ?: false
+                    return cwebViewClient?.shouldOverrideUrlLoading(mWebView, request) ?: false
                 }
 
                 override fun shouldInterceptRequest(request: AwWebResourceRequest): WebResourceResponseInfo? {
-                    return cwebViewClient?.shouldInterceptRequest(null, request)
+                    return cwebViewClient?.shouldInterceptRequest(mWebView, request)
                 }
             }
             , settings)
