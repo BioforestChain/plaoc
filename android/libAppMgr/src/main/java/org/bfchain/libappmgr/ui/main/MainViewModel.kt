@@ -44,7 +44,7 @@ class MainViewModel : ViewModel() {
                             baseData.data?.let {
                                 // 将改内容存储到 remember-app/bfs-id-app/tmp/autoUpdate 中
                                 FilesUtil.writeFileContent(
-                                    FilesUtil.getAppVersionSaveFile(appInfo.bfsAppId),
+                                    FilesUtil.getAppVersionSaveFile(appInfo),
                                     JsonUtil.toJson(AppVersion::class.java, baseData.data)
                                 )
                                 apiResult?.let {

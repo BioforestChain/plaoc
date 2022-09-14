@@ -34,6 +34,9 @@ class ApiServiceImpl(private val client: HttpClient) : ApiService {
     }
     val httpStatement = HttpStatement(builder, client)
     httpStatement.execute { response: HttpResponse ->
+      if (response.status.value != 200) {
+        throw Exception("网络请求异常[$path]->${response.status}")
+      }
       // 下载放在这边实现
       val channel = response.body<ByteReadChannel>()
       val contentLength = response.contentLength() // 文件大小
