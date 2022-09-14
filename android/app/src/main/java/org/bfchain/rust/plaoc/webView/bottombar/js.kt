@@ -25,8 +25,8 @@ class BottomBarFFI(
     fun getEnabled() = state.isEnabled
 
    // 控制是否隐藏bottom bar, 此方法如果不传不会调用，一传肯定是true，也就是不显示bottom bar
-    fun setEnabled(isEnabledBool: Boolean): Boolean? {
-        state.enabled.value = !isEnabledBool
+    fun setEnabled(isEnabledBool: String): Boolean {
+        state.enabled.value = !isEnabledBool.toBoolean()
         return getEnabled()
     }
 
@@ -39,23 +39,18 @@ class BottomBarFFI(
         return state.overlay.value ?: 1F
     }
 
-    @JavascriptInterface
     fun getHeight(): Float {
         return state.height.value ?: 0F
     }
 
-    @JavascriptInterface
     fun setHeight(heightDp: String) {
         state.height.value = heightDp.toFloat()
     }
 
-
-    @JavascriptInterface
     fun getActions(): DataString<List<BottomBarAction>> {
         return DataString_From(state.actions)//.map { action -> toDataString(action) }
     }
 
-    @JavascriptInterface
     fun setActions(actionListJson: DataString<List<BottomBarAction>>) {
         state.actions.clear()
       Log.i(TAG, "actionListJson:${actionListJson}")
@@ -67,22 +62,18 @@ class BottomBarFFI(
 //      }
     }
 
-    @JavascriptInterface
     fun getBackgroundColor(): Int {
         return state.backgroundColor.value.toArgb()
     }
 
-    @JavascriptInterface
     fun setBackgroundColor(color: ColorInt) {
         state.backgroundColor.value = Color(color)
     }
 
-    @JavascriptInterface
     fun getForegroundColor(): Int {
         return state.foregroundColor.value.toArgb()
     }
 
-    @JavascriptInterface
     fun setForegroundColor(color: ColorInt) {
         state.foregroundColor.value = Color(color)
     }

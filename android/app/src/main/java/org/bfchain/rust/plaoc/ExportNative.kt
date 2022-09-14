@@ -24,7 +24,6 @@ enum class ExportNativeUi(val type: String) {
   SetStatusBarVisible("setStatusBarVisible"),
   GetStatusBarOverlay("getStatusBarOverlay"),
   SetStatusBarOverlay("setStatusBarOverlay"),
-
   // keyboard
   GetKeyBoardSafeArea("getKeyBoardSafeArea"),
   GetKeyBoardHeight("getKeyBoardHeight"),
@@ -32,12 +31,6 @@ enum class ExportNativeUi(val type: String) {
   SetKeyBoardOverlay("setKeyBoardOverlay"),
   ShowKeyBoard("showKeyBoard"),
   HideKeyBoard("hideKeyBoard"),
-  // bottomBar
-  GetBottomBarEnabled("getBottomBarEnabled"),
-  SetBottomBarEnabled("getBottomBarEnabled"),
-  GetBottomBarOverlay("getBottomBarOverlay"),
-  SetBottomBarOverlay("setBottomBarOverlay"),
-
   // Top Bar
   TopBarNavigationBack("topBarNavigationBack"),
   GetTopBarEnabled("getTopBarEnabled"),
@@ -54,6 +47,17 @@ enum class ExportNativeUi(val type: String) {
   SetTopBarBackgroundColor("setTopBarBackgroundColor"),
   GetTopBarForegroundColor("getTopBarForegroundColor"),
   SetTopBarForegroundColor("setTopBarForegroundColor"),
-
-
+  // bottomBar
+  GetBottomBarEnabled("getBottomBarEnabled"),
+  SetBottomBarEnabled("getBottomBarEnabled"),
+  GetBottomBarOverlay("getBottomBarOverlay"),
+  SetBottomBarOverlay("setBottomBarOverlay"),
+  GetBottomBarHeight("getBottomBarHeight"),
+  SetBottomBarHeight("setBottomBarHeight"),
+  GetBottomBarActions("getBottomBarActions"),
+  SetBottomBarActions("setBottomBarActions"),
+  GetBottomBarBackgroundColor("getBottomBarBackgroundColor"),
+  SetBottomBarBackgroundColor("setBottomBarBackgroundColor"),
+  GetBottomBarForegroundColor("getBottomBarForegroundColor"),
+  SetBottomBarForegroundColor("setBottomBarForegroundColor")
 }

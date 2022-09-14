@@ -196,18 +196,16 @@ fun DWebView(
                         jsUtil!!,
                         systemUIState,
                     )
-                  initUiFn(systemUiFFI)
+                  initSystemUiFn(systemUiFFI)
 
                     val topBarFFI = TopBarFFI(
                         topBarState,
                     )
 
                   initTopBarFn(topBarFFI)
-                    webView.addJavascriptInterface(topBarFFI, "top_bar")
-
 
                     val bottomBarFFI = BottomBarFFI(bottomBarState)
-                    webView.addJavascriptInterface(bottomBarFFI, "bottom_bar")
+                  initBottomFn(bottomBarFFI)
 
                     val dialogFFI = DialogFFI(
                         jsUtil!!,

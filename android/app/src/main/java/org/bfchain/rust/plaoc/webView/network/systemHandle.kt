@@ -3,6 +3,7 @@ package org.bfchain.rust.plaoc.webView.network
 import android.util.Log
 import org.bfchain.rust.plaoc.ExportNativeUi
 import org.bfchain.rust.plaoc.mapper
+import org.bfchain.rust.plaoc.webView.bottombar.BottomBarFFI
 import org.bfchain.rust.plaoc.webView.jsutil.ColorInt
 import org.bfchain.rust.plaoc.webView.systemui.SystemUiFFI
 import org.bfchain.rust.plaoc.webView.topbar.TopBarFFI
@@ -12,7 +13,7 @@ private const val TAG = "systemHandle"
 /**
  * 初始化操作ui的请求
  */
-fun initUiFn(systemUiFFI:SystemUiFFI) {
+fun initSystemUiFn(systemUiFFI:SystemUiFFI) {
   /**Navigation*/
   call_ui_map[ExportNativeUi.SetNavigationBarVisible] = {
     systemUiFFI.setNavigationBarVisible(it)
@@ -79,7 +80,6 @@ data class NavigationBarColor(
   val darkIcons: Boolean = true,
   val isNavigationBarContrastEnforced: Boolean = true
 )
-
 /**
  * 初始化操作TopBar ui的请求
  */
@@ -131,5 +131,46 @@ fun initTopBarFn(topBarFFI: TopBarFFI) {
   }
 }
 
+/**
+ * 初始化bottomBar ui的请求
+ */
+fun initBottomFn(bottomBarFFI: BottomBarFFI) {
+  call_ui_map[ExportNativeUi.GetBottomBarEnabled] = {
+    bottomBarFFI.getEnabled()
+  }
+  call_ui_map[ExportNativeUi.SetBottomBarEnabled] = {
+    bottomBarFFI.setEnabled(it)
+  }
+  call_ui_map[ExportNativeUi.GetBottomBarOverlay] = {
+    bottomBarFFI.getOverlay()
+  }
+  call_ui_map[ExportNativeUi.SetBottomBarOverlay] = {
+    bottomBarFFI.setOverlay(it)
+  }
+  call_ui_map[ExportNativeUi.GetBottomBarHeight] = {
+    bottomBarFFI.getHeight()
+  }
+  call_ui_map[ExportNativeUi.SetBottomBarHeight] = {
+    bottomBarFFI.setHeight(it)
+  }
+  call_ui_map[ExportNativeUi.GetBottomBarActions] = {
+    bottomBarFFI.getActions()
+  }
+  call_ui_map[ExportNativeUi.SetBottomBarActions] = {
+    bottomBarFFI.setActions(it)
+  }
+  call_ui_map[ExportNativeUi.GetBottomBarBackgroundColor] = {
+    bottomBarFFI.getBackgroundColor()
+  }
+  call_ui_map[ExportNativeUi.SetBottomBarBackgroundColor] = {
+    bottomBarFFI.setBackgroundColor(it.toInt())
+  }
+  call_ui_map[ExportNativeUi.GetBottomBarForegroundColor] = {
+    bottomBarFFI.getForegroundColor()
+  }
+  call_ui_map[ExportNativeUi.SetBottomBarForegroundColor] = {
+    bottomBarFFI.setForegroundColor(it.toInt())
+  }
+}
 
 

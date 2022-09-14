@@ -41,7 +41,7 @@ function getStatusBarColor() {
 <template>
   <h2>andrid/ios 系统api 测试</h2>
   <dweb-status-bar id="status_bar" background-color="rgba(133,100,100,0.5)" overlay></dweb-status-bar>
-  <dweb-keyboard id="key_board" hidden="true"></dweb-keyboard>
+  <dweb-keyboard id="key_board" hidden></dweb-keyboard>
   <dweb-view></dweb-view>
   <ion-button expand="block" fill="outline" @click="hideNavigation">点我隐藏系统navigation</ion-button>
   <ion-button expand="block" fill="outline" @click="getNavigationVisible">获取navigation颜色</ion-button>

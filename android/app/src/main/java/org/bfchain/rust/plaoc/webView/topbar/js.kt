@@ -51,7 +51,7 @@ class TopBarFFI(
     }
 
     fun setTopBarTitle(str: String) {
-        state.title.value = str.replace("\"", "");
+        state.title.value = str
     }
     fun getTopBarHeight(): Float {
         return state.height.value

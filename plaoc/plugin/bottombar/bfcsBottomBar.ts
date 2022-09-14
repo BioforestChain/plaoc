@@ -1,6 +1,6 @@
 import { convertToRGBAHex } from "./../util";
 import { DwebPlugin } from "../native/dweb-plugin";
-import { BottomBarFFI } from "./ffi";
+import { BottomBarFFI } from "./net";
 import "../typings";
 import { BottomBar } from "./bfcsBottomBar.type";
 import { Icon } from "../icon/bfspIcon.type";
@@ -58,52 +58,58 @@ export class BfcsBottomBar extends DwebPlugin {
       await this.collectActions();
     }
   }
-
-  async toggleEnabled(): Promise<void> {
-    await this._ffi.toggleEnabled();
-
-    return;
+  /**
+   * 是否隐藏bottomBar
+   * @param isEnabled true隐藏
+   * @returns 
+   */
+  async setHidden(isEnabled: boolean = true): Promise<void> {
+    return await this._ffi.setHidden(isEnabled);
   }
-
-  async getEnabled(): Promise<boolean> {
-    const isEnabled = await this._ffi.getEnabled();
+  /**获取bottomBar是否隐藏 */
+  async getHidden(): Promise<boolean> {
+    const isEnabled = await this._ffi.getHidden();
 
     return isEnabled;
   }
-
-  async getOverlay(): Promise<boolean> {
-    const overlay = await this._ffi.getOverlay();
-
-    return overlay;
+  /**获取bottomBar透明度 */
+  async getOverlay(): Promise<number> {
+    return await this._ffi.getOverlay();
   }
-
-  async toggleOverlay(): Promise<void> {
-    await this._ffi.toggleOverlay();
-
-    return;
+  /**
+   * 设置bottomBar是否透明
+   * @param alpha 默认1不透明
+   * @returns 
+   */
+  async setOverlay(alpha: string = "1"): Promise<number> {
+    return await this._ffi.setOverlay(alpha);
   }
-
+  /**获取bottomBar高度 */
   async getHeight(): Promise<number> {
     const height = await this._ffi.getHeight();
-
     return height;
   }
-
+  /**
+   * 设置bottomBar高度
+   * @param height
+   * @returns 
+   */
   async setHeight(height: number): Promise<void> {
-
     this.setAttribute("height", `${height}`);
-
     await this._ffi.setHeight(height);
-
     return;
   }
-
+  /**获取bottomBar背景颜色 */
   async getBackgroundColor(): Promise<Color.RGBAHex> {
     const color = await this._ffi.getBackgroundColor();
 
     return color;
   }
-
+  /**
+   * 设置bottomBar背景颜色
+   * @param color 
+   * @returns 
+   */
   async setBackgroundColor(color: string): Promise<void> {
     const colorHex = convertToRGBAHex(color);
     await this._ffi.setBackgroundColor(colorHex);
@@ -244,11 +250,11 @@ export class BfcsBottomBar extends DwebPlugin {
       await this.setHeight(newVal as number);
     } else if (attrName === "overlay") {
       if (this.hasAttribute(attrName)) {
-        await this._ffi.setOverlay(newVal as string);
+        await this.setOverlay(newVal as string);
       }
     } else if (attrName === "hidden") {
       if (this.hasAttribute(attrName)) {
-        await this._ffi.setHidden();
+        await this.setHidden();
       }
     }
   }
