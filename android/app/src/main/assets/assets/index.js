@@ -40,7 +40,10 @@
   }
 })();
 async function netCallNative(fun, data = "") {
-  const message = `{"function":"${fun}","data":${JSON.stringify(JSON.stringify(data))}}`;
+  if (data instanceof Object) {
+    data = JSON.stringify(data);
+  }
+  const message = `{"function":"${fun}","data":${JSON.stringify(data)}}`;
   const buffer = new TextEncoder().encode(message);
   return connectChannel(`/setUi?data=${buffer}`);
 }
@@ -155,6 +158,18 @@ var NativeUI = /* @__PURE__ */ ((NativeUI2) => {
   NativeUI2["SetTopBarBackgroundColor"] = "SetTopBarBackgroundColor";
   NativeUI2["GetTopBarForegroundColor"] = "GetTopBarForegroundColor";
   NativeUI2["SetTopBarForegroundColor"] = "SetTopBarForegroundColor";
+  NativeUI2["GetBottomBarEnabled"] = "GetBottomBarEnabled";
+  NativeUI2["SetBottomBarEnabled"] = "SetBottomBarEnabled";
+  NativeUI2["GetBottomBarOverlay"] = "GetBottomBarOverlay";
+  NativeUI2["SetBottomBarOverlay"] = "SetBottomBarOverlay";
+  NativeUI2["GetBottomBarHeight"] = "GetBottomBarHeight";
+  NativeUI2["SetBottomBarHeight"] = "SetBottomBarHeight";
+  NativeUI2["GetBottomBarActions"] = "GetBottomBarActions";
+  NativeUI2["SetBottomBarActions"] = "SetBottomBarActions";
+  NativeUI2["GetBottomBarBackgroundColor"] = "GetBottomBarBackgroundColor";
+  NativeUI2["SetBottomBarBackgroundColor"] = "SetBottomBarBackgroundColor";
+  NativeUI2["GetBottomBarForegroundColor"] = "GetBottomBarForegroundColor";
+  NativeUI2["SetBottomBarForegroundColor"] = "SetBottomBarForegroundColor";
   return NativeUI2;
 })(NativeUI || {});
 function getColorInt(color, alpha) {
@@ -337,128 +352,83 @@ class BottomBarFFI {
   constructor() {
     this._ffi = window.bottom_bar;
   }
-  getEnabled() {
-    return new Promise((resolve2, reject) => {
-      const isEnabled = this._ffi.getEnabled();
-      resolve2(isEnabled);
-    });
+  async getHidden() {
+    return await netCallNative(NativeUI.GetBottomBarEnabled);
   }
-  toggleEnabled() {
-    return new Promise((resolve2, reject) => {
-      this._ffi.toggleEnabled(false);
-      resolve2();
-    });
+  async setHidden(isEnabled = true) {
+    return await netCallNative(NativeUI.SetBottomBarEnabled, isEnabled);
   }
-  setHidden() {
-    return new Promise((resolve2, reject) => {
-      this._ffi.toggleEnabled(true);
-      resolve2();
-    });
+  async getOverlay() {
+    return await netCallNative(NativeUI.GetBottomBarOverlay);
   }
-  getOverlay() {
-    return new Promise((resolve2, reject) => {
-      const overlay = this._ffi.getOverlay();
-      resolve2(overlay);
-    });
+  async setOverlay(alpha) {
+    return await netCallNative(NativeUI.SetBottomBarOverlay, alpha);
   }
-  toggleOverlay() {
-    return new Promise((resolve2, reject) => {
-      this._ffi.toggleOverlay("0");
-      resolve2();
-    });
+  async getHeight() {
+    return await netCallNative(NativeUI.GetBottomBarHeight);
   }
-  setOverlay(alpha) {
-    return new Promise((resolve2, reject) => {
-      this._ffi.toggleOverlay(alpha);
-      resolve2();
-    });
+  async setHeight(height) {
+    return await netCallNative(NativeUI.SetBottomBarHeight, height);
   }
-  getHeight() {
-    return new Promise((resolve2, reject) => {
-      const height = this._ffi.getHeight();
-      resolve2(height);
-    });
+  async getBackgroundColor() {
+    const color = await netCallNative(NativeUI.GetBottomBarBackgroundColor);
+    const colorHex = getColorHex(color);
+    return colorHex;
   }
-  setHeight(height) {
-    return new Promise((resolve2, reject) => {
-      this._ffi.setHeight(String(height));
-      resolve2();
-    });
+  async setBackgroundColor(color) {
+    const colorHex = getColorInt(
+      color.slice(0, -2),
+      color.slice(-2)
+    );
+    return await netCallNative(NativeUI.SetBottomBarBackgroundColor, colorHex);
   }
-  getBackgroundColor() {
-    return new Promise((resolve2, reject) => {
-      const color = this._ffi.getBackgroundColor();
-      const colorHex = getColorHex(color);
-      resolve2(colorHex);
-    });
+  async getForegroundColor() {
+    const color = await netCallNative(NativeUI.GetBottomBarForegroundColor);
+    const colorHex = getColorHex(color);
+    return colorHex;
   }
-  setBackgroundColor(color) {
-    return new Promise(async (resolve2, reject) => {
-      const colorHex = getColorInt(
-        color.slice(0, -2),
-        color.slice(-2)
-      );
-      this._ffi.setBackgroundColor(colorHex);
-      resolve2();
-    });
+  async setForegroundColor(color) {
+    const colorHex = getColorInt(
+      color.slice(0, -2),
+      color.slice(-2)
+    );
+    return await netCallNative(NativeUI.SetBottomBarForegroundColor, colorHex);
   }
-  getForegroundColor() {
-    return new Promise((resolve2, reject) => {
-      const color = this._ffi.getForegroundColor();
-      const colorHex = getColorHex(color);
-      resolve2(colorHex);
-    });
-  }
-  setForegroundColor(color) {
-    return new Promise((resolve2, reject) => {
-      const colorHex = getColorInt(
-        color.slice(0, -2),
-        color.slice(-2)
-      );
-      this._ffi.setForegroundColor(colorHex);
-      resolve2();
-    });
-  }
-  getActions() {
-    return new Promise((resolve2, reject) => {
-      const actionList = JSON.parse(this._ffi.getActions());
-      const _actionList = [];
-      for (const item of actionList) {
-        if (item.colors) {
-          for (let key of Object.keys(item.colors)) {
-            let color = item.colors[key];
-            if (typeof color === "number") {
-              let colorARGB = "#" + color.toString(16);
-              item.colors[key] = colorARGB.slice(0, 1) + colorARGB.slice(3) + colorARGB.slice(1, 3);
-            }
+  async getActions() {
+    const actionList = JSON.parse(await netCallNative(NativeUI.GetBottomBarActions));
+    const _actionList = [];
+    for (const item of actionList) {
+      if (item.colors) {
+        for (let key of Object.keys(item.colors)) {
+          let color = item.colors[key];
+          if (typeof color === "number") {
+            let colorARGB = "#" + color.toString(16);
+            item.colors[key] = colorARGB.slice(0, 1) + colorARGB.slice(3) + colorARGB.slice(1, 3);
           }
         }
-        _actionList.push(item);
       }
-      resolve2(_actionList);
-    });
+      _actionList.push(item);
+    }
+    return _actionList;
   }
-  setActions(actionList) {
-    return new Promise((resolve2, reject) => {
-      let _actionList = [];
-      for (const item of actionList) {
-        if (item.colors) {
-          for (const key of Object.keys(item.colors)) {
-            let color = item.colors[key];
-            if (typeof color === "string") {
-              let colorRGBA = convertToRGBAHex(color).replace("#", "0x");
-              let colorARGB = colorRGBA.slice(0, 2) + colorRGBA.slice(-2) + colorRGBA.slice(2, -2);
-              item.colors[key] = parseInt(
-                colorARGB
-              );
-            }
+  async setActions(actionList) {
+    let _actionList = [];
+    for (const item of actionList) {
+      if (item.colors) {
+        for (const key of Object.keys(item.colors)) {
+          let color = item.colors[key];
+          if (typeof color === "string") {
+            let colorRGBA = convertToRGBAHex(color).replace("#", "0x");
+            let colorARGB = colorRGBA.slice(0, 2) + colorRGBA.slice(-2) + colorRGBA.slice(2, -2);
+            item.colors[key] = parseInt(
+              colorARGB
+            );
           }
         }
-        _actionList.push(item);
       }
-      this._ffi.setActions(JSON.stringify(_actionList));
-      resolve2();
-    });
+      _actionList.push(item);
+    }
+    return await netCallNative(NativeUI.SetBottomBarActions, _actionList);
   }
 }
 class BfcsBottomBar extends DwebPlugin {
@@ -504,21 +474,18 @@ class BfcsBottomBar extends DwebPlugin {
       await this.collectActions();
     }
   }
-  async toggleEnabled() {
-    await this._ffi.toggleEnabled();
-    return;
+  async setHidden(isEnabled = true) {
+    return await this._ffi.setHidden(isEnabled);
   }
-  async getEnabled() {
-    const isEnabled = await this._ffi.getEnabled();
+  async getHidden() {
+    const isEnabled = await this._ffi.getHidden();
     return isEnabled;
   }
   async getOverlay() {
-    const overlay = await this._ffi.getOverlay();
-    return overlay;
+    return await this._ffi.getOverlay();
   }
-  async toggleOverlay() {
-    await this._ffi.toggleOverlay();
-    return;
+  async setOverlay(alpha = "0") {
+    return await this._ffi.setOverlay(alpha);
   }
   async getHeight() {
     const height = await this._ffi.getHeight();
@@ -640,11 +607,11 @@ class BfcsBottomBar extends DwebPlugin {
       await this.setHeight(newVal);
     } else if (attrName === "overlay") {
       if (this.hasAttribute(attrName)) {
-        await this._ffi.setOverlay(newVal);
+        await this.setOverlay(newVal);
       }
     } else if (attrName === "hidden") {
       if (this.hasAttribute(attrName)) {
-        await this._ffi.setHidden();
+        await this.setHidden();
       }
     }
   }

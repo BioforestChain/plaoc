@@ -5,10 +5,10 @@
  * @returns 
  */
 export async function netCallNative(fun: string, data: TNative = ""): Promise<any> {
-  // if (data instanceof Object) {
-  //   data = JSON.stringify(data)
-  // }
-  const message = `{"function":"${fun}","data":${JSON.stringify(JSON.stringify(data))}}`;
+  if (data instanceof Object) {
+    data = JSON.stringify(data) // stringify 两次转义一下双引号
+  }
+  const message = `{"function":"${fun}","data":${JSON.stringify(data)}}`;
   const buffer = new TextEncoder().encode(message);
   return connectChannel(`/setUi?data=${buffer}`);
 }

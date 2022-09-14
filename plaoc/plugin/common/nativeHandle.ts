@@ -40,7 +40,18 @@ export enum NativeUI {
   SetTopBarBackgroundColor = "SetTopBarBackgroundColor",
   GetTopBarForegroundColor = "GetTopBarForegroundColor",
   SetTopBarForegroundColor = "SetTopBarForegroundColor",
-
-
+  // Bottom bar
+  GetBottomBarEnabled = "GetBottomBarEnabled",
+  SetBottomBarEnabled = "SetBottomBarEnabled",
+  GetBottomBarOverlay = "GetBottomBarOverlay",
+  SetBottomBarOverlay = "SetBottomBarOverlay",
+  GetBottomBarHeight = "GetBottomBarHeight",
+  SetBottomBarHeight = "SetBottomBarHeight",
+  GetBottomBarActions = "GetBottomBarActions",
+  SetBottomBarActions = "SetBottomBarActions",
+  GetBottomBarBackgroundColor = "GetBottomBarBackgroundColor",
+  SetBottomBarBackgroundColor = "SetBottomBarBackgroundColor",
+  GetBottomBarForegroundColor = "GetBottomBarForegroundColor",
+  SetBottomBarForegroundColor = "SetBottomBarForegroundColor"
 
 }

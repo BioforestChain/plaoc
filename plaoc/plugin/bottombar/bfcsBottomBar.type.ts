@@ -80,12 +80,10 @@ export namespace BottomBar {
   }
 
   export interface IBottomBarFFI {
-    getEnabled(): Promise<boolean>;
-    toggleEnabled(isEnabled: number): Promise<void>;
-    setHidden(): Promise<void>;
-    getOverlay(): Promise<boolean>;
-    toggleOverlay(isOverlay: string): Promise<void>;
-    setOverlay(alpha:string): Promise<void>;
+    getHidden(): Promise<boolean>;
+    setHidden(isEnabled: boolean): Promise<void>;
+    getOverlay(): Promise<number>;
+    setOverlay(alpha: string): Promise<number>;
     getHeight(): Promise<number>;
     setHeight(heightDp: number): Promise<void>;
     getActions(): Promise<BottomBarItem[]>;
