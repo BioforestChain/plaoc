@@ -59,7 +59,7 @@ fun dataGateWay(
 fun messageGateWay(
     request: AwWebResourceRequest
 ): WebResourceResponseInfo {
-    val url = request.url.toString().lowercase(Locale.ROOT)
+    val url = request.url
     Log.i(TAG, " messageGateWay: $url")
     val byteData = url.substring(url.lastIndexOf("=") + 1)
     DenoService().backDataToRust(hexStrToByteArray(byteData))// 通知
@@ -83,7 +83,7 @@ fun messageGateWay(
 fun uiGateWay(
   request: AwWebResourceRequest
 ): WebResourceResponseInfo {
-  val url = request.url.toString().lowercase(Locale.ROOT)
+  val url = request.url
   val byteData = url.substring(url.lastIndexOf("=") + 1)
   val stringData = String(hexStrToByteArray(byteData))
   Log.i(TAG, " uiGateWay: $stringData")
@@ -110,7 +110,7 @@ fun viewGateWay(
     customUrlScheme: CustomUrlScheme,
     request: AwWebResourceRequest
 ): WebResourceResponseInfo {
-    val url = request.url.toString().lowercase(Locale.ROOT)
+    val url = request.url
     Log.i(TAG, " viewGateWay: ${request.url}")
 //    Log.i(TAG, " viewGateWay: ${front_to_rear_map.contains(url)}")
     if (front_to_rear_map.contains(url)) {
@@ -142,7 +142,7 @@ fun initMetaData(metaData: String) {
     val metaJson =
         mapper.readValue(metaData, UserMetaData::class.java)
     // 设置域名
-    dWebView_host = metaJson.baseUrl.lowercase(Locale.ROOT)
+    dWebView_host = metaJson.baseUrl
     // 设置路由
     for (importMap in metaJson.dwebview.importmap) {
         front_to_rear_map[resolveUrl(importMap.url)] = importMap.response
