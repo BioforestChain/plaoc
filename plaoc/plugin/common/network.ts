@@ -1,5 +1,20 @@
 
 /**
+ * 注册serverWorker方法
+ */
+export function registerServerWorker() {
+  window.addEventListener("load", () => {
+    // 能力检测
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("./serverWorker.js").then((res) => {
+        console.log("serverWorker:", res);
+      });
+    }
+  });
+
+}
+
+/**
  *  发送请求到netive设置ui
  * @param url 
  * @returns 

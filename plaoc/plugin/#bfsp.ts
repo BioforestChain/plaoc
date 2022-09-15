@@ -4,6 +4,7 @@ export default defineConfig((info) => {
     name: "@bfsx/plugin",
     exports: {
       ".": "./index.ts",
+      "./serverWorker": "./common/serverWorker.ts"
     },
     // profiles: ["android", "ios", "desktop", "default"],
     profiles: ["android"],
