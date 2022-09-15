@@ -16,21 +16,12 @@ object JsonUtil {
     try {
       var appInfo: AppInfo = Gson().fromJson(content, AppInfo::class.java)
       appInfo.isSystemApp = when (type) {
-        FilesUtil.APP_DIR_TYPE.RememberApp -> false
         FilesUtil.APP_DIR_TYPE.SystemApp -> true
+        else -> false
       }
-      appInfo.iconPath = when (type) {
-        FilesUtil.APP_DIR_TYPE.RememberApp -> FilesUtil.getAppIconPathName(
-          appInfo.bfsAppId,
-          appInfo.icon.replace("file://", ""),
-          FilesUtil.APP_DIR_TYPE.RememberApp
-        )
-        FilesUtil.APP_DIR_TYPE.SystemApp -> FilesUtil.getAppIconPathName(
-          appInfo.bfsAppId,
-          appInfo.icon.replace("file://", ""),
-          FilesUtil.APP_DIR_TYPE.SystemApp
-        )
-      }
+      appInfo.iconPath = FilesUtil.getAppIconPathName(
+        appInfo.bfsAppId, appInfo.icon.replace("file://", ""), type
+      )
       return appInfo
     } catch (e: Exception) {
       Log.d(TAG, "getAppInfoFromLinkJson e->$e")
@@ -47,8 +38,8 @@ object JsonUtil {
         Gson().fromJson(content, object : TypeToken<List<AppInfo>>() {}.type)
       appInfos.forEach {
         it.isSystemApp = when (type) {
-          FilesUtil.APP_DIR_TYPE.RememberApp -> false
           FilesUtil.APP_DIR_TYPE.SystemApp -> true
+          else -> false
         }
       }
       return appInfos

@@ -37,7 +37,7 @@ class MainActivity : ComponentActivity() {
         GlobalScope.launch {
             // 判断是否是第一次加载软件，如果是，那么将assets中的remember-app拷贝到app目录下
             if (PreferencesHelper.isFirstIn()) {
-                FilesUtil.copyAssetsToRememberAppDir()
+                FilesUtil.copyAssetsToRecommendAppDir()
                 PreferencesHelper.saveFirstState(false)
             }
 

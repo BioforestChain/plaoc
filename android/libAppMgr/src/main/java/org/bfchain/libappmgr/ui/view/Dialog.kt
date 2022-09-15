@@ -1,6 +1,5 @@
 package org.bfchain.libappmgr.ui.view
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -9,82 +8,45 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import org.bfchain.libappmgr.entity.AppVersion
-
-data class AlertDialogState(
-  var showDialog: MutableState<Boolean> = mutableStateOf(false),
-  var title: MutableState<String> = mutableStateOf("提示"),
-  var content: MutableState<String> = mutableStateOf("内容"),
-  var confirmText: MutableState<String> = mutableStateOf("确定"),
-  var dismissText: MutableState<String> = mutableStateOf("取消")
-)
-
-fun AlertDialogState.changeState(
-  showDialog: Boolean? = null,
-  title: String? = null,
-  content: String? = null,
-  confirmText: String? = null,
-  dismissText: String? = null
-) {
-  this.showDialog.value = showDialog?.let { it } ?: this.showDialog.value
-  this.title.value = title?.let { it } ?: this.title.value
-  this.content.value = content?.let { it } ?: this.content.value
-  this.confirmText.value = confirmText?.let { it } ?: this.confirmText.value
-  this.dismissText.value = dismissText?.let { it } ?: this.dismissText.value
-}
-
-fun AlertDialogState.changeStateNewVersion(
-  showDialog: Boolean? = null,
-  appVersion: AppVersion? = null,
-  confirmText: String? = null
-) {
-  this.showDialog.value = showDialog?.let { it } ?: this.showDialog.value
-  this.title.value = "版本更新提醒"
-  this.content.value =
-    appVersion?.let { "版本信息：${it.version}\n更新内容：${it.releaseNotes}" } ?: "暂无版本信息"
-  this.confirmText.value = confirmText?.let { it } ?: "下载"
-  this.dismissText.value = "取消"
-}
+import org.bfchain.libappmgr.data.DialogShowOrHide
+import org.bfchain.libappmgr.data.rememberDialogAllState
 
 /**
  * 显示普通的提示框
  */
 @Composable
 fun CustomAlertDialog(
-  state: AlertDialogState,
+  state: DialogShowOrHide = rememberDialogAllState(),
   onConfirm: (() -> Unit)? = null,
   onCancel: (() -> Unit)? = null
 ) {
-  Log.d("Dialog.kt", "CustomAlertDialog enter -> ${state.showDialog.value}")
-  if (state.showDialog.value) {
+  if (state.customShow.value) {
     AlertDialog(
       modifier = Modifier.padding(20.dp),
-      onDismissRequest = { state.showDialog.value = false }, // 点击对话框周围空白部分
+      onDismissRequest = { state.customShow.value = false }, // 点击对话框周围空白部分
       title = {
-        Text(text = state.title.value)
+        Text(text = state.customDialog.title.value)
       },
-      text = { Text(text = state.content.value) },
+      text = { Text(text = state.customDialog.content.value) },
       confirmButton = {
         TextButton(onClick = {
           onConfirm?.let { onConfirm() } // 回调通知点击了确认按钮
         }) {
-          Text(text = state.confirmText.value)
+          Text(text = state.customDialog.confirmText.value)
         }
       },
       dismissButton = {
         TextButton(onClick = {
-          state.showDialog.value = false
+          state.customShow.value = false
           onCancel?.let { onCancel() }
         }) {
-          Text(text = state.dismissText.value)
+          Text(text = state.customDialog.dismissText.value)
         }
       })
   }
@@ -94,11 +56,13 @@ fun CustomAlertDialog(
  * 显示加载提示框
  */
 @Composable
-fun LoadingDialog(showDialog: MutableState<Boolean>, onCancel: (() -> Unit)? = null) {
-  Log.d("Dialog.kt", "LoadingDialog enter -> ${showDialog.value}")
-  if (showDialog.value) {
+fun LoadingDialog(
+  state: DialogShowOrHide = rememberDialogAllState(),
+  onCancel: (() -> Unit)? = null
+) {
+  if (state.loadingShow.value) {
     Dialog(onDismissRequest = {
-      showDialog.value = false
+      state.loadingShow.value = false
       onCancel?.let { onCancel() }
     }) {
       Box(
@@ -127,12 +91,10 @@ fun LoadingDialog(showDialog: MutableState<Boolean>, onCancel: (() -> Unit)? = n
 
 @Composable
 fun ProgressDialog(
-  showDialog: MutableState<Boolean>,
-  progress: MutableState<Float>,
+  state: DialogShowOrHide = rememberDialogAllState(),
   onCancel: (() -> Unit)? = null
 ) {
-  Log.d("Dialog.kt", "ProgressDialog enter -> ${showDialog.value}")
-  if (showDialog.value) {
+  if (state.progressShow.value) {
     Dialog(onDismissRequest = {}) {
       Box(
         modifier = Modifier
@@ -149,10 +111,10 @@ fun ProgressDialog(
           verticalAlignment = Alignment.CenterVertically
         ) {
           // 左边显示 加载动画，右边显示“正在加载中，请稍后..."
-          CircularProgressIndicator(progress = progress.value)
+          CircularProgressIndicator(progress = state.progressDialog.progress.value)
           Spacer(modifier = Modifier.width(18.dp))
-          var pp = String.format("%d", (progress.value * 100).toInt())
-          Text(text = "正在加载中，请稍后...$pp %")
+          var pro = String.format("%02d", (state.progressDialog.progress.value * 100).toInt())
+          Text(text = "正在加载中，请稍后... $pro%")
         }
       }
     }

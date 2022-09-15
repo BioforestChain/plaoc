@@ -73,7 +73,7 @@ class MainViewModel : ViewModel() {
               Log.d("MainViewModel", "baseData->${baseData}")
               Log.d("MainViewModel", "appVersion->${baseData.data}")
               baseData.data?.let {
-                // 将改内容存储到 remember-app/bfs-id-app/tmp/autoUpdate 中
+                // 将改内容存储到 recommend-app/bfs-id-app/tmp/autoUpdate 中
                 FilesUtil.writeFileContent(
                   FilesUtil.getAppVersionSaveFile(appInfo),
                   JsonUtil.toJson(AppVersion::class.java, baseData.data)
