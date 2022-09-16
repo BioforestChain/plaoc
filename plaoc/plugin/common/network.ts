@@ -1,13 +1,17 @@
 
+
 /**
  * 注册serverWorker方法
  */
 export function registerServerWorker() {
+  console.log("Xxxx")
   window.addEventListener("load", () => {
     // 能力检测
     if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("./serverWorker.js").then((res) => {
-        console.log("serverWorker:", res);
+      navigator.serviceWorker.register("serverWorker.mjs", { scope: '/' }).then((res) => {
+        console.log('Service Worker 注册成功');
+      }).catch(() => {
+        console.log('Service Worker 注册失败');
       });
     }
   });

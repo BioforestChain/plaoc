@@ -38,7 +38,7 @@ export const metaData: MetaData = {
       },
       {
         url: "/index.html",
-        response: "/index.html",
+        response: "/sys/index.html",
       },
       {
         url: "/app/bfchain.dev/index.html",

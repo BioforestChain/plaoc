@@ -10,7 +10,6 @@ export * from "./keyboard/index";
 export * from "./statusbar/index";
 export * from "./topbar/index";
 
-export * from "./common/serverWorker";
 import { registerServerWorker } from "./common/network";
 registerServerWorker()
 

@@ -40,6 +40,7 @@ import java.net.URI
 import java.net.URL
 import kotlin.math.min
 
+
 private const val TAG = "DWebView"
 
 
@@ -150,8 +151,8 @@ fun DWebView(
 
     Scaffold(
         modifier = modifier
-            .padding(overlayPadding)
-            .offset { overlayOffset },
+          .padding(overlayPadding)
+          .offset { overlayOffset },
          // 如果前端没有传递overlay,并且没有传递enabled
         topBar = { if ((topBarState.overlay.value == 1F) and topBarState.enabled.value) TopAppBar() },
         bottomBar = {
@@ -329,9 +330,35 @@ fun DWebView(
                     MyWebChromeClient()
                 },
                 client = remember {
+                  val swController = ServiceWorkerController.getInstance()
+                  swController.setServiceWorkerClient(object : ServiceWorkerClient() {
+                    override fun shouldInterceptRequest(request: WebResourceRequest): WebResourceResponse? {
+                      val url = request.url.toString();
+                      val path = URL(url).path
+//                      Log.e(
+//                        TAG,
+//                        "in service worker. isMainFrame: $path :" + request.isForMainFrame + ": " + request.url
+//                      )
+                      val temp = url.substring(url.lastIndexOf("/") + 1)
+                      //拦截转发到后端的事件
+                      if (temp.startsWith("poll")) {
+                        return messageGateWay(request)
+                      }
+                      //拦截设置ui的请求，代替JavascriptInterface
+                      if (temp.startsWith("setUi")) {
+                        return uiGateWay(request)
+                      }
+                      val suffixIndex = temp.lastIndexOf(".")
+                      // 只拦截数据文件,忽略资源文件
+                      if (suffixIndex == -1) {
+                        return dataGateWay(request)
+                      }
+                      return customUrlScheme.handleRequest(request, path)
+                    }
+                  })
+                  swController.serviceWorkerWebSettings.allowContentAccess = true
                     class MyWebViewClient : AdWebViewClient() {
                         private val ITAG = "$TAG/CUSTOM-SCHEME"
-
                         // API >= 21
                         @SuppressLint("NewApi")
                         @Override
@@ -345,37 +372,17 @@ fun DWebView(
                                 val url = request.url.toString()
                                 // 拦截，跳过本地和远程脚本
                                 if (jumpWhitelist(url)) {
-                                    try {
-                                        // 拦截视图文件
-                                        if (url.endsWith(".html")) {
-                                            return viewGateWay(customUrlScheme, request)
-                                        }
-                                        /**
-                                         * 这里放行了所有的资源文件（比如 .css .gif .js) 只有api类型的数据会被拦截到
-                                         * 下面这种实现方法会有安全问题（比如说一些.php,.jsp的提权），可能需要完善一下下面规则的健壮性。
-                                         */
-                                        val temp = url.substring(url.lastIndexOf("/") + 1)
-                                        //拦截转发到后端的事件
-                                        if (temp.startsWith("poll")) {
-                                            return messageGateWay(request)
-                                        }
-                                        //拦截设置ui的请求，代替JavascriptInterface
-                                        if (temp.startsWith("setUi")) {
-                                          return uiGateWay(request)
-                                        }
-                                        val suffixIndex = temp.lastIndexOf(".")
-                                        // 只拦截数据文件,忽略资源文件
-                                        if (suffixIndex == -1) {
-                                            return dataGateWay(request)
-                                        }
-                                        // 映射本地文件的资源文件 https://bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj.dweb/index.mjs -> /plaoc/index.mjs
-                                        if (Regex(dWebView_host).containsMatchIn(url)) {
-                                            val path = URL(url).path
-                                            return customUrlScheme.handleRequest(request, path)
-                                        }
-                                    } catch (e: java.lang.Exception) {
-                                        e.printStackTrace()
-                                    }
+
+                                  // 拦截视图文件
+                                  if (url.endsWith(".html")) {
+                                      return viewGateWay(customUrlScheme, request)
+                                  }
+                                  val temp = url.substring(url.lastIndexOf("/") + 1)
+                                  // 映射本地文件的资源文件 https://bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj.dweb/index.mjs -> /plaoc/index.mjs
+                                  if (Regex(dWebView_host).containsMatchIn(url)) {
+                                      val path = URL(url).path
+                                      return customUrlScheme.handleRequest(request, path)
+                                  }
                                 }
                             }
                             return super.shouldInterceptRequest(view, request)
