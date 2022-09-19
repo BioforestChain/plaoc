@@ -20,7 +20,7 @@ object FilesUtil {
   val simpleDateFormat = SimpleDateFormat("yyyyMMddhhmmss")
 
   private val DIR_BOOT: String = "boot" // 存放 link.json 数据
-  private val DIR_SYS: String = "sys" // 存放 icon 信息等
+  private val DIR_SYS: String = "sys" // system-app/bfs-id-xxx/sys 是运行程序路径
   private val DIR_AUTO_UPDATE: String = "tmp" + File.separator + "autoUpdate" // 存放最新版本的路径
   private val FILE_LINK_JSON: String = "link.json"
   private val FILE_BFSA_META_JSON: String = "bfsa-metadata.json"
@@ -70,9 +70,21 @@ object FilesUtil {
    * 获取应用的解压路径
    */
   fun getAppUnzipPath(appInfo: AppInfo): String {
-    /*return getAppRootDirectory(APP_DIR_TYPE.SystemApp) + File.separator +
-            appInfo.bfsAppId + File.separator + "sys"*/
     return getAppRootDirectory(APP_DIR_TYPE.SystemApp) + File.separator + appInfo.bfsAppId
+  }
+
+  /**
+   * 获取程序运行路径
+   */
+  fun getAppLauncherPath(appInfo: AppInfo): String {
+    return getAppLauncherPath(appInfo.bfsAppId)
+  }
+  /**
+   * 获取程序运行路径
+   */
+  fun getAppLauncherPath(appName: String): String {
+    return getAppRootDirectory(APP_DIR_TYPE.SystemApp) + File.separator + appName +
+      File.separator + DIR_SYS
   }
 
   /**
@@ -215,7 +227,7 @@ object FilesUtil {
   fun copyAssetsToRecommendAppDir() {
     var rootPath = getAppRootDirectory(APP_DIR_TYPE.RecommendApp)
     var file = File(rootPath)
-    file.deleteRecursively() // 第一次运行程序时，recommend-app
+    file.delete() // 第一次运行程序时，recommend-app
     copyFilesFassets(
       APP_DIR_TYPE.RecommendApp.rootName,
       getAppRootDirectory(APP_DIR_TYPE.RecommendApp)
