@@ -6,7 +6,7 @@ const val BASE_URL = "172.30.93.165"
 const val BASE_PORT = 8080
 const val BASE_URL_PATH = "http://$BASE_URL:$BASE_PORT/"
 
-const val AppVersionPath = "bfs-app-1234567A/appversion-base.json"
+const val AppVersionPath = "bfs-app-1234567a/appversion-base.json"
 
 /*typealias _ERROR = suspend (Throwable) -> Unit
 typealias _PROCESS = suspend (downloadedSize: Long, length: Long, progress: Float) -> Unit

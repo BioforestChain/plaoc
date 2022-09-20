@@ -2,7 +2,6 @@ package org.bfchain.libappmgr.ui.view
 
 import android.annotation.SuppressLint
 import android.graphics.BitmapFactory
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -48,6 +47,7 @@ enum class DownloadType { Init, Process, Complete, Fail }
 fun AppInfoView(
   showBadge: MutableState<Boolean>,
   appInfo: AppInfo,
+  state: DialogShowOrHide = rememberDialogAllState(),
   onClick: ((appInfo: AppInfo) -> Unit)? = null
 ) {
   Box(
@@ -61,9 +61,12 @@ fun AppInfoView(
         modifier = Modifier
           .width(60.dp)
           .height(60.dp)
-          .clickable { onClick?.let { onClick(appInfo) } }
+          .clickable {
+            if (!appInfo.downloading) {
+              onClick?.let { onClick(appInfo) }
+            }
+          }
       ) {
-        Log.d("AppView", "iconPath->${appInfo.iconPath}")
         Image(
           bitmap = BitmapFactory.decodeFile(appInfo.iconPath)?.asImageBitmap()
             ?: ImageBitmap.imageResource(id = R.drawable.ic_launcher),
@@ -73,6 +76,8 @@ fun AppInfoView(
             .padding(2.dp)
             .clip(RoundedCornerShape(12.dp))
         )
+
+        CircleProgressView(state) // 进度遮罩层
 
         if (showBadge.value) {
           Box(
@@ -118,48 +123,49 @@ fun AppInfoView(appInfo: AppInfo, onOpenApp: ((url: String) -> Unit)? = null) {
   var downloadType = DownloadType.Init
 
   // 显示界面图标
-  AppInfoView(showBadge = showBadge, appInfo = appInfo, onClick = {
-    if (!appInfo.isSystemApp) {
-      dialogState.updateState(customShow = true)
-      var requestFinish = false
-      coroutineScope.launch {
-        var version = FilesUtil.getLastUpdateContent(appInfo)?.let {
-          JsonUtil.fromJson(AppVersion::class.java, it)
-        }
-        if (!requestFinish) {
-          appVersion = version
-          customDialogData.updateNewVersion(appVersion = appVersion)
-        }
-      }
-      vmMain.getAppVersionAndSave(appInfo, object : IApiResult<AppVersion> {
-        override fun onSuccess(errorCode: Int, errorMsg: String, data: AppVersion) {
-          requestFinish = true
-          appVersion = data
-          customDialogData.updateNewVersion(appVersion = appVersion)
-        }
-      })
-    } else {
-      // 1.打开应用
-      var dappInfo = FilesUtil.getDAppInfo(appInfo)
-      dappInfo?.let { dApp ->
-        onOpenApp?.let { onOpenApp(dApp.enter.main) } // 回调dweb请求的地址
-        Toast.makeText(
-          AppContextUtil.sInstance, "直接打开应用-->${dApp.enter.main}", Toast.LENGTH_SHORT
-        ).show()
-        appInfo.isShowBadge = false // 打开后，隐藏小红点
-        showBadge.value = false
-      }
-      vmMain.getAppVersion(appInfo, object : IApiResult<AppVersion> {
-        override fun onSuccess(errorCode: Int, errorMsg: String, data: AppVersion) {
-          // 请求成功后，比对获取的版本号和当前版本号
-          if (dappInfo == null || hasNewVersion(dappInfo.version, data.version)) {
-            appVersion = data
-            dialogState.updateState(customShow = true).customDialog.updateNewVersion(appVersion)
+  AppInfoView(showBadge = showBadge, appInfo = appInfo, state = dialogState,
+    onClick = {
+      if (!appInfo.isSystemApp) {
+        dialogState.updateState(customShow = true)
+        var requestFinish = false
+        coroutineScope.launch {
+          var version = FilesUtil.getLastUpdateContent(appInfo)?.let {
+            JsonUtil.fromJson(AppVersion::class.java, it)
+          }
+          if (!requestFinish) {
+            appVersion = version
+            customDialogData.updateNewVersion(appVersion = appVersion)
           }
         }
-      })
-    }
-  })
+        vmMain.getAppVersionAndSave(appInfo, object : IApiResult<AppVersion> {
+          override fun onSuccess(errorCode: Int, errorMsg: String, data: AppVersion) {
+            requestFinish = true
+            appVersion = data
+            customDialogData.updateNewVersion(appVersion = appVersion)
+          }
+        })
+      } else {
+        // 1.打开应用
+        var dappInfo = FilesUtil.getDAppInfo(appInfo)
+        dappInfo?.let { dApp ->
+          onOpenApp?.let { onOpenApp(dApp.enter.main) } // 回调dweb请求的地址
+          Toast.makeText(
+            AppContextUtil.sInstance, "直接打开应用-->${dApp.enter.main}", Toast.LENGTH_SHORT
+          ).show()
+          appInfo.isShowBadge = false // 打开后，隐藏小红点
+          showBadge.value = false
+        }
+        vmMain.getAppVersion(appInfo, object : IApiResult<AppVersion> {
+          override fun onSuccess(errorCode: Int, errorMsg: String, data: AppVersion) {
+            // 请求成功后，比对获取的版本号和当前版本号
+            if (dappInfo == null || hasNewVersion(dappInfo.version, data.version)) {
+              appVersion = data
+              dialogState.updateState(customShow = true).customDialog.updateNewVersion(appVersion)
+            }
+          }
+        })
+      }
+    })
   // 显示提示对话框
   CustomAlertDialog(dialogState, onConfirm = {
     if (downloadType == DownloadType.Complete) {
@@ -174,12 +180,17 @@ fun AppInfoView(appInfo: AppInfo, onOpenApp: ((url: String) -> Unit)? = null) {
       showBadge.value = false
     } else if (appVersion != null && appVersion!!.files.isNotEmpty()) {
       // 调用下载操作
-      dialogState.updateState(progressShow = true)
+      //dialogState.updateState(progressShow = true)
       downloadType = DownloadType.Process
       vmDown.downloadAndSave(
         appVersion!!.files[0].url,
         FilesUtil.getAppDownloadPath(),
         object : IApiResult<Nothing> {
+          override fun onPrepare() {
+            dialogState.updateState(circleProgressShow = true)
+            appInfo.downloading = true
+          }
+
           override fun downloadProgress(current: Long, total: Long, progress: Float) {
             dialogState.progressDialog.progress.value = progress
             downloadType = DownloadType.Process
@@ -192,23 +203,24 @@ fun AppInfoView(appInfo: AppInfo, onOpenApp: ((url: String) -> Unit)? = null) {
             )
             file.delete() // 解压后，删除压缩包
             // 隐藏下载进度界面，显示对话框界面
-            dialogState.updateState(customShow = true).customDialog.update(
+            dialogState.updateState(circleProgressShow = false)
+            /*dialogState.updateState(customShow = true).customDialog.update(
               content = "下载完成", confirmText = "打开"
-            )
+            )*/
             downloadType = DownloadType.Complete
             appInfo.isSystemApp = true
             showBadge.value = true
             appInfo.isShowBadge = true
+            appInfo.downloading = false
           }
 
-          override fun onError(
-            errorCode: Int, errorMsg: String, exception: Throwable?
-          ) {
+          override fun onError(errorCode: Int, errorMsg: String, exception: Throwable?) {
             downloadType = DownloadType.Fail
             // 隐藏下载进度界面，显示对话框界面
             dialogState.updateState(customShow = true).customDialog.update(
               title = "异常提醒", content = errorMsg, confirmText = "重新下载"
             )
+            appInfo.downloading = false
           }
         })
     } else {

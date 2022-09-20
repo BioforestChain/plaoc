@@ -51,7 +51,8 @@ data class AppInfo(
   val autoUpdate: AutoUpdateInfo, // 自动更新的相关配置
   var isSystemApp: Boolean = false, // 判断是recommend-app还是system-app
   var iconPath: String = "", // 将icon转为实际路径
-  var isShowBadge: Boolean = false // 是否显示应用更新提醒，也就是左上角的小圆点
+  var isShowBadge: Boolean = false, // 是否显示应用更新提醒，也就是左上角的小圆点
+  var downloading: Boolean = false // 表示当前是否在下载
 )
 
 /**
