@@ -1,6 +1,6 @@
 import { DialogsFFI } from "./net";
 import { DwebPlugin } from "../native/dweb-plugin";
-import { Dialogs } from "./bfcsDialogs.type";
+import { Dialogs } from "./bfcsDialogsType";
 
 class BfcsDialogs extends DwebPlugin {
   protected _ffi: Dialogs.IDialogsFFI;
@@ -19,7 +19,7 @@ class BfcsDialogs extends DwebPlugin {
     attrName: string,
     oldVal: unknown,
     newVal: unknown
-  ) { }
+  ) {}
 }
 
 export class BfcsDialogAlert extends BfcsDialogs {

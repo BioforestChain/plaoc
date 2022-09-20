@@ -1,10 +1,9 @@
 import { convertToRGBAHex } from "./../util";
 import { DwebPlugin } from "../native/dweb-plugin";
 import { BottomBarFFI } from "./net";
-import "../typings";
-import { BottomBar } from "./bfcsBottomBar.type";
-import { Icon } from "../icon/bfspIcon.type";
-import { Color } from "../typings/types/color.type";
+import { BottomBar } from "./bfcsBottomBarType";
+import { Icon } from "../icon/bfspIconType";
+import { Color } from "../types/colorType";
 
 export class BfcsBottomBar extends DwebPlugin {
   private _ffi: BottomBarFFI;
@@ -39,7 +38,7 @@ export class BfcsBottomBar extends DwebPlugin {
         "selected-color",
         "indicator-color",
         "height",
-        "hide-value"
+        "hide-value",
       ],
     });
 
@@ -61,7 +60,7 @@ export class BfcsBottomBar extends DwebPlugin {
   /**
    * 是否隐藏bottomBar
    * @param isEnabled true隐藏
-   * @returns 
+   * @returns
    */
   async setHidden(isEnabled: boolean = true): Promise<void> {
     return await this._ffi.setHidden(isEnabled);
@@ -79,7 +78,7 @@ export class BfcsBottomBar extends DwebPlugin {
   /**
    * 设置bottomBar是否透明
    * @param alpha 默认1不透明
-   * @returns 
+   * @returns
    */
   async setOverlay(alpha: string = "1"): Promise<number> {
     return await this._ffi.setOverlay(alpha);
@@ -92,7 +91,7 @@ export class BfcsBottomBar extends DwebPlugin {
   /**
    * 设置bottomBar高度
    * @param height
-   * @returns 
+   * @returns
    */
   async setHeight(height: number): Promise<void> {
     this.setAttribute("height", `${height}`);
@@ -107,8 +106,8 @@ export class BfcsBottomBar extends DwebPlugin {
   }
   /**
    * 设置bottomBar背景颜色
-   * @param color 
-   * @returns 
+   * @param color
+   * @returns
    */
   async setBackgroundColor(color: string): Promise<void> {
     const colorHex = convertToRGBAHex(color);
@@ -180,10 +179,10 @@ export class BfcsBottomBar extends DwebPlugin {
         let $ = childNode.querySelector("dweb-bottom-bar-text")!;
 
         if ($.hasAttribute("value")) {
-          label = $.getAttribute("value")!
+          label = $.getAttribute("value")!;
         }
         // 是否一直显示文字，如果指定此值，则只有选择才会显示文字
-        alwaysShowLabel = ($.hasAttribute("hide-value")) ? true : false;
+        alwaysShowLabel = $.hasAttribute("hide-value") ? true : false;
 
         if ($.hasAttribute("color")) {
           colors.textColor = convertToRGBAHex($?.getAttribute("color")!);
@@ -201,7 +200,9 @@ export class BfcsBottomBar extends DwebPlugin {
       const disabled = childNode.hasAttribute("disabled") ? true : false;
       const selected = childNode.hasAttribute("selected") ? true : false;
       // 不允许选择，不加diSelectable属性则允许选择
-      const diSelectable = childNode.hasAttribute("diSelectable") ? false : true;
+      const diSelectable = childNode.hasAttribute("diSelectable")
+        ? false
+        : true;
       // 指示器颜色，当前选中的背景颜色
       if (childNode.hasAttribute("indicator-color")) {
         colors.indicatorColor = convertToRGBAHex(

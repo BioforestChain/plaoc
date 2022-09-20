@@ -1,7 +1,6 @@
-import "../typings";
-import { Color } from "../typings/types/color.type";
+import { Color } from "../types/colorType";
 import { convertToRGBAHex } from "../util";
-import { BottomBar } from "./bfcsBottomBar.type";
+import { BottomBar } from "./bfcsBottomBarType";
 import { NativeUI } from "../common/nativeHandle";
 import { netCallNative } from "../common/network";
 
@@ -80,11 +79,10 @@ export class BottomBarFFI implements BottomBar.IBottomBarFFI {
             let color = item.colors[key as keyof BottomBar.IBottomBarColors];
 
             if (typeof color === "string") {
-              item.colors[
-                key as keyof BottomBar.IBottomBarColors
-              ] = convertToRGBAHex(
-                color as string
-              ) as BottomBar.BottomBarColorType;
+              item.colors[key as keyof BottomBar.IBottomBarColors] =
+                convertToRGBAHex(
+                  color as string
+                ) as BottomBar.BottomBarColorType;
             }
           }
         }
@@ -99,9 +97,8 @@ export class BottomBarFFI implements BottomBar.IBottomBarFFI {
   }
 
   async getBackgroundColor(): Promise<Color.RGBAHex> {
-    const colorHex: Color.RGBAHex = await this._ffi.getBottomBarBackgroundColor.postMessage(
-      null
-    );
+    const colorHex: Color.RGBAHex =
+      await this._ffi.getBottomBarBackgroundColor.postMessage(null);
 
     return colorHex;
   }
@@ -115,9 +112,8 @@ export class BottomBarFFI implements BottomBar.IBottomBarFFI {
   }
 
   async getForegroundColor(): Promise<Color.RGBAHex> {
-    const colorHex: Color.RGBAHex = await this._ffi.getBottomViewForegroundColor.postMessage(
-      null
-    );
+    const colorHex: Color.RGBAHex =
+      await this._ffi.getBottomViewForegroundColor.postMessage(null);
 
     return colorHex;
   }

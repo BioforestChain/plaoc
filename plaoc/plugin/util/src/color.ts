@@ -1,4 +1,4 @@
-import { Color } from "../../typings/types/color.type";
+import { Color } from "../../types/colorType";
 
 // 将RGB 和 Alpha 转化为 ARGB color int
 export function getColorInt(
@@ -42,14 +42,13 @@ export function convertToRGBAHex(color: string): Color.RGBAHex {
     }
   }
   if (color.startsWith("#")) {
-
     if (color.length === 9) {
       colorHex = color;
     } else {
       color = color.substring(1);
       // 如果是 #f71 或者#f72e这种格式的话,转换为5字符格式
       if (color.length === 4 || color.length === 3) {
-        color = color.replace(/(.)/g, '$1$1');
+        color = color.replace(/(.)/g, "$1$1");
       }
       // 填充成9字符格式，不然android无法渲染
       colorHex += color.padEnd(8, "F");
@@ -60,7 +59,7 @@ export function convertToRGBAHex(color: string): Color.RGBAHex {
 
 /**
  * 把颜色转换为int类型
- * @param color 
+ * @param color
  */
 export function hexToIntColor(color: string): number {
   color = convertToRGBAHex(color);

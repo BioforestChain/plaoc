@@ -1,4 +1,4 @@
-import { Keyboard } from "./bfcsKeyboard.type";
+import { Keyboard } from "./bfcsKeyboardType";
 
 export class VirtualKeyboardFFI implements Keyboard.IVirtualKeyboardFFI {
   private _ffi = (window as any).webkit

@@ -1,8 +1,8 @@
 import { NativeUI } from "../common/nativeHandle";
 import { netCallNative } from "../common/network";
-import { Color } from "../typings/types/color.type";
+import { Color } from "../types/colorType";
 import { getColorInt, getColorHex, convertToRGBAHex } from "../util";
-import { BottomBar } from "./bfcsBottomBar.type";
+import { BottomBar } from "./bfcsBottomBarType";
 export class BottomBarFFI implements BottomBar.IBottomBarFFI {
   async getHidden(): Promise<boolean> {
     return await netCallNative(NativeUI.GetBottomBarEnabled);
@@ -31,7 +31,7 @@ export class BottomBarFFI implements BottomBar.IBottomBarFFI {
   async getBackgroundColor(): Promise<Color.RGBAHex> {
     const color = await netCallNative(NativeUI.GetBottomBarBackgroundColor);
     const colorHex = getColorHex(color);
-    return colorHex
+    return colorHex;
   }
 
   async setBackgroundColor(color: Color.RGBAHex): Promise<void> {
@@ -57,7 +57,9 @@ export class BottomBarFFI implements BottomBar.IBottomBarFFI {
   }
 
   async getActions(): Promise<BottomBar.BottomBarItem[]> {
-    const actionList = JSON.parse(await netCallNative(NativeUI.GetBottomBarActions));
+    const actionList = JSON.parse(
+      await netCallNative(NativeUI.GetBottomBarActions)
+    );
     const _actionList: BottomBar.BottomBarItem[] = [];
 
     for (const item of actionList) {
@@ -68,18 +70,17 @@ export class BottomBarFFI implements BottomBar.IBottomBarFFI {
           if (typeof color === "number") {
             let colorARGB = "#" + color.toString(16);
 
-            item.colors[
-              key as keyof BottomBar.IBottomBarColors
-            ] = (colorARGB.slice(0, 1) +
-              colorARGB.slice(3) +
-              colorARGB.slice(1, 3)) as BottomBar.BottomBarColorType;
+            item.colors[key as keyof BottomBar.IBottomBarColors] =
+              (colorARGB.slice(0, 1) +
+                colorARGB.slice(3) +
+                colorARGB.slice(1, 3)) as BottomBar.BottomBarColorType;
           }
         }
       }
 
       _actionList.push(item);
     }
-    return _actionList
+    return _actionList;
   }
 
   async setActions(actionList: BottomBar.BottomBarItem[]): Promise<void> {
@@ -96,9 +97,8 @@ export class BottomBarFFI implements BottomBar.IBottomBarFFI {
               colorRGBA.slice(0, 2) +
               colorRGBA.slice(-2) +
               colorRGBA.slice(2, -2);
-            item.colors[key as keyof BottomBar.IBottomBarColors] = parseInt(
-              colorARGB
-            );
+            item.colors[key as keyof BottomBar.IBottomBarColors] =
+              parseInt(colorARGB);
           }
         }
       }

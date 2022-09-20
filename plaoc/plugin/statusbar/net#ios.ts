@@ -1,9 +1,7 @@
-import "../typings";
-import { Color } from "../typings/types/color.type";
-import { StatusBar } from "./bfcsStatusBar.type";
+import { Color } from "../types/colorType";
+import { StatusBar } from "./bfcsStatusBarType";
 
 export class StatusBarFFI implements StatusBar.IStatusBarFFI {
-
   setStatusBarVisible(isVer: boolean): Promise<boolean> {
     throw new Error("Method not implemented.");
   }
@@ -95,9 +93,8 @@ export class StatusBarFFI implements StatusBar.IStatusBarFFI {
   }
 
   async getStatusBarStyle(): Promise<StatusBar.StatusBarStyle> {
-    const barStyle: StatusBar.StatusBarIosStyle = await this._ffi.statusBarStyle.postMessage(
-      null
-    );
+    const barStyle: StatusBar.StatusBarIosStyle =
+      await this._ffi.statusBarStyle.postMessage(null);
 
     let darkIcons: StatusBar.StatusBarStyle;
 

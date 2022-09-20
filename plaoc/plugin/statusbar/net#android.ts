@@ -1,13 +1,10 @@
 import { NativeUI } from "../common/nativeHandle";
 import { netCallNative } from "../common/network";
-import "../typings";
-import { Color } from "../typings/types/color.type";
+import { Color } from "../types/colorType";
 import { getColorInt, getColorHex } from "../util";
-import { StatusBar } from "./bfcsStatusBar.type";
-
+import { StatusBar } from "./bfcsStatusBarType";
 
 export class StatusBarFFI implements StatusBar.IStatusBarFFI {
-
   async setStatusBarColor(
     color?: Color.RGBAHex,
     barStyle?: StatusBar.StatusBarStyle
@@ -16,8 +13,8 @@ export class StatusBarFFI implements StatusBar.IStatusBarFFI {
     let darkIcons: boolean;
 
     if (!color) {
-      const stringColor = await netCallNative(NativeUI.GetStatusBarColor)
-      colorHex = Number(stringColor)
+      const stringColor = await netCallNative(NativeUI.GetStatusBarColor);
+      colorHex = Number(stringColor);
     } else {
       colorHex = getColorInt(
         color.slice(0, -2) as Color.RGBHex,
@@ -26,8 +23,8 @@ export class StatusBarFFI implements StatusBar.IStatusBarFFI {
     }
 
     if (!barStyle) {
-      let isDarkIcons = await netCallNative(NativeUI.GetStatusBarIsDark)
-      darkIcons = isDarkIcons
+      let isDarkIcons = await netCallNative(NativeUI.GetStatusBarIsDark);
+      darkIcons = isDarkIcons;
     } else {
       switch (barStyle) {
         case "light-content":
@@ -40,24 +37,29 @@ export class StatusBarFFI implements StatusBar.IStatusBarFFI {
           darkIcons = false;
       }
     }
-    netCallNative(NativeUI.SetStatusBarColor, { colorHex, darkIcons })
+    netCallNative(NativeUI.SetStatusBarColor, { colorHex, darkIcons });
     return;
   }
 
   async getStatusBarColor(): Promise<Color.RGBAHex> {
-    const stringColor = await netCallNative(NativeUI.GetStatusBarColor) as string
+    const stringColor = (await netCallNative(
+      NativeUI.GetStatusBarColor
+    )) as string;
     const colorHex = getColorHex(parseFloat(stringColor));
-    return colorHex
+    return colorHex;
   }
 
   async getStatusBarVisible(): Promise<boolean> {
-    const isVisible = await netCallNative(NativeUI.GetStatusBarVisible)
-    return Boolean(isVisible)
+    const isVisible = await netCallNative(NativeUI.GetStatusBarVisible);
+    return Boolean(isVisible);
   }
 
   async setStatusBarVisible(isVer: boolean): Promise<boolean> {
-    const stringVisible = await netCallNative(NativeUI.SetStatusBarVisible, isVer)
-    return Boolean(stringVisible)
+    const stringVisible = await netCallNative(
+      NativeUI.SetStatusBarVisible,
+      isVer
+    );
+    return Boolean(stringVisible);
   }
 
   async setStatusBarHidden(): Promise<boolean> {
@@ -69,15 +71,14 @@ export class StatusBarFFI implements StatusBar.IStatusBarFFI {
   }
 
   async getStatusBarOverlay(): Promise<boolean> {
-    const stringOverlay = await netCallNative(NativeUI.GetStatusBarOverlay)
+    const stringOverlay = await netCallNative(NativeUI.GetStatusBarOverlay);
     return Boolean(stringOverlay);
   }
 
   async setStatusBarOverlay(isOverlay: boolean): Promise<boolean> {
-    const isOver = await netCallNative(NativeUI.SetStatusBarOverlay, isOverlay)
+    const isOver = await netCallNative(NativeUI.SetStatusBarOverlay, isOverlay);
     return Boolean(isOver);
   }
-
 
   async getStatusBarIsDark(): Promise<StatusBar.StatusBarStyle> {
     const isDarkIcons = await netCallNative(NativeUI.GetStatusBarIsDark);
@@ -87,6 +88,6 @@ export class StatusBarFFI implements StatusBar.IStatusBarFFI {
     } else {
       barStyle = "light-content" as StatusBar.StatusBarStyle.LIGHT_CONTENT;
     }
-    return barStyle
+    return barStyle;
   }
 }

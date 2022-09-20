@@ -1,4 +1,4 @@
-import { Data } from "../typings/types/data.type";
+import { Data } from "../types/dataType";
 
 export namespace Keyboard {
   export interface IKeyboardSafeArea {

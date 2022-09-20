@@ -1,4 +1,4 @@
-import { Dialogs } from "./bfcsDialogs.type";
+import { Dialogs } from "./bfcsDialogsType";
 
 export class DialogsFFI implements Dialogs.IDialogsFFI {
   private _ffi = (window as any).webkit

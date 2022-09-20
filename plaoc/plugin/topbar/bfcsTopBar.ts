@@ -1,8 +1,7 @@
 import { TopBarFFI } from "./net";
-import { TopBar } from "./bfcsTopBar.type";
-import "../typings";
-import { Icon } from "../icon/bfspIcon.type";
-import { Color } from "../typings/types/color.type";
+import { TopBar } from "./bfcsTopBarType";
+import { Icon } from "../icon/bfspIconType";
+import { Color } from "../types/colorType";
 import { DwebPlugin } from "../native/dweb-plugin";
 import { convertToRGBAHex } from "./../util";
 
@@ -48,12 +47,12 @@ export class BfcsTopBar extends DwebPlugin {
   }
   /**返回上一级 */
   async topBarNavigationBack(): Promise<boolean> {
-    return await this._ffi.topBarNavigationBack();;
+    return await this._ffi.topBarNavigationBack();
   }
   /**
    * 设置是否可点击
    * @param isEnabled boolean
-   * @returns 
+   * @returns
    */
   async setTopBarEnabled(isEnabled: boolean): Promise<void> {
     await this._ffi.setTopBarEnabled(isEnabled);
@@ -70,9 +69,9 @@ export class BfcsTopBar extends DwebPlugin {
     return title;
   }
   /**
-   * 设置状态栏标题 
+   * 设置状态栏标题
    * @param title string
-   * @returns 
+   * @returns
    */
   async setTopBarTitle(title: string): Promise<void> {
     await this._ffi.setTopBarTitle(title);
@@ -90,8 +89,8 @@ export class BfcsTopBar extends DwebPlugin {
   }
   /**
    * 设置状态栏的透明度
-   * @param alpha 
-   * @returns 
+   * @param alpha
+   * @returns
    */
   async setTopBarOverlay(alpha: string): Promise<void> {
     await this._ffi.setTopBarOverlay(alpha);
@@ -109,8 +108,8 @@ export class BfcsTopBar extends DwebPlugin {
   }
   /**
    * 设置状态栏背景颜色
-   * @param color 
-   * @returns 
+   * @param color
+   * @returns
    */
   async setTopBarBackgroundColor(color: string): Promise<void> {
     const colorHex = convertToRGBAHex(color);
@@ -125,8 +124,8 @@ export class BfcsTopBar extends DwebPlugin {
   }
   /**
    * 设置状态栏文字和图标颜色
-   * @param color 
-   * @returns 
+   * @param color
+   * @returns
    */
   async setTopBarForegroundColor(color: string): Promise<void> {
     const colorHex = convertToRGBAHex(color);
