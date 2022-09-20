@@ -1,6 +1,6 @@
-import { Color } from "../typings/types/color.type";
+import { Color } from "../types/colorType";
 import { convertToRGBAHex } from "../util";
-import { StatusBar } from "./bfcsStatusBar.type";
+import { StatusBar } from "./bfcsStatusBarType";
 
 async () => {
   // 等到dweb-communication组件注册成功，再执行StatusBarFFI代码
@@ -11,9 +11,9 @@ export class StatusBarFFI implements StatusBar.IStatusBarFFI {
   private _ffi!: StatusBar.StatusBarDesktopFFI;
 
   constructor() {
-    this._ffi = (document.querySelector(
+    this._ffi = document.querySelector(
       "dweb-communication"
-    ) as unknown) as StatusBar.StatusBarDesktopFFI;
+    ) as unknown as StatusBar.StatusBarDesktopFFI;
   }
   setStatusBarVisible(isVer: boolean): Promise<boolean> {
     throw new Error("Method not implemented.");

@@ -1,14 +1,19 @@
 import { netCallNative } from "../common/network";
-import { Dialogs } from "./bfcsDialogs.type";
-import { NativeUI } from '../common/nativeHandle';
+import { Dialogs } from "./bfcsDialogsType";
+import { NativeUI } from "../common/nativeHandle";
 
 export class DialogsFFI implements Dialogs.IDialogsFFI {
-
-  async openAlert(config: Dialogs.IAlertConfig, confirmFunc: string): Promise<void> {
+  async openAlert(
+    config: Dialogs.IAlertConfig,
+    confirmFunc: string
+  ): Promise<void> {
     let cb: string = `(()=>{
           ${confirmFunc}
       })`;
-    await netCallNative(NativeUI.OpenDialogAlert, { config: JSON.stringify(config), cb })
+    await netCallNative(NativeUI.OpenDialogAlert, {
+      config: JSON.stringify(config),
+      cb,
+    });
   }
 
   async openPrompt(
@@ -23,7 +28,10 @@ export class DialogsFFI implements Dialogs.IDialogsFFI {
           ${cancelFunc ?? ""}
         }
       })`;
-    await netCallNative(NativeUI.OpenDialogPrompt, { config: JSON.stringify(config), cb })
+    await netCallNative(NativeUI.OpenDialogPrompt, {
+      config: JSON.stringify(config),
+      cb,
+    });
   }
 
   async openConfirm(
@@ -38,7 +46,10 @@ export class DialogsFFI implements Dialogs.IDialogsFFI {
           ${cancelFunc ?? ""}
         }
       })`;
-    await netCallNative(NativeUI.OpenDialogConfirm, { config: JSON.stringify(config), cb })
+    await netCallNative(NativeUI.OpenDialogConfirm, {
+      config: JSON.stringify(config),
+      cb,
+    });
   }
 
   async openWarning(
@@ -53,6 +64,9 @@ export class DialogsFFI implements Dialogs.IDialogsFFI {
           ${cancelFunc ?? ""}
         }
       })`;
-    await netCallNative(NativeUI.OpenDialogWarning, { config: JSON.stringify(config), cb })
+    await netCallNative(NativeUI.OpenDialogWarning, {
+      config: JSON.stringify(config),
+      cb,
+    });
   }
 }

@@ -1,12 +1,10 @@
-import "../typings";
-import { Color } from "../typings/types/color.type";
-import { TopBar } from "./bfcsTopBar.type";
+import { Color } from "../types/colorType";
+import { TopBar } from "./bfcsTopBarType";
 import { NativeUI } from "../common/nativeHandle";
 import { netCallNative } from "../common/network";
 import { getColorHex, hexToIntColor } from "../util";
 
 export class TopBarFFI implements TopBar.ITopBarFFI {
-
   async topBarNavigationBack(): Promise<boolean> {
     return await netCallNative(NativeUI.TopBarNavigationBack);
   }

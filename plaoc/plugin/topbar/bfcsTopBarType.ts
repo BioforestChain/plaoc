@@ -1,6 +1,6 @@
-import { Icon } from "../icon/bfspIcon.type";
-import { Color } from "../typings/types/color.type";
-import { Data } from "../typings/types/data.type";
+import { Icon } from "../icon/bfspIconType";
+import { Color } from "../types/colorType";
+import { Data } from "../types/dataType";
 
 export namespace TopBar {
   export interface TopBarItem {

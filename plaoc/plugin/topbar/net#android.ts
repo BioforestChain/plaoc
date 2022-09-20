@@ -1,9 +1,8 @@
 import { NativeUI } from "../common/nativeHandle";
 import { netCallNative } from "../common/network";
-import "../typings";
-import { Color } from "../typings/types/color.type";
+import { Color } from "../types/colorType";
 import { getColorInt, getColorHex, hexToIntColor } from "../util";
-import { TopBar } from "./bfcsTopBar.type";
+import { TopBar } from "./bfcsTopBarType";
 
 // 禁止传递float 因为不管传递什么，到android都会变0。
 export class TopBarFFI implements TopBar.ITopBarFFI {

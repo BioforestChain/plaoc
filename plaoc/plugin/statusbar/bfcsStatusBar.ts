@@ -1,9 +1,8 @@
 import { convertToRGBAHex } from "./../util";
 import { DwebPlugin } from "../native/dweb-plugin";
 import { StatusBarFFI } from "./net";
-import { StatusBar } from "./bfcsStatusBar.type";
-import "../typings";
-import { Color } from "../typings/types/color.type";
+import { StatusBar } from "./bfcsStatusBarType";
+import { Color } from "../types/colorType";
 
 export class BfcsStatusBar extends DwebPlugin {
   private _ffi: StatusBar.IStatusBarFFI;
@@ -17,7 +16,7 @@ export class BfcsStatusBar extends DwebPlugin {
     this._init();
   }
   /**移除DOM添加的方法 */
-  disconnectedCallback() { }
+  disconnectedCallback() {}
 
   private async _init() {
     // this.setAttribute("background-color", colorHex);
@@ -28,7 +27,7 @@ export class BfcsStatusBar extends DwebPlugin {
    * 设置状态栏颜色
    * @param color string
    * @param barStyle enum(light-content,dark-content)
-   * @returns 
+   * @returns
    */
   async setStatusBarColor(
     color?: string,
@@ -60,7 +59,7 @@ export class BfcsStatusBar extends DwebPlugin {
   /**设置状态栏是否覆盖内容 */
   async setStatusBarOverlay(isOver: boolean = false): Promise<boolean> {
     const overlay = await this._ffi.setStatusBarOverlay(isOver);
-    return overlay
+    return overlay;
   }
   /**获取状态栏是否更偏向于使用黑色效果 */
   async getStatusBarIsDark(): Promise<StatusBar.StatusBarStyle> {

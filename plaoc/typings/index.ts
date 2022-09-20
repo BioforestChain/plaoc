@@ -1,2 +1,2 @@
-import "./types/deno.type";
+import "./types/denoType";
 export {};

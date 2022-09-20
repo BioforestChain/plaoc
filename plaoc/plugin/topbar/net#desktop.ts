@@ -1,6 +1,5 @@
-import { TopBar } from "./bfcsTopBar.type";
-import "../typings";
-import { Color } from "../typings/types/color.type";
+import { TopBar } from "./bfcsTopBarType";
+import { Color } from "../types/colorType";
 import { NativeUI } from "../common/nativeHandle";
 import { netCallNative } from "../common/network";
 import { getColorHex, hexToIntColor } from "../util";
@@ -9,9 +8,7 @@ import { getColorHex, hexToIntColor } from "../util";
 await customElements.whenDefined("dweb-communication");
 
 export class TopBarFFI implements TopBar.ITopBarFFI {
-
-  constructor() {
-  }
+  constructor() {}
 
   async topBarNavigationBack(): Promise<boolean> {
     return await netCallNative(NativeUI.TopBarNavigationBack);
