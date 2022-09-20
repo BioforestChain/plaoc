@@ -1,7 +1,6 @@
 import { convertToRGBAHex } from "../util";
-import { BottomBar } from "./bfcsBottomBar.type";
-import "../typings";
-import { Color } from "../typings/types/color.type";
+import { BottomBar } from "./bfcsBottomBarType";
+import { Color } from "../types/colorType";
 
 // 等到dweb-communication组件注册成功，再执行StatusBarFFI代码
 await customElements.whenDefined("dweb-communication");
@@ -10,11 +9,10 @@ export class BottomBarFFI implements BottomBar.IBottomBarFFI {
   private _ffi!: BottomBar.BottomBarDesktopFFI;
 
   constructor() {
-    this._ffi = (document.querySelector(
+    this._ffi = document.querySelector(
       "dweb-communication"
-    ) as unknown) as BottomBar.BottomBarDesktopFFI;
+    ) as unknown as BottomBar.BottomBarDesktopFFI;
   }
-
 
   async getHidden(): Promise<boolean> {
     const isHidden = await this._ffi.getBottombarHidden();
@@ -41,7 +39,6 @@ export class BottomBarFFI implements BottomBar.IBottomBarFFI {
 
     return isOverlay;
   }
-
 
   async setOverlay(alpha: string): Promise<number> {
     return await this._ffi.setBottombarOverlay(alpha);

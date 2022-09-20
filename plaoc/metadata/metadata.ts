@@ -1,4 +1,4 @@
-import { IManifest, IDwebview, IMetaData, IImportMap } from "./metadata.type";
+import { IManifest, IDwebview, IMetaData, IImportMap } from "./metadataType";
 class MetaData implements IMetaData {
   manifest: Manifest;
   dwebview: DWebView;

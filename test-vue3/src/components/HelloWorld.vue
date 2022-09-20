@@ -27,9 +27,10 @@ async function onPushFile(e: Event) {
     fetch('/upload', {
       body: formData,
       method: "post",
-    }).then(res => {
-      console.log('上传成功')
+    }).then(async res => {
+      console.log('哈哈哈哈哈哈', await res.text(), await res)
     }).catch(error => {
+      console.log("error", error)
       // 文件上传失败
     }).finally(() => {
       // 文件上传完成，无论成功还是失败
