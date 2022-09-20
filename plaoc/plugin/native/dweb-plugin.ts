@@ -1,5 +1,5 @@
 import { loop } from '../common'
-import { connectChannel } from '../common/network';
+import { getConnectChannel } from '../common/network';
 /**
  * 所有的dweb-plugin需要继承这个类
  */
@@ -77,19 +77,7 @@ export class DwebPlugin extends HTMLElement {
   async createMessage(fun: string, data: string = `"''"`): Promise<string> {
     const message = `{"function":"${fun}","data":${data},"channelId":"${this.channelId}"}`;
     const buffer = new TextEncoder().encode(message);
-    return connectChannel(`/poll?data=${buffer}`);
+    return getConnectChannel(`/poll?data=${buffer}`);
   }
-
-  /**返回需要监听的属性 */
-  //   static get observedAttributes() {
-  //     return ["channelId"]; // 用来区分多个组件
-  //   }
-  //   /**当属性值改变的时候会调用 attributeChangedCallback 这个我 */
-  //   attributeChangedCallback(name: string, oldValue: string, newValue: string) {
-  //     console.log("channelId: ", name, oldValue, newValue);
-  //     if (name === "channelId") {
-  //       this.channelId = newValue;
-  //     }
-  //   }
 }
 

@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite && node ./copy-to-build.cjs",
     "build": "vue-tsc --noEmit && vite build && node ./copy.cjs",
     "preview": "vite preview"
   },

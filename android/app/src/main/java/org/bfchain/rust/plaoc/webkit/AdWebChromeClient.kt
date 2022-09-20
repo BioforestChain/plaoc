@@ -53,6 +53,8 @@ open class AdWebChromeClient : WebChromeClient() {
         var capture = false
         val accept = mutableListOf<String>()
 
+        accept.addAll(listOf("*/*")) // 不加这个选择文件会报错
+
         fileChooserParams?.let { params ->
             capture = params.isCaptureEnabled
             multiple = params.mode == WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE
@@ -66,10 +68,10 @@ open class AdWebChromeClient : WebChromeClient() {
             fileInputHelper.inputFileLauncher.launch(options)
         }
 
-        if (capture && PackageManager.PERMISSION_GRANTED != webView?.context?.checkPermission(
-                android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Process.myPid(), Process.myUid()
-            ) ?: return false/*cancel*/
+        if (capture && PackageManager.PERMISSION_GRANTED != (webView?.context?.checkPermission(
+            android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Process.myPid(), Process.myUid()
+          ) ?: return false)/*cancel*/
         ) {
             fileInputHelper.requestPermissionCallback = ValueCallback {
                 launchFileInput()

@@ -36,6 +36,7 @@ import org.bfchain.rust.plaoc.webView.topbar.TopBarFFI
 import org.bfchain.rust.plaoc.webView.topbar.TopBarState
 import org.bfchain.rust.plaoc.webView.urlscheme.CustomUrlScheme
 import org.bfchain.rust.plaoc.webkit.*
+import java.io.ByteArrayInputStream
 import java.net.URI
 import java.net.URL
 import kotlin.math.min
@@ -353,7 +354,22 @@ fun DWebView(
                       if (suffixIndex == -1) {
                         return dataGateWay(request)
                       }
-                      return customUrlScheme.handleRequest(request, path)
+                      // 拦截，跳过本地和远程脚本
+                      if (jumpWhitelist(url)) {
+                        // 拦截视图文件
+                        if (url.endsWith(".html")) {
+                          return viewGateWay(customUrlScheme, request)
+                        }
+                        // 映射本地文件的资源文件 https://bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj.dweb/index.mjs -> /plaoc/index.mjs
+                        if (Regex(dWebView_host).containsMatchIn(url)) {
+                          return customUrlScheme.handleRequest(request, path)
+                        }
+                      }
+                      return WebResourceResponse(
+                        "application/json",
+                        "utf-8",
+                        ByteArrayInputStream("无权限，需要前往后端配置".toByteArray())
+                      )
                     }
                   })
                   swController.serviceWorkerWebSettings.allowContentAccess = true
@@ -366,7 +382,7 @@ fun DWebView(
                             view: WebView?,
                             request: WebResourceRequest?
                         ): WebResourceResponse? {
-//                            Log.i(ITAG, "Intercept Request: ${request?.url}")
+//                            Log.i(ITAG, "Intercept Request: ${request?.method}")
                             if (request !== null) {
                                 // 这里出来的url全部都用是小写，俺觉得这是个bug
                                 val url = request.url.toString()
