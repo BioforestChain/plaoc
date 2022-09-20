@@ -21,13 +21,12 @@
             android:launchMode="standard"
             android:theme="@style/Theme.plaoc">
             <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <action android:name="org.bfchain.dweb" />
-
-                <category android:name="android.intent.category.DEFAULT" />
+              <action android:name="android.intent.action.VIEW" />
+              <action android:name="org.bfchain.rust.plaoc.webView" />
+              <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data android:scheme="dweb" />
+<!--                <data android:scheme="dweb" />-->
                 <!--                android:host="@string/web_host"-->
                 <data android:scheme="https" />
             </intent-filter>

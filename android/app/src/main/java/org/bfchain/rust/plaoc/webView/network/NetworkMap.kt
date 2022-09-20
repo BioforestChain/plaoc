@@ -27,9 +27,6 @@ var network_whitelist = "http://127.0.0.1"
 
 /**
  * 数据资源拦截
- *  单独对转发给deno-js 的请求进行处理
- *  https://channelId.bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj.dweb/poll
- *  https://channelId.bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj.dweb/done
  */
 fun dataGateWay(
     request: WebResourceRequest
@@ -38,24 +35,34 @@ fun dataGateWay(
     Log.i(TAG, " dataGateWay: $url")
     if (front_to_rear_map.contains(url)) {
         val trueUrl = front_to_rear_map[url]
+      Log.i(TAG, " dataGateWay front_to_rear_map.contains: $trueUrl")
+      try {
         val connection = URL(trueUrl).openConnection() as HttpURLConnection
         connection.requestMethod = request.method
-        Log.i(TAG, " dataGateWay front_to_rear_map.contains: $trueUrl")
-        Log.i(TAG, " dataGateWay connection.inputStream: ${connection.inputStream}")
+//        Log.i(TAG, " dataGateWay connection.inputStream: ${connection.inputStream}")
         return WebResourceResponse(
-            "application/json",
-            "utf-8",
-            connection.inputStream
+          "application/json",
+          "utf-8",
+          connection.inputStream
         )
+      } catch (e: Exception) { // 处理用户在配置文件里写的资源或服务，但实际没有引发webview崩溃重载的情况
+        return WebResourceResponse(
+          "application/json",
+          "utf-8",
+          ByteArrayInputStream("This data service could not be found".toByteArray())
+        )
+      }
     }
     return WebResourceResponse(
         "application/json",
         "utf-8",
-        ByteArrayInputStream("access denied".toByteArray())
+        ByteArrayInputStream("No permission, need to go to the backend configuration".toByteArray())
     )
 }
-
-// 传递dwebView到deno的消息
+/**
+ * 传递dwebView到deno的消息,单独对转发给deno-js 的请求进行处理
+ * https://channelId.bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj.dweb/poll
+ */
 fun messageGateWay(
     request: WebResourceRequest
 ): WebResourceResponse {
@@ -70,7 +77,7 @@ fun messageGateWay(
     )
 }
 
-// 转发给ui
+/** 转发给ui*/
 fun uiGateWay(
   request: WebResourceRequest
 ): WebResourceResponse {

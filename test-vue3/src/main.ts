@@ -20,6 +20,7 @@ import App from "./App.vue";
 import { IonicVue } from '@ionic/vue';
 import router from './router';
 
+import '@bfsx/plugin';
 
 
 const app = createApp(App).use(IonicVue).use(router);

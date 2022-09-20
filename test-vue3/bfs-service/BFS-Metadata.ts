@@ -49,8 +49,8 @@ export const metaData: MetaData = {
         response: "./api/*",
       },
       {
-        url: "/api-source/*",
-        response: "./api/*",
+        url: "/api/upload",
+        response: "/api/update",
       },
     ],
   },

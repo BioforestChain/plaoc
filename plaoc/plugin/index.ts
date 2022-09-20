@@ -12,4 +12,6 @@ export * from "./statusbar";
 export * from "./topbar";
 export * from "./types";
 
-// export * from "./statusBar/index";
+import { registerServerWorker } from "./common/network";
+registerServerWorker()
+
