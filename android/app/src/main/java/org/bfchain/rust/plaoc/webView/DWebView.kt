@@ -27,7 +27,6 @@ import org.bfchain.rust.plaoc.webView.bottombar.BottomBarState
 import org.bfchain.rust.plaoc.webView.bottombar.DWebBottomBar
 import org.bfchain.rust.plaoc.webView.dialog.*
 import org.bfchain.rust.plaoc.webView.jsutil.JsUtil
-import org.bfchain.rust.plaoc.webView.navigator.NavigatorFFI
 import org.bfchain.rust.plaoc.webView.network.*
 import org.bfchain.rust.plaoc.webView.systemui.SystemUIState
 import org.bfchain.rust.plaoc.webView.systemui.SystemUiFFI
@@ -37,6 +36,7 @@ import org.bfchain.rust.plaoc.webView.topbar.TopBarFFI
 import org.bfchain.rust.plaoc.webView.topbar.TopBarState
 import org.bfchain.rust.plaoc.webView.urlscheme.CustomUrlScheme
 import org.bfchain.rust.plaoc.webkit.*
+import java.io.ByteArrayInputStream
 import java.net.URI
 import java.net.URL
 import kotlin.math.min
@@ -138,25 +138,30 @@ fun DWebView(
         }
     }
     val topBarState = TopBarState.Default(presseBack)
-
     @Composable
     fun TopAppBar() {
         DWebTopBar(jsUtil, state, topBarState)
     }
 
-    val bottomBarState = BottomBarState.Default()
+  val bottomBarState = BottomBarState.Default()
 
-    @Composable
+  @Composable
     fun BottomAppBar() {
         DWebBottomBar(jsUtil, bottomBarState)
     }
 
     Scaffold(
         modifier = modifier
-            .padding(overlayPadding)
-            .offset { overlayOffset },
-        topBar = { if (!topBarState.overlay.value and topBarState.enabled.value) TopAppBar() },
-        bottomBar = { if (!bottomBarState.overlay.value and bottomBarState.isEnabled) BottomAppBar() },
+          .padding(overlayPadding)
+          .offset { overlayOffset },
+         // 如果前端没有传递overlay,并且没有传递enabled
+        topBar = { if ((topBarState.overlay.value == 1F) and topBarState.enabled.value) TopAppBar() },
+        bottomBar = {
+           // Log.i("DwebView","bottomBarState.isEnabled:${ bottomBarState.isEnabled}, bottomBarState.overlay:${ bottomBarState.overlay.value}");
+          // 如果前端没有传递hidden，也就是bottomBarState.isEnabled等于true，则显示bottom bar
+          if ((bottomBarState.overlay.value == 1F) and bottomBarState.isEnabled) {
+            BottomAppBar()
+        } },
         content = { innerPadding ->
             val jsAlertConfig = remember {
                 mutableStateOf<JsAlertConfiguration?>(null)
@@ -167,7 +172,7 @@ fun DWebView(
             val jsConfirmConfig = remember {
                 mutableStateOf<JsConfirmConfiguration?>(null)
             }
-            val jsBeforeUnloadConfig = remember {
+            val jsWarningConfig = remember {
                 mutableStateOf<JsConfirmConfiguration?>(null)
             }
 
@@ -186,9 +191,6 @@ fun DWebView(
                             callback
                         )
                     })
-                    val navigatorFFI = NavigatorFFI(webView, activity, navController)
-                    webView.addJavascriptInterface(navigatorFFI, "my_nav")
-
                     val systemUiFFI = SystemUiFFI(
                         activity,
                         webView,
@@ -196,28 +198,21 @@ fun DWebView(
                         jsUtil!!,
                         systemUIState,
                     )
-
-                    webView.addJavascriptInterface(systemUiFFI, "system_ui");
-                    webView.addJavascriptInterface(systemUiFFI.virtualKeyboard, "virtual_keyboard")
-
-                    val topBarFFI = TopBarFFI(
-                        topBarState,
-                    )
-                    webView.addJavascriptInterface(topBarFFI, "top_bar")
-
-
+                    initSystemUiFn(systemUiFFI)
+                      val topBarFFI = TopBarFFI(
+                          topBarState,
+                      )
+                    initTopBarFn(topBarFFI)
                     val bottomBarFFI = BottomBarFFI(bottomBarState)
-                    webView.addJavascriptInterface(bottomBarFFI, "bottom_bar")
-
-                    val dialogFFI = DialogFFI(
-                        jsUtil!!,
-                        jsAlertConfig,
-                        jsPromptConfig,
-                        jsConfirmConfig,
-                        jsBeforeUnloadConfig
-                    )
-                    webView.addJavascriptInterface(dialogFFI, "native_dialog")
-
+                    initBottomFn(bottomBarFFI)
+                      val dialogFFI = DialogFFI(
+                          jsUtil!!,
+                          jsAlertConfig,
+                          jsPromptConfig,
+                          jsConfirmConfig,
+                          jsWarningConfig
+                      )
+                    initDialogFn(dialogFFI);
                     onCreated(webView)
                 },
                 chromeClient = remember {
@@ -321,7 +316,7 @@ fun DWebView(
                             if (result == null) {
                                 return super.onJsBeforeUnload(view, url, message, result)
                             }
-                            jsBeforeUnloadConfig.value = JsConfirmConfiguration(
+                           jsWarningConfig.value = JsConfirmConfiguration(
                                 getJsDialogTitle(url, "提示您"),
                                 message ?: "",
                                 "离开",
@@ -336,9 +331,50 @@ fun DWebView(
                     MyWebChromeClient()
                 },
                 client = remember {
+                  val swController = ServiceWorkerController.getInstance()
+                  swController.setServiceWorkerClient(object : ServiceWorkerClient() {
+                    override fun shouldInterceptRequest(request: WebResourceRequest): WebResourceResponse? {
+                      val url = request.url.toString();
+                      // 防止卡住请求为空而崩溃
+                      if (!url.isNullOrEmpty()) {
+                        val path = URL(url).path
+//                      Log.e("setServiceWorkerClient: ",  "${request.url}")
+                        val temp = url.substring(url.lastIndexOf("/") + 1)
+                        //拦截转发到后端的事件
+                        if (temp.startsWith("poll")) {
+                          return messageGateWay(request)
+                        }
+                        //拦截设置ui的请求，代替JavascriptInterface
+                        if (temp.startsWith("setUi")) {
+                          return uiGateWay(request)
+                        }
+                        val suffixIndex = temp.lastIndexOf(".")
+                        // 只拦截数据文件,忽略资源文件
+                        if (suffixIndex == -1) {
+                          return dataGateWay(request)
+                        }
+                        // 拦截，跳过本地和远程脚本
+                        if (jumpWhitelist(url)) {
+                          // 拦截视图文件
+                          if (url.endsWith(".html")) {
+                            return viewGateWay(customUrlScheme, request)
+                          }
+                          // 映射本地文件的资源文件 https://bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj.dweb/index.mjs -> /plaoc/index.mjs
+                          if (Regex(dWebView_host).containsMatchIn(url)) {
+                            return customUrlScheme.handleRequest(request, path)
+                          }
+                        }
+                      }
+                      return WebResourceResponse(
+                        "application/json",
+                        "utf-8",
+                        ByteArrayInputStream("无权限，需要前往后端配置".toByteArray())
+                      )
+                    }
+                  })
+                  swController.serviceWorkerWebSettings.allowContentAccess = true
                     class MyWebViewClient : AdWebViewClient() {
                         private val ITAG = "$TAG/CUSTOM-SCHEME"
-
                         // API >= 21
                         @SuppressLint("NewApi")
                         @Override
@@ -346,56 +382,27 @@ fun DWebView(
                             view: WebView?,
                             request: WebResourceRequest?
                         ): WebResourceResponse? {
-                            Log.i(ITAG, "Intercept Request: ${request?.url}")
+//                           Log.i(ITAG, "Intercept Request: ${request?.url}")
                             if (request !== null) {
                                 // 这里出来的url全部都用是小写，俺觉得这是个bug
                                 val url = request.url.toString()
                                 // 拦截，跳过本地和远程脚本
                                 if (jumpWhitelist(url)) {
-                                    try {
-                                        // 拦截视图文件
-                                        if (url.endsWith(".html")) {
-                                            return viewGateWay(customUrlScheme, request)
-                                        }
-                                        /**
-                                         * 这里放行了所有的资源文件（比如 .css .gif .js) 只有api类型的数据会被拦截到
-                                         * 下面这种实现方法会有安全问题（比如说一些.php,.jsp的提权），可能需要完善一下下面规则的健壮性。
-                                         */
-                                        val temp = url.substring(url.lastIndexOf("/") + 1)
-                                        if (temp.startsWith("poll")) {
-                                            return messageGateWay(request)
-                                        }
-                                        val suffixIndex = temp.lastIndexOf(".")
-                                        // 只拦截数据文件,忽略资源文件
-                                        if (suffixIndex == -1) {
-                                            return dataGateWay(request)
-                                        }
-                                        // 映射本地文件的资源文件 https://bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj.dweb/index.mjs -> /plaoc/index.mjs
-                                        if (Regex(dWebView_host).containsMatchIn(url)) {
-                                            val path = URL(url).path
-                                            return customUrlScheme.handleRequest(request, path)
-                                        }
-                                    } catch (e: java.lang.Exception) {
-                                        e.printStackTrace()
-                                    }
+
+                                  // 拦截视图文件
+                                  if (url.endsWith(".html")) {
+                                      return viewGateWay(customUrlScheme, request)
+                                  }
+                                  val temp = url.substring(url.lastIndexOf("/") + 1)
+                                  // 映射本地文件的资源文件 https://bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj.dweb/index.mjs -> /plaoc/index.mjs
+                                  if (Regex(dWebView_host).containsMatchIn(url)) {
+                                      val path = URL(url).path
+                                      return customUrlScheme.handleRequest(request, path)
+                                  }
                                 }
                             }
                             return super.shouldInterceptRequest(view, request)
                         }
-
-                        // API < 21
-//                        override fun shouldInterceptRequest(view: WebView?, url: String?): WebResourceResponse? {
-//                            if (url != null) {
-//                                if (!(url.startsWith("http://127.0.0.1") || url.startsWith(
-//                                        "https://unpkg.com"
-//                                    ))
-//                                ) {
-//                                    return super.shouldInterceptRequest(view,
-//                                        url.let { gateWay(it) })
-//                                }
-//                            }
-//                            return super.shouldInterceptRequest(view, url)
-//                        }
 
                         override fun shouldOverrideUrlLoading(
                             view: WebView?,
@@ -416,10 +423,11 @@ fun DWebView(
                     val layoutDirection = LocalLayoutDirection.current
                     var start = innerPadding.calculateStartPadding(layoutDirection)
                     var end = innerPadding.calculateEndPadding(layoutDirection)
-                    if (topBarState.overlay.value or !topBarState.enabled.value) {
+                    if ((topBarState.overlay.value != 1F) or !topBarState.enabled.value) {
                         top = 0.dp
                     }
-                    if (bottomBarState.overlay.value or !bottomBarState.isEnabled) {
+                    // 如果不显示bottomBar，即bottomBarState.isEnabled 为false
+                    if ((bottomBarState.overlay.value != 1F) or !bottomBarState.isEnabled) {
                         bottom = 0.dp
                     }
                     if ((top.value == 0F) and (bottom.value == 0F)) {
@@ -430,35 +438,40 @@ fun DWebView(
                 },
             )
 
-            if (topBarState.overlay.value and topBarState.enabled.value) {
+          // 如果前端传递了透明度属性，并且是需要显示的
+            if ((topBarState.overlay.value != 1F) and topBarState.enabled.value) {
                 Box(
                     contentAlignment = Alignment.TopCenter,
                     modifier = if (systemUIState.statusBar.overlay.value) {
-                        with(LocalDensity.current) {
+                      with(LocalDensity.current) {
                             Modifier.offset(y = WindowInsets.statusBars.getTop(this).toDp())
                         }
                     } else {
-                        Modifier
+                      Modifier
                     }
                 ) {
                     TopAppBar()
                 }
             }
-            if (bottomBarState.overlay.value and bottomBarState.isEnabled) {
+            if ((bottomBarState.overlay.value != 1F) and bottomBarState.isEnabled) {
                 Box(
                     contentAlignment = Alignment.BottomCenter,
-                    modifier = Modifier.fillMaxSize().let {
+                    modifier = Modifier.fillMaxSize()
+                      .let {
                         it
                     }
-                ) { BottomAppBar() }
+                ) {
+                  BottomAppBar()
+                }
             }
 
             jsAlertConfig.value?.openAlertDialog { jsAlertConfig.value = null }
             jsPromptConfig.value?.openPromptDialog { jsPromptConfig.value = null }
             jsConfirmConfig.value?.openConfirmDialog { jsConfirmConfig.value = null }
-            jsBeforeUnloadConfig.value?.openBeforeUnloadDialog { jsBeforeUnloadConfig.value = null }
+            jsWarningConfig.value?.openWarningDialog { jsWarningConfig.value = null }
         },
         containerColor = Companion.Transparent,
+      contentColor = Companion.Transparent
     )
 }
 

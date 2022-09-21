@@ -3,8 +3,12 @@ package org.bfchain.rust.plaoc.webView.network
 import android.util.Log
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
+import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.DeserializationFeature
-import org.bfchain.rust.plaoc.*
+import org.bfchain.rust.plaoc.DenoService
+import org.bfchain.rust.plaoc.ExportNativeUi
+import org.bfchain.rust.plaoc.jsHandle
+import org.bfchain.rust.plaoc.mapper
 import org.bfchain.rust.plaoc.webView.urlscheme.CustomUrlScheme
 import java.io.ByteArrayInputStream
 import java.net.HttpURLConnection
@@ -13,7 +17,6 @@ import java.util.*
 
 
 private const val TAG = "NetworkMap"
-
 // 这里是存储客户端的映射规则的，这样才知道需要如何转发给后端 <String,ImportMap>
 val front_to_rear_map = mutableMapOf<String, String>()
 var dWebView_host = ""
@@ -24,9 +27,6 @@ var network_whitelist = "http://127.0.0.1"
 
 /**
  * 数据资源拦截
- *  单独对转发给deno-js 的请求进行处理
- *  https://channelId.bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj.dweb/poll
- *  https://channelId.bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj.dweb/done
  */
 fun dataGateWay(
     request: WebResourceRequest
@@ -35,24 +35,34 @@ fun dataGateWay(
     Log.i(TAG, " dataGateWay: $url")
     if (front_to_rear_map.contains(url)) {
         val trueUrl = front_to_rear_map[url]
+      Log.i(TAG, " dataGateWay front_to_rear_map.contains: $trueUrl")
+      try {
         val connection = URL(trueUrl).openConnection() as HttpURLConnection
         connection.requestMethod = request.method
-        Log.i(TAG, " dataGateWay front_to_rear_map.contains: $trueUrl")
-        Log.i(TAG, " dataGateWay connection.inputStream: ${connection.inputStream}")
+//        Log.i(TAG, " dataGateWay connection.inputStream: ${connection.inputStream}")
         return WebResourceResponse(
-            "application/json",
-            "utf-8",
-            connection.inputStream
+          "application/json",
+          "utf-8",
+          connection.inputStream
         )
+      } catch (e: Exception) { // 处理用户在配置文件里写的资源或服务，但实际没有引发webview崩溃重载的情况
+        return WebResourceResponse(
+          "application/json",
+          "utf-8",
+          ByteArrayInputStream("This data service could not be found".toByteArray())
+        )
+      }
     }
     return WebResourceResponse(
         "application/json",
         "utf-8",
-        ByteArrayInputStream("access denied".toByteArray())
+        ByteArrayInputStream("No permission, need to go to the backend configuration".toByteArray())
     )
 }
-
-// 传递dwebView到deno的消息
+/**
+ * 传递dwebView到deno的消息,单独对转发给deno-js 的请求进行处理
+ * https://channelId.bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj.dweb/poll
+ */
 fun messageGateWay(
     request: WebResourceRequest
 ): WebResourceResponse {
@@ -60,21 +70,38 @@ fun messageGateWay(
     Log.i(TAG, " messageGateWay: $url")
     val byteData = url.substring(url.lastIndexOf("=") + 1)
     DenoService().backDataToRust(hexStrToByteArray(byteData))// 通知
-
-//    val stringData = String(hexStrToByteArray(byteData))
-//    mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true)
-//    mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true) //允许使用单引号
-//    val handle = mapper.readValue(stringData, jsHandle::class.java)
-//    val funName = (handle.function[0]).toString()
-//    // 执行函数
-//    callable_map[funName]?.let { it -> it(handle.data) }
-
     return WebResourceResponse(
         "application/json",
         "utf-8",
         ByteArrayInputStream("ok".toByteArray())
     )
 }
+
+/** 转发给ui*/
+fun uiGateWay(
+  request: WebResourceRequest
+): WebResourceResponse {
+  val url = request.url.toString().lowercase(Locale.ROOT)
+  val byteData = url.substring(url.lastIndexOf("=") + 1)
+  val stringData = String(hexStrToByteArray(byteData))
+//  Log.i(TAG, " uiGateWay: $stringData")
+  mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true) // 允许使用单引号包裹字符串
+  val handle = mapper.readValue(stringData, jsHandle::class.java)
+  val funName = ExportNativeUi.valueOf(handle.function);
+  // 执行函数
+  val result = call_ui_map[funName]?.let { it -> it(handle.data)
+  }?: return WebResourceResponse(
+        "application/json",
+        "utf-8",
+        ByteArrayInputStream("0".toByteArray())
+      )
+  return WebResourceResponse(
+    "application/json",
+    "utf-8",
+    ByteArrayInputStream(result.toString().toByteArray())
+  )
+}
+
 
 // 视图文件拦截
 fun viewGateWay(
@@ -104,7 +131,7 @@ fun viewGateWay(
     return WebResourceResponse(
         "application/json",
         "utf-8",
-        ByteArrayInputStream("access denied".toByteArray())
+        ByteArrayInputStream("无权限，需要前往后端配置".toByteArray())
     )
 }
 
@@ -156,7 +183,7 @@ fun hexStrToByteArray(str: String): ByteArray {
     val currentStr = str.split(",")
     val byteArray = ByteArray(currentStr.size)
     for (i in byteArray.indices) {
-        byteArray[i] = currentStr[i].toByte()
+        byteArray[i] = currentStr[i].toInt().toByte()
     }
     return byteArray
 }

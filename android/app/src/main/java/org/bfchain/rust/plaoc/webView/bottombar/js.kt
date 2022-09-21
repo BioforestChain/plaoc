@@ -1,6 +1,7 @@
 package org.bfchain.rust.plaoc.webView.bottombar
 
 
+import android.R.color
 import android.util.Log
 import android.webkit.JavascriptInterface
 import androidx.compose.material3.NavigationBarItemColors
@@ -21,72 +22,58 @@ private const val TAG = "BottomBarFFI"
 class BottomBarFFI(
     private val state: BottomBarState,
 ) {
-    @JavascriptInterface
     fun getEnabled() = state.isEnabled
 
-    @JavascriptInterface
-    fun toggleEnabled(isEnabledInt: BoolInt): Boolean {
-        var isEnabled = isEnabledInt.toBooleanOrNull()
-        if (isEnabled == null && state.enabled.value == null) {
-            isEnabled = !state.isEnabled
-        }
-        state.enabled.value = isEnabled
-        Log.i(TAG, "toggleEnabled:${isEnabled}")
+   // 控制是否隐藏bottom bar, 此方法如果不传不会调用，一传肯定是true，也就是不显示bottom bar
+    fun setEnabled(isEnabledBool: String): Boolean {
+        state.enabled.value = !isEnabledBool.toBoolean()
         return getEnabled()
     }
 
-    @JavascriptInterface
-    fun getOverlay(): Boolean {
-        return state.overlay.value
+    fun getOverlay(): Float {
+        return state.overlay.value?: 1F
+    }
+    // 控制是开启bottom bar 遮罩。
+    fun setOverlay(isOverlay: String): Float {
+      state.overlay.value = isOverlay.toFloat()
+        return state.overlay.value ?: 1F
     }
 
-    @JavascriptInterface
-    fun toggleOverlay(isOverlay: BoolInt): Boolean {
-        state.overlay.value = isOverlay.toBoolean { !state.overlay.value }
-        Log.i(TAG, "toggleOverlay:${state.overlay.value}")
-        return state.overlay.value
-    }
-
-    @JavascriptInterface
     fun getHeight(): Float {
         return state.height.value ?: 0F
     }
 
-    @JavascriptInterface
-    fun setHeight(heightDp: Float) {
-        state.height.value = heightDp
+    fun setHeight(heightDp: String) {
+        state.height.value = heightDp.toFloat()
     }
 
-
-    @JavascriptInterface
     fun getActions(): DataString<List<BottomBarAction>> {
         return DataString_From(state.actions)//.map { action -> toDataString(action) }
     }
 
-    @JavascriptInterface
     fun setActions(actionListJson: DataString<List<BottomBarAction>>) {
         state.actions.clear()
-        val actionList = actionListJson.toData<List<BottomBarAction>>(object :
+//      Log.i(TAG, "actionListJson:${actionListJson}")
+      val actionList = actionListJson.toData<List<BottomBarAction>>(object :
             TypeToken<List<BottomBarAction>>() {}.type)
         actionList.toCollection(state.actions)
+//      actionList.forEach{
+//        Log.i(TAG, "actionList:${it.colors}")
+//      }
     }
 
-    @JavascriptInterface
     fun getBackgroundColor(): Int {
         return state.backgroundColor.value.toArgb()
     }
 
-    @JavascriptInterface
     fun setBackgroundColor(color: ColorInt) {
         state.backgroundColor.value = Color(color)
     }
 
-    @JavascriptInterface
     fun getForegroundColor(): Int {
         return state.foregroundColor.value.toArgb()
     }
 
-    @JavascriptInterface
     fun setForegroundColor(color: ColorInt) {
         state.foregroundColor.value = Color(color)
     }
@@ -101,13 +88,14 @@ data class BottomBarAction(
     val icon: DWebIcon,
     val onClickCode: String,
     val label: String,
+    val alwaysShowLabel:Boolean,
     val selected: Boolean,
     val selectable: Boolean,
     val disabled: Boolean,
     val colors: Colors?
 ) {
 
-    data class Colors(
+  data class Colors(
         val indicatorColor: ColorInt?,
         val iconColor: ColorInt?,
         val iconColorSelected: ColorInt?,
@@ -119,27 +107,27 @@ data class BottomBarAction(
         @Composable
         fun toNavigationBarItemColors(): NavigationBarItemColors {
             val defaultColors = NavigationBarItemDefaults.colors()
+           // indicatorColor 无法控制透明度
             val indicatorColor = indicatorColor?.toComposeColor() ?: defaultColors.indicatorColor
             val iconColor =
-                ColorState(iconColor?.toComposeColor() ?: defaultColors.iconColor(false).value)
+                ColorState(iconColor?.toComposeColor()?: defaultColors.iconColor(false).value)
             val iconColorSelected = ColorState(
                 textColorSelected?.toComposeColor() ?: defaultColors.indicatorColor
             )
             val textColor =
                 ColorState(textColor?.toComposeColor() ?: defaultColors.textColor(false).value)
             val textColorSelected = ColorState(
-                textColorSelected?.toComposeColor() ?: defaultColors.indicatorColor
+                textColorSelected?.toComposeColor()  ?: defaultColors.indicatorColor
             )
 
             val colors = @Stable object : NavigationBarItemColors {
                 override val indicatorColor: Color
                     @Composable get() = indicatorColor
 
-
                 /**
-                 * Represents the icon color for this item, depending on whether it is [selected].
+                 * 表示该项的图标颜色，取决于它是否被[选中]。
                  *
-                 * @param selected whether the item is selected
+                 * @param selected 项目是否被选中
                  */
                 @Composable
                 override fun iconColor(selected: Boolean) = if (selected) {
@@ -149,9 +137,9 @@ data class BottomBarAction(
                 }
 
                 /**
-                 * Represents the text color for this item, depending on whether it is [selected].
+                 * 表示该项的文本颜色，取决于它是否被[选中]。
                  *
-                 * @param selected whether the item is selected
+                 * @param selected 项目是否被选中
                  */
                 @Composable
                 override fun textColor(selected: Boolean) = if (selected) {
@@ -169,6 +157,7 @@ data class BottomBarAction(
             icon: DWebIcon,
             onClickCode: String,
             label: String? = null,
+            alwaysShowLabel:Boolean = true,
             selected: Boolean? = null,
             selectable: Boolean? = null,
             disabled: Boolean? = null,
@@ -177,7 +166,8 @@ data class BottomBarAction(
             icon,
             onClickCode,
             label ?: "",
-            selected ?: false,
+          alwaysShowLabel,
+          selected ?: false,
             selectable ?: true,
             disabled ?: false,
             colors,
@@ -190,6 +180,7 @@ data class BottomBarAction(
                     context.deserialize(jsonObject["icon"], DWebIcon::class.java),
                     jsonObject["onClickCode"].asString,
                     jsonObject["label"]?.asString,
+                  jsonObject["alwaysShowLabel"].asBoolean,
                     jsonObject["selected"]?.asBoolean,
                     jsonObject["selectable"]?.asBoolean,
                     jsonObject["disabled"]?.asBoolean,

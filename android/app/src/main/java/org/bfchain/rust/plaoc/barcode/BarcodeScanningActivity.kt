@@ -1,6 +1,7 @@
 package org.bfchain.rust.plaoc.barcode
 
 
+import android.util.Log
 import android.widget.ImageView
 import com.google.mlkit.vision.barcode.Barcode
 import com.king.app.dialog.AppDialog
@@ -9,7 +10,10 @@ import org.bfchain.rust.plaoc.lib.drawRect
 import com.king.mlkit.vision.barcode.BarcodeCameraScanActivity
 import com.king.mlkit.vision.camera.AnalyzeResult
 import com.king.mlkit.vision.camera.config.ResolutionCameraConfig
+import org.bfchain.rust.plaoc.DenoService
+import org.bfchain.rust.plaoc.ExportNative
 import org.bfchain.rust.plaoc.R
+import org.bfchain.rust.plaoc.createBytesFactory
 import java.lang.StringBuilder
 
 
@@ -29,7 +33,11 @@ class BarcodeScanningActivity : BarcodeCameraScanActivity() {
         val bitmap = result.bitmap.drawRect { canvas, paint ->
             for ((index, data) in result.result.withIndex()) {
                 buffer.append("[$index] ").append(data.displayValue).append("\n")
-                data.boundingBox?.let { canvas.drawRect(it, paint) }
+                data.boundingBox?.let {
+                  Log.d("条形码扫码数据.xxxxxxxx", it.toString())
+                  DenoService().backDataToRust(createBytesFactory(ExportNative.OpenQrScanner, it.toString()))
+                  canvas.drawRect(it, paint)
+                }
             }
         }
 

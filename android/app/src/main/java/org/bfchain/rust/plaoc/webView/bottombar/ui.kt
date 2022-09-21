@@ -1,10 +1,8 @@
 package org.bfchain.rust.plaoc.webView.bottombar
 
+import android.util.Log
 import androidx.compose.foundation.layout.height
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -22,7 +20,7 @@ fun DWebBottomBar(
     NavigationBar(
         modifier = Modifier
             .let {
-                bottomBarState.height.value?.let { height ->
+              bottomBarState.height.value?.let { height ->
                     if (height >= 0) {
                         it.height(height.dp)
                     } else {
@@ -33,37 +31,39 @@ fun DWebBottomBar(
             .onGloballyPositioned { coordinates ->
                 bottomBarState.height.value = coordinates.size.height / localDensity.density
             },
-        containerColor = bottomBarState.backgroundColor.value,
+        containerColor = bottomBarState.backgroundColor.value.copy(bottomBarState.overlay.value ?: 1F),
         contentColor = bottomBarState.foregroundColor.value,
         tonalElevation = 0.dp,
     ) {
-        if (bottomBarState.actions.size > 0) {
-            var selectedItem by remember(bottomBarState.actions) {
-                mutableStateOf(bottomBarState.actions.indexOfFirst { it.selected }
-                    .let { if (it == -1) 0 else it })
-            }
-            bottomBarState.actions.forEachIndexed { index, action ->
-                NavigationBarItem(
-                    icon = {
-                        DWebIcon(action.icon)
-                    },
-                    label = if (action.label.isNotEmpty()) {
-                        { Text(action.label) }
-                    } else {
-                        null
-                    },
-                    enabled = !action.disabled,
-                    onClick = {
-                        if (action.selectable) {
-                            selectedItem = index
-                        }
-                        jsUtil?.evalQueue { action.onClickCode }
-                    },
-                    selected = selectedItem == index,
-                    colors = action.colors?.toNavigationBarItemColors()
-                        ?: NavigationBarItemDefaults.colors(),
-                )
-            }
+      if (bottomBarState.actions.size > 0) {
+          var selectedItem by remember(bottomBarState.actions) {
+            mutableStateOf(bottomBarState.actions.indexOfFirst { it.selected }
+              .let { if (it == -1) 0 else it })
+          }
+
+          bottomBarState.actions.forEachIndexed { index, action ->
+            NavigationBarItem(
+              icon = {
+                DWebIcon(action.icon)
+              },
+              alwaysShowLabel = !action.alwaysShowLabel,
+              label = if (action.label.isNotEmpty()) {
+                { Text(action.label) }
+              } else {
+                null
+              },
+              enabled = !action.disabled,
+              onClick = {
+                if (action.selectable) {
+                  selectedItem = index
+                }
+                jsUtil?.evalQueue { action.onClickCode }
+              },
+              selected = selectedItem == index,
+              colors = action.colors?.toNavigationBarItemColors()
+                ?: NavigationBarItemDefaults.colors(),
+            )
+          }
         }
     }
 }

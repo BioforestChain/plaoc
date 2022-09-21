@@ -1,5 +1,6 @@
 package org.bfchain.rust.plaoc.webView.jsutil
 
+import android.util.Log
 import android.webkit.ValueCallback
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.graphics.Color

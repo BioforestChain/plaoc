@@ -2,16 +2,19 @@ package org.bfchain.rust.plaoc.webView.icon
 
 import com.google.gson.JsonDeserializer
 import org.bfchain.rust.plaoc.webView.jsutil.JsUtil
+import javax.inject.Inject
 
 
 data class DWebIcon(
-    val source: String,
-    val type: IconType,
-    val description: String?,
-    val size: Float?,
+  var source: String,
+  val type: IconType,
+  val description: String?,
+  val size: Float?,
 ) {
 
-    enum class IconType {
+  var currentSource: String= ""
+
+  enum class IconType {
         NamedIcon(),
         AssetIcon(),
     }

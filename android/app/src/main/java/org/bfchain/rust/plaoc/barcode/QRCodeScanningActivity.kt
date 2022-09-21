@@ -105,7 +105,7 @@ class QRCodeScanningActivity : QRCodeCameraScanActivity() {
             results[it].displayValue?.let {
                 Log.d("1.2.xxxxxxxx", it)
                 // 拿到扫完的数据，传递给rust方法
-                DenoService().backDataToRust(createBytesFactory(ExportNative.OpenScanner, it))
+                DenoService().backDataToRust(createBytesFactory(ExportNative.OpenQrScanner, it))
             }
             setResult(RESULT_OK, intent)
             finish()
@@ -124,7 +124,7 @@ class QRCodeScanningActivity : QRCodeCameraScanActivity() {
             intent.putExtra(CameraScan.SCAN_RESULT, results[0].displayValue)
             results[0].displayValue?.let {
                 Log.d("2.xxxxxxxx", it)
-                DenoService().backDataToRust(createBytesFactory(ExportNative.OpenScanner, it))
+                DenoService().backDataToRust(createBytesFactory(ExportNative.OpenQrScanner, it))
             }
             setResult(RESULT_OK, intent)
             finish()
