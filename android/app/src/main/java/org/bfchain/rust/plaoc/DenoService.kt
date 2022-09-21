@@ -42,13 +42,14 @@ class DenoService : IntentService("DenoService") {
 
     private external fun denoSetCallback(callback: IDenoCallback)
     private external fun nativeSetCallback(callback: IHandleCallback)
-    private external fun initDeno(assets: AssetManager)
+    private external fun initDeno(assets: AssetManager,target:String)
     external fun backDataToRust(
         bufferData: ByteArray,
     )
 
     external fun denoRuntime(assets: AssetManager, path: String)
 
+    @Deprecated("Deprecated in Java")
     override fun onHandleIntent(p0: Intent?) {
         val appContext = applicationContext
         // rust 通知 kotlin doing sting
@@ -63,7 +64,7 @@ class DenoService : IntentService("DenoService") {
                 warpCallback(bytes, false) // 单工模式不要存储
             }
         })
-        initDeno(appContext.assets) // BFS初始化的操作
+        initDeno(appContext.assets,"/ar/plaoc/bfs-service/index.mjs") // BFS初始化的操作
     }
 }
 

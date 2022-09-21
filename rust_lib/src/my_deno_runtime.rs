@@ -94,7 +94,7 @@ fn create_web_worker_callback(
             stdio: stdio.clone(),
         };
 
-        log::info!("bootstrap_from_options: {:?}", args.name);
+        // log::info!("bootstrap_from_options: {:?}", args.name);
 
         WebWorker::bootstrap_from_options(
             args.name,
@@ -169,6 +169,7 @@ pub async fn bootstrap_deno_runtime(
     #[cfg(not(target_os = "android"))] module_loader_builder: fn()->Rc<dyn ModuleLoader>,
     entry_js_path: &str,
 ) -> Result<(), AnyError> {
+    log::info!("start deno runtime for entry_js_path!!!{:}", &entry_js_path);
     let main_module = deno_core::resolve_path(entry_js_path)?;
     let permissions = Permissions::allow_all();
 
