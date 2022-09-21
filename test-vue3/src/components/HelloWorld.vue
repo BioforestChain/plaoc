@@ -28,7 +28,7 @@ async function onPushFile(e: Event) {
       body: formData,
       method: "post",
     }).then(async res => {
-      console.log('哈哈哈哈哈哈', await res.text(), await res)
+      console.log('哈哈哈哈哈哈', await res.text())
     }).catch(error => {
       console.log("error", error)
       // 文件上传失败

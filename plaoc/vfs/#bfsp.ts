@@ -11,7 +11,8 @@ export default defineConfig((info) => {
       version: "0.0.2",
       private: false,
       devDependencies: {
-        // "@bfsx/typings": "./",
+        "@bfsx/core": "0.0.2",
+        "@bfsx/typings": "0.0.2",
       },
     },
     tsConfig: {
