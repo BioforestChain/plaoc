@@ -24,55 +24,39 @@
 //   })
 // }
 
-var fs = require('fs');
+const fs = require('fs');
+const path = require("path");
 
 /*
  * 复制目录、子目录，及其中的文件
  * @param src {String} 要复制的目录
  * @param dist {String} 复制到目标目录
  */
-function copyDir(src, dist, callback) {
-  fs.access(dist, function (err) {
-    if (err) {
-      // 目录不存在时创建目录
-      fs.mkdirSync(dist);
-    }
-    _copy(null, src, dist);
-  });
+function createSymlink(src, dist) {
+  // if(!fs.existsSync(src)) {
+  //   console.log("不存在要复制的目录");
+  // }
 
-  function _copy(err, src, dist) {
-    if (err) {
-      callback(err);
-    } else {
-      fs.readdir(src, function (err, paths) {
-        if (err) {
-          callback(err)
-        } else {
-          paths.forEach(function (path) {
-            var _src = src + '/' + path;
-            var _dist = dist + '/' + path;
-            fs.stat(_src, function (err, stat) {
-              if (err) {
-                callback(err);
-              } else {
-                // 判断是文件还是目录
-                if (stat.isFile()) {
-                  fs.writeFileSync(_dist, fs.readFileSync(_src));
-                } else if (stat.isDirectory()) {
-                  // 当是目录是，递归复制
-                  copyDir(_src, _dist, callback)
-                }
-              }
-            })
-          })
-        }
-      })
+  // // 不存在目标目录时，创建目录
+  // if(!fs.existsSync(dist)) {
+  //   fs.mkdirSync(dist, { recursive: true });
+  // }
+
+  if(fs.existsSync(dist)) {
+    try {
+      fs.unlinkSync(dist);
+    } catch(e) {
+      console.log(e);
+      fs.rmdirSync(dist);
     }
   }
+
+  fs.symlinkSync(src, dist);
+
+  return;
 }
 
-copyDir('./core/build/@bfsa/core/dist/default/esm', "../app/src/main/assets/bfs", function (err) {
-  if (err) {
-    console.log(err);
-  }
-})
+const sourcePath = path.join(__dirname, "./core/build/@bfsx/core/dist/default/esm");
+const targetPath = path.join(__dirname, "../android/app/src/main/assets/bfs");
+
+createSymlink(sourcePath, targetPath);
