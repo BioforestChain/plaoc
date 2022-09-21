@@ -12,12 +12,13 @@ sw.addEventListener('activate', function (event) {
   event.waitUntil(sw.clients.claim());
 });
 
+// remember event.respondWith must sync call🐰
 sw.addEventListener('fetch', async function (event) {
   const request = event.request;
   // POST
   if (request.method.match(/POST/i)) {
-    await postFactory(request, event); // 发送请求
-    await handleRequest(event)
+    handleRequest(event);
+    return;
   }
   // GET
   event.respondWith(
@@ -28,14 +29,16 @@ sw.addEventListener('fetch', async function (event) {
   );
 });
 
-async function handleRequest(event: FetchEvent) {
-  // const response = await new Promise(async (resolve) => {
-  const reader = iterResponse()
-  while (true) {
-    const { value, done } = await reader.next();
-    if (done) break;
-    event.respondWith(value);
-  }
+
+function handleRequest(event: FetchEvent) {
+  event.respondWith(
+    async function () {
+      await postFactory(event.request, event); // 发送请求
+      const reader = iterResponse()
+      const { value, done } = await reader.next();
+      return value
+    }()
+  );
 }
 
 /**迭代器 */
@@ -65,10 +68,13 @@ async function postFactory(request: Request, event: FetchEvent) {
   const file = await request.arrayBuffer();
 
   const bufferList = fileChunk(new Uint8Array(file))
-
+  const warpRes: string[] = [];
+  // 等待
   await Promise.all(bufferList.map(async (value) => {
-    responseList.push(await getFactory(event, value))
+    const res = await getFactory(event, value);
+    warpRes.push(await res.text())
   }))
+  responseList.push(new Response(String(warpRes)))
 }
 /**
  * get处理
