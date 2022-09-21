@@ -353,7 +353,7 @@ fun DWebView(
                         if (suffixIndex == -1) {
                           return dataGateWay(request)
                         }
-                        // 拦截，跳过本地和远程脚本
+                        // 跳过白名单
                         if (jumpWhitelist(url)) {
                           // 拦截视图文件
                           if (url.endsWith(".html")) {
@@ -386,9 +386,8 @@ fun DWebView(
                             if (request !== null) {
                                 // 这里出来的url全部都用是小写，俺觉得这是个bug
                                 val url = request.url.toString()
-                                // 拦截，跳过本地和远程脚本
+                                // 跳过白名单
                                 if (jumpWhitelist(url)) {
-
                                   // 拦截视图文件
                                   if (url.endsWith(".html")) {
                                       return viewGateWay(customUrlScheme, request)

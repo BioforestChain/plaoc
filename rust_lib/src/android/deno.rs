@@ -29,6 +29,7 @@ pub async extern "system" fn Java_org_bfchain_rust_plaoc_DenoService_initDeno(
     env: JNIEnv,
     _context: JObject,
     jasset_manager: JObject,
+    terget:JString
 ) {
     log::info!("启动BFS后端!!");
     android_logger::init_once(
@@ -39,12 +40,12 @@ pub async extern "system" fn Java_org_bfchain_rust_plaoc_DenoService_initDeno(
     let asset_manager_ptr = unsafe {
         ndk_sys::AAssetManager_fromJava(env.get_native_interface(), jasset_manager.cast())
     };
-
+    let entrance: String = env.get_string(terget).unwrap().into();
     bootstrap_deno_runtime(
         Arc::new(AssetsModuleLoader::from_ptr(
             NonNull::new(asset_manager_ptr).unwrap(),
         )),
-        "/test-vue3/bfs-service/index.mjs",
+        &entrance,
         // "/assets/hello_runtime.js",
     )
     .await
