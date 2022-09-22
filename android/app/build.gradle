@@ -25,6 +25,9 @@ android {
   sourceSets {
     main {
       jniLibs.srcDirs = ["src/main/libs"]
+      assets {
+        srcDirs  'src/main/assets/recommend-app/ar'
+      }
     }
   }
 

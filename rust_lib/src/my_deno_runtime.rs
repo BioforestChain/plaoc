@@ -33,7 +33,7 @@ fn create_web_worker_preload_module_callback() -> Arc<PreloadModuleCb> {
 
 fn create_web_worker_callback(
     #[cfg(target_os = "android")] module_loader_builder: Arc<AssetsModuleLoader>,
-    #[cfg(not(target_os = "android"))] module_loader_builder: fn()->Rc<dyn ModuleLoader>,
+    #[cfg(not(target_os = "android"))] module_loader_builder: fn() -> Rc<dyn ModuleLoader>,
     stdio: deno_runtime::ops::io::Stdio,
 ) -> Arc<CreateWebWorkerCb> {
     Arc::new(move |args| {
@@ -42,7 +42,8 @@ fn create_web_worker_callback(
         #[cfg(not(target_os = "android"))]
         let module_loader = module_loader_builder();
 
-        let create_web_worker_cb = create_web_worker_callback(module_loader_builder.clone(), stdio.clone());
+        let create_web_worker_cb =
+            create_web_worker_callback(module_loader_builder.clone(), stdio.clone());
         let preload_module_cb = create_web_worker_preload_module_callback();
 
         let extensions = cli_exts();
@@ -108,7 +109,7 @@ fn create_web_worker_callback(
 
 pub fn create_main_worker(
     #[cfg(target_os = "android")] module_loader_builder: Arc<AssetsModuleLoader>,
-    #[cfg(not(target_os = "android"))] module_loader_builder: fn()->Rc<dyn ModuleLoader>,
+    #[cfg(not(target_os = "android"))] module_loader_builder: fn() -> Rc<dyn ModuleLoader>,
     main_module: ModuleSpecifier,
     permissions: Permissions,
     stdio: deno_runtime::ops::io::Stdio,
@@ -166,7 +167,7 @@ pub fn create_main_worker(
 // #[tokio::main]
 pub async fn bootstrap_deno_runtime(
     #[cfg(target_os = "android")] module_loader_builder: Arc<AssetsModuleLoader>,
-    #[cfg(not(target_os = "android"))] module_loader_builder: fn()->Rc<dyn ModuleLoader>,
+    #[cfg(not(target_os = "android"))] module_loader_builder: fn() -> Rc<dyn ModuleLoader>,
     entry_js_path: &str,
 ) -> Result<(), AnyError> {
     log::info!("start deno runtime for entry_js_path!!!{:}", &entry_js_path);
