@@ -1,5 +1,8 @@
 package org.bfchain.libappmgr.entity
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+
 /**
  * version: {Semantic Version} 该文件格式的版本号，用于告知解析器该如何认知接下来的字段。以下字段是 1.0.0 的字段描述（未来默认向下兼容）
  * bfsAppId: {string} 唯一标识，也就是 bfs-app-id，跟文件夹一致。未来该数据需要从链上申请，所以格式需要保持一致：长度为7+1（校验位）的大写英文字母或数字（链就是系统的“证书颁发机构”，资深用户可以配置不同的的链来安装那些未知来源的应用）
@@ -51,9 +54,9 @@ data class AppInfo(
   val autoUpdate: AutoUpdateInfo, // 自动更新的相关配置
   var isSystemApp: Boolean = false, // 判断是recommend-app还是system-app
   var iconPath: String = "", // 将icon转为实际路径
-  var isShowBadge: Boolean = false, // 是否显示应用更新提醒，也就是左上角的小圆点
-  var downloading: Boolean = false // 表示当前是否在下载
 )
+
+enum class DownLoadState { IDLE, LOADING, PAUSE, COMPLETED}
 
 /**
  * 解析bfsa-metadata.json

@@ -75,7 +75,6 @@ data class DialogShowOrHide(
   var customShow: MutableState<Boolean> = mutableStateOf(false),
   var loadingShow: MutableState<Boolean> = mutableStateOf(false),
   var progressShow: MutableState<Boolean> = mutableStateOf(false),
-  var circleProgressShow: MutableState<Boolean> = mutableStateOf(false),
   var customDialog: CustomDialogData = rememberCustomData(),
   var progressDialog: ProgressDialogData = rememberProgressData(),
 )
@@ -87,11 +86,9 @@ fun DialogShowOrHide.updateState(
   customShow: Boolean? = null,
   loadingShow: Boolean? = null,
   progressShow: Boolean? = null,
-  circleProgressShow: Boolean? = null,
 ): DialogShowOrHide {
   this.customShow.value = customShow?.let { customShow } ?: false
   this.loadingShow.value = loadingShow?.let { loadingShow } ?: false
   this.progressShow.value = progressShow?.let { progressShow } ?: false
-  this.circleProgressShow.value = circleProgressShow?.let { circleProgressShow } ?: false
   return this
 }

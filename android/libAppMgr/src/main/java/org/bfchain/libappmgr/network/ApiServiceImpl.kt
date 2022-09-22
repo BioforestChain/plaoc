@@ -11,6 +11,7 @@ import org.bfchain.libappmgr.entity.AppVersion
 import org.bfchain.libappmgr.network.base.ApiResultData
 import org.bfchain.libappmgr.network.base.BASE_URL_PATH
 import org.bfchain.libappmgr.network.base.BaseData
+import org.bfchain.libappmgr.utils.FilesUtil
 import java.io.File
 
 class ApiServiceImpl(private val client: HttpClient) : ApiService {

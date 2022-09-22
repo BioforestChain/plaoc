@@ -17,6 +17,7 @@ import com.king.mlkit.vision.camera.CameraScan
 import com.king.mlkit.vision.camera.analyze.Analyzer.OnAnalyzeListener
 import com.king.mlkit.vision.camera.util.LogUtils
 import com.king.mlkit.vision.camera.util.PermissionUtils
+import org.bfchain.libappmgr.ui.main.MainActivity
 import org.bfchain.rust.plaoc.barcode.BarcodeScanningActivity
 import org.bfchain.rust.plaoc.barcode.QRCodeScanningActivity
 import org.bfchain.rust.plaoc.lib.drawRect
@@ -206,11 +207,13 @@ class MainActivity : AppCompatActivity() {
               )
             }
           R.id.imageButton2 -> {
-            LogUtils.d("启动了DWebView")
+            /*LogUtils.d("启动了DWebView")
             openDWebWindow(
               activity = getContext(),
               url = "https://bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj.dweb/index.html"
-            )
+            )*/
+            LogUtils.d("启动了主界面")
+            startActivity(Intent(this@MainActivity, MainActivity::class.java))
           }
           R.id.imageButton3 -> {
             LogUtils.d("启动了DWebView")

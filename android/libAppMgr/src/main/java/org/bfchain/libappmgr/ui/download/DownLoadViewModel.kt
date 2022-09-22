@@ -26,6 +26,7 @@ class DownLoadViewModel : ViewModel() {
             apiResult.downloadProgress(current, total, progress)
           }
           delay(100)
+
           emit(ApiResultData.success(file))
         } catch (e: Exception) {
           emit(ApiResultData.failure(e))
