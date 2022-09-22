@@ -20,6 +20,8 @@ function createSymlink(src, dist) {
 
       fs.rmSync(dist, options);
     }
+  } else {
+    fs.mkdirSync(path.join(dist, "../"), { recursive: true });
   }
 
   fs.symlinkSync(src, dist);
@@ -29,7 +31,7 @@ function createSymlink(src, dist) {
 
 // 创建test-vue3链接到android项目
 const sourcePath = path.join(__dirname, "./build");
-const targetPath = path.join(__dirname, "../android/app/src/main/assets");
+const targetPath = path.join(__dirname, "../android/app/src/main/assets/recommend-app/AR");
 
 createSymlink(sourcePath, targetPath);
 
@@ -39,4 +41,15 @@ const workerSrcPath = path.join(__dirname, "./node_modules/@bfsx/plugin/dist/def
 const workerDistPath = path.join(__dirname, "../android/app/src/main/assets/serverWorker.mjs");
 
 createSymlink(workerSrcPath, workerDistPath);
+
+// 创建bfs-service链接到android项目
+const plaocSrcPath = path.join(__dirname, "./bfs-service/dist/esm/plaoc");
+const plaocDistPath = path.join(__dirname, "../android/app/src/main/assets/recommend-app/AR/plaoc");
+
+createSymlink(plaocSrcPath, plaocDistPath);
+
+const vueSrcPath = path.join(__dirname, "./bfs-service/dist/esm/test-vue3");
+const vueDistPath = path.join(__dirname, "../android/app/src/main/assets/recommend-app/AR/test-vue3");
+
+createSymlink(vueSrcPath, vueDistPath);
 
