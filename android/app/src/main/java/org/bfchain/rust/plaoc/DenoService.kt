@@ -53,7 +53,6 @@ class DenoService : IntentService("DenoService") {
 
     external fun denoRuntime(assets: AssetManager, path: String)
 
-
     @RequiresApi(Build.VERSION_CODES.S)
     @Deprecated("Deprecated in Java")
     override fun onHandleIntent(p0: Intent?) {
