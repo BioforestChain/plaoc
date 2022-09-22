@@ -13,7 +13,6 @@ import java.io.InputStream
 import java.io.InputStreamReader
 import java.nio.ByteBuffer
 
-
 private const val TAG = "DENO_SERVICE"
 
 /** 针对64位
@@ -71,7 +70,7 @@ class DenoService : IntentService("DenoService") {
                 warpCallback(bytes, false) // 单工模式不要存储
             }
         })
-        initDeno(appContext.assets,"/test-vue3/bfs-service/index.mjs") // BFS初始化的操作
+        initDeno(appContext.assets,"/bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj/test-vue3/bfs-service/index.mjs") // BFS初始化的操作
     }
 }
 

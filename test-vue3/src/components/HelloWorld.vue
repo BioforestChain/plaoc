@@ -11,7 +11,6 @@ let dwebPluginData = ref("dweb的数据");
 onMounted(async () => {
 })
 
-
 async function onPushFile(e: Event) {
   const dwebPlugin = document.querySelector<DWebMessager>('dweb-messager')!;
   console.log("dwebPlugin:", dwebPlugin);

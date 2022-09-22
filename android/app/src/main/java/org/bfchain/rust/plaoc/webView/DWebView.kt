@@ -382,7 +382,7 @@ fun DWebView(
                             view: WebView?,
                             request: WebResourceRequest?
                         ): WebResourceResponse? {
-//                           Log.i(ITAG, "Intercept Request: ${request?.url}")
+                           Log.i(ITAG, "Intercept Request: ${request?.url}")
                             if (request !== null) {
                               // 这里出来的url全部都用是小写，俺觉得这是个bug
                               val url = request.url.toString()
@@ -406,7 +406,6 @@ fun DWebView(
                                   if (url.endsWith(".html")) {
                                       return viewGateWay(customUrlScheme, request)
                                   }
-                                  val temp = url.substring(url.lastIndexOf("/") + 1)
                                   // 映射本地文件的资源文件 https://bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj.dweb/index.mjs -> /plaoc/index.mjs
                                   if (Regex(dWebView_host).containsMatchIn(url)) {
                                       val path = URL(url).path

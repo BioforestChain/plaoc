@@ -44,7 +44,7 @@ function copyDir(src, dist, callback) {
     }
   }
 }
-copyDir('./bfs-service/dist/esm', '../android/app/src/main/assets/recommend-app/AR', function (err) {
+copyDir('./bfs-service/dist/esm', '../android/app/src/main/assets/recommend-app/bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj', function (err) {
   if (err) {
     console.log(err);
   }

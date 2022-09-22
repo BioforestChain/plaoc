@@ -4,4 +4,5 @@ import { metaData } from "./BFS-Metadata";
 import { DWebView } from "@bfsx/core";
 
 const webView = new DWebView(new MetaData(metaData));
-webView.activity();
+// 多入口指定
+webView.activity("index.html");
