@@ -137,13 +137,16 @@ fun viewGateWay(
 
 fun initMetaData(metaData: String) {
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-    val metaJson =
-        mapper.readValue(metaData, UserMetaData::class.java)
-    // 设置域名
-    dWebView_host = metaJson.baseUrl.lowercase(Locale.ROOT)
+    val metaJson = mapper.readValue(metaData, UserMetaData::class.java)
+    // 设置域名,转换为小写
+    dWebView_host = metaJson.manifest.dwebId.lowercase(Locale.ROOT)
     // 设置路由
     for (importMap in metaJson.dwebview.importmap) {
         front_to_rear_map[resolveUrl(importMap.url)] = importMap.response
+    }
+   // 默认入口全部加上加载路径，用户不用配置
+    for ( entry in metaJson.manifest.enters) {
+      front_to_rear_map[resolveUrl(entry)] = "/$dWebView_host${shakeUrl(entry)}"
     }
     // 设置白名单
     for (whitelist in metaJson.whitelist) {
@@ -152,13 +155,18 @@ fun initMetaData(metaData: String) {
     Log.d(TAG, "this is metaData:${network_whitelist}")
 }
 
+/** 返回应用的虚拟路径 "https://$dWebView_host.dweb$path"*/
 fun resolveUrl(path: String): String {
-    val pathname = if (path.startsWith("/")) {
-        path
-    } else {
-        "/$path"
-    }
-    return (dWebView_host + pathname)
+    return "https://$dWebView_host.dweb${shakeUrl(path)}"
+}
+/** 适配路径没有 / 的尴尬情况，没有的话会帮你加上*/
+fun shakeUrl(path: String): String {
+  val pathname = if (path.startsWith("/")) {
+    path
+  } else {
+    "/$path"
+  }
+  return pathname
 }
 
 // 跳过白名单（因为每次请求都会走这个方法，所以抛弃循环的方法，用contains进行模式匹配，保证了速度）
@@ -201,7 +209,7 @@ fun hexStrToByteArray(str: String): ByteArray {
 
 data class UserMetaData(
     val baseUrl: String = "",
-    val manifest: Manifest = Manifest("", arrayOf("xx"), "", arrayOf(""), "", "", ""),
+    val manifest: Manifest = Manifest("", arrayOf("xx"), "", arrayOf(""), "", "", arrayOf("")),
     val dwebview: ImportMap = ImportMap(arrayOf(DwebViewMap("", ""))),
     val whitelist: Array<String> = arrayOf("http://localhost")
 )
@@ -221,7 +229,7 @@ data class Manifest(
     val privateKey: String = "",
 // 应用入口，可以配置多个，其中index为缺省名称。
 // 外部可以使用 DWEB_ID.bfchain (等价同于index.DWEB_ID.bfchain)、admin.DWEB_ID.bfchain 来启动其它页面
-    val enter: String = "index.html"
+    val enters:  Array<String> =  arrayOf("index.html")
 )
 
 data class ImportMap(

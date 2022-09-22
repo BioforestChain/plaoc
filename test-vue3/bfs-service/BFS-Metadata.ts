@@ -2,7 +2,6 @@ import { MetaData } from "@bfsx/metadata";
 // import "./node_modules/index.html";
 
 export const metaData: MetaData = {
-  baseUrl: "",
   manifest: {
     // 应用所属链的名称（系统应用的链名为通配符“*”，其合法性由节点程序自身决定，不跟随链上数据）
     origin: "bfchain",
@@ -18,7 +17,7 @@ export const metaData: MetaData = {
     privateKey: "bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj",
     // 应用入口，可以配置多个，其中index为缺省名称。
     // 外部可以使用 DWEB_ID.bfchain (等价同于index.DWEB_ID.bfchain)、admin.DWEB_ID.bfchain 来启动其它页面
-    enter: "index.html",
+    enters: ["index.html"],
   },
   //  这里配置的白名单将不被拦截
   whitelist: ["https://unpkg.com", "https://cn.vitejs.dev"],
@@ -35,10 +34,6 @@ export const metaData: MetaData = {
         url: "/getBlockHigh",
         response:
           "https://62b94efd41bf319d22797acd.mockapi.io/bfchain/v1/getBlockInfo",
-      },
-      {
-        url: "/index.html",
-        response: "/index.html",
       },
       {
         url: "/app/bfchain.dev/index.html",

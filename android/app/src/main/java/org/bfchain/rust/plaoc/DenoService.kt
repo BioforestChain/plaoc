@@ -3,11 +3,15 @@ package org.bfchain.rust.plaoc
 import android.app.IntentService
 import android.content.Intent
 import android.content.res.AssetManager
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.ObjectMapper
+import java.io.BufferedReader
+import java.io.InputStream
+import java.io.InputStreamReader
 import java.nio.ByteBuffer
-
 
 private const val TAG = "DENO_SERVICE"
 
@@ -49,6 +53,7 @@ class DenoService : IntentService("DenoService") {
 
     external fun denoRuntime(assets: AssetManager, path: String)
 
+    @RequiresApi(Build.VERSION_CODES.S)
     @Deprecated("Deprecated in Java")
     override fun onHandleIntent(p0: Intent?) {
         val appContext = applicationContext
@@ -64,7 +69,7 @@ class DenoService : IntentService("DenoService") {
                 warpCallback(bytes, false) // 单工模式不要存储
             }
         })
-        initDeno(appContext.assets,"/ar/plaoc/bfs-service/index.mjs") // BFS初始化的操作
+        initDeno(appContext.assets,"/bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj/test-vue3/bfs-service/index.mjs") // BFS初始化的操作
     }
 }
 

@@ -3,13 +3,10 @@ class MetaData implements IMetaData {
   manifest: Manifest;
   dwebview: DWebView;
   whitelist?: string[];
-  baseUrl: string;
   constructor(metaData: IMetaData) {
     this.manifest = metaData.manifest;
     this.dwebview = metaData.dwebview;
     this.whitelist = metaData.whitelist;
-    // 生成DwebView地址
-    this.baseUrl = `https://${metaData.manifest.dwebId}.dweb`;
   }
 }
 
@@ -20,7 +17,7 @@ class Manifest implements IManifest {
   keywords!: string[];
   dwebId!: string;
   privateKey!: string;
-  enter!: string;
+  enters!: string[];
   // constructor(meta: IManifest) {
   //   this.origin = meta.origin;
   //   this.author = meta.author;

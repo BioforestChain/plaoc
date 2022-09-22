@@ -9,10 +9,10 @@ export class DWebView {
   /**反压高水位，暴露给开发者控制 */
   hightWaterMark = 10;
   url!: string;
-  entry: string;
+  entrys: string[];
   constructor(metaData: MetaData) {
-    this.entry = metaData.manifest.enter;
-    this.url = metaData.baseUrl;
+    this.entrys = metaData.manifest.enters;
+    this.url = `https://${metaData.manifest.dwebId}.dweb`;
     this.initAppMetaData(metaData);
     deno.createHeader();
     this.waterOverflow();
@@ -72,11 +72,16 @@ export class DWebView {
    * 激活DwebView
    * @param entry // DwebView入口
    */
-  activity() {
-    deno.callFunction(
-      callDeno.openDWebView,
-      `"${new URL(this.entry, this.url).href}"`
-    );
+  activity(entry: string) {
+    // 判断在不在入口文件内
+    if (this.entrys.toString().match(RegExp(`${entry}`))) {
+      deno.callFunction(
+        callDeno.openDWebView,
+        `"${new URL(entry, this.url).href}"`
+      );
+      return
+    }
+    throw new Error("您传递的入口不在配置的入口内，需要在配置文件里配置入口");
   }
   /**
    * 操作传递到kotlin
