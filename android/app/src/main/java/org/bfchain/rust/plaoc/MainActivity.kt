@@ -17,8 +17,8 @@ import com.king.mlkit.vision.camera.CameraScan
 import com.king.mlkit.vision.camera.analyze.Analyzer.OnAnalyzeListener
 import com.king.mlkit.vision.camera.util.LogUtils
 import com.king.mlkit.vision.camera.util.PermissionUtils
-import org.bfchain.rust.plaoc.barcode.BarcodeScanningActivity
-import org.bfchain.rust.plaoc.barcode.QRCodeScanningActivity
+import org.bfchain.rust.plaoc.system.barcode.BarcodeScanningActivity
+import org.bfchain.rust.plaoc.system.barcode.QRCodeScanningActivity
 import org.bfchain.rust.plaoc.lib.drawRect
 import org.bfchain.rust.plaoc.webView.network.initMetaData
 import org.bfchain.rust.plaoc.webView.openDWebWindow

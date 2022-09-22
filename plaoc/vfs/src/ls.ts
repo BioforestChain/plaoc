@@ -6,9 +6,12 @@
 //   recursive: true, // 是否要递归遍历目录，默认是 false
 // });
 import { } from "@bfsx/core"
-export function ls() {
+import { IsOption } from './lsType';
+export function ls(path: string, option: IsOption) {
 
 }
+
+
 
 // for await (const entry of fs.list("./")) { // 也可以用异步迭代器来访问，避免列表过大
 //   entry.name // 文件或者目录的完整名称
