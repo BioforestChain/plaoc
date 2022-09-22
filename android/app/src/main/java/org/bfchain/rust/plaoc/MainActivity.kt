@@ -57,7 +57,7 @@ class MainActivity : AppCompatActivity() {
         initMetaData(it)
       }
       callable_map[ExportNative.DenoRuntime] = {
-        DenoService().denoRuntime(this.assets, it)
+        DenoService().denoRuntime(it)
       }
       callable_map[ExportNative.EvalJsRuntime] =
         { sendToJavaScript(it) }

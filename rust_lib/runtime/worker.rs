@@ -240,6 +240,7 @@ impl MainWorker {
     &mut self,
     module_specifier: &ModuleSpecifier,
   ) -> Result<ModuleId, AnyError> {
+    log::info!("start deno runtime1.1{}",module_specifier);
     self
       .js_runtime
       .load_main_module(module_specifier, None)
