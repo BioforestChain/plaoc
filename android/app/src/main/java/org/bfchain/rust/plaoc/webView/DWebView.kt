@@ -409,7 +409,6 @@ fun DWebView(
                                   // 映射本地文件的资源文件 https://bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj.dweb/index.mjs -> /plaoc/index.mjs
                                   if (Regex(dWebView_host).containsMatchIn(url)) {
                                       val path = URL(url).path
-                                    Log.e("xxxxxx: ",  "${path}")
                                       return customUrlScheme.handleRequest(request, path)
                                   }
                                 }

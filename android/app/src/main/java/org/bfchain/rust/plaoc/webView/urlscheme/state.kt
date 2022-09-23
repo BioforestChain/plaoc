@@ -10,6 +10,7 @@ import org.bfchain.rust.plaoc.App
 import org.bfchain.rust.plaoc.webView.network.dWebView_host
 import java.io.ByteArrayInputStream
 import java.io.File
+import java.io.FileInputStream
 import java.io.InputStream
 import java.net.URI
 import kotlin.io.path.Path
@@ -97,11 +98,9 @@ class CustomUrlScheme(
             isRedirect = req.isRedirect,
             isForMainFrame = req.isForMainFrame,
         )
-//        Log.d(TAG, "handleRequest urlMimeType: $urlMimeType")
-//        Log.d(TAG, "handleRequest urlExt: $urlExt")
-//        Log.d(TAG, "handleRequest url: ${req.url}")
-//        Log.d(TAG, "handleRequest urlState url: $urlEncoding")
-        val responseBodyStream = requestHandler.onRequest(urlState)
+      //        Log.d(TAG, "handleRequest url: ${req.url}")
+      // 在这里判断是读取FileRequest还是onReadOnlyRequest(只读文件，指assets目录下文件)
+        val responseBodyStream = requestHandler.onFileRequest(urlState)
             ?: return WebResourceResponse(
                 urlMimeType, urlEncoding, 404, "Resource No Found", mapOf(),
                 nullInputStream
@@ -115,11 +114,10 @@ val nullInputStream by lazy { ByteArrayInputStream(byteArrayOf()) }
 
 //typealias  RequestHandler = (req: UrlState) -> InputStream?
 interface RequestHandler {
-    fun onRequest(req: UrlState): InputStream?
-    fun onHttpRequest(req: UrlState): InputStream?
+    fun onFileRequest(req: UrlState): InputStream?
+    fun onReadOnlyRequest(req: UrlState): InputStream?
 }
 
-//
 fun requestHandlerFromAssets(assetManager: AssetManager, basePath: String): RequestHandler {
     return object : RequestHandler {
         private fun openInputStream(path: String): InputStream? {
@@ -129,25 +127,25 @@ fun requestHandlerFromAssets(assetManager: AssetManager, basePath: String): Requ
                 null
             }
         }
-
-        override fun onRequest(req: UrlState): InputStream? {
+          /** 读取存储文件*/
+        override fun onFileRequest(req: UrlState): InputStream? {
             val uri = URI(req.href)
             val warpWarp = "${App.appContext?.dataDir}/user-app/$dWebView_host"
-            var urlPath = Path(warpWarp, uri.path).toString()
-          Log.d(TAG, "handleRequest url: ${urlPath},$uri")
-            // 使用 context.assets.open 来读取文件
-            var inputStream = File(urlPath).inputStream()
-            // 判断 isFile，不是的话就看 isDirectory，如果是的话就尝试访问 index.html
-            if (inputStream == null) {
-                val fileLists =  File(urlPath).list() ?: return null
-                val indexName = fileLists.find { it == "index.html" } ?: return null
-                // 如果加上 index.html 后 isFile 仍然是 false，那么返回 null
-                return openInputStream(Path(urlPath, indexName).toString())
+            val urlPath = Path(warpWarp, uri.path).toString()
+          Log.d(TAG, "onFileRequest url: ${urlPath},$uri")
+            val inputStream:FileInputStream
+            try {
+              inputStream = File(urlPath).inputStream()
+            } catch (e: Exception) {
+              val fileLists =  File(urlPath).list() ?: return null
+              val indexName = fileLists.find { it == uri.toString() } ?: return null
+              // 如果加上 index.html 后 isFile 仍然是 false，那么返回 null
+              return File(Path(urlPath, indexName).toString()).inputStream()
             }
             return inputStream
         }
-
-        override fun onHttpRequest(req: UrlState): InputStream? {
+        /** 读取只读文件*/
+        override fun onReadOnlyRequest(req: UrlState): InputStream? {
             var urlPath = req.href
             // 本地文件前面不能有 /,必须直接写不然读不到，下面再做一成保险，帮用户去掉前缀
             if (urlPath.startsWith("/")) {

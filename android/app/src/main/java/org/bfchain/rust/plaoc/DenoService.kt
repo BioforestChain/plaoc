@@ -73,9 +73,7 @@ class DenoService : IntentService("DenoService") {
         })
 //      onlyReadRuntime(appContext.assets,"/bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj/test-vue3/bfs-service/index.mjs")
 
-      @SuppressLint("SdCardPath")
       val loadUrl = "${App.appContext?.dataDir}/user-app/bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj/test-vue3/bfs-service/index.mjs"
-      Log.i("xxxx",loadUrl)
       denoRuntime(loadUrl)
     }
 }

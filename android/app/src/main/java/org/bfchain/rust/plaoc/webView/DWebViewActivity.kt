@@ -138,7 +138,8 @@ fun openDWebWindow(activity: ComponentActivity, url: String) {
     var intent = Intent(activity.applicationContext, DWebViewActivity::class.java).also {
         it.data = Uri.parse("https://" + URLEncoder.encode(url, "UTF-8"))
     }
-    activity.startActivity(intent)
+  Log.i("xxx", "2222->$intent")
+  activity.startActivity(intent)
 }
 
 fun sendToJavaScript(message: String) {

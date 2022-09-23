@@ -17,10 +17,9 @@ import com.king.mlkit.vision.camera.CameraScan
 import com.king.mlkit.vision.camera.analyze.Analyzer.OnAnalyzeListener
 import com.king.mlkit.vision.camera.util.LogUtils
 import com.king.mlkit.vision.camera.util.PermissionUtils
-import org.bfchain.libappmgr.ui.main.MainActivity
+import org.bfchain.rust.plaoc.lib.drawRect
 import org.bfchain.rust.plaoc.system.barcode.BarcodeScanningActivity
 import org.bfchain.rust.plaoc.system.barcode.QRCodeScanningActivity
-import org.bfchain.rust.plaoc.lib.drawRect
 import org.bfchain.rust.plaoc.webView.network.initMetaData
 import org.bfchain.rust.plaoc.webView.openDWebWindow
 import org.bfchain.rust.plaoc.webView.sendToJavaScript
@@ -201,10 +200,8 @@ class MainActivity : AppCompatActivity() {
         when (v.id) {
             R.id.imageButton1 -> {
               LogUtils.d("启动了Ar 扫雷")
-              openDWebWindow(
-                activity = getContext(),
-                url = "https://bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj.dweb/index.html"
-              )
+              val loadUrl = "${App.appContext?.dataDir}/user-app/bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj/test-vue3/bfs-service/index.mjs"
+             DenoService().denoRuntime(loadUrl)
             }
           R.id.imageButton2 -> {
             LogUtils.d("启动了DWebView")
