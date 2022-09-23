@@ -1,4 +1,4 @@
-package org.bfchain.rust.plaoc.barcode
+package org.bfchain.rust.plaoc.system.barcode
 
 
 import android.util.Log

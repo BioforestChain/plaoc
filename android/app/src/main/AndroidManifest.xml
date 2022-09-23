@@ -43,15 +43,15 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="org.bfchain.rust.plaoc.barcode.MultipleQRCodeScanningActivity"
+            android:name="org.bfchain.rust.plaoc.system.barcode.MultipleQRCodeScanningActivity"
             android:screenOrientation="portrait"
             android:theme="@style/CameraScanTheme" />
         <activity
-            android:name="org.bfchain.rust.plaoc.barcode.QRCodeScanningActivity"
+            android:name="org.bfchain.rust.plaoc.system.barcode.QRCodeScanningActivity"
             android:screenOrientation="portrait"
             android:theme="@style/CameraScanTheme" />
         <activity
-            android:name="org.bfchain.rust.plaoc.barcode.BarcodeScanningActivity"
+            android:name="org.bfchain.rust.plaoc.system.barcode.BarcodeScanningActivity"
             android:screenOrientation="portrait"
             android:theme="@style/CameraScanTheme" />
 
