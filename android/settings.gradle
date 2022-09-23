@@ -3,6 +3,7 @@ include ':mlkit-barcode-scanning'
 include ':mlkit-camera-core'
 //include ':writeintercept'
 include ':app'
+include ':libAppMgr'
 
 
 dependencyResolutionManagement {

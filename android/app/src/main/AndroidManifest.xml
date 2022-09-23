@@ -55,6 +55,8 @@
             android:screenOrientation="portrait"
             android:theme="@style/CameraScanTheme" />
 
+        <activity android:name="org.bfchain.libappmgr.ui.main.MainActivity"/>
+
         <service
             android:name="org.bfchain.rust.plaoc.DenoService"
             android:enabled="true"

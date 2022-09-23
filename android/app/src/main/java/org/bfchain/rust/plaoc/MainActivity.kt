@@ -17,6 +17,7 @@ import com.king.mlkit.vision.camera.CameraScan
 import com.king.mlkit.vision.camera.analyze.Analyzer.OnAnalyzeListener
 import com.king.mlkit.vision.camera.util.LogUtils
 import com.king.mlkit.vision.camera.util.PermissionUtils
+import org.bfchain.libappmgr.ui.main.MainActivity
 import org.bfchain.rust.plaoc.system.barcode.BarcodeScanningActivity
 import org.bfchain.rust.plaoc.system.barcode.QRCodeScanningActivity
 import org.bfchain.rust.plaoc.lib.drawRect

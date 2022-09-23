@@ -3,6 +3,7 @@
 buildscript {
     apply from: 'versions.gradle'
     ext.compose_version = "1.2.0-alpha08"
+    ext.ktor_version = "2.1.0"
     addRepos(repositories)
     repositories {
         google()
