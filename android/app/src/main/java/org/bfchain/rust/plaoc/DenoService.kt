@@ -71,7 +71,7 @@ class DenoService : IntentService("DenoService") {
                 warpCallback(bytes, false) // 单工模式不要存储
             }
         })
-//      onlyReadRuntime(appContext.assets,"user-app/bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj/test-vue3/bfs-service/index.mjs")
+//      onlyReadRuntime(appContext.assets,"/bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj/test-vue3/bfs-service/index.mjs")
 
       @SuppressLint("SdCardPath")
       val loadUrl = "${App.appContext?.dataDir}/user-app/bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj/test-vue3/bfs-service/index.mjs"

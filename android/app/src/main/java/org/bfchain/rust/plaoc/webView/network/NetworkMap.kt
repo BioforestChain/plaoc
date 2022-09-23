@@ -5,10 +5,7 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.DeserializationFeature
-import org.bfchain.rust.plaoc.DenoService
-import org.bfchain.rust.plaoc.ExportNativeUi
-import org.bfchain.rust.plaoc.jsHandle
-import org.bfchain.rust.plaoc.mapper
+import org.bfchain.rust.plaoc.*
 import org.bfchain.rust.plaoc.webView.urlscheme.CustomUrlScheme
 import java.io.ByteArrayInputStream
 import java.net.HttpURLConnection
@@ -109,10 +106,10 @@ fun viewGateWay(
     request: WebResourceRequest
 ): WebResourceResponse {
     val url = request.url.toString().lowercase(Locale.ROOT)
-    Log.i(TAG, " viewGateWay: ${request.url}")
-//    Log.i(TAG, " viewGateWay: ${front_to_rear_map.contains(url)}")
+    Log.i(TAG, " viewGateWay: $url")
     if (front_to_rear_map.contains(url)) {
         val trueUrl = front_to_rear_map[url]
+      Log.i(TAG, " viewGateWay: $trueUrl")
         if (trueUrl != null) {
             // 远程文件处理
             if (trueUrl.startsWith("https") || trueUrl.startsWith("http")) {
@@ -146,7 +143,7 @@ fun initMetaData(metaData: String) {
     }
    // 默认入口全部加上加载路径，用户不用配置
     for ( entry in metaJson.manifest.enters) {
-      front_to_rear_map[resolveUrl(entry)] = "/$dWebView_host${shakeUrl(entry)}"
+      front_to_rear_map[resolveUrl(entry)] = "${shakeUrl(entry)}"
     }
     // 设置白名单
     for (whitelist in metaJson.whitelist) {
