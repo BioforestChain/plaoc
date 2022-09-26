@@ -56,7 +56,7 @@ fun Gretting(name: String) {
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
-fun Home() {
+fun Home(onOpenDWebview: ((url: String) -> Unit)? = null) {
   var appInfoList: MutableList<AppInfo> = mutableStateListOf()
   LaunchedEffect(Unit) {
     if (PreferencesHelper.isFirstIn()) {
@@ -68,5 +68,5 @@ fun Home() {
     appInfoList.addAll(FilesUtil.getAppInfoList())
     CoroutineUpdateTask().scheduleUpdate(1000 * 60) // 轮询执行
   }
-  AppInfoGridView(appInfoList = appInfoList, downModeDialog = false)
+  AppInfoGridView(appInfoList = appInfoList, downModeDialog = false, onOpenApp = onOpenDWebview)
 }

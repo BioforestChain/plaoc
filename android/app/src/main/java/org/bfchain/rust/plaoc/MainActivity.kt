@@ -2,14 +2,22 @@ package org.bfchain.rust.plaoc
 
 
 import android.Manifest
+import android.content.ComponentName
 import android.content.Intent
 import android.os.Bundle
+import android.os.IBinder
+import android.os.UserHandle
 import android.provider.MediaStore
 import android.view.View
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.work.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.MaterialTheme
+import androidx.compose.ui.Modifier
 import com.google.mlkit.vision.barcode.Barcode
 import com.king.app.dialog.AppDialog
 import com.king.app.dialog.AppDialogConfig
@@ -21,6 +29,10 @@ import com.king.mlkit.vision.camera.util.PermissionUtils
 import org.bfchain.rust.plaoc.lib.drawRect
 import org.bfchain.rust.plaoc.system.barcode.BarcodeScanningActivity
 import org.bfchain.rust.plaoc.system.barcode.QRCodeScanningActivity
+import org.bfchain.libappmgr.ui.main.Home
+import org.bfchain.libappmgr.ui.main.MainActivity
+import org.bfchain.rust.plaoc.ui.theme.RustApplicationTheme
+import org.bfchain.rust.plaoc.webView.network.dWebView_host
 import org.bfchain.rust.plaoc.webView.network.initMetaData
 import org.bfchain.rust.plaoc.webView.openDWebWindow
 import org.bfchain.rust.plaoc.webView.sendToJavaScript
@@ -41,8 +53,24 @@ class MainActivity : AppCompatActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContentView(R.layout.activity_main)
+    //setContentView(R.layout.activity_main)
     this.initSystemFn()
+    setContent {
+      RustApplicationTheme {
+        Box(
+          modifier = Modifier
+              .fillMaxSize()
+              .background(MaterialTheme.colors.primary)
+        ) {
+          Home() {
+            LogUtils.d("启动了Ar 扫雷")
+            val loadUrl =
+              "${App.appContext.dataDir}/system-app/$it/sys/test-vue3/bfs-service/index.mjs"
+            createWorker(WorkerNative.valueOf("DenoRuntime"), loadUrl)
+          }
+        }
+      }
+    }
   }
 
   /** 初始化系统函数*/
@@ -201,8 +229,9 @@ class MainActivity : AppCompatActivity() {
     when (v.id) {
       R.id.imageButton1 -> {
         LogUtils.d("启动了Ar 扫雷")
-        val loadUrl = "${App.appContext?.dataDir}/user-app/bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj/test-vue3/bfs-service/index.mjs"
-        createWorker(WorkerNative.valueOf("DenoRuntime"),loadUrl)
+        val loadUrl =
+          "${App.appContext.dataDir}/system-app/bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj/bfs-service/index.mjs"
+        createWorker(WorkerNative.valueOf("DenoRuntime"), loadUrl)
       }
       R.id.imageButton2 -> {
         LogUtils.d("启动了DWebView")
@@ -227,6 +256,5 @@ class MainActivity : AppCompatActivity() {
       }
     }
   }
-
 
 }

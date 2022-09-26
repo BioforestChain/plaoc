@@ -58,8 +58,8 @@ object JsonUtil {
     return null
   }
 
-  fun <T> toJson(type: Class<T>, value: T?): String {
-    return Gson().toJson(value, type)
+  fun <T> toJson(value: T?): String {
+    return Gson().toJson(value)
   }
 
   fun <T> fromJson(type: Class<T>, value: String): T? {

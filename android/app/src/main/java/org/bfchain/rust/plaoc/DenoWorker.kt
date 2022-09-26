@@ -21,7 +21,7 @@ class DenoWorker(appContext: Context, workerParams: WorkerParameters) :
         }
       }
       // 移除任务，防止重启
-      App.appContext?.let { WorkManager.getInstance(it.applicationContext).cancelAllWorkByTag(funName) }
+      WorkManager.getInstance(App.appContext.applicationContext).cancelAllWorkByTag(funName)
       return Result.success()
     }
     // 启动不成功就不移除了
@@ -47,10 +47,8 @@ fun createWorker(funName: WorkerNative, data: String = "") {
       .build()
 
   // 推入处理队列
-  App.appContext?.let {
     WorkManager
-      .getInstance(it.applicationContext)
+      .getInstance(App.appContext.applicationContext)
       .enqueue(denoWorkRequest)
-  }
 
 }

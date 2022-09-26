@@ -130,7 +130,7 @@ fun requestHandlerFromAssets(assetManager: AssetManager, basePath: String): Requ
           /** 读取存储文件*/
         override fun onFileRequest(req: UrlState): InputStream? {
             val uri = URI(req.href)
-            val warpWarp = "${App.appContext?.dataDir}/user-app/$dWebView_host"
+            val warpWarp = "${App.appContext?.dataDir}/system-app/$dWebView_host/sys/"
             val urlPath = Path(warpWarp, uri.path).toString()
           Log.d(TAG, "onFileRequest url: ${urlPath},$uri")
             val inputStream:FileInputStream
