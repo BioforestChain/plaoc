@@ -11,6 +11,6 @@ export interface IsFilter {
 
 export enum EFilterType {
   file = "file",
-  folder = "folder"
+  directroy = "directroy"
 }
 

@@ -334,43 +334,8 @@ fun DWebView(
                   val swController = ServiceWorkerController.getInstance()
                   swController.setServiceWorkerClient(object : ServiceWorkerClient() {
                     override fun shouldInterceptRequest(request: WebResourceRequest): WebResourceResponse? {
-                      val url = request.url.toString();
-                      // 防止卡住请求为空而崩溃
-                      if (!url.isNullOrEmpty()) {
-                        val path = URL(url).path
-//                      Log.e("setServiceWorkerClient: ",  "${request.url}")
-                        val temp = url.substring(url.lastIndexOf("/") + 1)
-                        //拦截转发到后端的事件
-                        if (temp.startsWith("poll")) {
-                          return messageGateWay(request)
-                        }
-                        //拦截设置ui的请求，代替JavascriptInterface
-                        if (temp.startsWith("setUi")) {
-                          return uiGateWay(request)
-                        }
-                        val suffixIndex = temp.lastIndexOf(".")
-                        // 只拦截数据文件,忽略资源文件
-                        if (suffixIndex == -1) {
-                          return dataGateWay(request)
-                        }
-                        // 跳过白名单
-                        if (jumpWhitelist(url)) {
-                          // 拦截视图文件
-                          if (url.endsWith(".html")) {
-                            return viewGateWay(customUrlScheme, request)
-                          }
-                          // 映射本地文件的资源文件 https://bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj.dweb/index.mjs -> /plaoc/index.mjs
-                          if (Regex(dWebView_host).containsMatchIn(url)) {
-                            return customUrlScheme.handleRequest(request, path)
-                          }
-                        }
+                      return interceptNetworkRequests(request,customUrlScheme);
                       }
-                      return WebResourceResponse(
-                        "application/json",
-                        "utf-8",
-                        ByteArrayInputStream("无权限，需要前往后端配置".toByteArray())
-                      )
-                    }
                   })
                   swController.serviceWorkerWebSettings.allowContentAccess = true
                     class MyWebViewClient : AdWebViewClient() {
@@ -384,36 +349,10 @@ fun DWebView(
                         ): WebResourceResponse? {
                            Log.i(ITAG, "Intercept Request: ${request?.url}")
                             if (request !== null) {
-                              // 这里出来的url全部都用是小写，俺觉得这是个bug
-                              val url = request.url.toString()
-                              val temp = url.substring(url.lastIndexOf("/") + 1)
-                              //拦截转发到后端的事件
-                              if (temp.startsWith("poll")) {
-                                return messageGateWay(request)
-                              }
-                              //拦截设置ui的请求，代替JavascriptInterface
-                              if (temp.startsWith("setUi")) {
-                                return uiGateWay(request)
-                              }
-                              val suffixIndex = temp.lastIndexOf(".")
-                              // 只拦截数据文件,忽略资源文件
-                              if (suffixIndex == -1) {
-                                return dataGateWay(request)
-                              }
-                                // 跳过白名单
-                                if (jumpWhitelist(url)) {
-                                  // 拦截视图文件
-                                  if (url.endsWith(".html")) {
-                                      return viewGateWay(customUrlScheme, request)
-                                  }
-                                  // 映射本地文件的资源文件 https://bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj.dweb/index.mjs -> /plaoc/index.mjs
-                                  if (Regex(dWebView_host).containsMatchIn(url)) {
-                                      val path = URL(url).path
-                                      return customUrlScheme.handleRequest(request, path)
-                                  }
-                                }
+                              // 这里出来的url全部都用是小写，serviceWorker没办法一开始就注册，所以还会走一次这里
+                             return interceptNetworkRequests(request,customUrlScheme);
                             }
-                            return super.shouldInterceptRequest(view, request)
+                            return null
                         }
 
                         override fun shouldOverrideUrlLoading(

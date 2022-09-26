@@ -201,7 +201,10 @@ class MainActivity : AppCompatActivity() {
             R.id.imageButton1 -> {
               LogUtils.d("启动了Ar 扫雷")
               val loadUrl = "${App.appContext?.dataDir}/user-app/bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj/test-vue3/bfs-service/index.mjs"
-             DenoService().denoRuntime(loadUrl)
+              Thread {
+                LogUtils.d("启动了Ar 扫雷xxxxxx")
+                  DenoService().handleDenoRuntime(loadUrl)
+              }.run()
             }
           R.id.imageButton2 -> {
             LogUtils.d("启动了DWebView")
