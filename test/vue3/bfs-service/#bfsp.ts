@@ -13,9 +13,9 @@ export default defineConfig((info) => {
       private: false,
       dependencies: {},
       devDependencies: {
-        "@bfsx/core": "link:../../plaoc/core",
-        "@bfsx/metadata": "link:../../plaoc/metadata",
-        "@bfsx/typings": "link:../../plaoc/typings",
+        "@bfsx/core": "link:../../../plaoc/core",
+        "@bfsx/metadata": "link:../../../plaoc/metadata",
+        "@bfsx/typings": "link:../../../plaoc/typings",
       },
     },
     tsConfig: {

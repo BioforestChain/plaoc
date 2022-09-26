@@ -7,8 +7,8 @@
   "resolved" "https://registry.npmmirror.com/@babel/parser/-/parser-7.18.11.tgz"
   "version" "7.18.11"
 
-"@bfsx/plugin@file:../plaoc/plugin":
-  "resolved" "file:../plaoc/plugin"
+"@bfsx/plugin@file:../../plaoc/plugin":
+  "resolved" "file:../../plaoc/plugin"
   "version" "0.0.2"
 
 "@ionic/core@^6.2.5":
@@ -190,6 +190,8 @@
   "version" "2.6.20"
 
 "esbuild-darwin-64@0.14.54":
+  "integrity" "sha512-jtdKWV3nBviOd5v4hOpkVmpxsBy90CGzebpbO9beiqUYVMBtSc0AL9zGftFuBon7PNDcdvNCEuQqw2x0wP9yug=="
+  "resolved" "https://registry.npmjs.org/esbuild-darwin-64/-/esbuild-darwin-64-0.14.54.tgz"
   "version" "0.14.54"
 
 "esbuild@^0.14.47":

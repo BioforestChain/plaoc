@@ -1,7 +1,7 @@
 package org.bfchain.rust.plaoc
 
-import android.annotation.SuppressLint
 import android.app.IntentService
+import android.app.Notification
 import android.content.Intent
 import android.content.res.AssetManager
 import android.os.Binder
@@ -11,10 +11,6 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.ObjectMapper
-import java.io.BufferedReader
-import java.io.File
-import java.io.InputStream
-import java.io.InputStreamReader
 import java.nio.ByteBuffer
 
 private const val TAG = "DENO_SERVICE"
@@ -61,7 +57,7 @@ class DenoService : IntentService("DenoService") {
 
     private external fun denoSetCallback(callback: IDenoCallback)
     private external fun nativeSetCallback(callback: IHandleCallback)
-    private external fun onlyReadRuntime(assets: AssetManager,target:String)
+    private external fun onlyReadRuntime(assets: AssetManager,target:String) // 只读模式走这里
     external fun backDataToRust(
         bufferData: ByteArray,
     )
@@ -71,7 +67,6 @@ class DenoService : IntentService("DenoService") {
     @RequiresApi(Build.VERSION_CODES.S)
     @Deprecated("Deprecated in Java")
     override fun onHandleIntent(p0: Intent?) {
-        val appContext = applicationContext
         // rust 通知 kotlin doing sting
         nativeSetCallback(object : IHandleCallback {
             override fun handleCallback(bytes: ByteArray) {
@@ -84,15 +79,6 @@ class DenoService : IntentService("DenoService") {
                 warpCallback(bytes, false) // 单工模式不要存储
             }
         })
-//      onlyReadRuntime(appContext.assets,"/bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj/test-vue3/bfs-service/index.mjs")
-
-      /*@SuppressLint("SdCardPath")
-      val loadUrl = "${App.appContext?.dataDir}/user-app/bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj/test-vue3/bfs-service/index.mjs"
-      Log.i("xxxx",loadUrl)
-      denoRuntime(loadUrl)*/
-      @SuppressLint("SdCardPath")
-      val loadUrl = "${App.appContext?.dataDir}/system-app/bfs-app-tanyuanyu/sys/bfs-service/index.mjs"
-      denoRuntime(loadUrl)
     }
 }
 

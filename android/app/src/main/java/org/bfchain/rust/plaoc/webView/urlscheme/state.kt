@@ -139,7 +139,7 @@ fun requestHandlerFromAssets(assetManager: AssetManager, basePath: String): Requ
             } catch (e: Exception) {
               val fileLists =  File(urlPath).list() ?: return null
               val indexName = fileLists.find { it == uri.toString() } ?: return null
-              // 如果加上 index.html 后 isFile 仍然是 false，那么返回 null
+              // 如果加上 url.path 后 isFile 仍然是 false，那么返回 null
               return File(Path(urlPath, indexName).toString()).inputStream()
             }
             return inputStream

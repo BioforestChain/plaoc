@@ -87,17 +87,16 @@
       android:name="org.bfchain.rust.plaoc.system.barcode.BarcodeScanningActivity"
       android:screenOrientation="portrait"
       android:theme="@style/CameraScanTheme" />
+        <service
+            android:name="org.bfchain.rust.plaoc.DenoService"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="org.bfchain.rust.plaoc.DenoService" />
+            </intent-filter>
+        </service>
 
     <activity android:name="org.bfchain.libappmgr.ui.main.MainActivity" />
-
-    <service
-      android:name="org.bfchain.rust.plaoc.DenoService"
-      android:enabled="true"
-      android:exported="true">
-      <intent-filter>
-        <action android:name="org.bfchain.rust.example.DenoService" />
-      </intent-filter>
-    </service>
 
     <meta-data
       android:name="com.google.firebase.ml.vision.DEPENDENCIES"

@@ -1,1 +1,0 @@
-/Users/mac/Desktop/waterbang/project/plaoc/test-vue3/node_modules/@bfsx/plugin/dist/default/esm/common/serverWorker.mjs
