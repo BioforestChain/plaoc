@@ -41,11 +41,6 @@ var dWebView: AdAndroidWebView? = null
 
 class DWebViewActivity : AppCompatActivity() {
 
-    companion object {
-        val ALL = mutableListOf<DWebViewActivity>()
-    }
-
-
     override fun onBackPressed() {
         Log.i(TAG, "parentActivityIntent:${this.parentActivityIntent}")
 
@@ -56,15 +51,9 @@ class DWebViewActivity : AppCompatActivity() {
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        ALL.remove(this)
-    }
-
-
-    override fun onCreate(savedInstanceState: Bundle?) {
+  override fun onCreate(savedInstanceState: Bundle?) {
+        Log.i("xxxx","DWebViewActivity")
         super.onCreate(savedInstanceState)
-        ALL.add(this)
         WebView.setWebContentsDebuggingEnabled(true)// 开启调试
         // 设置装饰视图是否应适合WindowInsetsCompat(Describes a set of insets for window content.)
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -105,6 +94,7 @@ private fun NavFun(activity: ComponentActivity) {
                     uriPattern = "https://{url}"
                 })
             ) { entry ->
+              Log.d(TAG, "NavFun entry : ${entry.arguments?.getString("url")}")
                 // 请求文件路径
                 var urlStr = entry.arguments?.getString("url")
                     .let { it -> URLDecoder.decode(it, "UTF-8") }
@@ -136,9 +126,10 @@ private fun NavFun(activity: ComponentActivity) {
 
 fun openDWebWindow(activity: ComponentActivity, url: String) {
     var intent = Intent(activity.applicationContext, DWebViewActivity::class.java).also {
-        it.data = Uri.parse("https://" + URLEncoder.encode(url, "UTF-8"))
+        it.data = Uri.parse("https://"+URLEncoder.encode(url, "UTF-8"))
+      Log.i("xxx", "111111->${it.data}")
     }
-    activity.startActivity(intent)
+  activity.startActivity(intent)
 }
 
 fun sendToJavaScript(message: String) {

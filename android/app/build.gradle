@@ -57,6 +57,9 @@ android {
   packagingOptions {
     resources {
       excludes += "/META-INF/{AL2.0,LGPL2.1}"
+      // 添加 ktor 框架后，会有异常报错，需要添加如下内容
+      excludes += "/META-INF/INDEX.LIST"
+      excludes += "/META-INF/io.netty.versions.properties"
     }
   }
 }
@@ -121,6 +124,8 @@ dependencies {
   implementation("com.squareup.retrofit2:retrofit:2.6.2")
   implementation("com.squareup.retrofit2:converter-gson:2.6.2")
   // endregion
+
+  implementation project(":libAppMgr")
 }
 
 

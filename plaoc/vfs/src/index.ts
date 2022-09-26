@@ -1,26 +1,23 @@
 import { ls, list } from "./ls"
-import { open } from "./open"
+import { mkdir } from "./open"
 import { read } from "./read";
 import { write } from "./write"
-import { deleteHandle } from "./delete"
-import { createHandle } from "./create"
+import { rm } from "./delete"
 
 const fs = {
   ls,
   list,
-  open,
+  mkdir,
   read,
   write,
-  deleteHandle,
-  createHandle,
+  rm,
 }
 export {
   fs,
   ls,
   list,
-  open,
+  mkdir,
   read,
   write,
-  deleteHandle,
-  createHandle
+  rm,
 }
