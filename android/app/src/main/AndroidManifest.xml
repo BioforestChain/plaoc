@@ -62,7 +62,7 @@
             android:enabled="true"
             android:exported="true">
             <intent-filter>
-                <action android:name="org.bfchain.rust.example.DenoService" />
+                <action android:name="org.bfchain.rust.plaoc.DenoService" />
             </intent-filter>
         </service>
 

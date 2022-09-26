@@ -1,6 +1,6 @@
 package org.bfchain.rust.plaoc
 
-
+/** 系统调用函数*/
 enum class ExportNative(val type: String) {
   OpenQrScanner("openQrScanner"),
   BarcodeScanner("barcodeScanner"),
@@ -8,6 +8,13 @@ enum class ExportNative(val type: String) {
     InitMetaData("initMetaData"),
     DenoRuntime("denoRuntime"),
     EvalJsRuntime("evalJsRuntime"),
+}
+
+/** worker */
+enum class WorkerNative{
+  DenoRuntime,
+  WorkerName,
+  WorkerData
 }
 
 enum class ExportNativeUi(val type: String) {
