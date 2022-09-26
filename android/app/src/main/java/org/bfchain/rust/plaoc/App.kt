@@ -8,7 +8,7 @@ import java.util.concurrent.Executors
 class App : Application() {
     val executorService: ExecutorService = Executors.newFixedThreadPool(4)
     companion object {
-       var appContext: Context? = null
+       lateinit var appContext: Context
     }
 
   override fun onCreate() {

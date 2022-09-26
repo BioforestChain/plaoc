@@ -27,6 +27,7 @@ import androidx.navigation.navDeepLink
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
 import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
+import com.king.mlkit.vision.camera.util.LogUtils
 import org.bfchain.rust.plaoc.ui.theme.RustApplicationTheme
 import org.bfchain.rust.plaoc.webView.urlscheme.CustomUrlScheme
 import org.bfchain.rust.plaoc.webView.urlscheme.requestHandlerFromAssets
@@ -63,6 +64,7 @@ class DWebViewActivity : AppCompatActivity() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        LogUtils.d("onCreate")
         super.onCreate(savedInstanceState)
         ALL.add(this)
         WebView.setWebContentsDebuggingEnabled(true)// 开启调试
@@ -138,8 +140,7 @@ fun openDWebWindow(activity: ComponentActivity, url: String) {
     var intent = Intent(activity.applicationContext, DWebViewActivity::class.java).also {
         it.data = Uri.parse("https://" + URLEncoder.encode(url, "UTF-8"))
     }
-  Log.i("xxx", "2222->$intent")
-  activity.startActivity(intent)
+    activity.startActivity(intent)
 }
 
 fun sendToJavaScript(message: String) {

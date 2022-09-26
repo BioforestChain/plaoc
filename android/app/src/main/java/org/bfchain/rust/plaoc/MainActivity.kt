@@ -2,13 +2,22 @@ package org.bfchain.rust.plaoc
 
 
 import android.Manifest
+import android.content.ComponentName
 import android.content.Intent
 import android.os.Bundle
+import android.os.IBinder
+import android.os.UserHandle
 import android.provider.MediaStore
 import android.view.View
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.MaterialTheme
+import androidx.compose.ui.Modifier
 import com.google.mlkit.vision.barcode.Barcode
 import com.king.app.dialog.AppDialog
 import com.king.app.dialog.AppDialogConfig
@@ -20,10 +29,14 @@ import com.king.mlkit.vision.camera.util.PermissionUtils
 import org.bfchain.rust.plaoc.lib.drawRect
 import org.bfchain.rust.plaoc.system.barcode.BarcodeScanningActivity
 import org.bfchain.rust.plaoc.system.barcode.QRCodeScanningActivity
+import org.bfchain.libappmgr.ui.main.Home
+import org.bfchain.libappmgr.ui.main.MainActivity
+import org.bfchain.rust.plaoc.ui.theme.RustApplicationTheme
 import org.bfchain.rust.plaoc.webView.network.initMetaData
 import org.bfchain.rust.plaoc.webView.openDWebWindow
 import org.bfchain.rust.plaoc.webView.sendToJavaScript
 import java.net.URL
+import android.content.ServiceConnection as ServiceConnection
 
 
 val callable_map = mutableMapOf<ExportNative, (data: String) -> Unit>()
@@ -37,14 +50,42 @@ class MainActivity : AppCompatActivity() {
         const val REQUEST_CODE_REQUEST_EXTERNAL_STORAGE = 2
         const val REQUEST_CODE_SCAN_CODE = 3
     }
+    var mDenoService: DenoService? = null
+    var denoServiceConnect : ServiceConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            mDenoService = (service as DenoService.CommBinder).getService()
+        }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+        override fun onServiceDisconnected(name: ComponentName?) {
+            mDenoService = null
+        }
+    }
+
+  override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        //setContentView(R.layout.activity_main)
         this.initSystemFn()
         // 启动Deno服务
         val deno = Intent(this, DenoService::class.java)
         startService(deno)
+        //bindService(deno, denoServiceConnect, BIND_AUTO_CREATE)
+        setContent {
+            RustApplicationTheme {
+              Box(
+                modifier = Modifier
+                  .fillMaxSize()
+                  .background(MaterialTheme.colors.primary)
+              ) {
+                Home() {
+                  /*mDenoService?.let {service ->
+                    var path = "${App.appContext?.dataDir}/system-app/bfs-app-tanyuanyu/sys/bfs-service/index.mjs"
+                    service.denoRuntime(path)
+                  }*/
+                }
+                //Gretting(name = "Compose!!")
+              }
+            }
+        }
     }
     // 初始化系统函数
     private fun initSystemFn() {
@@ -204,11 +245,8 @@ class MainActivity : AppCompatActivity() {
              DenoService().denoRuntime(loadUrl)
             }
           R.id.imageButton2 -> {
-            LogUtils.d("启动了DWebView")
-            openDWebWindow(
-              activity = getContext(),
-              url = "https://bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj.dweb/index.html"
-            )
+            LogUtils.d("启动主界面")
+            startActivity(Intent(this@MainActivity, MainActivity::class.java))
           }
           R.id.imageButton3 -> {
             LogUtils.d("启动了DWebView")

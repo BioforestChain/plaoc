@@ -137,9 +137,9 @@ object FilesUtil {
    */
   fun getChildrenDirectoryList(file: File): Map<String, String>? {
     if (file.exists()) {
-      if (!file.exists()) {
+      /*if (!file.exists()) {
         file.mkdirs()
-      }
+      }*/
       var childrenMap: HashMap<String, String> = HashMap<String, String>()
       file.listFiles().forEach {
         if (it.isDirectory) {

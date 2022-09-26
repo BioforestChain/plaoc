@@ -4,7 +4,9 @@ import android.annotation.SuppressLint
 import android.app.IntentService
 import android.content.Intent
 import android.content.res.AssetManager
+import android.os.Binder
 import android.os.Build
+import android.os.IBinder
 import android.util.Log
 import androidx.annotation.RequiresApi
 import com.fasterxml.jackson.core.JsonParser
@@ -46,6 +48,17 @@ class DenoService : IntentService("DenoService") {
         fun denoCallback(bytes: ByteArray)
     }
 
+    internal inner class CommBinder(private val service: DenoService) : Binder() {
+        fun getService() : DenoService {
+            return service
+        }
+    }
+    private var mBinder = CommBinder(this@DenoService)
+
+  override fun onBind(intent: Intent?): IBinder? {
+    return mBinder
+  }
+
     private external fun denoSetCallback(callback: IDenoCallback)
     private external fun nativeSetCallback(callback: IHandleCallback)
     private external fun onlyReadRuntime(assets: AssetManager,target:String)
@@ -73,7 +86,12 @@ class DenoService : IntentService("DenoService") {
         })
 //      onlyReadRuntime(appContext.assets,"/bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj/test-vue3/bfs-service/index.mjs")
 
+      /*@SuppressLint("SdCardPath")
       val loadUrl = "${App.appContext?.dataDir}/user-app/bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj/test-vue3/bfs-service/index.mjs"
+      Log.i("xxxx",loadUrl)
+      denoRuntime(loadUrl)*/
+      @SuppressLint("SdCardPath")
+      val loadUrl = "${App.appContext?.dataDir}/system-app/bfs-app-tanyuanyu/sys/bfs-service/index.mjs"
       denoRuntime(loadUrl)
     }
 }

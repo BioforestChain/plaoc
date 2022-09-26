@@ -76,7 +76,7 @@ class MainViewModel : ViewModel() {
                 // 将改内容存储到 recommend-app/bfs-id-app/tmp/autoUpdate 中
                 FilesUtil.writeFileContent(
                   FilesUtil.getAppVersionSaveFile(appInfo),
-                  JsonUtil.toJson(AppVersion::class.java, baseData.data)
+                  JsonUtil.toJson(it)
                 )
                 apiResult?.let {
                   apiResult.onSuccess(
