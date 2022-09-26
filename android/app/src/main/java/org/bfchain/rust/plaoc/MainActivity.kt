@@ -9,6 +9,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.work.*
 import com.google.mlkit.vision.barcode.Barcode
 import com.king.app.dialog.AppDialog
 import com.king.app.dialog.AppDialogConfig
@@ -29,206 +30,203 @@ import java.net.URL
 val callable_map = mutableMapOf<ExportNative, (data: String) -> Unit>()
 
 class MainActivity : AppCompatActivity() {
-    var isQRCode = false //是否是识别二维码
-    fun getContext() = this
+  var isQRCode = false //是否是识别二维码
+  fun getContext() = this
 
-    companion object {
-        const val REQUEST_CODE_PHOTO = 1
-        const val REQUEST_CODE_REQUEST_EXTERNAL_STORAGE = 2
-        const val REQUEST_CODE_SCAN_CODE = 3
-    }
+  companion object {
+    const val REQUEST_CODE_PHOTO = 1
+    const val REQUEST_CODE_REQUEST_EXTERNAL_STORAGE = 2
+    const val REQUEST_CODE_SCAN_CODE = 3
+  }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        this.initSystemFn()
-        // 启动Deno服务
-        val deno = Intent(this, DenoService::class.java)
-        startService(deno)
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    setContentView(R.layout.activity_main)
+    this.initSystemFn()
+  }
+
+  /** 初始化系统函数*/
+  private fun initSystemFn() {
+    callable_map[ExportNative.OpenQrScanner] = { openScannerActivity() }
+    callable_map[ExportNative.BarcodeScanner] = { openBarCodeScannerActivity() }
+    callable_map[ExportNative.OpenDWebView] = {
+      openDWebViewActivity(it)
     }
-    // 初始化系统函数
-    private fun initSystemFn() {
-      callable_map[ExportNative.OpenQrScanner] = { openScannerActivity() }
-      callable_map[ExportNative.BarcodeScanner] = { openBarCodeScannerActivity() }
-      callable_map[ExportNative.OpenDWebView] = {
-        openDWebViewActivity(it)
+    callable_map[ExportNative.InitMetaData] = {
+      initMetaData(it)
+    }
+    callable_map[ExportNative.DenoRuntime] = {
+      DenoService().denoRuntime(it)
+    }
+    callable_map[ExportNative.EvalJsRuntime] =
+      { sendToJavaScript(it) }
+  }
+
+  // 选择图片后回调到这
+  override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    super.onActivityResult(requestCode, resultCode, data)
+    if (resultCode == RESULT_OK) {
+      when (requestCode) {
+        REQUEST_CODE_PHOTO -> processPhoto(data)
+        REQUEST_CODE_SCAN_CODE -> processScanResult(data)
       }
-      callable_map[ExportNative.InitMetaData] = {
-        initMetaData(it)
-      }
-      callable_map[ExportNative.DenoRuntime] = {
-        DenoService().denoRuntime(it)
-      }
-      callable_map[ExportNative.EvalJsRuntime] =
-        { sendToJavaScript(it) }
     }
+  }
 
-    // 选择图片后回调到这
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == RESULT_OK) {
-            when (requestCode) {
-                REQUEST_CODE_PHOTO -> processPhoto(data)
-                REQUEST_CODE_SCAN_CODE -> processScanResult(data)
-            }
-        }
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
+  override fun onRequestPermissionsResult(
+    requestCode: Int,
+    permissions: Array<out String>,
+    grantResults: IntArray
+  ) {
+    super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    if (requestCode == REQUEST_CODE_REQUEST_EXTERNAL_STORAGE && PermissionUtils.requestPermissionsResult(
+        Manifest.permission.READ_EXTERNAL_STORAGE,
+        permissions,
+        grantResults
+      )
     ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == REQUEST_CODE_REQUEST_EXTERNAL_STORAGE && PermissionUtils.requestPermissionsResult(
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                permissions,
-                grantResults
-            )
-        ) {
-            startPickPhoto()
-        }
+      startPickPhoto()
     }
+  }
 
-    // 扫码后显示一下Toast
-    private fun processScanResult(data: Intent?) {
-        val text = CameraScan.parseScanResult(data)
-        Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
-    }
+  // 扫码后显示一下Toast
+  private fun processScanResult(data: Intent?) {
+    val text = CameraScan.parseScanResult(data)
+    Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
+  }
 
-    // 显示扫码的结果，是显示一张图片
-    private fun processPhoto(data: Intent?) {
-        data?.let {
-            try {
-                val src = MediaStore.Images.Media.getBitmap(contentResolver, it.data)
-                BarcodeDecoder.process(src, object : OnAnalyzeListener<List<Barcode>?> {
-                    override fun onSuccess(result: List<Barcode>) {
-                        if (result.isNotEmpty()) {
-                            val buffer = StringBuilder()
-                            val bitmap = src.drawRect { canvas, paint ->
-                                for ((index, data) in result.withIndex()) {
-                                    buffer.append("[$index] ").append(data.displayValue)
-                                        .append("\n")
-                                    canvas.drawRect(data.boundingBox, paint)
-                                }
-                            }
+  // 显示扫码的结果，是显示一张图片
+  private fun processPhoto(data: Intent?) {
+    data?.let {
+      try {
+        val src = MediaStore.Images.Media.getBitmap(contentResolver, it.data)
+        BarcodeDecoder.process(src, object : OnAnalyzeListener<List<Barcode>?> {
+          override fun onSuccess(result: List<Barcode>) {
+            if (result.isNotEmpty()) {
+              val buffer = StringBuilder()
+              val bitmap = src.drawRect { canvas, paint ->
+                for ((index, data) in result.withIndex()) {
+                  buffer.append("[$index] ").append(data.displayValue)
+                    .append("\n")
+                  canvas.drawRect(data.boundingBox, paint)
+                }
+              }
 
-                            val config =
-                                AppDialogConfig(getContext(), R.layout.barcode_result_dialog)
-                            config.setContent(buffer)
-                                .setHideCancel(true)
-                                .setOnClickOk {
-                                    AppDialog.INSTANCE.dismissDialog()
-                                }
-                            val imageView = config.getView<ImageView>(R.id.ivDialogContent)
-                            imageView.setImageBitmap(bitmap)
-                            AppDialog.INSTANCE.showDialog(config)
-                        } else {
-                            LogUtils.d("result is null")
-                            Toast.makeText(getContext(), "result is null", Toast.LENGTH_SHORT)
-                                .show()
-                        }
-                    }
-
-                    override fun onFailure() {
-                        LogUtils.d("onFailure")
-                        Toast.makeText(getContext(), "onFailure", Toast.LENGTH_SHORT).show()
-                    }
-                    //如果指定具体的识别条码类型，速度会更快
-                }, if (isQRCode) Barcode.FORMAT_QR_CODE else Barcode.FORMAT_ALL_FORMATS)
-            } catch (e: Exception) {
-                e.printStackTrace()
-                Toast.makeText(getContext(), e.message, Toast.LENGTH_SHORT).show()
+              val config =
+                AppDialogConfig(getContext(), R.layout.barcode_result_dialog)
+              config.setContent(buffer)
+                .setHideCancel(true)
+                .setOnClickOk {
+                  AppDialog.INSTANCE.dismissDialog()
+                }
+              val imageView = config.getView<ImageView>(R.id.ivDialogContent)
+              imageView.setImageBitmap(bitmap)
+              AppDialog.INSTANCE.showDialog(config)
+            } else {
+              LogUtils.d("result is null")
+              Toast.makeText(getContext(), "result is null", Toast.LENGTH_SHORT)
+                .show()
             }
+          }
 
-        }
+          override fun onFailure() {
+            LogUtils.d("onFailure")
+            Toast.makeText(getContext(), "onFailure", Toast.LENGTH_SHORT).show()
+          }
+          //如果指定具体的识别条码类型，速度会更快
+        }, if (isQRCode) Barcode.FORMAT_QR_CODE else Barcode.FORMAT_ALL_FORMATS)
+      } catch (e: Exception) {
+        e.printStackTrace()
+        Toast.makeText(getContext(), e.message, Toast.LENGTH_SHORT).show()
+      }
+
     }
+  }
 
   // 相册的二维码
-    private fun pickPhotoClicked(isQRCode: Boolean) {
-        this.isQRCode = isQRCode
-        if (PermissionUtils.checkPermission(
-                getContext(),
-                Manifest.permission.READ_EXTERNAL_STORAGE
-            )
-        ) {
-            startPickPhoto()
-        } else {
-            PermissionUtils.requestPermission(
-                this,
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                REQUEST_CODE_REQUEST_EXTERNAL_STORAGE
-            )
-        }
-    }
-
-    // 打开相册
-    private fun startPickPhoto() {
-        val pickIntent = Intent(
-            Intent.ACTION_PICK,
-            MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-        )
-        pickIntent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*")
-        startActivityForResult(pickIntent, REQUEST_CODE_PHOTO)
-    }
-  // 打开条形码（现在这里的效果是不断扫二维码,还需要修改）
-    private fun openBarCodeScannerActivity() {
-    startActivityForResult(
-      Intent(this, BarcodeScanningActivity::class.java),
-        REQUEST_CODE_SCAN_CODE
+  private fun pickPhotoClicked(isQRCode: Boolean) {
+    this.isQRCode = isQRCode
+    if (PermissionUtils.checkPermission(
+        getContext(),
+        Manifest.permission.READ_EXTERNAL_STORAGE
+      )
+    ) {
+      startPickPhoto()
+    } else {
+      PermissionUtils.requestPermission(
+        this,
+        Manifest.permission.READ_EXTERNAL_STORAGE,
+        REQUEST_CODE_REQUEST_EXTERNAL_STORAGE
       )
     }
+  }
+
+  // 打开相册
+  private fun startPickPhoto() {
+    val pickIntent = Intent(
+      Intent.ACTION_PICK,
+      MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+    )
+    pickIntent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*")
+    startActivityForResult(pickIntent, REQUEST_CODE_PHOTO)
+  }
+
+  // 打开条形码（现在这里的效果是不断扫二维码,还需要修改）
+  private fun openBarCodeScannerActivity() {
+    startActivityForResult(
+      Intent(this, BarcodeScanningActivity::class.java),
+      REQUEST_CODE_SCAN_CODE
+    )
+  }
+
   // 打开二维码
-    private fun openScannerActivity() {
-        startActivityForResult(
-            Intent(this, QRCodeScanningActivity::class.java),
-            REQUEST_CODE_SCAN_CODE
-        )
-    }
+  private fun openScannerActivity() {
+    startActivityForResult(
+      Intent(this, QRCodeScanningActivity::class.java),
+      REQUEST_CODE_SCAN_CODE
+    )
+  }
 
-    private fun openDWebViewActivity(url: String) {
-        // 存储一下host，用来判断是远程的还是本地的
-        val host = URL(url).host
-        LogUtils.d("启动了DWebView:$url，host为： $host")
+  private fun openDWebViewActivity(url: String) {
+    // 存储一下host，用来判断是远程的还是本地的
+    val host = URL(url).host
+    LogUtils.d("启动了DWebView:$url，host为： $host")
+    openDWebWindow(
+      activity = getContext(),
+      url = url
+    )
+  }
+
+  fun onClick(v: View) {
+    when (v.id) {
+      R.id.imageButton1 -> {
+        LogUtils.d("启动了Ar 扫雷")
+        val loadUrl = "${App.appContext?.dataDir}/user-app/bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj/test-vue3/bfs-service/index.mjs"
+        createWorker(WorkerNative.valueOf("DenoRuntime"),loadUrl)
+      }
+      R.id.imageButton2 -> {
+        LogUtils.d("启动了DWebView")
         openDWebWindow(
-            activity = getContext(),
-            url = url
+          activity = getContext(),
+          url = "https://bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj.dweb/index.html"
         )
+      }
+      R.id.imageButton3 -> {
+        LogUtils.d("启动了DWebView")
+        openDWebWindow(
+          activity = getContext(),
+          url = "https://bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj.dweb/index.html"
+        )
+      }
+      R.id.imageButton4 -> {
+        LogUtils.d("启动了DWebView")
+        openDWebWindow(
+          activity = getContext(),
+          url = "https://bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj.dweb/index.html"
+        )
+      }
     }
-
-    fun onClick(v: View) {
-        when (v.id) {
-            R.id.imageButton1 -> {
-              LogUtils.d("启动了Ar 扫雷")
-              val loadUrl = "${App.appContext?.dataDir}/user-app/bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj/test-vue3/bfs-service/index.mjs"
-              Thread {
-                LogUtils.d("启动了Ar 扫雷xxxxxx")
-                  DenoService().handleDenoRuntime(loadUrl)
-              }.run()
-            }
-          R.id.imageButton2 -> {
-            LogUtils.d("启动了DWebView")
-            openDWebWindow(
-              activity = getContext(),
-              url = "https://bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj.dweb/index.html"
-            )
-          }
-          R.id.imageButton3 -> {
-            LogUtils.d("启动了DWebView")
-            openDWebWindow(
-              activity = getContext(),
-              url = "https://bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj.dweb/index.html"
-            )
-          }
-          R.id.imageButton4 -> {
-            LogUtils.d("启动了DWebView")
-            openDWebWindow(
-              activity = getContext(),
-              url = "https://bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj.dweb/index.html"
-            )
-            }
-        }
-    }
+  }
 
 
 }

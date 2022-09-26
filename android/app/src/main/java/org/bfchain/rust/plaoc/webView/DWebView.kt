@@ -48,8 +48,7 @@ private const val TAG = "DWebView"
 private const val LEAVE_URI_SYMBOL = ":~:dweb=leave"
 
 @ExperimentalLayoutApi
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
-@SuppressLint("JavascriptInterface")
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DWebView(
     state: AdWebViewState,
@@ -92,11 +91,9 @@ fun DWebView(
         }
     }
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-        SetTaskDescription(state, activity)
-    }
+  SetTaskDescription(state, activity)
 
-    val systemUIState = SystemUIState.Default(activity)
+  val systemUIState = SystemUIState.Default(activity)
 
     jsUtil?.apply {
         VirtualKeyboardFFI.injectVirtualKeyboardVars(
@@ -334,6 +331,7 @@ fun DWebView(
                   val swController = ServiceWorkerController.getInstance()
                   swController.setServiceWorkerClient(object : ServiceWorkerClient() {
                     override fun shouldInterceptRequest(request: WebResourceRequest): WebResourceResponse? {
+                      // 拦截serviceWorker的网络请求
                       return interceptNetworkRequests(request,customUrlScheme);
                       }
                   })

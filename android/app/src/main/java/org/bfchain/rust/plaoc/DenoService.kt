@@ -1,6 +1,7 @@
 package org.bfchain.rust.plaoc
 
 import android.app.IntentService
+import android.app.Notification
 import android.content.Intent
 import android.content.res.AssetManager
 import android.os.Build
@@ -43,17 +44,12 @@ class DenoService : IntentService("DenoService") {
 
     private external fun denoSetCallback(callback: IDenoCallback)
     private external fun nativeSetCallback(callback: IHandleCallback)
-    private external fun onlyReadRuntime(assets: AssetManager,target:String)
+    private external fun onlyReadRuntime(assets: AssetManager,target:String) // 只读模式走这里
     external fun backDataToRust(
         bufferData: ByteArray,
     )
 
     external fun denoRuntime(path: String)
-
-
-    fun handleDenoRuntime(path: String) {
-      denoRuntime(path)
-    }
 
     @RequiresApi(Build.VERSION_CODES.S)
     @Deprecated("Deprecated in Java")
@@ -72,8 +68,8 @@ class DenoService : IntentService("DenoService") {
         })
 //      onlyReadRuntime(appContext.assets,"/bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj/test-vue3/bfs-service/index.mjs")
 
-      val loadUrl = "${App.appContext?.dataDir}/user-app/bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj/test-vue3/bfs-service/index.mjs"
-      denoRuntime(loadUrl)
+//      val loadUrl = "${App.appContext?.dataDir}/user-app/bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj/test-vue3/bfs-service/index.mjs"
+//      denoRuntime(loadUrl)
     }
 }
 
