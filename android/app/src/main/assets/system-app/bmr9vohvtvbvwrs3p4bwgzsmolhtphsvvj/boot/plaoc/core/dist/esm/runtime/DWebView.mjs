@@ -7,7 +7,6 @@ class DWebView {
     this.pool = [];
     this.hightWaterMark = 10;
     this.entrys = metaData.manifest.enters;
-    this.url = `https://${metaData.manifest.dwebId}.dweb`;
     this.initAppMetaData(metaData);
     deno.createHeader();
     this.waterOverflow();
@@ -51,7 +50,7 @@ class DWebView {
     if (this.entrys.toString().match(RegExp(`${entry}`))) {
       deno.callFunction(
         callDeno.openDWebView,
-        `"${new URL(entry, this.url).href}"`
+        `"${entry}"`
       );
       return;
     }

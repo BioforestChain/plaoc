@@ -12,7 +12,7 @@ const metaData = {
     description: "Awasome DWeb",
     keywords: ["demo"],
     privateKey: "bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj",
-    enters: ["dweb+file:///sys/index.html"]
+    enters: ["index.html"]
   },
   whitelist: ["https://unpkg.com", "https://cn.vitejs.dev"],
   dwebview: {
