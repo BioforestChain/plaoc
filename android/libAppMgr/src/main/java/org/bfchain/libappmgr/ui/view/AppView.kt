@@ -146,7 +146,7 @@ fun AppInfoView(
 fun AppInfoGridView(
   appInfoList: List<AppInfo>,
   downModeDialog: Boolean = false,
-  onOpenApp: ((url: String) -> Unit)? = null
+  onOpenApp: ((appId:String, url: String) -> Unit)? = null
 ) {
   LazyVerticalGrid(
     columns = GridCells.Fixed(5),//GridCells.Adaptive(minSize = 60.dp), // 一行五个，或者指定大小

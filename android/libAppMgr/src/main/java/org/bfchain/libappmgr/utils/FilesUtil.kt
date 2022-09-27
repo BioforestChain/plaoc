@@ -24,12 +24,15 @@ object FilesUtil {
   private val DIR_AUTO_UPDATE: String = "tmp" + File.separator + "autoUpdate" // 存放最新版本的路径
   private val FILE_LINK_JSON: String = "link.json"
   private val FILE_BFSA_META_JSON: String = "bfsa-metadata.json"
+  private val DENO_FILE: String = "bfs-service/index.mjs"
 
   enum class APP_DIR_TYPE(val rootName: String) {
     // 内置应用
     RecommendApp(rootName = "recommend-app"),
+
     // 下载应用
     SystemApp(rootName = "system-app"),
+
     // 客户应用
     UserApp(rootName = "user-app"),
   }
@@ -79,12 +82,21 @@ object FilesUtil {
   fun getAppLauncherPath(appInfo: AppInfo): String {
     return getAppLauncherPath(appInfo.bfsAppId)
   }
+
   /**
    * 获取程序运行路径
    */
   fun getAppLauncherPath(appName: String): String {
     return getAppRootDirectory(APP_DIR_TYPE.SystemApp) + File.separator + appName +
       File.separator + DIR_SYS
+  }
+
+  /**
+   * 获取程序运行路径
+   */
+  fun getAppDenoUrl(appInfo: AppInfo): String {
+    return getAppRootDirectory(APP_DIR_TYPE.SystemApp) + File.separator + appInfo.bfsAppId +
+      File.separator + DIR_BOOT + File.separator + DENO_FILE
   }
 
   /**

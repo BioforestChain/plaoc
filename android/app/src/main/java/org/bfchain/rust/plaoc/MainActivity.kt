@@ -33,6 +33,7 @@ import org.bfchain.rust.plaoc.system.barcode.BarcodeScanningActivity
 import org.bfchain.rust.plaoc.system.barcode.QRCodeScanningActivity
 import org.bfchain.libappmgr.ui.main.Home
 import org.bfchain.libappmgr.ui.main.MainActivity
+import org.bfchain.rust.plaoc.system.device.DeviceInfo
 import org.bfchain.rust.plaoc.ui.theme.RustApplicationTheme
 import org.bfchain.rust.plaoc.webView.network.dWebView_host
 import org.bfchain.rust.plaoc.webView.network.initMetaData
@@ -67,12 +68,13 @@ class MainActivity : AppCompatActivity() {
               .fillMaxSize()
               .background(MaterialTheme.colors.primary)
         ) {
-          Home() {
-            dWebView_host = it
-            LogUtils.d("启动了Ar 扫雷：$dWebView_host")
-            val loadUrl =
+          Home() {appId, url ->
+            dWebView_host = appId
+            LogUtils.d("启动了Ar 扫雷：$dWebView_host--$url")
+            createWorker(WorkerNative.valueOf("DenoRuntime"), url)
+            /*val loadUrl =
               "${App.appContext.dataDir}/system-app/$it/boot/bfs-service/index.mjs"
-            createWorker(WorkerNative.valueOf("DenoRuntime"), loadUrl)
+            createWorker(WorkerNative.valueOf("DenoRuntime"), loadUrl)*/
           }
         }
       }

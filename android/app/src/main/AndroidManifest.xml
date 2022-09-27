@@ -19,6 +19,7 @@
   <!-- 位置 -->
   <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
   <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+  <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
   <!-- 麦克风 -->
   <uses-permission android:name="android.permission.RECORD_AUDIO" />
   <!-- 传感器 -->

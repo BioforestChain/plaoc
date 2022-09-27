@@ -56,7 +56,7 @@ fun Gretting(name: String) {
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
-fun Home(onOpenDWebview: ((url: String) -> Unit)? = null) {
+fun Home(onOpenDWebview: ((appId:String, url: String) -> Unit)? = null) {
   var appInfoList: MutableList<AppInfo> = mutableStateListOf()
   LaunchedEffect(Unit) {
     if (PreferencesHelper.isFirstIn()) {

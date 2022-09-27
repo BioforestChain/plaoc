@@ -1,7 +1,6 @@
 package org.bfchain.libappmgr.ui.download
 
 import android.annotation.SuppressLint
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -26,7 +25,10 @@ import java.io.File
  */
 @SuppressLint("UnrememberedMutableState")
 @Composable
-fun DownloadAppInfoView(appInfo: AppInfo, onOpenApp: ((url: String) -> Unit)? = null) {
+fun DownloadAppInfoView(
+  appInfo: AppInfo,
+  onOpenApp: ((appId: String, url: String) -> Unit)? = null
+) {
   var coroutineScope = rememberCoroutineScope()
   var vmMain: MainViewModel = viewModel()
   var vmDown: DownLoadViewModel = viewModel()
@@ -74,7 +76,7 @@ fun DownloadAppInfoView(appInfo: AppInfo, onOpenApp: ((url: String) -> Unit)? = 
         // 1.打开应用
         var dappInfo = FilesUtil.getDAppInfo(appInfo)
         dappInfo?.let { dApp ->
-          onOpenApp?.let { onOpenApp(dApp.enter.main) } // 回调dweb请求的地址
+          onOpenApp?.let { onOpenApp(appInfo.bfsAppId, getDAppInfoUrl(appInfo)) } // 回调dweb请求的地址
           Toast.makeText(
             AppContextUtil.sInstance, "直接打开应用-->${dApp.enter.main}", Toast.LENGTH_SHORT
           ).show()
@@ -144,7 +146,10 @@ fun DownloadAppInfoView(appInfo: AppInfo, onOpenApp: ((url: String) -> Unit)? = 
  */
 @SuppressLint("UnrememberedMutableState")
 @Composable
-fun DownloadDialogView(appInfo: AppInfo, onOpenApp: ((url: String) -> Unit)? = null) {
+fun DownloadDialogView(
+  appInfo: AppInfo,
+  onOpenApp: ((appId: String, url: String) -> Unit)? = null
+) {
   var coroutineScope = rememberCoroutineScope()
   var vmMain: MainViewModel = viewModel()
   var vmDown: DownLoadViewModel = viewModel()
@@ -181,7 +186,7 @@ fun DownloadDialogView(appInfo: AppInfo, onOpenApp: ((url: String) -> Unit)? = n
         // 1.打开应用
         var dappInfo = FilesUtil.getDAppInfo(appInfo)
         dappInfo?.let { dApp ->
-          onOpenApp?.let { onOpenApp(dApp.enter.main) } // 回调dweb请求的地址
+          onOpenApp?.let { onOpenApp(appInfo.bfsAppId, getDAppInfoUrl(appInfo)) } // 回调dweb请求的地址
           Toast.makeText(
             AppContextUtil.sInstance, "直接打开应用-->${dApp.enter.main}", Toast.LENGTH_SHORT
           ).show()
@@ -207,7 +212,7 @@ fun DownloadDialogView(appInfo: AppInfo, onOpenApp: ((url: String) -> Unit)? = n
       Toast.makeText(
         AppContextUtil.sInstance, "直接打开应用-->${appInfo.name} url->$url", Toast.LENGTH_SHORT
       ).show()
-      onOpenApp?.let { onOpenApp(url) }
+      onOpenApp?.let { onOpenApp(appInfo.bfsAppId, getDAppInfoUrl(appInfo)) }
       appInfoMode.showBadge.value = false // 打开后，隐藏小红点
     } else if (appVersion != null && appVersion!!.files.isNotEmpty()) {
       // 调用下载操作
@@ -261,7 +266,8 @@ fun DownloadDialogView(appInfo: AppInfo, onOpenApp: ((url: String) -> Unit)? = n
 
 
 private fun getDAppInfoUrl(appInfo: AppInfo): String {
-  return FilesUtil.getDAppInfo(appInfo)?.let { it.enter.main } ?: ""
+  // return FilesUtil.getDAppInfo(appInfo)?.let { it.enter.main } ?: ""
+  return FilesUtil.getAppDenoUrl(appInfo)
 }
 
 private fun hasNewVersion(cur: String, net: String): Boolean {
