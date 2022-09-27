@@ -1,10 +1,16 @@
 const metaData = {
   manifest: {
+  version: "1.0.0",
+    name: "ar扫码",
+    icon: "file:///sys/mzt.png",
+    engines: {
+      dwebview: "~1.0.0"
+    },
+    maxAge:3,
     origin: "bfchain",
     author: ["waterbang,water_bang@163.com"],
     description: "Awasome DWeb",
     keywords: ["demo"],
-    dwebId: "bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj",
     privateKey: "bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj",
     enters: ["index.html"]
   },

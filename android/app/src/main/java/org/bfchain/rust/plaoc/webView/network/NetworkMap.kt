@@ -150,7 +150,7 @@ fun viewGateWay(
   request: WebResourceRequest
 ): WebResourceResponse {
   val url = request.url.toString().lowercase(Locale.ROOT)
-  Log.i(TAG, " viewGateWay: $url")
+  Log.i(TAG, " viewGateWay: $url,contains: ${front_to_rear_map.contains(url)}")
   if (front_to_rear_map.contains(url)) {
     val trueUrl = front_to_rear_map[url]
     Log.i(TAG, " viewGateWay: $trueUrl")
@@ -176,18 +176,20 @@ fun viewGateWay(
   )
 }
 
+/** 初始化app数据*/
 fun initMetaData(metaData: String) {
   mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
   val metaJson = mapper.readValue(metaData, UserMetaData::class.java)
-  // 设置域名,转换为小写
-  dWebView_host = metaJson.manifest.dwebId.lowercase(Locale.ROOT)
+  if (dWebView_host == "") return
   // 设置路由
   for (importMap in metaJson.dwebview.importmap) {
     front_to_rear_map[resolveUrl(importMap.url)] = importMap.response
   }
   // 默认入口全部加上加载路径，用户不用配置
   for (entry in metaJson.manifest.enters) {
-    front_to_rear_map[resolveUrl(entry)] = "${shakeUrl(entry)}"
+    val main = shakeUrl(entry)
+    Log.d(TAG, "initMetaData:entry=> ${resolveUrl(entry)} ,main=> $main")
+    front_to_rear_map[resolveUrl(entry)] = main
   }
   // 设置白名单
   for (whitelist in metaJson.whitelist) {
@@ -251,7 +253,7 @@ fun hexStrToByteArray(str: String): ByteArray {
 
 data class UserMetaData(
   val baseUrl: String = "",
-  val manifest: Manifest = Manifest("", arrayOf("xx"), "", arrayOf(""), "", "", arrayOf("")),
+  val manifest: Manifest = Manifest("", arrayOf("xx"), "", arrayOf(""), "", arrayOf("")),
   val dwebview: ImportMap = ImportMap(arrayOf(DwebViewMap("", ""))),
   val whitelist: Array<String> = arrayOf("http://localhost")
 )
@@ -266,7 +268,7 @@ data class Manifest(
 // 应用搜索的关键字
   val keywords: Array<String> = arrayOf("new test", "App"),
 // 应用ID，参考共识标准
-  val dwebId: String = "",
+//  val dwebId: String = "",
 // 私钥文件，用于最终的应用签名
   val privateKey: String = "",
 // 应用入口，可以配置多个，其中index为缺省名称。

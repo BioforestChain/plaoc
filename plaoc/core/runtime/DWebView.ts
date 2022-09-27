@@ -8,11 +8,9 @@ export class DWebView {
   private pool: string[] = [];
   /**反压高水位，暴露给开发者控制 */
   hightWaterMark = 10;
-  url!: string;
   entrys: string[];
   constructor(metaData: MetaData) {
     this.entrys = metaData.manifest.enters;
-    this.url = `https://${metaData.manifest.dwebId}.dweb`;
     this.initAppMetaData(metaData);
     deno.createHeader();
     this.waterOverflow();
@@ -77,7 +75,7 @@ export class DWebView {
     if (this.entrys.toString().match(RegExp(`${entry}`))) {
       deno.callFunction(
         callDeno.openDWebView,
-        `"${new URL(entry, this.url).href}"`
+        `"${entry}"`
       );
       return
     }

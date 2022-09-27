@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.work.*
+import java.util.concurrent.TimeUnit
 
 private const val TAG = "DENO_WORKER"
 
@@ -20,19 +21,21 @@ class DenoWorker(appContext: Context, workerParams: WorkerParameters) :
           it(data)
         }
       }
-      // 移除任务，防止重启
-      WorkManager.getInstance(App.appContext.applicationContext).cancelAllWorkByTag(funName)
-      return Result.success()
     }
-    // 启动不成功就不移除了
-    return Result.retry()
+    return Result.success()
   }
 
 }
 
 /** 创建后台线程worker，来运行Service*/
 fun createWorker(funName: WorkerNative, data: String = "") {
+//  if(WorkManager.getInstance(App.appContext.applicationContext).getWorkInfoById())
   val fnName = funName.toString()
+
+//  WorkManager.getInstance(App.appContext.applicationContext).enqueueUniquePeriodicWork(
+//    fnName,
+//    ExistingPeriodicWorkPolicy.KEEP, request
+//  )
   // 创建worker
   val denoWorkRequest: WorkRequest =
     OneTimeWorkRequestBuilder<DenoWorker>()
@@ -47,8 +50,7 @@ fun createWorker(funName: WorkerNative, data: String = "") {
       .build()
 
   // 推入处理队列
-    WorkManager
-      .getInstance(App.appContext.applicationContext)
-      .enqueue(denoWorkRequest)
-
+  WorkManager
+    .getInstance(App.appContext.applicationContext)
+    .enqueue(denoWorkRequest)
 }

@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.os.IBinder
 import android.os.UserHandle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.Toast
@@ -18,6 +19,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.ui.Modifier
+import androidx.work.WorkManager
 import com.google.mlkit.vision.barcode.Barcode
 import com.king.app.dialog.AppDialog
 import com.king.app.dialog.AppDialogConfig
@@ -34,6 +36,7 @@ import org.bfchain.libappmgr.ui.main.MainActivity
 import org.bfchain.rust.plaoc.ui.theme.RustApplicationTheme
 import org.bfchain.rust.plaoc.webView.network.dWebView_host
 import org.bfchain.rust.plaoc.webView.network.initMetaData
+import org.bfchain.rust.plaoc.webView.network.shakeUrl
 import org.bfchain.rust.plaoc.webView.openDWebWindow
 import org.bfchain.rust.plaoc.webView.sendToJavaScript
 import java.net.URL
@@ -53,7 +56,9 @@ class MainActivity : AppCompatActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    //setContentView(R.layout.activity_main)
+    // 移除任务，防止重启
+    WorkManager.getInstance(this).cancelAllWorkByTag("DenoRuntime")
+//    Log.i("xx","workManager=> ${}")
     this.initSystemFn()
     setContent {
       RustApplicationTheme {
@@ -63,9 +68,10 @@ class MainActivity : AppCompatActivity() {
               .background(MaterialTheme.colors.primary)
         ) {
           Home() {
-            LogUtils.d("启动了Ar 扫雷")
+            dWebView_host = it
+            LogUtils.d("启动了Ar 扫雷：$dWebView_host")
             val loadUrl =
-              "${App.appContext.dataDir}/system-app/$it/sys/test-vue3/bfs-service/index.mjs"
+              "${App.appContext.dataDir}/system-app/$it/boot/bfs-service/index.mjs"
             createWorker(WorkerNative.valueOf("DenoRuntime"), loadUrl)
           }
         }
@@ -215,10 +221,13 @@ class MainActivity : AppCompatActivity() {
     )
   }
 
-  private fun openDWebViewActivity(url: String) {
+  private fun openDWebViewActivity(path: String) {
     // 存储一下host，用来判断是远程的还是本地的
-    val host = URL(url).host
-    LogUtils.d("启动了DWebView:$url，host为： $host")
+    if (dWebView_host == "") {
+      return
+    }
+    val url = "https://$dWebView_host.dweb${shakeUrl(path)}"
+    LogUtils.d("启动了DWebView:$path")
     openDWebWindow(
       activity = getContext(),
       url = url
@@ -228,10 +237,10 @@ class MainActivity : AppCompatActivity() {
   fun onClick(v: View) {
     when (v.id) {
       R.id.imageButton1 -> {
-        LogUtils.d("启动了Ar 扫雷")
-        val loadUrl =
-          "${App.appContext.dataDir}/system-app/bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj/bfs-service/index.mjs"
-        createWorker(WorkerNative.valueOf("DenoRuntime"), loadUrl)
+//        LogUtils.d("启动了Ar 扫雷")
+//        val loadUrl =
+//          "${App.appContext.dataDir}/system-app/bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj/bfs-service/index.mjs"
+//        createWorker(WorkerNative.valueOf("DenoRuntime"), loadUrl)
       }
       R.id.imageButton2 -> {
         LogUtils.d("启动了DWebView")

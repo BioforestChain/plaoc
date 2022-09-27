@@ -1,5 +1,5 @@
 import { MetaData } from "@bfsx/metadata";
-import { metaData } from "./BFS-Metadata";
+import { metaData } from "./bfsa-metadata";
 
 import { DWebView } from "@bfsx/core";
 
