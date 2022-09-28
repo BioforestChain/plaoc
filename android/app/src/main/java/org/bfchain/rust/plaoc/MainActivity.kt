@@ -60,9 +60,6 @@ class MainActivity : AppCompatActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    // 移除任务，防止重启
-    WorkManager.getInstance(App.appContext).cancelAllWorkByTag("DenoRuntime")
-    // Log.i("xx","workManager=> ${}")
     this.initSystemFn()
     setContent {
       RustApplicationTheme {
@@ -75,9 +72,6 @@ class MainActivity : AppCompatActivity() {
             dWebView_host = appId
             LogUtils.d("启动了Ar 扫雷：$dWebView_host--$url")
             createWorker(WorkerNative.valueOf("DenoRuntime"), url)
-            /*val loadUrl =
-              "${App.appContext.dataDir}/system-app/$it/boot/bfs-service/index.mjs"
-            createWorker(WorkerNative.valueOf("DenoRuntime"), loadUrl)*/
           }
         }
       }
@@ -95,7 +89,6 @@ class MainActivity : AppCompatActivity() {
       initMetaData(it)
     }
     callable_map[ExportNative.DenoRuntime] = {
-      Log.i(TAG, "哈哈哈哈哈哈哈哈哈哈哈哈")
       denoService.denoRuntime(it)
     }
     callable_map[ExportNative.EvalJsRuntime] =
