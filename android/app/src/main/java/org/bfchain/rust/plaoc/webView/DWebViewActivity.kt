@@ -44,12 +44,6 @@ var dWebView: AdAndroidWebView? = null
 
 class DWebViewActivity : AppCompatActivity() {
 
-  override fun onDestroy() {
-    super.onDestroy()
-    // 移除任务，防止重启
-//    WorkManager.getInstance(App.appContext).cancelAllWorkByTag("DenoRuntime")
-  }
-
     override fun onBackPressed() {
         Log.i(TAG, "parentActivityIntent:${this.parentActivityIntent}")
 

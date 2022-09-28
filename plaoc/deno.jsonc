@@ -1,0 +1,31 @@
+{
+  "tasks": {
+    "build": "deno run -A ./scripts/build_npm.ts",
+    "pub": "deno run -A ./scripts/pub_npm.ts"
+  },
+  "compilerOptions": {
+    "allowJs": false,
+    "lib": [
+      "deno.window"
+    ],
+    "strict": true,
+    "strictNullChecks": true
+  },
+  "lint": {
+    "rules": {
+      "exclude": [
+        "no-namespace"
+      ]
+    }
+  },
+  "fmt": {
+    "options": {
+      "useTabs": false,
+      "lineWidth": 120,
+      "indentWidth": 2,
+      "singleQuote": false,
+      "proseWrap": "preserve"
+    }
+  },
+  "importMap": "./import_map_android.json"
+}

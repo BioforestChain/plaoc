@@ -6,7 +6,7 @@ dirctory=("core" "plugin" "metadata" "typings" "vfs")
 
 for dir in ${dirctory[@]}
 do
-    cd $dir && pwd && npm link && cd ..
+    cd ./packages/$dir && pwd && npm link && cd ../../
 done
 
 
