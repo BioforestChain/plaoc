@@ -2,11 +2,11 @@
 
 # 快速npm link 方便测试
 
-dirctory=("core" "plugin" "metadata" "typings" "vfs")
+dirctory=("core" "plugin-android" "metadata" "typings" "vfs")
 
 for dir in ${dirctory[@]}
 do
-    cd ./packages/$dir && pwd && npm link && cd ../../
+    cd ./.npm/$dir/ && pwd && npm link && cd ../../
 done
 
 
