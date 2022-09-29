@@ -1,0 +1,9 @@
+{
+  "imports": {
+    "@bfsx/typings": "../../plaoc/packages/typings/index.ts",
+    "@bfsx/core": "../../plaoc/packages/core/index.ts",
+    "@bfsx/metadata": "../../plaoc/packages/metadata/index.ts",
+    "@bfsx/plugin": "../../plaoc/packages/plugin/index.ts",
+    "@bfsx/vfs": "../../plaoc/packages/vfs/index.ts"
+  }
+}

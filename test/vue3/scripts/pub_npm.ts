@@ -45,6 +45,5 @@ export const doPubFromJson = async (
 };
 
 if (import.meta.main) {
-  // deno-lint-ignore no-explicit-any
-  await doPubFromJson((import.meta as any).resolve("./npm.json"));
+  await doPubFromJson(import.meta.resolve("./npm.json"));
 }

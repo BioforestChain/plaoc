@@ -6,7 +6,7 @@ import android.content.pm.PackageManager
 import com.google.gson.Gson
 import org.bfchain.rust.plaoc.App
 
-data class App(
+data class AppData(
   var versionCode: Int = 0,
   var versionName: String = "",
   var packageName: String = "",
@@ -17,9 +17,10 @@ class AppInfo() {
   private val NOT_FOUND_VAL = "unknown"
 
   fun getAppInfo(): String {
-    var app = App(versionCode, versionName, packageName, appName)
-    return Gson().toJson(app)
+    return Gson().toJson(appData)
   }
+
+  val appData: AppData get() = AppData(versionCode, versionName, packageName, appName)
 
   val versionName: String
     get() {

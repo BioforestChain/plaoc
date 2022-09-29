@@ -24,5 +24,5 @@
       "proseWrap": "preserve"
     }
   },
-  "importMap": "./import_map_android.json"
+  "importMap": "./import_map.json"
 }
