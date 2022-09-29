@@ -3,6 +3,7 @@ package org.bfchain.rust.plaoc
 
 import android.Manifest
 import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.IBinder
@@ -44,6 +45,8 @@ import java.net.URL
 
 
 val callable_map = mutableMapOf<ExportNative, (data: String) -> Unit>()
+val denoService = DenoService()
+private const val TAG = "MainActivity"
 
 class MainActivity : AppCompatActivity() {
   var isQRCode = false //是否是识别二维码
@@ -57,9 +60,6 @@ class MainActivity : AppCompatActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    // 移除任务，防止重启
-    WorkManager.getInstance(this).cancelAllWorkByTag("DenoRuntime")
-//    Log.i("xx","workManager=> ${}")
     this.initSystemFn()
     setContent {
       RustApplicationTheme {
@@ -72,9 +72,6 @@ class MainActivity : AppCompatActivity() {
             dWebView_host = appId
             LogUtils.d("启动了Ar 扫雷：$dWebView_host--$url")
             createWorker(WorkerNative.valueOf("DenoRuntime"), url)
-            /*val loadUrl =
-              "${App.appContext.dataDir}/system-app/$it/boot/bfs-service/index.mjs"
-            createWorker(WorkerNative.valueOf("DenoRuntime"), loadUrl)*/
           }
         }
       }
@@ -92,7 +89,7 @@ class MainActivity : AppCompatActivity() {
       initMetaData(it)
     }
     callable_map[ExportNative.DenoRuntime] = {
-      DenoService().denoRuntime(it)
+      denoService.denoRuntime(it)
     }
     callable_map[ExportNative.EvalJsRuntime] =
       { sendToJavaScript(it) }
@@ -235,37 +232,4 @@ class MainActivity : AppCompatActivity() {
       url = url
     )
   }
-
-  fun onClick(v: View) {
-    when (v.id) {
-      R.id.imageButton1 -> {
-//        LogUtils.d("启动了Ar 扫雷")
-//        val loadUrl =
-//          "${App.appContext.dataDir}/system-app/bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj/bfs-service/index.mjs"
-//        createWorker(WorkerNative.valueOf("DenoRuntime"), loadUrl)
-      }
-      R.id.imageButton2 -> {
-        LogUtils.d("启动了DWebView")
-        openDWebWindow(
-          activity = getContext(),
-          url = "https://bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj.dweb/index.html"
-        )
-      }
-      R.id.imageButton3 -> {
-        LogUtils.d("启动了DWebView")
-        openDWebWindow(
-          activity = getContext(),
-          url = "https://bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj.dweb/index.html"
-        )
-      }
-      R.id.imageButton4 -> {
-        LogUtils.d("启动了DWebView")
-        openDWebWindow(
-          activity = getContext(),
-          url = "https://bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj.dweb/index.html"
-        )
-      }
-    }
-  }
-
 }

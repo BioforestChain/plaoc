@@ -24,10 +24,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
+import androidx.work.WorkManager
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
 import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import com.king.mlkit.vision.camera.util.LogUtils
+import org.bfchain.rust.plaoc.App
 import org.bfchain.rust.plaoc.ui.theme.RustApplicationTheme
 import org.bfchain.rust.plaoc.webView.urlscheme.CustomUrlScheme
 import org.bfchain.rust.plaoc.webView.urlscheme.requestHandlerFromAssets
