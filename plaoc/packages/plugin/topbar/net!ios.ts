@@ -1,21 +1,21 @@
 import { Color } from "../types/colorType.ts";
 import { TopBar } from "./bfcsTopBarType.ts";
 import { NativeUI } from "../common/nativeHandle.ts";
-import { netCallNative } from "@bfsx/gateway";
+import { netCallNativeUi } from "@bfsx/gateway";
 import { getColorHex, hexToIntColor } from "../util/index.ts";
 
 export class TopBarFFI implements TopBar.ITopBarFFI {
   async topBarNavigationBack(): Promise<boolean> {
-    return await netCallNative(NativeUI.TopBarNavigationBack);
+    return await netCallNativeUi(NativeUI.TopBarNavigationBack);
   }
 
   async getTopBarEnabled(): Promise<boolean> {
-    const isEnabled = await netCallNative(NativeUI.GetTopBarEnabled);
+    const isEnabled = await netCallNativeUi(NativeUI.GetTopBarEnabled);
     return Boolean(isEnabled);
   }
 
   async setTopBarEnabled(isEnabled: boolean): Promise<void> {
-    await netCallNative(NativeUI.SetTopBarEnabled, isEnabled);
+    await netCallNativeUi(NativeUI.SetTopBarEnabled, isEnabled);
     return;
   }
 
@@ -30,40 +30,40 @@ export class TopBarFFI implements TopBar.ITopBarFFI {
   }
 
   async getTopBarOverlay(): Promise<boolean> {
-    const isOverlay = await netCallNative(NativeUI.GetTopBarOverlay);
+    const isOverlay = await netCallNativeUi(NativeUI.GetTopBarOverlay);
 
     return Boolean(isOverlay);
   }
 
   async setTopBarOverlay(alpha: string): Promise<void> {
-    await netCallNative(NativeUI.SetTopBarOverlay, Number(alpha));
+    await netCallNativeUi(NativeUI.SetTopBarOverlay, Number(alpha));
 
     return;
   }
 
   async getTopBarTitle(): Promise<string> {
-    const title = await netCallNative(NativeUI.GetTopBarTitle);
+    const title = await netCallNativeUi(NativeUI.GetTopBarTitle);
     return title.toString();
   }
 
   async setTopBarTitle(title: string): Promise<void> {
-    await netCallNative(NativeUI.SetTopBarTitle, title);
+    await netCallNativeUi(NativeUI.SetTopBarTitle, title);
     return;
   }
 
   async hasTopBarTitle(): Promise<boolean> {
-    const has = await netCallNative(NativeUI.HasTopBarTitle);
+    const has = await netCallNativeUi(NativeUI.HasTopBarTitle);
     return Boolean(has);
   }
 
   async getTopBarHeight(): Promise<number> {
-    const height = await netCallNative(NativeUI.GetTopBarHeight);
+    const height = await netCallNativeUi(NativeUI.GetTopBarHeight);
 
     return Number(height);
   }
 
   async getTopBarActions(): Promise<TopBar.TopBarItem[]> {
-    const actionList = (await netCallNative(
+    const actionList = (await netCallNativeUi(
       NativeUI.GetTopBarActions,
     )) as string;
 
@@ -71,12 +71,12 @@ export class TopBarFFI implements TopBar.ITopBarFFI {
   }
 
   async setTopBarActions(actionList: TopBar.TopBarItem[]): Promise<void> {
-    await netCallNative(NativeUI.SetTopBarActions, actionList);
+    await netCallNativeUi(NativeUI.SetTopBarActions, actionList);
     return;
   }
 
   async getTopBarBackgroundColor(): Promise<Color.RGBAHex> {
-    const stringColor = (await netCallNative(
+    const stringColor = (await netCallNativeUi(
       NativeUI.GetTopBarBackgroundColor,
     )) as string;
     const colorHex = getColorHex(parseFloat(stringColor));
@@ -86,13 +86,13 @@ export class TopBarFFI implements TopBar.ITopBarFFI {
 
   async setTopBarBackgroundColor(color: Color.RGBAHex): Promise<void> {
     const colorHex = hexToIntColor(color);
-    await netCallNative(NativeUI.SetTopBarBackgroundColor, colorHex);
+    await netCallNativeUi(NativeUI.SetTopBarBackgroundColor, colorHex);
 
     return;
   }
 
   async getTopBarForegroundColor(): Promise<Color.RGBAHex> {
-    const stringColor = (await netCallNative(
+    const stringColor = (await netCallNativeUi(
       NativeUI.GetTopBarForegroundColor,
     )) as string;
     const colorHex = getColorHex(parseFloat(stringColor));
@@ -102,7 +102,7 @@ export class TopBarFFI implements TopBar.ITopBarFFI {
 
   async setTopBarForegroundColor(color: Color.RGBAHex): Promise<void> {
     const colorHex = hexToIntColor(color);
-    await netCallNative(NativeUI.SetTopBarForegroundColor, colorHex);
+    await netCallNativeUi(NativeUI.SetTopBarForegroundColor, colorHex);
 
     return;
   }

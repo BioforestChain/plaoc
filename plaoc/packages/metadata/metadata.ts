@@ -23,6 +23,10 @@ export class Manifest implements IManifest {
   keywords!: string[];
   privateKey!: string;
   homepage!: string;
+  // 应用最大缓存时间
+  maxAge!: number;
+  // 后端入口地址，开发者不用管，打包的时候会打包写到bfsa-metadata.json
+  bfsaEntry?: string;
   enters!: string[];
   //本次发布的信息，一般存放更新信息
   releaseNotes!: string;

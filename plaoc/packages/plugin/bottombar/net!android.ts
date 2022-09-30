@@ -1,35 +1,35 @@
 import { NativeUI } from "../common/nativeHandle.ts";
-import { netCallNative } from "@bfsx/gateway";
+import { netCallNativeUi } from "@bfsx/gateway";
 import { Color } from "../types/colorType.ts";
 import { convertToRGBAHex, getColorHex, getColorInt } from "../util/index.ts";
 import { BottomBar } from "./bfcsBottomBarType.ts";
 export class BottomBarFFI implements BottomBar.IBottomBarFFI {
   async getHidden(): Promise<boolean> {
-    return await netCallNative(NativeUI.GetBottomBarEnabled);
+    return await netCallNativeUi(NativeUI.GetBottomBarEnabled);
   }
 
   async setHidden(isEnabled = true): Promise<void> {
-    return await netCallNative(NativeUI.SetBottomBarEnabled, isEnabled);
+    return await netCallNativeUi(NativeUI.SetBottomBarEnabled, isEnabled);
   }
 
   async getOverlay(): Promise<number> {
-    return await netCallNative(NativeUI.GetBottomBarOverlay);
+    return await netCallNativeUi(NativeUI.GetBottomBarOverlay);
   }
 
   async setOverlay(alpha: string): Promise<number> {
-    return await netCallNative(NativeUI.SetBottomBarOverlay, alpha);
+    return await netCallNativeUi(NativeUI.SetBottomBarOverlay, alpha);
   }
 
   async getHeight(): Promise<number> {
-    return await netCallNative(NativeUI.GetBottomBarHeight);
+    return await netCallNativeUi(NativeUI.GetBottomBarHeight);
   }
 
   async setHeight(height: number): Promise<void> {
-    return await netCallNative(NativeUI.SetBottomBarHeight, height);
+    return await netCallNativeUi(NativeUI.SetBottomBarHeight, height);
   }
 
   async getBackgroundColor(): Promise<Color.RGBAHex> {
-    const color = await netCallNative(NativeUI.GetBottomBarBackgroundColor);
+    const color = await netCallNativeUi(NativeUI.GetBottomBarBackgroundColor);
     const colorHex = getColorHex(color);
     return colorHex;
   }
@@ -39,11 +39,11 @@ export class BottomBarFFI implements BottomBar.IBottomBarFFI {
       color.slice(0, -2) as Color.RGBHex,
       color.slice(-2) as Color.AlphaValueHex,
     );
-    return await netCallNative(NativeUI.SetBottomBarBackgroundColor, colorHex);
+    return await netCallNativeUi(NativeUI.SetBottomBarBackgroundColor, colorHex);
   }
 
   async getForegroundColor(): Promise<Color.RGBAHex> {
-    const color = await netCallNative(NativeUI.GetBottomBarForegroundColor);
+    const color = await netCallNativeUi(NativeUI.GetBottomBarForegroundColor);
     const colorHex = getColorHex(color);
     return colorHex;
   }
@@ -53,12 +53,12 @@ export class BottomBarFFI implements BottomBar.IBottomBarFFI {
       color.slice(0, -2) as Color.RGBHex,
       color.slice(-2) as Color.AlphaValueHex,
     );
-    return await netCallNative(NativeUI.SetBottomBarForegroundColor, colorHex);
+    return await netCallNativeUi(NativeUI.SetBottomBarForegroundColor, colorHex);
   }
 
   async getActions(): Promise<BottomBar.BottomBarItem[]> {
     const actionList = JSON.parse(
-      await netCallNative(NativeUI.GetBottomBarActions),
+      await netCallNativeUi(NativeUI.GetBottomBarActions),
     );
     const _actionList: BottomBar.BottomBarItem[] = [];
 
@@ -106,6 +106,6 @@ export class BottomBarFFI implements BottomBar.IBottomBarFFI {
       _actionList.push(item);
     }
 
-    return await netCallNative(NativeUI.SetBottomBarActions, _actionList);
+    return await netCallNativeUi(NativeUI.SetBottomBarActions, _actionList);
   }
 }
