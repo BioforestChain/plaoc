@@ -1,66 +1,66 @@
 [
   {
     "buildFromRootDir": "./packages/core",
-    "mainExports": "core",
-    "buildToRootDir": "./.npm/core",
+    "mainExports": ".",
+    "buildToRootDir": "./build/core",
     "importMap": "./import_map.json",
     "name": "@bfsx/core",
-    "version": "0.0.1",
+    "version": "0.0.3",
     "lib": [
       "es2020"
     ]
   },
   {
     "buildFromRootDir": "./packages/metadata",
-    "mainExports": "metadata",
-    "buildToRootDir": "./.npm/metadata",
+    "mainExports": ".",
+    "buildToRootDir": "./build/metadata",
     "importMap": "./import_map.json",
     "name": "@bfsx/metadata",
-    "version": "0.0.1",
+    "version": "0.0.3",
     "lib": [
       "es2020"
     ]
   },
   {
     "buildFromRootDir": "./packages/typings",
-    "mainExports": "typings",
-    "buildToRootDir": "./.npm/typings",
+    "mainExports": ".",
+    "buildToRootDir": "./build/typings",
     "importMap": "./import_map.json",
     "name": "@bfsx/typings",
-    "version": "0.0.1",
+    "version": "0.0.3",
     "lib": [
       "es2020"
     ]
   },
   {
     "buildFromRootDir": "./packages/vfs",
-    "mainExports": "vfs",
-    "buildToRootDir": "./.npm/vfs",
+    "mainExports": ".",
+    "buildToRootDir": "./build/vfs",
     "importMap": "./import_map.json",
     "name": "@bfsx/vfs",
-    "version": "0.0.1",
+    "version": "0.0.3",
     "lib": [
       "es2020"
     ]
   },
   {
     "buildFromRootDir": "./packages/gateway",
-    "mainExports": "gateway",
-    "buildToRootDir": "./.npm/gateway",
+    "mainExports": ".",
+    "buildToRootDir": "./build/gateway",
     "importMap": "./import_map.json",
     "name": "@bfsx/gateway",
-    "version": "0.0.1",
+    "version": "0.0.3",
     "lib": [
       "es2020"
     ]
   },
   {
     "buildFromRootDir": "./packages/plugin",
-    "mainExports": "plugin",
-    "buildToRootDir": "./.npm/plugin-android",
+    "mainExports": ".",
+    "buildToRootDir": "./build/plugin",
     "importMap": "./import_map_android.json",
     "name": "@bfsx/plugin",
-    "version": "0.0.1",
+    "version": "0.0.3",
     "lib": [
       "es2020",
       "dom"

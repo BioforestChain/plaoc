@@ -20,6 +20,10 @@ export interface IManifest {
   author: string[];
   // 应用搜索的描述
   description: string;
+  // 应用最大缓存时间
+  maxAge: number;
+  // 后端入口地址，开发者不用管，打包的时候会打包写到bfsa-metadata.json
+  bfsaEntry?: string;
   // 应用搜索的关键字
   keywords: string[];
   // 应用介绍主页

@@ -1,0 +1,13 @@
+[
+  {
+    "buildFromRootDir": "./",
+    "mainExports": "bfsa-service",
+    "buildToRootDir": "./dist",
+    "importMap": "./import_map.json",
+    "name": "@bfsx/bfsa-service",
+    "version": "0.0.1",
+    "lib": [
+      "es2020"
+    ]
+  }
+]

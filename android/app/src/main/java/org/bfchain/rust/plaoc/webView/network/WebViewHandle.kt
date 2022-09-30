@@ -1,6 +1,5 @@
 package org.bfchain.rust.plaoc.webView.network
 
-import android.util.Log
 import org.bfchain.rust.plaoc.ExportNativeUi
 import org.bfchain.rust.plaoc.mapper
 import org.bfchain.rust.plaoc.webView.bottombar.BottomBarFFI

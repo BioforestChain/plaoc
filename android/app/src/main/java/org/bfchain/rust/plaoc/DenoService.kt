@@ -28,6 +28,8 @@ val rust_call_map = mutableMapOf<ExportNative, ByteArray>()
 // 存储版本号 <versionID,headerID>
 val version_head_map = mutableMapOf<ByteArray, ByteArray>()
 val mapper = ObjectMapper()
+// deno服务
+val denoService = DenoService()
 
 class DenoService : IntentService("DenoService") {
 

@@ -35,7 +35,6 @@ export const doBuid = async (config: {
     const getOrder = (ep: EntryPoint) => orderMap.get(ep.name) || 1;
     entryPoints.sort((a, b) => getOrder(b) - getOrder(a));
   }
-  // console.group("entryPoints ===========> ", JSON.stringify(entryPoints));
 
   await build({
     importMap: importMap,
@@ -54,7 +53,7 @@ export const doBuid = async (config: {
     compilerOptions: {
       target: "ES2020",
       importHelpers: true,
-      isolatedModules: false,
+      isolatedModules: true,
       experimentalDecorators: true,
       emitDecoratorMetadata: true,
       lib: lib as LibName[],
@@ -73,6 +72,8 @@ export const doBuid = async (config: {
       bugs: {
         url: "https://github.com/BioforestChain/plaoc/issues",
       },
+      devDependencies: {
+      }
     },
   });
 

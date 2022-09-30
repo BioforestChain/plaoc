@@ -30,7 +30,10 @@ import com.google.accompanist.navigation.material.ModalBottomSheetLayout
 import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import com.king.mlkit.vision.camera.util.LogUtils
 import org.bfchain.rust.plaoc.App
+import org.bfchain.rust.plaoc.MainActivity
 import org.bfchain.rust.plaoc.ui.theme.RustApplicationTheme
+import org.bfchain.rust.plaoc.webView.network.dWebView_host
+import org.bfchain.rust.plaoc.webView.network.shakeUrl
 import org.bfchain.rust.plaoc.webView.urlscheme.CustomUrlScheme
 import org.bfchain.rust.plaoc.webView.urlscheme.requestHandlerFromAssets
 import org.bfchain.rust.plaoc.webkit.AdAndroidWebView
@@ -124,8 +127,7 @@ private fun NavFun(activity: ComponentActivity) {
         }
     }
 }
-
-
+/** 打开DWebview*/
 fun openDWebWindow(activity: ComponentActivity, url: String) {
     var intent = Intent(activity.applicationContext, DWebViewActivity::class.java).also {
         it.data = Uri.parse("https://"+URLEncoder.encode(url, "UTF-8"))
@@ -134,6 +136,7 @@ fun openDWebWindow(activity: ComponentActivity, url: String) {
     activity.startActivity(intent)
 }
 
+/** 传递参数给前端*/
 fun sendToJavaScript(message: String) {
     Log.i("xxx", "sendToJavaScript->:$message")
     dWebView?.post(Runnable {

@@ -24,7 +24,7 @@ data class FileFilter(
 class FileSystem {
 
   private fun getRootPath(): String {
-    return "${App.appContext?.dataDir}/system-app/$dWebView_host/home"
+    return "${App.appContext.dataDir}/system-app/$dWebView_host/home"
   }
 
   private fun getFileByPath(path: String) : File {
@@ -33,7 +33,7 @@ class FileSystem {
 
   private fun checkFilter(filer: String?, file: File): Boolean {
     checkNotNull(filer)
-    var fileFilter = JsonUtil.fromJson(FileFilter::class.java, filer)
+    val fileFilter = JsonUtil.fromJson(FileFilter::class.java, filer)
     var rType = true
     fileFilter?.type?.let {
       rType = when (it) {
@@ -54,9 +54,9 @@ class FileSystem {
   }
 
   fun ls(path: String, filter: String? = null, recursive: Boolean = false): String {
-    var rootPath = getRootPath()
-    var file = File(rootPath + File.separator + path)
-    var fileList = arrayListOf<String>()
+    val rootPath = getRootPath()
+    val file = File(rootPath + File.separator + path)
+    val fileList = arrayListOf<String>()
     when (recursive) {
       true -> { // 遍历获取
         file.walk().iterator().forEach {
@@ -90,7 +90,7 @@ class FileSystem {
     append: Boolean = false,
     autoCreate: Boolean = true
   ): Boolean {
-    var file = getFileByPath(path)
+    val file = getFileByPath(path)
     if (!file.exists() && autoCreate) {
       file.parentFile.mkdirs()
     }
@@ -107,12 +107,12 @@ class FileSystem {
   }
 
   fun read(path: String): String {
-    var file = getFileByPath(path)
+    val file = getFileByPath(path)
     return file.bufferedReader().use { it.readText() }
   }
 
   fun rm(path:String, deepDelete: Boolean = true): Boolean {
-    var file = getFileByPath(path)
+    val file = getFileByPath(path)
     when (deepDelete) {
       true -> file.deleteRecursively()
       false -> file.delete()
