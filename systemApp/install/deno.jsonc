@@ -1,6 +1,6 @@
 {
   "tasks": {
-    "build": "deno run --unstable -A ./#bfsp.ts"
+    "build": "deno run --unstable -A ./npm.ts"
   },
   "compilerOptions": {
     "allowJs": false,

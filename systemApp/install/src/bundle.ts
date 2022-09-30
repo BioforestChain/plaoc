@@ -1,14 +1,15 @@
 import * as fs from "node_fs";
 import * as process from "node_process";
+import { pathToFileURL } from "node_url";
 import { Files, LinkMetadata, MetaData } from "@bfsx/metadata";
-import { path } from "path";
+import { path, slash } from "path";
 import { checksumFile } from "crypto";
-import { compress } from "compress";
+import * as compress from "std_tar";
 
 import "@bfsx/typings";
 
 const { existsSync } = fs;
-const { mkdir, writeFile, copyFile, readdir, stat } = fs.promises;
+const { mkdir, writeFile, copyFile, readdir, stat, rm } = fs.promises;
 
 const bfsAppId = "AK12LK23";
 
@@ -32,11 +33,21 @@ export async function bundle(options: {
 
   // 将后端项目移动到boot目录
   const bootPath = path.join(destPath, "boot");
-  await copyDir(backPath, bootPath);
-  const metadata = await getBfsaMetaDataJson(bootPath);
+  // copy时没有带上目录，因此加上项目目录
+  const backname = path.basename(backPath);
+  await copyDir(backPath, path.join(bootPath, backname));
+  const metadata = await getBfsaMetaDataJson(bootPath, backPath);
   await writeConfigJson(bootPath, bfsAppId, metadata);
 
-  compress(destPath, "./");
+  // compress(destPath, path.join(process.cwd(), `./${bfsAppId}.bfsa`));
+  // compressing.tar.compressDir(
+  //   destPath,
+  //   path.join(process.cwd(), `./${bfsAppId}.bfsa`)
+  // );
+  const tar = new compress.Tar();
+  tar.append(`./${bfsAppId}.bfsa`, {
+    filePath: destPath,
+  });
 }
 
 /**
@@ -51,6 +62,11 @@ async function createBfsaDir(bfsAppId: string): Promise<string> {
 
   try {
     const destPath = path.join(root, bfsAppId);
+
+    if (existsSync(destPath)) {
+      await rm(destPath, { recursive: true });
+    }
+
     // 创建bfsAppId目录
     await mkdir(destPath, { recursive: true });
     await mkdir(path.join(destPath, "boot"));
@@ -82,7 +98,10 @@ async function copyDir(src: string, dest: string) {
     const destPath = path.join(dest, entry.name!);
 
     if (entry.isDirectory()) {
-      await copyDir(srcPath, destPath);
+      // 排除node_modules
+      if (entry.name !== "node_modules") {
+        await copyDir(srcPath, destPath);
+      }
     } else {
       await copyFile(srcPath, destPath);
     }
@@ -109,16 +128,58 @@ async function writeServiceWorkder(destPath: string): Promise<boolean> {
  * @param bootPath boot目录
  * @returns
  */
-async function getBfsaMetaDataJson(bootPath: string): Promise<MetaData> {
-  const bfsaMetaDataFile = await searchFile(bootPath, /bfs-metadata.m?js/);
+async function getBfsaMetaDataJson(
+  bootPath: string,
+  backPath: string
+): Promise<MetaData> {
+  const packageJsonPath = await searchFile(bootPath, /package.json/);
+  const bfsaMetaDataFile = await searchFile(backPath, /bfsa-metadata\.m?js/);
 
   if (!bfsaMetaDataFile) {
     throw new Error("未找到bfsa-metadata配置文件");
   }
 
-  const metadata = await import(bfsaMetaDataFile);
+  const url = pathToFileURL(bfsaMetaDataFile);
+  const metadata = await import(url.href);
 
-  return metadata;
+  const jsonPath = pathToFileURL(packageJsonPath);
+  const jsonConfig = (await import(jsonPath.href, { assert: { type: "json" } }))
+    .default;
+  const backDir = path.dirname(packageJsonPath);
+  console.log(jsonConfig);
+  let bfsaEntry = "";
+
+  if (jsonConfig.main) {
+    bfsaEntry = path.relative(
+      path.resolve(bootPath, "../"),
+      path.resolve(backDir, jsonConfig.main)
+    );
+  } else if (jsonConfig.module) {
+    bfsaEntry = path.relative(
+      path.resolve(bootPath, "../"),
+      path.resolve(backDir, jsonConfig.module)
+    );
+  } else if (jsonConfig.exports?.["."]?.import) {
+    const entry =
+      typeof jsonConfig.exports["."].import === "string"
+        ? jsonConfig.exports["."].import
+        : jsonConfig.exports["."].import.default;
+    bfsaEntry = path.relative(
+      path.resolve(bootPath, "../"),
+      path.resolve(backDir, entry)
+    );
+  }
+
+  const _metadata: MetaData = {
+    manifest: {
+      ...metadata.default.manifest,
+      bfsaEntry: bfsaEntry ? "./" + slash(bfsaEntry) : "",
+    },
+    dwebview: metadata.default.dwebview,
+    whitelist: metadata.default.whitelist,
+  };
+
+  return _metadata;
 }
 
 /**
@@ -129,13 +190,14 @@ async function getBfsaMetaDataJson(bootPath: string): Promise<MetaData> {
  */
 async function copyIcon(bootPath: string, iconName: string) {
   const reg = new RegExp(iconName);
+  console.log("iconName: " + iconName);
   const iconPath = await searchFile(path.resolve(bootPath, "../"), reg);
 
   if (!iconPath) {
     throw new Error("未找到应用icon");
   }
 
-  await copyFile(iconPath, bootPath);
+  await copyFile(iconPath, path.join(bootPath, iconName));
 
   return;
 }
@@ -183,13 +245,6 @@ async function writeConfigJson(
   return;
 }
 
-// function genBfsaMetaDataJson(
-//   bfsAppId: string,
-//   metadata: MetaData
-// ): Promise<string> {
-
-// }
-
 /**
  * 生成link.json
  * @param bfsAppId  应用id
@@ -233,22 +288,30 @@ function genLinkJson(
  * @param nameReg 搜索文件正则
  * @returns
  */
-async function searchFile(
-  src: string,
-  nameReg: RegExp
-): Promise<string | null> {
-  const entries = await readdir(src, { withFileTypes: true });
 
-  for (const entry of entries) {
-    const filePath = path.join(src, entry.name!);
-    if (nameReg.test(entry.name!) && entry.isFile()) {
-      return filePath;
-    } else if (entry.isDirectory()) {
-      await searchFile(filePath, nameReg);
+async function searchFile(src: string, nameReg: RegExp): Promise<string> {
+  let searchPath = "";
+  await loopSearchFile(src, nameReg);
+
+  async function loopSearchFile(src: string, nameReg: RegExp) {
+    if (!searchPath) {
+      const entries = await readdir(src, { withFileTypes: true });
+
+      for (const entry of entries) {
+        const filePath = path.join(src, entry.name!);
+        if (nameReg.test(entry.name!) && entry.isFile()) {
+          searchPath = filePath;
+          break;
+        } else if (entry.isDirectory()) {
+          await loopSearchFile(filePath, nameReg);
+        }
+      }
     }
+
+    return;
   }
 
-  return null;
+  return searchPath;
 }
 
 /**
@@ -263,10 +326,12 @@ async function fileListHash(
   bfsAppId: string,
   filesList: Files[]
 ): Promise<Files[]> {
+  console.log("dest: " + dest);
   const entries = await readdir(dest, { withFileTypes: true });
 
   for (const entry of entries) {
     const filePath = path.join(dest, entry.name!);
+    console.log("filePath: " + filePath);
 
     if (entry.isFile()) {
       const fileStat = await stat(filePath);
@@ -280,8 +345,8 @@ async function fileListHash(
       };
 
       filesList.push(file);
-    } else {
-      await fileListHash(dest, bfsAppId, filesList);
+    } else if (entry.isDirectory()) {
+      await fileListHash(filePath, bfsAppId, filesList);
     }
   }
 
