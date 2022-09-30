@@ -73,7 +73,12 @@ export const doBuid = async (config: {
         url: "https://github.com/BioforestChain/plaoc/issues",
       },
       devDependencies: {
-      }
+        "@bfsx/typings": "file:../../../../plaoc/build/typings",
+        "@bfsx/core": "file:../../../../plaoc/build/core",
+        "@bfsx/metadata": "file:../../../../plaoc/build/metadata",
+        "@bfsx/plugin": "file:../../../../plaoc/build/plugin",
+        "@bfsx/vfs": "file:../../../../plaoc/build/vfs",
+      },
     },
   });
 
