@@ -3,4 +3,4 @@
 /////////////////////////////
 
 export { MetaData, metaConfig } from "./metadata.ts";
-export { LinkMetadata } from "./link.ts";
+export { LinkMetadata, Files } from "./link.ts";

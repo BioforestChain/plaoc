@@ -1,7 +1,7 @@
 [
   {
     "buildFromRootDir": "./packages/core",
-    "mainExports": "core",
+    "mainExports": ".",
     "buildToRootDir": "./build/core",
     "importMap": "./import_map.json",
     "name": "@bfsx/core",
@@ -12,7 +12,7 @@
   },
   {
     "buildFromRootDir": "./packages/metadata",
-    "mainExports": "metadata",
+    "mainExports": ".",
     "buildToRootDir": "./build/metadata",
     "importMap": "./import_map.json",
     "name": "@bfsx/metadata",
@@ -23,7 +23,7 @@
   },
   {
     "buildFromRootDir": "./packages/typings",
-    "mainExports": "typings",
+    "mainExports": ".",
     "buildToRootDir": "./build/typings",
     "importMap": "./import_map.json",
     "name": "@bfsx/typings",
@@ -34,7 +34,7 @@
   },
   {
     "buildFromRootDir": "./packages/vfs",
-    "mainExports": "vfs",
+    "mainExports": ".",
     "buildToRootDir": "./build/vfs",
     "importMap": "./import_map.json",
     "name": "@bfsx/vfs",
@@ -45,7 +45,7 @@
   },
   {
     "buildFromRootDir": "./packages/gateway",
-    "mainExports": "gateway",
+    "mainExports": ".",
     "buildToRootDir": "./build/gateway",
     "importMap": "./import_map.json",
     "name": "@bfsx/gateway",
@@ -56,7 +56,7 @@
   },
   {
     "buildFromRootDir": "./packages/plugin",
-    "mainExports": "plugin",
+    "mainExports": ".",
     "buildToRootDir": "./build/plugin",
     "importMap": "./import_map_android.json",
     "name": "@bfsx/plugin",

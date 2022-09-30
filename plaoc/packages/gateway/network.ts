@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-explicit-any
 /// <reference lib="dom" />
 /**
  * 注册serverWorker方法
@@ -8,10 +9,10 @@ export function registerServerWorker() {
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("serverWorker.js", { scope: "/" }).then(
         () => {
-          console.log("Service Worker 注册成功");
+          console.log("Service Worker register success");
         },
       ).catch(() => {
-        console.log("Service Worker 注册失败");
+        console.log("Service Worker register error");
       });
     }
   });
@@ -22,7 +23,7 @@ export function registerServerWorker() {
  * @param url
  * @returns
  */
-export function netCallNative(
+export function netCallNativeUi(
   fun: string,
   data: TNative = "",
 ): Promise<any> {
@@ -32,6 +33,24 @@ export function netCallNative(
   const message = `{"function":"${fun}","data":${JSON.stringify(data)}}`;
   const buffer = new TextEncoder().encode(message);
   return getConnectChannel(`/setUi?data=${buffer}`);
+}
+
+
+/**
+ *  发送请求到netive设置ui
+ * @param url
+ * @returns
+ */
+export function netCallNativeVfs(
+  fun: string,
+  data: TNative = "",
+): Promise<string> {
+  if (data instanceof Object) {
+    data = JSON.stringify(data); // stringify 两次转义一下双引号
+  }
+  const message = `{"function":"${fun}","data":${JSON.stringify(data)}}`;
+  const buffer = new TextEncoder().encode(message);
+  return getConnectChannel(`/setVfs?data=${buffer}`);
 }
 
 // deno-lint-ignore ban-types

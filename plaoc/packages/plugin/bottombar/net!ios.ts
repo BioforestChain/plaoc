@@ -2,7 +2,7 @@ import { Color } from "../types/colorType.ts";
 import { convertToRGBAHex } from "../util/index.ts";
 import { BottomBar } from "./bfcsBottomBarType.ts";
 import { NativeUI } from "../common/nativeHandle.ts";
-import { netCallNative } from "@bfsx/gateway";
+import { netCallNativeUi } from "@bfsx/gateway";
 
 export class BottomBarFFI implements BottomBar.IBottomBarFFI {
   private _ffi = (window as any).webkit
@@ -45,7 +45,7 @@ export class BottomBarFFI implements BottomBar.IBottomBarFFI {
   }
 
   async setOverlay(alpha: string): Promise<number> {
-    return await netCallNative(NativeUI.SetBottomBarOverlay, alpha);
+    return await netCallNativeUi(NativeUI.SetBottomBarOverlay, alpha);
   }
 
   async getHeight(): Promise<number> {
