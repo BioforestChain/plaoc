@@ -10,8 +10,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Fill
@@ -50,6 +52,15 @@ fun MaskProgressMode.updateState(state: DownLoadState): MaskProgressMode {
   return this
 }
 
+private fun Modifier.maskView(): Modifier {
+  fillMaxSize()
+  padding(3.dp)
+  clip(RoundedCornerShape(12.dp))
+  background(Color.Black.copy(alpha = 0.6f))
+  padding(7.dp)
+  return this
+}
+
 /**
  * 模仿IOS的下载加载界面
  * 覆盖整个图标，中间显示一个圆环，然后根据下载进度显示白色扇形，直到填充完整
@@ -64,9 +75,7 @@ fun MaskProgressView(
   if (cpMode.show.value) {
     Box(
       modifier = Modifier
-        .fillMaxSize()
-        .background(Color.Black.copy(alpha = 0.6f))
-        .padding(10.dp)
+        .maskView()
         .clickable {
           Log.d("lin.huang", "MaskProgressView -> onClick")
           onClick?.let { onClick() }
@@ -122,12 +131,7 @@ fun MaskProgressView(
     }
 
     if (!isFinished) {
-      Box(
-        modifier = Modifier
-          .fillMaxSize()
-          .background(Color.Black.copy(alpha = 0.6f))
-          .padding(10.dp)
-      ) {
+      Box(modifier = Modifier.maskView()) {
 
         Canvas(modifier = Modifier.fillMaxSize()) {
           translate {

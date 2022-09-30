@@ -3,6 +3,7 @@ package org.bfchain.rust.plaoc
 import android.app.IntentService
 import android.app.Notification
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.res.AssetManager
 import android.os.Binder
 import android.os.Build
@@ -11,6 +12,7 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.bfchain.rust.plaoc.system.deeplink.DWebReceiver
 import java.nio.ByteBuffer
 
 private const val TAG = "DENO_SERVICE"
@@ -35,6 +37,22 @@ class DenoService : IntentService("DenoService") {
             System.loadLibrary("rust_lib")
         }
     }
+
+  /**
+   * 注册广播，用于接收广播信息
+   */
+  private var dWebReceiver = DWebReceiver()
+  override fun onCreate() {
+    super.onCreate()
+    var intentFilter = IntentFilter()
+    intentFilter.addAction(DWebReceiver.ACTION_OPEN_DWEB)
+    registerReceiver(dWebReceiver, intentFilter)
+  }
+
+  override fun onDestroy() {
+    super.onDestroy()
+    unregisterReceiver(dWebReceiver)
+  }
 
     interface IHandleCallback {
         fun handleCallback(bytes: ByteArray)
