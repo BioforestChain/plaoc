@@ -7,6 +7,9 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
+import org.bfchain.rust.plaoc.system.initSystemFn
+import org.bfchain.rust.plaoc.webView.network.initMetaData
+import org.bfchain.rust.plaoc.webView.sendToJavaScript
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -19,6 +22,7 @@ class App : Application() {
   override fun onCreate() {
     super.onCreate()
     appContext = this
+    // 启动deno runtime
     startDenoService()
   }
 
@@ -28,3 +32,4 @@ class App : Application() {
     startService(deno)
   }
 }
+

@@ -6,7 +6,7 @@ export function registerServerWorker() {
   addEventListener("load", () => {
     // 能力检测
     if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("serverWorker.mjs", { scope: "/" }).then(
+      navigator.serviceWorker.register("serverWorker.js", { scope: "/" }).then(
         () => {
           console.log("Service Worker 注册成功");
         },
@@ -34,6 +34,7 @@ export function netCallNative(
   return getConnectChannel(`/setUi?data=${buffer}`);
 }
 
+// deno-lint-ignore ban-types
 type TNative = boolean | object | string | number;
 
 /**

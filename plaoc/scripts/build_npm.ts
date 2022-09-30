@@ -41,7 +41,7 @@ export const doBuid = async (config: {
     importMap: importMap,
     entryPoints: entryPoints,
     outDir: buildToRootDir,
-    scriptModule: false,
+    scriptModule: "cjs",
     /**
      * @TODO should ignore errors:
      * 1. TS2691

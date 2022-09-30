@@ -1,10 +1,9 @@
 /////////////////////////////
-/// 这里是所有DwebView-js的网关 负责跟Deno-js通信。
+/// 这里是所有DwebView-js的网关 负责发送消息到移动端，调用系统API。
 /// 通信格式 :
-/// https://channelId.bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj.dweb/open
 /// https://channelId.bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj.dweb/poll
+/// https://channelId.bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj.dweb/setUi
 /////////////////////////////
 
-// import { createChannel } from "./channel";
-// export { createChannel };
-export {};
+export * from './network.ts';
+export * from "./serverWorker.ts"

@@ -1,4 +1,4 @@
-import { netCallNative } from "../common/network.ts";
+import { netCallNative } from "@bfsx/gateway";
 import { Keyboard } from "./bfcsKeyboardType.ts";
 import { NativeUI } from "../common/nativeHandle.ts";
 

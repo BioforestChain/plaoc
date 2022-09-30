@@ -1,11 +1,11 @@
-import { MetaData } from "@bfsx/metadata";
+import { metaConfig } from "@bfsx/metadata";
 // import "./node_modules/index.html";
 
-export const metaData: MetaData = {
+export default metaConfig({
   manifest: {
     version: "1.0.0",
     name: "ar扫码",
-    icon: "file:///sys/mzt.png",
+    icon: "mzt.png",
     engines: {
       dwebview: "~1.0.0"
     },
@@ -60,7 +60,7 @@ export const metaData: MetaData = {
       },
     ],
   },
-};
+})
 
 // // web
 // await fetch("./api/z.ts?a=1");

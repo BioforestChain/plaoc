@@ -3,6 +3,7 @@
   "bfsAppId": "bfs-app-tanyuanyu",
   "name": "ar扫码",
   "icon": "file:///sys/tanyuanyu.png",
+  "bfsaEntry":"./esm/test/vue3/bfsa-service/index.js",
   "engines": {
     "dwebview": "~1.0.0"
   },

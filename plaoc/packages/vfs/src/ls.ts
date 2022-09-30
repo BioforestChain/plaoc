@@ -7,7 +7,14 @@
 // });
 import { } from "@bfsx/core";
 import { IsOption } from "./lsType.ts";
+
+
+export function getRootPath() {
+  // return await 
+}
+
 export function ls(_path: string, _option: IsOption) {
+
 }
 
 // for await (const entry of fs.list("./")) { // 也可以用异步迭代器来访问，避免列表过大
