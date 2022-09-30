@@ -1,5 +1,18 @@
 {
   "imports": {
-    "!entry": "./src/entry.ts",
+    "dnt": "https://deno.land/x/gaubee_dnt@0.31.0-1/mod.ts",
+    "node_process": "https://deno.land/std@0.157.0/node/process.ts",
+    "node_crypto": "https://deno.land/std@0.157.0/node/crypto.ts",
+    "node_fs": "https://deno.land/std@0.157.0/node/fs.ts",
+    "node_stream": "https://deno.land/std@0.157.0/node/stream.ts",
+    "node_util": "https://deno.land/std@0.157.0/node/util.ts",
+    "node_buffer": "https://deno.land/std@0.157.0/node/internal/buffer.d.ts",
+    "std_tar": "https://deno.land/std@0.157.0/archive/tar.ts",
+    "std_crypto": "https://deno.land/std@0.157.0/crypto/mod.ts",
+    "std_path": "https://deno.land/std@0.157.0/path/mod.ts",
+    "commander": "https://cdn.skypack.dev/commander@9.4.0",
+    "compress": "https://deno.land/x/compress@v0.4.5/tar/mod.ts",
+    "crypto": "./src/crypto.ts",
+    "path": "./src/path.ts"
   }
 }
