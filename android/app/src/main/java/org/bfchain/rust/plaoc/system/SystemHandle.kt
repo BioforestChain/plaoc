@@ -5,9 +5,11 @@ import org.bfchain.rust.plaoc.ExportNative
 import org.bfchain.rust.plaoc.MainActivity
 import org.bfchain.rust.plaoc.callable_map
 import org.bfchain.rust.plaoc.denoService
+import org.bfchain.rust.plaoc.system.file.FileSystem
 import org.bfchain.rust.plaoc.webView.network.initMetaData
 import org.bfchain.rust.plaoc.webView.sendToJavaScript
 
+private val fileSystem = FileSystem()
 
 /** 初始化系统函数*/
  fun initSystemFn(activity: MainActivity) {

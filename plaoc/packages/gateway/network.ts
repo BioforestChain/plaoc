@@ -35,24 +35,6 @@ export function netCallNativeUi(
   return getConnectChannel(`/setUi?data=${buffer}`);
 }
 
-
-/**
- *  发送请求到netive设置ui
- * @param url
- * @returns
- */
-export function netCallNativeVfs(
-  fun: string,
-  data: TNative = "",
-): Promise<string> {
-  if (data instanceof Object) {
-    data = JSON.stringify(data); // stringify 两次转义一下双引号
-  }
-  const message = `{"function":"${fun}","data":${JSON.stringify(data)}}`;
-  const buffer = new TextEncoder().encode(message);
-  return getConnectChannel(`/setVfs?data=${buffer}`);
-}
-
 // deno-lint-ignore ban-types
 type TNative = boolean | object | string | number;
 
