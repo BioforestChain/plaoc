@@ -52,15 +52,6 @@ fun MaskProgressMode.updateState(state: DownLoadState): MaskProgressMode {
   return this
 }
 
-private fun Modifier.maskView(): Modifier {
-  fillMaxSize()
-  padding(3.dp)
-  clip(RoundedCornerShape(12.dp))
-  background(Color.Black.copy(alpha = 0.6f))
-  padding(7.dp)
-  return this
-}
-
 /**
  * 模仿IOS的下载加载界面
  * 覆盖整个图标，中间显示一个圆环，然后根据下载进度显示白色扇形，直到填充完整
@@ -75,7 +66,11 @@ fun MaskProgressView(
   if (cpMode.show.value) {
     Box(
       modifier = Modifier
-        .maskView()
+        .fillMaxSize()
+        .padding(3.dp)
+        .clip(RoundedCornerShape(12.dp))
+        .background(Color.Black.copy(alpha = 0.6f))
+        .padding(7.dp)
         .clickable {
           Log.d("lin.huang", "MaskProgressView -> onClick")
           onClick?.let { onClick() }
@@ -131,7 +126,14 @@ fun MaskProgressView(
     }
 
     if (!isFinished) {
-      Box(modifier = Modifier.maskView()) {
+      Box(
+        modifier = Modifier
+          .fillMaxSize()
+          .padding(3.dp)
+          .clip(RoundedCornerShape(12.dp))
+          .background(Color.Black.copy(alpha = 0.6f))
+          .padding(7.dp)
+      ) {
 
         Canvas(modifier = Modifier.fillMaxSize()) {
           translate {
