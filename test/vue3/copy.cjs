@@ -58,25 +58,25 @@ function mkdirsSync(dirname) {
   }
 }
 
-// // 创建目录
-// mkdirsSync('../../android/app/src/main/assets/system-app/bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj');
-// // 复制前端
-// copyDir('./test/vue3/build', '../../android/app/src/main/assets/system-app/bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj', (e) => {
-//   console.log(e)
-// })
-// // 复制后端
-// copyDir('./test/vue3/bfs-service/dist/esm', '../../android/app/src/main/assets/system-app/bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj', (e) => {
-//   console.log(e)
-// })
+// 创建目录
+mkdirsSync('../../android/app/src/main/assets/system-app/bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj');
+// 复制前端
+copyDir('./test/vue3/build', '../../android/app/src/main/assets/system-app/bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj', (e) => {
+  console.log(e)
+})
+// 复制后端
+copyDir('./test/vue3/bfs-service/dist/esm', '../../android/app/src/main/assets/system-app/bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj', (e) => {
+  console.log(e)
+})
 
 
-// // 创建读取流
-// readable = fs.createReadStream("./test/vue3/node_modules/@bfsx/plugin/dist/esm/common/serverWorker.mjs");
+// 创建读取流
+readable = fs.createReadStream("./test/vue3/node_modules/@bfsx/plugin/dist/esm/common/serverWorker.mjs");
 
-// // 创建写入流
-// writable = fs.createWriteStream("../../android/app/src/main/assets/system-app/bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj/serverWorker.mjs");
-// // 通过管道来传输流
-// readable.pipe(writable);
+// 创建写入流
+writable = fs.createWriteStream("../../android/app/src/main/assets/system-app/bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj/serverWorker.mjs");
+// 通过管道来传输流
+readable.pipe(writable);
 
 /*
  * 复制目录、子目录，及其中的文件

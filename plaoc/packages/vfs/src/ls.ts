@@ -1,19 +1,27 @@
-// const list: string[] = await fs.ls("./", { // list
-//   filter: [{ // 声明筛选方式
-//     type: "file",
-//     name: ["*.ts"]
-//   }],
-//   recursive: true, // 是否要递归遍历目录，默认是 false
-// });
-import { } from "@bfsx/core";
+import { network } from "@bfsx/core"
 import { IsOption } from "./lsType.ts";
+import { vfsHandle } from '../vfsHandle.ts';
 
-
-export function getRootPath() {
-  // return await 
+/**获取文件根目录 */
+export async function getRootPath() {
+  await network.asyncCallDenoFunction(vfsHandle.GetRootPath)
 }
 
-export function ls(_path: string, _option: IsOption) {
+
+/// const list: string[] = await fs.ls("./", { // list
+///   filter: [{ // 声明筛选方式
+///     type: "file",
+///     name: ["*.ts"]
+///   }],
+///   recursive: true, // 是否要递归遍历目录，默认是 false
+/// });
+/**
+ * 获取目录下有哪些文件
+ * @param path 
+ * @param option 
+ */
+
+export function ls(path: string, option: IsOption) {
 
 }
 

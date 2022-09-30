@@ -78,6 +78,7 @@ class DenoService : IntentService("DenoService") {
     private external fun denoSetCallback(callback: IDenoCallback)
     private external fun nativeSetCallback(callback: IHandleCallback)
     private external fun onlyReadRuntime(assets: AssetManager,target:String) // 只读模式走这里
+    /** 这里负责返回数据到deno-js*/
     external fun backDataToRust(
         bufferData: ByteArray,
     )
@@ -128,9 +129,7 @@ fun parseBytesFactory(bytes: ByteArray): ByteData {
 }
 
 
-/**
- * 创建二进制数据返回
- */
+/*** 创建二进制数据返回*/
 fun createBytesFactory(callFun: ExportNative, message: String): ByteArray {
     val headId = rust_call_map[callFun] ?: ByteArray(2).plus(0x00)
     val versionId = version_head_map[headId] ?: ByteArray(1).plus(0x01)
