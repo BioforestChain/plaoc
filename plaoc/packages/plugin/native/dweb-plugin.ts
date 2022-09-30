@@ -1,5 +1,5 @@
 import { loop } from "../common/index.ts";
-import { getConnectChannel } from "../common/network.ts";
+import { getConnectChannel } from "@bfsx/gateway";
 /**
  * 所有的dweb-plugin需要继承这个类
  */

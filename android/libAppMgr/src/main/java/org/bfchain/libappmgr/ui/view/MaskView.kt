@@ -10,8 +10,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Fill
@@ -65,8 +67,10 @@ fun MaskProgressView(
     Box(
       modifier = Modifier
         .fillMaxSize()
+        .padding(3.dp)
+        .clip(RoundedCornerShape(12.dp))
         .background(Color.Black.copy(alpha = 0.6f))
-        .padding(10.dp)
+        .padding(7.dp)
         .clickable {
           Log.d("lin.huang", "MaskProgressView -> onClick")
           onClick?.let { onClick() }
@@ -125,8 +129,10 @@ fun MaskProgressView(
       Box(
         modifier = Modifier
           .fillMaxSize()
+          .padding(3.dp)
+          .clip(RoundedCornerShape(12.dp))
           .background(Color.Black.copy(alpha = 0.6f))
-          .padding(10.dp)
+          .padding(7.dp)
       ) {
 
         Canvas(modifier = Modifier.fillMaxSize()) {

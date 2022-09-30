@@ -1,13 +1,12 @@
 import { callDeno } from "../deno/android.fn.ts";
-import { deno } from "../deno/index.ts";
-
+import { network } from '../deno/network.ts';
 /**
  * 打开二维码扫码
  * @returns Promise<data>
  */
 export const openQrScanner = () => {
   return new Promise(() => {
-    deno.callFunction(callDeno.openQrScanner);
+    network.syncCallDenoFunction(callDeno.openQrScanner);
   });
 };
 
@@ -17,6 +16,6 @@ export const openQrScanner = () => {
  */
 export const openBarScanner = () => {
   return new Promise(() => {
-    deno.callFunction(callDeno.openBarcodeScanner);
+    network.syncCallDenoFunction(callDeno.openBarcodeScanner);
   });
 };

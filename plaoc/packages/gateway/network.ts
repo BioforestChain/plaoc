@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-explicit-any
 /// <reference lib="dom" />
 /**
  * 注册serverWorker方法
@@ -6,12 +7,12 @@ export function registerServerWorker() {
   addEventListener("load", () => {
     // 能力检测
     if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("serverWorker.mjs", { scope: "/" }).then(
+      navigator.serviceWorker.register("serverWorker.js", { scope: "/" }).then(
         () => {
-          console.log("Service Worker 注册成功");
+          console.log("Service Worker register success");
         },
       ).catch(() => {
-        console.log("Service Worker 注册失败");
+        console.log("Service Worker register error");
       });
     }
   });
@@ -22,7 +23,7 @@ export function registerServerWorker() {
  * @param url
  * @returns
  */
-export function netCallNative(
+export function netCallNativeUi(
   fun: string,
   data: TNative = "",
 ): Promise<any> {
@@ -34,6 +35,7 @@ export function netCallNative(
   return getConnectChannel(`/setUi?data=${buffer}`);
 }
 
+// deno-lint-ignore ban-types
 type TNative = boolean | object | string | number;
 
 /**

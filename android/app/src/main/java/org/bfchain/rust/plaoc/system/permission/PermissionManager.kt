@@ -41,7 +41,7 @@ class PermissionManager : DialogInterface.OnClickListener {
   constructor(fragment: Fragment) {
     this.fragment = fragment
     this.activity = fragment.activity
-    permissionUtils = PermissionUtils(activity!!)
+    permissionUtils = activity?.let { PermissionUtils(it) }
   }
 
   constructor(activity: Activity) {

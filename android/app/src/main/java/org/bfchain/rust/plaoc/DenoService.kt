@@ -3,6 +3,7 @@ package org.bfchain.rust.plaoc
 import android.app.IntentService
 import android.app.Notification
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.res.AssetManager
 import android.os.Binder
 import android.os.Build
@@ -11,6 +12,7 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.bfchain.rust.plaoc.system.deeplink.DWebReceiver
 import java.nio.ByteBuffer
 
 private const val TAG = "DENO_SERVICE"
@@ -26,6 +28,8 @@ val rust_call_map = mutableMapOf<ExportNative, ByteArray>()
 // 存储版本号 <versionID,headerID>
 val version_head_map = mutableMapOf<ByteArray, ByteArray>()
 val mapper = ObjectMapper()
+// deno服务
+val denoService = DenoService()
 
 class DenoService : IntentService("DenoService") {
 
@@ -35,6 +39,22 @@ class DenoService : IntentService("DenoService") {
             System.loadLibrary("rust_lib")
         }
     }
+
+  /**
+   * 注册广播，用于接收广播信息
+   */
+  private var dWebReceiver = DWebReceiver()
+  override fun onCreate() {
+    super.onCreate()
+    var intentFilter = IntentFilter()
+    intentFilter.addAction(DWebReceiver.ACTION_OPEN_DWEB)
+    registerReceiver(dWebReceiver, intentFilter)
+  }
+
+  override fun onDestroy() {
+    super.onDestroy()
+    unregisterReceiver(dWebReceiver)
+  }
 
     interface IHandleCallback {
         fun handleCallback(bytes: ByteArray)
@@ -58,6 +78,7 @@ class DenoService : IntentService("DenoService") {
     private external fun denoSetCallback(callback: IDenoCallback)
     private external fun nativeSetCallback(callback: IHandleCallback)
     private external fun onlyReadRuntime(assets: AssetManager,target:String) // 只读模式走这里
+    /** 这里负责返回数据到deno-js*/
     external fun backDataToRust(
         bufferData: ByteArray,
     )
@@ -108,9 +129,7 @@ fun parseBytesFactory(bytes: ByteArray): ByteData {
 }
 
 
-/**
- * 创建二进制数据返回
- */
+/*** 创建二进制数据返回*/
 fun createBytesFactory(callFun: ExportNative, message: String): ByteArray {
     val headId = rust_call_map[callFun] ?: ByteArray(2).plus(0x00)
     val versionId = version_head_map[headId] ?: ByteArray(1).plus(0x01)
