@@ -1,5 +1,5 @@
 /// <reference lib="dom" />
-import { netCallNative } from "../common/network.ts";
+import { netCallNative } from "@bfsx/gateway";
 import { DwebPlugin } from "./dweb-plugin.ts";
 import { NativeHandle, NativeUI } from "../common/nativeHandle.ts";
 import { hexToIntColor } from "../util/index.ts";

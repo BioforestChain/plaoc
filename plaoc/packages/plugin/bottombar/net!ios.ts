@@ -2,7 +2,7 @@ import { Color } from "../types/colorType.ts";
 import { convertToRGBAHex } from "../util/index.ts";
 import { BottomBar } from "./bfcsBottomBarType.ts";
 import { NativeUI } from "../common/nativeHandle.ts";
-import { netCallNative } from "../common/network.ts";
+import { netCallNative } from "@bfsx/gateway";
 
 export class BottomBarFFI implements BottomBar.IBottomBarFFI {
   private _ffi = (window as any).webkit

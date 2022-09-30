@@ -9,8 +9,6 @@ import android.os.Bundle
 import android.os.IBinder
 import android.os.UserHandle
 import android.provider.MediaStore
-import android.util.Log
-import android.view.View
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.compose.setContent
@@ -20,7 +18,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.ui.Modifier
-import androidx.work.WorkManager
 import com.google.mlkit.vision.barcode.Barcode
 import com.king.app.dialog.AppDialog
 import com.king.app.dialog.AppDialogConfig
@@ -33,25 +30,20 @@ import org.bfchain.rust.plaoc.lib.drawRect
 import org.bfchain.rust.plaoc.system.barcode.BarcodeScanningActivity
 import org.bfchain.rust.plaoc.system.barcode.QRCodeScanningActivity
 import org.bfchain.libappmgr.ui.main.Home
-import org.bfchain.libappmgr.ui.main.MainActivity
-import org.bfchain.rust.plaoc.system.device.DeviceInfo
+import org.bfchain.rust.plaoc.system.initSystemFn
 import org.bfchain.rust.plaoc.ui.theme.RustApplicationTheme
 import org.bfchain.rust.plaoc.webView.network.dWebView_host
-import org.bfchain.rust.plaoc.webView.network.initMetaData
 import org.bfchain.rust.plaoc.webView.network.shakeUrl
 import org.bfchain.rust.plaoc.webView.openDWebWindow
-import org.bfchain.rust.plaoc.webView.sendToJavaScript
-import java.net.URL
 
 
 val callable_map = mutableMapOf<ExportNative, (data: String) -> Unit>()
-val denoService = DenoService()
+
 private const val TAG = "MainActivity"
 
 class MainActivity : AppCompatActivity() {
   var isQRCode = false //是否是识别二维码
   fun getContext() = this
-
   companion object {
     const val REQUEST_CODE_PHOTO = 1
     const val REQUEST_CODE_REQUEST_EXTERNAL_STORAGE = 2
@@ -60,7 +52,8 @@ class MainActivity : AppCompatActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    this.initSystemFn()
+    // 初始化系统函数map
+    initSystemFn(this)
     setContent {
       RustApplicationTheme {
         Box(
@@ -71,6 +64,7 @@ class MainActivity : AppCompatActivity() {
           Home() {appId, url ->
             dWebView_host = appId
             LogUtils.d("启动了Ar 扫雷：$dWebView_host--$url")
+
             createWorker(WorkerNative.valueOf("DenoRuntime"), url)
           }
         }
@@ -78,22 +72,8 @@ class MainActivity : AppCompatActivity() {
     }
   }
 
-  /** 初始化系统函数*/
-  private fun initSystemFn() {
-    callable_map[ExportNative.OpenQrScanner] = { openScannerActivity() }
-    callable_map[ExportNative.BarcodeScanner] = { openBarCodeScannerActivity() }
-    callable_map[ExportNative.OpenDWebView] = {
-      openDWebViewActivity(it)
-    }
-    callable_map[ExportNative.InitMetaData] = {
-      initMetaData(it)
-    }
-    callable_map[ExportNative.DenoRuntime] = {
-      denoService.denoRuntime(it)
-    }
-    callable_map[ExportNative.EvalJsRuntime] =
-      { sendToJavaScript(it) }
-  }
+
+
 
   // 选择图片后回调到这
   override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -141,7 +121,7 @@ class MainActivity : AppCompatActivity() {
                 for ((index, data) in result.withIndex()) {
                   buffer.append("[$index] ").append(data.displayValue)
                     .append("\n")
-                  canvas.drawRect(data.boundingBox, paint)
+                  data.boundingBox?.let { it1 -> canvas.drawRect(it1, paint) }
                 }
               }
 
@@ -205,7 +185,7 @@ class MainActivity : AppCompatActivity() {
   }
 
   // 打开条形码（现在这里的效果是不断扫二维码,还需要修改）
-  private fun openBarCodeScannerActivity() {
+   fun openBarCodeScannerActivity() {
     startActivityForResult(
       Intent(this, BarcodeScanningActivity::class.java),
       REQUEST_CODE_SCAN_CODE
@@ -213,14 +193,13 @@ class MainActivity : AppCompatActivity() {
   }
 
   // 打开二维码
-  private fun openScannerActivity() {
+   fun openScannerActivity() {
     startActivityForResult(
       Intent(this, QRCodeScanningActivity::class.java),
       REQUEST_CODE_SCAN_CODE
     )
   }
-
-  private fun openDWebViewActivity(path: String) {
+  fun openDWebViewActivity(path: String) {
     // 存储一下host，用来判断是远程的还是本地的
     if (dWebView_host == "") {
       return

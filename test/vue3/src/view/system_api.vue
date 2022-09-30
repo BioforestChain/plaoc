@@ -1,33 +1,33 @@
 <script setup lang="ts">
-import { IonFab, IonFabButton, IonFabList,IonButton,IonIcon} from '@ionic/vue';
+import { IonFab, IonFabButton, IonFabList, IonButton, IonIcon } from '@ionic/vue';
 import { defineComponent, onMounted } from 'vue';
-import { BfcsKeyboard,DWebView,BfcsStatusBar } from '@bfsx/plugin';
+import { BfcsKeyboard, Navigation, BfcsStatusBar } from '@bfsx/plugin';
 
 defineComponent({
-  components: { IonFab, IonFabButton, IonFabList,IonButton, IonIcon }
+  components: { IonFab, IonFabButton, IonFabList, IonButton, IonIcon }
 });
-let nav:DWebView;
+let nav: Navigation;
 onMounted(async () => {
-  nav = document.querySelector<DWebView>('dweb-view')!
+  nav = document.querySelector<Navigation>('dweb-navigation')!
 })
 
 async function onShowKeyboard() {
   const keyboard = document.getElementById('key_board') as BfcsKeyboard
   keyboard?.showKeyboard()
   console.log("getKeyboardSafeArea:", JSON.stringify(await keyboard.getKeyboardSafeArea()))
-  console.log("getKeyboardHeight:",await keyboard.getKeyboardHeight())
-  console.log("getKeyboardOverlay:",await keyboard.getKeyboardOverlay())
+  console.log("getKeyboardHeight:", await keyboard.getKeyboardHeight())
+  console.log("getKeyboardOverlay:", await keyboard.getKeyboardOverlay())
 }
 
 function hideNavigation() {
-    nav.setNavigationBarVisible(false)
+  nav.setNavigationBarVisible(false)
 }
 async function getNavigationVisible() {
-  console.log("getNavigationBarVisible=>",await nav.getNavigationBarVisible())
-  console.log("getNavigationBarOverlay=>",await nav.getNavigationBarOverlay())
+  console.log("getNavigationBarVisible=>", await nav.getNavigationBarVisible())
+  console.log("getNavigationBarOverlay=>", await nav.getNavigationBarOverlay())
 }
 function setNavigationBarColor() {
-  nav.setNavigationBarColor("#ffb94f",true,false)
+  nav.setNavigationBarColor("#ffb94f", true, false)
 }
 function setNavigationBarOverlay() {
   nav.setNavigationBarOverlay(true)
@@ -42,7 +42,7 @@ function getStatusBarColor() {
   <h2>andrid/ios 系统api 测试</h2>
   <dweb-status-bar id="status_bar" background-color="rgba(133,100,100,0.5)" overlay></dweb-status-bar>
   <dweb-keyboard id="key_board" hidden></dweb-keyboard>
-  <dweb-view></dweb-view>
+  <dweb-navigation></dweb-navigation>
   <ion-button expand="block" fill="outline" @click="hideNavigation">点我隐藏系统navigation</ion-button>
   <ion-button expand="block" fill="outline" @click="getNavigationVisible">获取navigation颜色</ion-button>
   <ion-button expand="block" fill="outline" @click="setNavigationBarOverlay">设置navigation透明</ion-button>
@@ -52,4 +52,5 @@ function getStatusBarColor() {
 </template>
 
 <style scoped>
+
 </style>

@@ -1,5 +1,5 @@
 import { IDwebview, IImportMap, IManifest, IMetaData } from "./metadataType.ts";
-class MetaData implements IMetaData {
+export class MetaData implements IMetaData {
   manifest: Manifest;
   dwebview: DWebView;
   whitelist?: string[];
@@ -50,4 +50,6 @@ export class ImportMap implements IImportMap {
   response!: string;
 }
 
-export { MetaData };
+export function metaConfig(metaData: MetaData) {
+  return new MetaData(metaData)
+}

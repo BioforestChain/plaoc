@@ -1,7 +1,7 @@
 import { TopBar } from "./bfcsTopBarType.ts";
 import { Color } from "../types/colorType.ts";
 import { NativeUI } from "../common/nativeHandle.ts";
-import { netCallNative } from "../common/network.ts";
+import { netCallNative } from "@bfsx/gateway";
 import { getColorHex, hexToIntColor } from "../util/index.ts";
 
 // 等到dweb-communication组件注册成功，再执行topBarFFI代码

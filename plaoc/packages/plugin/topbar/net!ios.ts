@@ -1,7 +1,7 @@
 import { Color } from "../types/colorType.ts";
 import { TopBar } from "./bfcsTopBarType.ts";
 import { NativeUI } from "../common/nativeHandle.ts";
-import { netCallNative } from "../common/network.ts";
+import { netCallNative } from "@bfsx/gateway";
 import { getColorHex, hexToIntColor } from "../util/index.ts";
 
 export class TopBarFFI implements TopBar.ITopBarFFI {
