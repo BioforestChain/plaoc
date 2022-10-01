@@ -1,4 +1,4 @@
-import { build, emptyDir, EntryPoint, LibName, type BuildOptions } from "dnt";
+import { build, emptyDir, type BuildOptions } from "dnt";
 
 const npmConfig = (await import("./npm.json", { assert: { type: "json" } }))
   .default;
@@ -36,8 +36,13 @@ export const buildOptions: BuildOptions = {
     bugs: {
       url: "https://github.com/BioforestChain/plaoc/issues",
     },
+    dependencies: {
+      tar: "^6.1.11",
+      commander: "^9.4.0",
+    },
     devDependencies: {
       "@types/node": "latest",
+      "@types/tar": "^6.1.3",
       "@bfsx/typings": "link:../../../plaoc/build/typings",
       "@bfsx/metadata": "link:../../../plaoc/build/metadata",
     },

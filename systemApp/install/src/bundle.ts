@@ -4,11 +4,11 @@ import { pathToFileURL } from "node_url";
 import { Files, LinkMetadata, MetaData } from "@bfsx/metadata";
 import { path, slash } from "path";
 import { checksumFile } from "crypto";
-import * as compress from "std_tar";
+import tar from "tar";
 
 import "@bfsx/typings";
 
-const { existsSync } = fs;
+const { existsSync, createWriteStream } = fs;
 const { mkdir, writeFile, copyFile, readdir, stat, rm } = fs.promises;
 
 const bfsAppId = "AK12LK23";
@@ -39,15 +39,22 @@ export async function bundle(options: {
   const metadata = await getBfsaMetaDataJson(bootPath, backPath);
   await writeConfigJson(bootPath, bfsAppId, metadata);
 
-  // compress(destPath, path.join(process.cwd(), `./${bfsAppId}.bfsa`));
-  // compressing.tar.compressDir(
-  //   destPath,
-  //   path.join(process.cwd(), `./${bfsAppId}.bfsa`)
-  // );
-  const tar = new compress.Tar();
-  tar.append(`./${bfsAppId}.bfsa`, {
-    filePath: destPath,
-  });
+  // 对文件进行压缩
+  const prefixPath = path.resolve(destPath, "../");
+  const compressFile = path.resolve(destPath, "../", `./${bfsAppId}.bfsa`);
+  await tar.c(
+    {
+      gzip: true,
+      preservePaths: false,
+      // 设置工作目录，不设置的话，会在压缩包中带上绝对路径
+      cwd: prefixPath,
+      // 设置压缩文件名，设置后会使用promise方式，否则是流的方式
+      file: `${compressFile}`,
+    },
+    [`${bfsAppId}`]
+  );
+
+  console.log("compress done!");
 }
 
 /**
@@ -146,7 +153,6 @@ async function getBfsaMetaDataJson(
   const jsonConfig = (await import(jsonPath.href, { assert: { type: "json" } }))
     .default;
   const backDir = path.dirname(packageJsonPath);
-  console.log(jsonConfig);
   let bfsaEntry = "";
 
   if (jsonConfig.main) {
@@ -190,7 +196,6 @@ async function getBfsaMetaDataJson(
  */
 async function copyIcon(bootPath: string, iconName: string) {
   const reg = new RegExp(iconName);
-  console.log("iconName: " + iconName);
   const iconPath = await searchFile(path.resolve(bootPath, "../"), reg);
 
   if (!iconPath) {
@@ -326,12 +331,10 @@ async function fileListHash(
   bfsAppId: string,
   filesList: Files[]
 ): Promise<Files[]> {
-  console.log("dest: " + dest);
   const entries = await readdir(dest, { withFileTypes: true });
 
   for (const entry of entries) {
     const filePath = path.join(dest, entry.name!);
-    console.log("filePath: " + filePath);
 
     if (entry.isFile()) {
       const fileStat = await stat(filePath);
