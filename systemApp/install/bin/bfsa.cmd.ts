@@ -26,14 +26,14 @@ program
   .option("-b, --back-path <type>", "backend application path.")
   // .option("-d, --dist-path <type>", "publish .bfsa to path")
   .action((options: any) => {
-    console.log(options.frontPath);
-    console.log(options.backPath);
-    // console.log(options.distPath);
     bundle({
       bfsAppId: "111",
       frontPath: options.frontPath,
       backPath: options.backPath,
     });
   });
+
+// 设置version指令
+program.version(npmConfig.version);
 
 program.parse(process.argv);
