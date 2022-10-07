@@ -2,7 +2,7 @@
 
 import * as process from "node_process";
 import { Command } from "commander";
-import { bundle } from "../src/bundle.ts";
+import { bundle } from "cmd_bundle";
 
 const npmConfig = (await import("../npm.json", { assert: { type: "json" } }))
   .default;
@@ -13,21 +13,19 @@ program
   .description(npmConfig.description)
   .version(npmConfig.version);
 
-// program
-//   .command("install")
-//   .description("bfsa install service")
-//   .action(() => {});
-
 // 打包application为.bfsa到指定位置
 program
   .command("bundle")
   .description("bfsa bundle project to .bfsa")
-  .option("-f, --front-path <type>", "frontend application path.")
-  .option("-b, --back-path <type>", "backend application path.")
-  // .option("-d, --dist-path <type>", "publish .bfsa to path")
+  .option("-f, --front-path <string>", "frontend application path.")
+  .option("-b, --back-path <string>", "backend application path.")
+  .option(
+    "-i, --bfs-appid <string>",
+    "bfsAppId: app unique identification，new app ignore."
+  )
   .action((options: any) => {
     bundle({
-      bfsAppId: "111",
+      bfsAppId: options.bfsAppid,
       frontPath: options.frontPath,
       backPath: options.backPath,
     });

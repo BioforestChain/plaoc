@@ -10,7 +10,9 @@
     "node_url": "https://deno.land/std@0.157.0/node/url.ts",
     "std_crypto": "https://deno.land/std@0.157.0/crypto/mod.ts",
     "std_path": "https://deno.land/std@0.157.0/path/mod.ts",
-    "crypto": "./src/crypto.ts",
-    "path": "./src/path.ts"
+    "crypto": "./utils/crypto.ts",
+    "path": "./utils/path.ts",
+    "check": "./utils/check.ts",
+    "cmd_bundle": "./cmd/bundle.ts"
   }
 }

@@ -4,14 +4,13 @@ import { pathToFileURL } from "node_url";
 import { Files, LinkMetadata, MetaData } from "@bfsx/metadata";
 import { path, slash } from "path";
 import { checksumFile } from "crypto";
+import { genBfsAppId } from "check";
 import tar from "tar";
 
 import "@bfsx/typings";
 
-const { existsSync, createWriteStream } = fs;
+const { existsSync } = fs;
 const { mkdir, writeFile, copyFile, readdir, stat, rm } = fs.promises;
-
-const bfsAppId = "AK12LK23";
 
 /**
  * 打包入口
@@ -22,7 +21,7 @@ export async function bundle(options: {
   frontPath: string;
   backPath: string;
 }) {
-  // const destPath = await createBfsaDir(options.bfsAppId);
+  const bfsAppId = options.bfsAppId ?? (await genBfsAppId());
   const { frontPath, backPath } = options;
   const destPath = await createBfsaDir(bfsAppId);
 
