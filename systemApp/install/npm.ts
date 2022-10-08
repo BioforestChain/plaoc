@@ -50,6 +50,6 @@ export const buildOptions: BuildOptions = {
 };
 
 if (import.meta.main) {
-  emptyDir("./dist");
+  emptyDir("./.npm");
   await build(buildOptions);
 }
