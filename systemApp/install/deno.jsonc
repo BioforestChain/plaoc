@@ -1,6 +1,7 @@
 {
   "tasks": {
-    "build": "deno run --unstable -A ./npm.ts"
+    "build": "deno run --unstable -A ./npm.ts",
+    "pub": "deno run --unstable -A ./pub.ts"
   },
   "compilerOptions": {
     "allowJs": false,

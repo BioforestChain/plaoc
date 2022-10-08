@@ -208,7 +208,7 @@ async function writeConfigJson(
 ) {
   // bfsa-metadata.json
   await writeFile(
-    path.join(bootPath, "bfs-metadata.json"),
+    path.join(bootPath, "bfsa-metadata.json"),
     JSON.stringify(metadata),
     "utf-8"
   );

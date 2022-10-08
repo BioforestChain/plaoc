@@ -1,6 +1,11 @@
 import tar from "tar";
 import { path } from "path";
 
+/**
+ * 压缩目录为bfsa后缀
+ * @param dest     压缩文件目录
+ * @param bfsAppId 应用id
+ */
 export async function compressToSuffixesBfsa(dest: string, bfsAppId: string) {
   const cwd = path.resolve(dest, "../");
 
@@ -16,4 +21,16 @@ export async function compressToSuffixesBfsa(dest: string, bfsAppId: string) {
     },
     [`${bfsAppId}`]
   );
+}
+
+/**
+ * 解压
+ * @param file 压缩包名
+ * @param dest 目标地址
+ */
+export async function uncompressBfsa(file: string, dest: string) {
+  await tar.x({
+    file: file,
+    cwd: dest,
+  });
 }

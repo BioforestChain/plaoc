@@ -31,7 +31,4 @@ program
     });
   });
 
-// 设置version指令
-program.version(npmConfig.version);
-
 program.parse(process.argv);
