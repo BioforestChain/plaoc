@@ -55,7 +55,7 @@ export function checkSign(bfsAppId: string): Promise<boolean> {
     let total = 0;
     const strArray = STR.split("");
     const bfsArray = bfsAppId.slice(0, 7).split("");
-    const signAt = bfsAppId[-1];
+    const signAt = bfsAppId.slice(-1);
     for (let i = 0; i < bfsArray.length; i++) {
       if (!strArray.includes(bfsArray[i])) {
         break;

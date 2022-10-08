@@ -4,7 +4,7 @@ import { fileURLToPath, pathToFileURL, URL } from "node_url";
 import { Files, LinkMetadata, MetaData } from "@bfsx/metadata";
 import { path, slash } from "path";
 import { checksumFile } from "crypto";
-import { genBfsAppId } from "check";
+import { genBfsAppId, checkSign } from "check";
 import { compressToSuffixesBfsa } from "compress";
 
 import "@bfsx/typings";
@@ -21,7 +21,20 @@ export async function bundle(options: {
   frontPath: string;
   backPath: string;
 }) {
-  const bfsAppId = options.bfsAppId ?? (await genBfsAppId());
+  let bfsAppId = options.bfsAppId;
+
+  // 校验bfsAppId是否合法
+  if (bfsAppId) {
+    const suc = await checkSign(bfsAppId);
+
+    if (!suc) {
+      throw new Error("bfsAppId不合法，请输入正确的bfsAppId");
+    }
+  } else {
+    bfsAppId = await genBfsAppId();
+  }
+
+  // const bfsAppId = options.bfsAppId ?? (await genBfsAppId());
   const { frontPath, backPath } = options;
   const destPath = await createBfsaDir(bfsAppId);
 
