@@ -77,12 +77,12 @@ class DenoService : IntentService("DenoService") {
 
     private external fun denoSetCallback(callback: IDenoCallback)
     private external fun nativeSetCallback(callback: IHandleCallback)
-    private external fun onlyReadRuntime(assets: AssetManager,target:String) // 只读模式走这里
+    /** 只读模式走这里*/
+    private external fun onlyReadRuntime(assets: AssetManager,target:String)
     /** 这里负责返回数据到deno-js*/
-    external fun backDataToRust(
-        bufferData: ByteArray,
-    )
-
+    external fun backDataToRust(bufferData: ByteArray)
+    /** 这里负责返回数据到deno-js*/
+    external fun backSystemDataToRust(bufferData: ByteArray)
     external fun denoRuntime(path: String)
 
     @RequiresApi(Build.VERSION_CODES.S)
@@ -150,7 +150,7 @@ data class RustHandle(
     val data: String = ""
 )
 
-data class jsHandle(
+data class JsHandle(
     val function: String = "",
     val data: String = "",
     val channelId: String? = ""

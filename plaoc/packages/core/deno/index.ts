@@ -39,6 +39,7 @@ export class Deno {
   callFunction(handleFn: string, data = "''") {
     const uint8Array = this.structureBinary(handleFn, data);
     js_to_rust_buffer(uint8Array);
+    return { versionView, headView }
   }
   /**
    * 调用evaljs 执行js

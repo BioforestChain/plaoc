@@ -16,7 +16,6 @@ use deno_core::FsModuleLoader;
 use log::{Level, Metadata, Record};
 use std::path::Path;
 use std::rc::Rc;
-use std::sync::Arc;
 // mod android;
 mod js_bridge;
 

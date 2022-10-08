@@ -103,16 +103,16 @@ pub async extern "system" fn Java_org_bfchain_rust_plaoc_DenoService_backDataToR
     BUFFER_RESOLVE.lock().push(scanner_data.to_vec());
 }
 
-// 接收返回的操作对象
-// #[no_mangle]
-// #[tokio::main]
-// pub async extern "system" fn Java_org_bfchain_rust_plaoc_DenoService_backHanderToRust(
-//     env: JNIEnv,
-//     _context: JObject,
-//     byteData: jbyteArray,
-// ) {
-//     let scanner_data = env.convert_byte_array(byteData).unwrap();
-//     let data_string = std::str::from_utf8(&scanner_data).unwrap();
-//     log::info!(" backDataToRust:{:?}", data_string);
-//     BUFFER_HANDLER.lock().push(scanner_data.to_vec());
-// }
+/// 接收返回的系统API二进制数据
+#[no_mangle]
+#[tokio::main]
+pub async extern "system" fn Java_org_bfchain_rust_plaoc_DenoService_backSystemDataToRust(
+    env: JNIEnv,
+    _context: JObject,
+    byteData: jbyteArray,
+) {
+    let scanner_data = env.convert_byte_array(byteData).unwrap();
+    let data_string = std::str::from_utf8(&scanner_data).unwrap();
+    log::info!(" backSystemDataToRust:{:?}", data_string);
+    BUFFER_SYSTEM.lock().push(scanner_data.to_vec());
+}

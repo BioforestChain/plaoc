@@ -26,16 +26,18 @@ class Network {
       if (data instanceof Object) {
         data = JSON.stringify(data); // stringify 两次转义一下双引号
       }
-      deno.callFunction(handleFn, JSON.stringify(data)) // 发送请求
+      const { versionView } = deno.callFunction(handleFn, JSON.stringify(data)) // 发送请求
       do {
-        const data = await loopRustBuffer().next(); // TODO 这里不能用这个方法，需要跟返回前端的隔离
-        /// 忽略策略:如果队列大于高水位或者没有数据，直接忽略
+        const data = await loopRustBuffer("op_rust_to_js_system_buffer").next();
         if (data.done) {
           continue;
         }
-        console.log("waterOverflow====>", data.value);
-        resolve(data.value)
-        break;
+        console.log("asyncCallDenoFunction versionView  ====> ", data.value, versionView);
+        // 如果请求是返回了是同一个表示头则返回成功
+        if (data.versionView === Array.from(versionView)) {
+          resolve(data.value)
+          break;
+        }
       } while (true);
       setTimeout(() => {
         reject("call function timeout")
@@ -58,7 +60,7 @@ class Network {
   */
   async waterOverflow() {
     do {
-      const data = await loopRustBuffer().next();
+      const data = await loopRustBuffer("op_rust_to_js_buffer").next();
       /// 忽略策略:如果队列大于高水位或者没有数据，直接忽略
       if (data.done || this.isWaitingData > this.hightWaterMark) {
         continue;

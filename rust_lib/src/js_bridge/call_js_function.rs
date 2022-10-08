@@ -18,7 +18,7 @@ lazy_static! {
     pub(crate) static ref BUFFER_SYSTEM: Mutex<Vec<Vec<u8>>> = Mutex::new(vec![]);
 }
 
-/// js 消息从这里走
+/// deno-js消息从这里走到移动端
 #[op]
 pub fn op_js_to_rust_buffer(buffer: ZeroCopyBuf) {
     #[cfg(target_os = "android")]
@@ -37,6 +37,7 @@ pub fn op_eval_js(buffer: ZeroCopyBuf) {
     call_android_function::call_android_evaljs(buffer.to_vec()); // 通知FFI函数
 }
 
+///  deno-js 轮询访问这个方法，以达到把rust数据传递到deno-js的过程，这里负责的是移动端系统API的数据
 #[op]
 pub fn op_rust_to_js_system_buffer() -> Result<Vec<u8>, AnyError> {
     let box_data = BUFFER_SYSTEM.lock().pop();

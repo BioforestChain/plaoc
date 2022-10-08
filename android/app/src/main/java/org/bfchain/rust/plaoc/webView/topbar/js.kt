@@ -6,8 +6,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.google.gson.JsonDeserializer
 import com.google.gson.reflect.TypeToken
-import org.bfchain.rust.plaoc.jsHandle
-import org.bfchain.rust.plaoc.mapper
 import org.bfchain.rust.plaoc.webView.icon.DWebIcon
 import org.bfchain.rust.plaoc.webView.jsutil.*
 
