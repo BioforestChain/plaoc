@@ -45,6 +45,7 @@ export const buildOptions: BuildOptions = {
       "@types/tar": "^6.1.3",
       "@bfsx/typings": "link:../../../plaoc/build/typings",
       "@bfsx/metadata": "link:../../../plaoc/build/metadata",
+      "@bfsx/gateway": "link:../../../plaoc/build/gateway",
     },
   },
 };
