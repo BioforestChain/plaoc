@@ -41,7 +41,10 @@ export async function bundle(options: {
   // 对文件进行压缩
   await compressToSuffixesBfsa(destPath, bfsAppId);
 
-  console.log("compress done!");
+  // 压缩完成，删除目录
+  await rm(destPath, { recursive: true });
+
+  console.log("compress bfsa application done!!!");
 }
 
 /**
