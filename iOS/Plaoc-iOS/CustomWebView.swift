@@ -54,38 +54,38 @@ class CustomWebView: UIView {
         }
     }
     
-    private lazy var webView: XXWebView = {
+    private lazy var webView: WKWebView = {
         
-//        let config = WKWebViewConfiguration()
-//        config.userContentController = WKUserContentController()
-//        addScriptMessageHandler(config: config)
-//        addScriptMessageHandlerWithReply(config: config)
-//        if self.scripts != nil {
-//            for script in self.scripts! {
-//                config.userContentController.addUserScript(script)
-//            }
-//        }
-//        let prefreen = WKPreferences()
-//        prefreen.javaScriptCanOpenWindowsAutomatically = true
-//        config.preferences = prefreen
-//        config.setValue(true, forKey: "allowUniversalAccessFromFileURLs")
-//        config.setURLSchemeHandler(Schemehandler(), forURLScheme: schemeString)
-//        let webView = WKWebView(frame: self.bounds, configuration: config)
-//        webView.navigationDelegate = self
-//        webView.uiDelegate = self
-//        webView.allowsBackForwardNavigationGestures = true
-//        if #available(iOS 11.0, *) {
-//            webView.scrollView.contentInsetAdjustmentBehavior = .never
-//        } else {
-//
-//        }
-        
-        let webView = WebViewPool.shared.getReusedWebView(forHolder: self)
-        webView.frame = self.bounds
-        webView.uiDelegate = self
+        let config = WKWebViewConfiguration()
+        config.userContentController = WKUserContentController()
+        addScriptMessageHandler(config: config)
+        addScriptMessageHandlerWithReply(config: config)
+        if self.scripts != nil {
+            for script in self.scripts! {
+                config.userContentController.addUserScript(script)
+            }
+        }
+        let prefreen = WKPreferences()
+        prefreen.javaScriptCanOpenWindowsAutomatically = true
+        config.preferences = prefreen
+        config.setValue(true, forKey: "allowUniversalAccessFromFileURLs")
+        config.setURLSchemeHandler(Schemehandler(), forURLScheme: schemeString)
+        let webView = WKWebView(frame: self.bounds, configuration: config)
         webView.navigationDelegate = self
-        addScriptMessageHandler(config: webView.configuration)
-        addScriptMessageHandlerWithReply(config: webView.configuration)
+        webView.uiDelegate = self
+        webView.allowsBackForwardNavigationGestures = true
+        if #available(iOS 11.0, *) {
+            webView.scrollView.contentInsetAdjustmentBehavior = .never
+        } else {
+
+        }
+        
+//        let webView = WebViewPool.shared.getReusedWebView(forHolder: self)
+//        webView.frame = self.bounds
+//        webView.uiDelegate = self
+//        webView.navigationDelegate = self
+//        addScriptMessageHandler(config: webView.configuration)
+//        addScriptMessageHandlerWithReply(config: webView.configuration)
         return webView
     }()
     
@@ -191,7 +191,7 @@ extension CustomWebView {
     }
     
     func recycleWebView() {
-        WebViewPool.shared.recycleReusedWebView(webView: webView)
+//        WebViewPool.shared.recycleReusedWebView(webView: webView)
     }
 }
 

@@ -80,8 +80,7 @@ extension ViewController: UITableViewDelegate {
 //        self.present(controller, animated: true)
         self.navigationController?.pushViewController(controller, animated: true)
         
-//        permissionManager.startPermissionAuthenticate(type: .contact, isSet: true) { result in
-//            print(result)
-//        }
+//        CacheManager.shared.preserveData(data: "dfdfdf" as AnyObject, key: "test" as AnyObject, type: .disk)
+        
     }
 }

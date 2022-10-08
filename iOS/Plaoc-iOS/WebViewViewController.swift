@@ -43,7 +43,6 @@ class WebViewViewController: UIViewController {
         self.view.addSubview(statusView)
 //        self.view.addSubview(bottomView)
         
-        
     }
     
     override func viewDidLoad() {

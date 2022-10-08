@@ -33,10 +33,9 @@ class CustomTabbarViewController: UITabBarController {
         self.tabBar.shadowImage = UIImage()
         self.tabBar.backgroundImage = UIImage()
         
-        self.tabBar.selectionIndicatorImage = UIImage.svgImageNamed("method_photo", size: CGSize(width: 44, height: 22))
+//        self.tabBar.selectionIndicatorImage = UIImage.svgImageNamed("method_photo", size: CGSize(width: 44, height: 22))
         
         addChildViewController(child: webVC1, title: "首页", imageName: "")
-        
         
         operateMonitor.tabBarMonitor.subscribe(onNext: { [weak self] in
             guard let strongSelf = self else { return }
@@ -46,9 +45,9 @@ class CustomTabbarViewController: UITabBarController {
     
     func updateTabbar() {
         
-        self.tabBar.setNeedsDisplay()
-        self.tabBar.layoutIfNeeded()
-        self.tabBar.layoutSubviews()
+//        self.tabBar.setNeedsDisplay()
+//        self.tabBar.layoutIfNeeded()
+//        self.tabBar.layoutSubviews()
         
 //        let item = self.tabBar.items?.first
 //        item?.title = "测试"
@@ -59,38 +58,32 @@ class CustomTabbarViewController: UITabBarController {
 //        childVC?.tabBarItem.setTitleTextAttributes([NSAttributedString.Key.foregroundColor:UIColor.orange], for: .selected)
         
         //需要修改先修改自身视图控制器view的frame
-//        self.tabBar.backgroundColor = .orange
-//        var frame = webVC1.view.frame
-//        frame.size.height += 100
-//        webVC1.view.frame = frame
-//        webVC1.updateBottomViewOverlay(overlay: 1)
+        self.tabBar.barTintColor = .orange
+        self.tabBar.backgroundColor = .orange
+        var frame = webVC1.view.frame
+        frame.size.height += 100
+        webVC1.view.frame = frame
+        webVC1.updateBottomViewOverlay(overlay: 1)
         
-//        print(self.viewControllers)
-//        addChildViewController(child: webVC2, title: "话术", imageName: "")
-//        print(self.viewControllers)
-//        addChildViewController(child: webVC3, title: "教程", imageName: "")
-//        print(self.viewControllers)
-//        addChildViewController(child: webVC4, title: "我的", imageName: "")
-//        print(self.viewControllers)
-        
-        let vc1 = SecondViewController()
-        let vc2 = ThirdViewController()
-        for vc in [vc1,vc2] {
-            let childVC = UINavigationController(rootViewController: vc)
-            childVC.tabBarItem.title = "话术"
-
-            let image = UIImage.svgImageNamed("ico_bottom_tab_publisher", size: CGSize(width: 22, height: 22))
-            let selectedImage = UIImage.svgImageNamed("ico_bottom_tab_publisher", size: CGSize(width: 22, height: 22))
-
-            childVC.tabBarItem.image = image.withRenderingMode(UIImage.RenderingMode.alwaysOriginal)
-            childVC.tabBarItem.selectedImage = selectedImage.withRenderingMode(UIImage.RenderingMode.alwaysOriginal)
-            childVC.tabBarItem.setTitleTextAttributes([NSAttributedString.Key.foregroundColor:UIColor( "#C2C5CB"),NSAttributedString.Key.font:UIFont.systemFont(ofSize: 12)], for: .normal)
-            childVC.tabBarItem.setTitleTextAttributes([NSAttributedString.Key.foregroundColor:UIColor("#0A1930"),NSAttributedString.Key.font:UIFont.systemFont(ofSize: 12)], for: .selected)
-            self.viewControllers?.append(childVC)
-//            self.addChild(childVC)  这样些。没效果
-        }
+//        let vc1 = SecondViewController()
+//        let vc2 = ThirdViewController()
+//        for vc in [vc1,vc2] {
+//            let childVC = UINavigationController(rootViewController: vc)
+//            childVC.tabBarItem.title = "话术"
+//
+//            let image = UIImage.svgImageNamed("ico_bottom_tab_publisher", size: CGSize(width: 22, height: 22))
+//            let selectedImage = UIImage.svgImageNamed("ico_bottom_tab_publisher", size: CGSize(width: 22, height: 22))
+//
+//            childVC.tabBarItem.image = image.withRenderingMode(UIImage.RenderingMode.alwaysOriginal)
+//            childVC.tabBarItem.selectedImage = selectedImage.withRenderingMode(UIImage.RenderingMode.alwaysOriginal)
+//            childVC.tabBarItem.setTitleTextAttributes([NSAttributedString.Key.foregroundColor:UIColor( "#C2C5CB"),NSAttributedString.Key.font:UIFont.systemFont(ofSize: 12)], for: .normal)
+//            childVC.tabBarItem.setTitleTextAttributes([NSAttributedString.Key.foregroundColor:UIColor("#0A1930"),NSAttributedString.Key.font:UIFont.systemFont(ofSize: 12)], for: .selected)
+//            self.viewControllers?.append(childVC)
+////            self.addChild(childVC)  这样写。没效果
+//        }
         
     }
+    
     
     func updateHeight() {
         var frame = self.tabBar.frame

@@ -112,6 +112,13 @@ class PermissionManager: NSObject {
     //开启定位
     private func openLocationServiceWithBlock(isSet: Bool? = nil, action: @escaping ((Bool) -> Void)) {
         
+        guard CLLocationManager.locationServicesEnabled() else {
+            action(false)
+            if isSet ?? false {
+                openURLWithAlertView(type: .location)
+            }
+            return
+        }
         let status = CLLocationManager.authorizationStatus()
         switch status {
         case .notDetermined:
@@ -125,6 +132,11 @@ class PermissionManager: NSObject {
             }
         case .authorizedAlways, .authorizedWhenInUse, .authorized:
             action(true)
+        default:
+            action(false)
+            if isSet ?? false {
+                openURLWithAlertView(type: .location)
+            }
         }
     }
 
