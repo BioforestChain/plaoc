@@ -4,7 +4,7 @@ import { vfsHandle } from '../vfsHandle.ts';
 
 /**获取文件根目录 */
 export async function getRootPath() {
-  await network.asyncCallDenoFunction(vfsHandle.GetRootPath)
+
 }
 
 
@@ -21,8 +21,8 @@ export async function getRootPath() {
  * @param option 
  */
 
-export function ls(path: string, option: IsOption) {
-
+export async function ls(path: string, option: IsOption) {
+  await network.asyncCallDenoFunction(vfsHandle.FileSystemLs, { path, option })
 }
 
 // for await (const entry of fs.list("./")) { // 也可以用异步迭代器来访问，避免列表过大

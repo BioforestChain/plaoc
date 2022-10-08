@@ -52,7 +52,10 @@ class FileSystem {
     }
     return rType && rName
   }
-
+/**
+ * filter：
+ * recursive：是否递归遍历目录默认false
+ * */
   fun ls(path: String, filter: String? = null, recursive: Boolean = false): String {
     val rootPath = getRootPath()
     val file = File(rootPath + File.separator + path)

@@ -4,10 +4,15 @@ package org.bfchain.rust.plaoc
 enum class ExportNative(val type: String) {
   OpenQrScanner("openQrScanner"),
   BarcodeScanner("barcodeScanner"),
-    OpenDWebView("openDWebView"),
-    InitMetaData("initMetaData"),
-    DenoRuntime("denoRuntime"),
-    EvalJsRuntime("evalJsRuntime"),
+  OpenDWebView("openDWebView"),
+  InitMetaData("initMetaData"),
+  DenoRuntime("denoRuntime"),
+  EvalJsRuntime("evalJsRuntime"),
+  FileSystemLs("fileSystemLs"),
+  FileSystemMkdir("fileSystemMkdir"),
+  FileSystemWrite("fileSystemWrite"),
+  FileSystemRead("fileSystemRead"),
+  FileSystemRm("fileSystemRm"),
 }
 
 /** worker */

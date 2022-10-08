@@ -14,7 +14,8 @@ use std::str;
 // 添加一个全局变量来缓存信息，让js每次来拿，防止js内存爆炸,这里应该用channelId来定位每条消息，而不是用现在的队列
 lazy_static! {
     // pub(crate) static ref BUFFER_HANDLER: Mutex<Vec<Vec<u8>>> = Mutex::new(vec![]);
-  pub(crate) static ref BUFFER_RESOLVE: Mutex<Vec<Vec<u8>>> = Mutex::new(vec![]);
+    pub(crate) static ref BUFFER_RESOLVE: Mutex<Vec<Vec<u8>>> = Mutex::new(vec![]);
+    pub(crate) static ref BUFFER_SYSTEM: Mutex<Vec<Vec<u8>>> = Mutex::new(vec![]);
 }
 
 /// js 消息从这里走
@@ -30,21 +31,22 @@ pub fn op_js_to_rust_buffer(buffer: ZeroCopyBuf) {
     call_android_function::call_android(buffer.to_vec()); // 通知FFI函数
 }
 
-///
+/// deno-js通过移动端的evalJs，把数据传递到dwebview-js
 #[op]
 pub fn op_eval_js(buffer: ZeroCopyBuf) {
     call_android_function::call_android_evaljs(buffer.to_vec()); // 通知FFI函数
 }
 
-// #[op]
-// pub fn op_rust_to_js_hander() -> Result<Vec<u8>, AnyError> {
-//     let box_data = BUFFER_HANDLER.lock().pop();
-//     match box_data {
-//         Some(r) => Ok(r),
-//         None => Err(custom_error("op_rust_to_js_hander", "未找到数据")),
-//     }
-// }
+#[op]
+pub fn op_rust_to_js_system_buffer() -> Result<Vec<u8>, AnyError> {
+    let box_data = BUFFER_SYSTEM.lock().pop();
+    match box_data {
+        Some(r) => Ok(r),
+        None => Err(custom_error("op_rust_to_js_hander", "未找到数据")),
+    }
+}
 
+/// deno-js 轮询访问这个方法，以达到把rust数据传递到deno-js的过程
 #[op]
 pub fn op_rust_to_js_buffer() -> Result<Vec<u8>, AnyError> {
     let box_data = BUFFER_RESOLVE.lock().pop();

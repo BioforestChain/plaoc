@@ -1,22 +1,345 @@
 {
+  "version": "1.0.0",
+  "bfsAppId": "KEJPMHLA",
+  "name": "ar扫码",
+  "icon": "file:///boot/vite.svg",
+  "author": [
+    "waterbang,water_bang@163.com"
+  ],
+  "autoUpdate": {
+    "maxAge": 360,
+    "provider": 1,
+    "url": "https://shop.plaoc.com/KEJPMHLA.bfsa",
     "version": "1.0.0",
-    "bfsAppId": "bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj",
-    "name": "AR扫码",
-    "icon": "file:///sys/mzt.png",
-    "author": "kzf,kezhaofeng@bnqkl.cn,https://bnqkl.cn/developer/kzf",
-    "homepage": "NULL",
-    "autoUpdate": {
-        "maxAge": 3,
-        "provider": 1,
-        "url": "bfs-app-minzt/appversion.json",
-        "version": "1.0.1",
-        "files": [{
-            "url": "https://www.google.cn",
-            "size": 1024,
-            "sha512": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-        }],
-        "releaseNotes": "本次发布的信息，一般存放更新信息",
-        "releaseName": "本次发布的标题，用于展示更新信息时的标题",
-        "releaseDate": "2022-08-26"
-    }
+    "files": [
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/bfs-metadata.json",
+        "size": 907,
+        "sha512": "d70f39ef5e55eff2d88a0ec17d0b1080d83b1bdf2604c4284cb8a6920de9671595e157d6ec9d7f6080a4a50d095557860c17959dceae8ea72bcca8e30c1ea62c"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/.npmignore",
+        "size": 45,
+        "sha512": "d6959c5307139fd51040a88f9b245326930e6c8e81f990b6007f758ce2a92fbdc5da0354bd86b143c3ca1ef02ba6be414a01a07d64340c5a871087ca29441da8"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/esm/package.json",
+        "size": 23,
+        "sha512": "9d323420cc63c6bee79dcc5db5f0f18f6b8e073daaf8ffa5459e11f2de59a9f5e8c178d77fa92afc9ddd352623dec362c62fff859c71a2fab93f1e2172c4987f"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/esm/plaoc/packages/core/deno/android.fn.js",
+        "size": 714,
+        "sha512": "07229eb767b11ab5778aa93f1f42255f9abaabc86cb159473064aadd245c3098ce2818b9a42782b17cebfc247057023411e0d770f95576c50c2e5107dc4a677d"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/esm/plaoc/packages/core/deno/index.js",
+        "size": 3260,
+        "sha512": "457846f8ac223bbd8ea2cfa5fd923c7c34a990ee755606ac0ecb3c7bc3e72837d0c5a30e82530a0683e5f00497173bb4cf53aed2f18f6f7d717961a3ae9617b5"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/esm/plaoc/packages/core/deno/network.js",
+        "size": 4981,
+        "sha512": "dc6d6bca4967293f12228d08d856594221e3bf986f3a009e15cae7da33d5d583be47b005c06a8e108030b7ed6cdb30674f22f21d11e11b85a9bcc7ae60b9453f"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/esm/plaoc/packages/core/deno/rust.op.js",
+        "size": 1379,
+        "sha512": "f868a52b4b7e3e2de3740a024351d1cbb4ff4cd09097fbeac13ac85a4f4d863c1fc24c1f24d6abf6cf1ab3b11472058cbc46958a2f55aefd9693b9a5f709ac54"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/esm/plaoc/packages/core/index.js",
+        "size": 231,
+        "sha512": "d39b4e0b27dba1a3c484eb6efe83f38c57daf42f97a55be438e793fe9ab791cfc9a5cf56725dadd6c2d85bd03772eba9de445691f4ca0654c49b307fcf54a887"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/esm/plaoc/packages/core/runtime/DWebView.js",
+        "size": 1286,
+        "sha512": "22266ee132ebd6e097aa28723d5124ccb59b8542760fdc14d52be124e5b37f314eed9af658fbc66ded46c17171fd0766d6e0b2983083e742270b566c2e60f0d1"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/esm/plaoc/packages/core/runtime/Script.js",
+        "size": 521,
+        "sha512": "24b7ba77e3589229ff3a8ba21b8aaa54d82a62ea903c7504b17ce85b8ec1f2fe4691b5b7a66fcb606edf358ccfae79d43e5ca740b76094a763f5496545b9b3d6"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/esm/plaoc/packages/core/runtime/index.js",
+        "size": 90,
+        "sha512": "b2725f58f98a1f78a4e910e6b5530e7aee53099d38dbf354ea1e23f6da4157df1dc34bfd72a5780e7d2503c92fd41438134cc9233d53e36af3e479abf11fea46"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/esm/plaoc/packages/core/runtime/scanner.js",
+        "size": 502,
+        "sha512": "cb47f72561aa2911959cca17ebccf7cf9df558c1f7fec4e2f2196673c0791a8ed92a56627a777ed87908c49a36becbfdda3270d17f15751baae054b3fc98385b"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/esm/plaoc/packages/metadata/index.js",
+        "size": 180,
+        "sha512": "e35db0a8781efcca02ad0db02f8a761d53d011b168376567f2a07a6b3907068f9475df7c4128a5e4f723adbfc7819f85ef0389ea0fcac633a2f72d03e3d265e2"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/esm/plaoc/packages/metadata/link.js",
+        "size": 3243,
+        "sha512": "880850f6efe915329c336ed584fb43335a8954e5562829885bf6e55c417e2ab4459042fa82b58332ba7f41f3fb38f5b143d778fa45eb04e1f7d65e89c4408ec1"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/esm/plaoc/packages/metadata/metadata.js",
+        "size": 4984,
+        "sha512": "d02ae78775c5ca910b626c7e02c64a193d6d53c7a54bed9534cc451e5f70f0cb37b3fc01483f77494e9659d06c2607f5bb09afa4c33ba368d0716ab2d571259d"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/esm/plaoc/packages/metadata/metadataType.js",
+        "size": 11,
+        "sha512": "4ee1c88f8c3f4e4cd34cb6c00339bf9d6d036ff4ade3af49e871cc8966b84c729d8b75492acc6413c9a664ac00a57958223ac13c4229da8c62ebe6a53e4f783f"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/esm/plaoc/packages/typings/index.js",
+        "size": 37,
+        "sha512": "6d4a6885494f245a73408c2988110b7b6e91edf6b2f8f6ba2583bf2faa58af856cfbfcf9674e415f7afb5679890adec9194009d62ff8e296b6067ac76696d6ba"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/esm/plaoc/packages/typings/types/denoType.js",
+        "size": 151,
+        "sha512": "16ff9cd57c8147a509202ed5856b7b0300af55ddb25ec10c5d0a3684ee4f10bf1653bed94bd6b2fb57fc56d920a1337f6dc7ef106f7345cb39acc72792d49b51"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/esm/test/vue3/bfsa-service/bfsa-metadata.js",
+        "size": 2501,
+        "sha512": "a85f3f9a81a90d230eb996ecc9e72d0b08d72b81ed417c7bea73218a6f27923eef7531ae7136729a3fab54017a1855d0ced22b0b4031016fd1c29c0f3dbf736c"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/esm/test/vue3/bfsa-service/index.js",
+        "size": 289,
+        "sha512": "b26f448a847dcbfc776912ad006a0533da4803a2214992b0fffc412e8509cca49393d5c71afbb03294782a6ba9177155d3ee66658846202c0131727b252e4132"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/package-lock.json",
+        "size": 5788,
+        "sha512": "d8d1a84d54bca32053682e7904cc3d0ed9c2fbecc2e2e0dcf1f9d58b05a880349eef367261a7c78664e1b554af3f7725333b17fd09f9040778b3a285b1229e37"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/package.json",
+        "size": 781,
+        "sha512": "09bfd4b9d16b7953cfb92fd2fdf2e4f28037d231ff05046560591aecf13a72a47134acd9d252b820cb5a34632a8f209fef179465e6191a8e3b908fbc503a63e7"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/src/plaoc/packages/core/deno/android.fn.ts",
+        "size": 487,
+        "sha512": "0845249fda38874b8d708a9667554f1693e8994f48ba8cb0b437c0bf858ba3aae95ee0aa43711098f48364b0442536650409044859c43df9d00aff0c7eab2ce5"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/src/plaoc/packages/core/deno/index.ts",
+        "size": 3050,
+        "sha512": "1631b2f7d7d624c3c3e66aafa94f595e3bb4b0400cee40e6507616bdc7e5b30302505eb56f4eeff8e07cddf3c09df38918abd3a7df9fd4fbf08344cad88e848f"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/src/plaoc/packages/core/deno/network.ts",
+        "size": 4290,
+        "sha512": "4e06ed9ae5b7cd97f3b03e4d8e49970c0188559dd245f03d5914883f9b8bd5b0a290e0e42060b3ecb0519f1cb565587398ca057dc91505da0db8be04446c9014"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/src/plaoc/packages/core/deno/rust.op.ts",
+        "size": 1205,
+        "sha512": "ad84c73b4274b4d7dade8df2f2784b7e7f23a5be97c0b0db7fda6c67c339e87da03d8028b6014cb8b7587e1fb833537c9155e96fa477373ff3beb841f3508a34"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/src/plaoc/packages/core/index.ts",
+        "size": 233,
+        "sha512": "ee90e1a278e65ae79254ed151be94f30e50915a252f8684db20e6e41b1b2577b0762bc39c297c3688079040fad00cea99893316c10a488ca48895c35f0dcd1cb"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/src/plaoc/packages/core/runtime/DWebView.ts",
+        "size": 1148,
+        "sha512": "1af3af495c75e21641d1a005b553c8bf05974169b1c1afcad5c27d80b67d27dfacfea25ecb2da3650feb072bdc908c3c2f78fdfe6c5e0454882ebdd83c6120e9"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/src/plaoc/packages/core/runtime/Script.ts",
+        "size": 574,
+        "sha512": "26644eaf58ec2e9eb2294b1b931614ec1ec3be53c485d5339c413fe0450b7ad15c9a2a8a18d4e449582a0b702d34aea88e5e4098eef6b71195db527c61915088"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/src/plaoc/packages/core/runtime/index.ts",
+        "size": 87,
+        "sha512": "9557897a831f01ef6111fc4661019cb4a46b5d797628177922ad6782d09926b514f5b51a7055118708bf41391b6f40ef6303f4a559ad12be5f05c03528b6a926"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/src/plaoc/packages/core/runtime/runtime.d.ts",
+        "size": 146,
+        "sha512": "377a055d42dcdfe78140c0445d4a2c79baae66fab0ef0db90834b44b83baf6df838d6f3ce670378294917e7956ad7d86e3f6a2dcb938664af0516a7eddeb5f39"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/src/plaoc/packages/core/runtime/scanner.ts",
+        "size": 487,
+        "sha512": "68f396a6718568a22b40439c178860588f9dc60d575d0b1b67164d6c0ac1ab20c678772a818b3d59bae31e557e60107f1dda16aedbff09ea739d4dc470323634"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/src/plaoc/packages/metadata/index.ts",
+        "size": 181,
+        "sha512": "6351310f8db5130724ec3753c8284840d807f8d1fcb7262ae0da5066f96790c7371d19ab86f6fcb576a0bb408461c83cfc96ca7070e407e848dd31d275708934"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/src/plaoc/packages/metadata/link.ts",
+        "size": 505,
+        "sha512": "c8b8d062bfcbdf43152ea61b3d85c3fb429a7e6fb7ad59a66f23a0e9f9b31922ebc1f916c4d669f74635d20b465e9faf3fc5ff8c7f0c6d121619cc968e7e39f0"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/src/plaoc/packages/metadata/metadata.ts",
+        "size": 1576,
+        "sha512": "cd48f59e2807651e15a172660c4ab893377a9edafccde4febc8fdf25db4b22edc101d4c64b6be25e4f24f894110004f94d07f0c6dfa94d4060e8c0376310083e"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/src/plaoc/packages/metadata/metadataType.ts",
+        "size": 1422,
+        "sha512": "11e3bd4a1ff73f6828432edb7b00fd9f1231318f36e17fdb23a9e7805653c9482cec8b63ce42380ecae48ce0aea6c31416171def3ad4a3534eed9cf6c7fc3d50"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/src/plaoc/packages/typings/index.ts",
+        "size": 37,
+        "sha512": "6d4a6885494f245a73408c2988110b7b6e91edf6b2f8f6ba2583bf2faa58af856cfbfcf9674e415f7afb5679890adec9194009d62ff8e296b6067ac76696d6ba"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/src/plaoc/packages/typings/types/denoType.ts",
+        "size": 176663,
+        "sha512": "201da1c4039c25abb77ab474af9d594aa44d3b839388763cd601caf5b047ed87441ef5f1a6f432f4bd064bb4ef4ce89e21156b0b4889bb131097b92b0fd908b1"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/src/test/vue3/bfsa-service/bfsa-metadata.ts",
+        "size": 2252,
+        "sha512": "6c6c577e62de277987a5508ed9ba927eb0b3a4402d7d94a882851794882bfa049d9b43a29c94e101c97e4ae6fdaa5f0071e2894f46c01d3163ca4dd1d35a5c0f"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/src/test/vue3/bfsa-service/index.ts",
+        "size": 362,
+        "sha512": "ef0d7160a3b11cddfc8676e95392d2bfc33d1cfa84fa26a9b7c4c50ed5fbbdff727b81f90e22ab1ec4eb03c71f9a93dbcb8737a67ae39d1b89cbd6e6219c34ef"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/test_runner.js",
+        "size": 460,
+        "sha512": "242964c6780ea3edd9bd1c00241eb75769fae5bfba2cc58a4eea60d7ad12d7a5aecf698ebf199803771247a621a0bf4770f4f7f40908629169970149aedc35be"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/types/plaoc/packages/core/deno/android.fn.d.ts",
+        "size": 393,
+        "sha512": "aa3741cf778706a471b07422f9b4c8b0d466ba01e12ed6be4edab7bd4523a99eca7a14bf82e3afc0177e968427ab5b43e613b550a8891d049bde5f6c9197a061"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/types/plaoc/packages/core/deno/index.d.ts",
+        "size": 1233,
+        "sha512": "b4aeab61c5f8dfbbf10cd2810dbbc57db4e721bef8c24d5eecb74ed25e02fa0595d01f92eecc60b64cdef310587a13442520b7cc2871d78c2a1dd361e07e01ac"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/types/plaoc/packages/core/deno/network.d.ts",
+        "size": 1459,
+        "sha512": "ed3352e62d4fe425295b3c94c49722a384342ddb01e51e3310e5685c9219219a903705c3d8738f6ae6e9438a64c8fc99af8ac540911d064b7a310699ff13e45d"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/types/plaoc/packages/core/deno/rust.op.d.ts",
+        "size": 465,
+        "sha512": "5921d3d4024b7c548d320d9bd83250688c50457be6d0477f0b78a106412d99feeddf898d82ab000932f7587d72edb3cf97125c07d411b9bcf19e94846621cd8c"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/types/plaoc/packages/core/index.d.ts",
+        "size": 123,
+        "sha512": "9dcc36936f54c6829b09f94cf039952a5a2d7f97b967bc5f8de52195afdb1f45b8b47c3679cf3072a4b52fa0a56427beb5830757fe49268a6d86ef444fc9a6b3"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/types/plaoc/packages/core/runtime/DWebView.d.ts",
+        "size": 403,
+        "sha512": "f48287a597bcfa064b5c2fa99cbe83ae6957a6f85568ac6f2b6ddd4aa2b8847066f7bca289f9e4736a0525718063c5e90e3fa88b4ff5a317386728bc67d5ff5a"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/types/plaoc/packages/core/runtime/Script.d.ts",
+        "size": 337,
+        "sha512": "f1bffdb5d67b758262093d4a1100ba328cda22787af7af29204fe6df5808ee7e6b79fd530963205bbcc10e0d7f79f906383be0bf31de513f2e49d56484e104c3"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/types/plaoc/packages/core/runtime/index.d.ts",
+        "size": 90,
+        "sha512": "b2725f58f98a1f78a4e910e6b5530e7aee53099d38dbf354ea1e23f6da4157df1dc34bfd72a5780e7d2503c92fd41438134cc9233d53e36af3e479abf11fea46"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/types/plaoc/packages/core/runtime/scanner.d.ts",
+        "size": 239,
+        "sha512": "d074e6ae78138e1f7845b9c763ec516bfaa98d217202a6bd9daca011d252fbb48c5f486d848483a36e1f166a039395ba0cd60afa540785abc0ac6ab41482f960"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/types/plaoc/packages/metadata/index.d.ts",
+        "size": 103,
+        "sha512": "71bf010c14f0fbcd3a6d79152bb7a388e582542f472c8a9fda13d8d0cfa05f10a6347f7a2c07919e6ec3e18cb9cd21e6a651c9038b9156118000f4ef7a04ef18"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/types/plaoc/packages/metadata/link.d.ts",
+        "size": 465,
+        "sha512": "c56ad6fde3e18bee99a80be1e469690df039d2f5b82d476473a07b885fc62f1017faabaa60cc5f07df78e58d69e70b718e6a5f5b4f289d1fdab5588ed3866216"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/types/plaoc/packages/metadata/metadata.d.ts",
+        "size": 932,
+        "sha512": "f1c8bb8e66d061ecd7e979c98deabda7f9659c0811a4b2695eb519c90298657f29082be112ba4b02a60e097cbde84c3d5cceeea6818147693fc1be05cb87de36"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/types/plaoc/packages/metadata/metadataType.d.ts",
+        "size": 653,
+        "sha512": "e9713fa14d81350b56923b4bb80cd8cb3d9d6d7f5ef729d47221a0099a95affbbe5857d4df5692e91258b32c27ae6f5072b24f369031af36a343f6a6305b0a95"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/types/plaoc/packages/typings/index.d.ts",
+        "size": 37,
+        "sha512": "6d4a6885494f245a73408c2988110b7b6e91edf6b2f8f6ba2583bf2faa58af856cfbfcf9674e415f7afb5679890adec9194009d62ff8e296b6067ac76696d6ba"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/types/plaoc/packages/typings/types/denoType.d.ts",
+        "size": 192299,
+        "sha512": "8268947799364d7be6346ceafd3ca693fe1ec753075982cf11f84a06427efc482643c32f369a94609581e59406392a4e39342ffb4446f5cc7f1703372597c267"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/types/test/vue3/bfsa-service/bfsa-metadata.d.ts",
+        "size": 114,
+        "sha512": "eca98ba3a7490d7e88c3ac6eb440d7ed3948eceb9cca9eeabddef564a36f259ffe67dca1a58d901a4f684ee878473553299c083697488827be9d169b59641ef5"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/dist/types/test/vue3/bfsa-service/index.d.ts",
+        "size": 11,
+        "sha512": "4ee1c88f8c3f4e4cd34cb6c00339bf9d6d036ff4ade3af49e871cc8966b84c729d8b75492acc6413c9a664ac00a57958223ac13c4229da8c62ebe6a53e4f783f"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/boot/vite.svg",
+        "size": 1497,
+        "sha512": "fbf065e26d907454cb432a17d831f448e1c3df0f33cd681ccc52b63e5bc26bc9e4de08591a2de579e5b05219fcffd3b4d4261ada6fa55299e731343df860488d"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/sys/assets/index.css",
+        "size": 31270,
+        "sha512": "2e1eec16aa8a151f5f47ff55953f7bc6a8e901e2b5bfa960c5b2124c37c653262bbbbec8f2abe5d7b3293d5cff2979d48aaa2021ad9955543cecf89aa44b268a"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/sys/assets/index.js",
+        "size": 1595102,
+        "sha512": "457417d3a10769b839ff666ee6fa5664edca5ccf7849acdc4392133761e8a0c980c9f38ea459d2bb3a6ce1b4924cc48a0ce43cdf9002ac51a0de0c678621bb73"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/sys/assets/swiper.bundle.js",
+        "size": 182079,
+        "sha512": "68c19b26524bbed4885081b701e9b36accf7d2e4d65b4036dfbb4a1c2b5fe234a9727b1aad7e053678861c7f427ec843781d56bab95fac3dc0d4ad546db302b6"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/sys/index.html",
+        "size": 436,
+        "sha512": "675d77b17ea5356db5275ea6b3349fcfaf9b88a940e51932f8e5796ed764b9c24e89c48cecff56caec842af02f937583f3d387fa752d36fc256776ce906e2d59"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/sys/serverWorker.mjs",
+        "size": 990,
+        "sha512": "31aeb151b922aec35f3b2cdbfa17d828cc1d90d6e17471422f2a51e9e0779e10a476eaa2a235b468e37bf9bc7945dc074212d2eddae7fe966c694ac35de18726"
+      },
+      {
+        "url": "https://shop.plaoc.com/KEJPMHLA/sys/vite.svg",
+        "size": 1497,
+        "sha512": "fbf065e26d907454cb432a17d831f448e1c3df0f33cd681ccc52b63e5bc26bc9e4de08591a2de579e5b05219fcffd3b4d4261ada6fa55299e731343df860488d"
+      }
+    ],
+    "releaseNotes": "xxx",
+    "releaseName": "xxx",
+    "releaseDate": "xxx"
+  }
 }

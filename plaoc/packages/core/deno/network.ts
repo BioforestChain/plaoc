@@ -21,9 +21,12 @@ class Network {
  * @param data 
  * @returns 
  */
-  asyncCallDenoFunction(handleFn: string, data?: string, timeout = 3000): Promise<string> {
+  asyncCallDenoFunction(handleFn: string, data: TNative = "''", timeout = 3000): Promise<string> {
     return new Promise(async (resolve, reject) => {
-      deno.callFunction(handleFn, data) // 发送请求
+      if (data instanceof Object) {
+        data = JSON.stringify(data); // stringify 两次转义一下双引号
+      }
+      deno.callFunction(handleFn, JSON.stringify(data)) // 发送请求
       do {
         const data = await loopRustBuffer().next(); // TODO 这里不能用这个方法，需要跟返回前端的隔离
         /// 忽略策略:如果队列大于高水位或者没有数据，直接忽略
@@ -126,6 +129,7 @@ class Network {
   }
 
 }
-
+// deno-lint-ignore ban-types
+type TNative = boolean | object | string | number;
 
 export const network = new Network()

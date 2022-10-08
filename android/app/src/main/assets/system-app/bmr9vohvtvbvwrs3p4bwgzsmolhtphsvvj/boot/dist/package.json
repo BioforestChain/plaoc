@@ -1,0 +1,33 @@
+{
+  "module": "./esm/test/vue3/bfsa-service/index.js",
+  "types": "./types/test/vue3/bfsa-service/index.d.ts",
+  "name": "@bfsx/bfsa-service",
+  "version": "0.0.1",
+  "description": "plaoc system runtime",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BioforestChain/plaoc.git"
+  },
+  "bugs": {
+    "url": "https://github.com/BioforestChain/plaoc/issues"
+  },
+  "devDependencies": {
+    "@types/node": "16.11.37",
+    "chalk": "4.1.2"
+  },
+  "exports": {
+    "bfsa-service": {
+      "import": {
+        "default": "./esm/test/vue3/bfsa-service/index.js",
+        "types": "./types/test/vue3/bfsa-service/index.d.ts"
+      }
+    }
+  },
+  "scripts": {
+    "test": "node test_runner.js"
+  },
+  "dependencies": {
+    "tslib": "2.3.1"
+  }
+}

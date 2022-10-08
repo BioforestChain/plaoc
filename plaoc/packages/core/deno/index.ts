@@ -68,7 +68,7 @@ export class Deno {
    * 第三块分区：数据主体 动态创建
    */
   structureBinary(fn: string, data: string | Uint8Array = "") {
-    const message = `{"function":["${fn}"],"data":${data}}`;
+    const message = `{"function":"${fn}","data":${data}}`;
 
     // 字符 转 Uint8Array
     const encoder = new TextEncoder();

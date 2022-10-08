@@ -108,7 +108,7 @@ fun warpCallback(bytes: ByteArray, store: Boolean = true) {
     mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true) //允许出现特殊字符和转义符
     mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true) //允许使用单引号
     val handle = mapper.readValue(stringData, RustHandle::class.java)
-    val funName = ExportNative.valueOf((handle.function[0]))
+    val funName = ExportNative.valueOf((handle.function))
     if (store) {
         rust_call_map[funName] = headId     // 存一下头部标记，返回数据的时候才知道给谁,存储的调用的函数名跟头部标记一一对应
     }
@@ -146,7 +146,7 @@ fun createBytesFactory(callFun: ExportNative, message: String): ByteArray {
 
 
 data class RustHandle(
-    val function: Array<String> = arrayOf(""),
+    val function: String = "",
     val data: String = ""
 )
 
