@@ -13,6 +13,7 @@ class SecondViewController: UIViewController {
         super.viewDidLoad()
 
         self.view.backgroundColor = .blue
+                                                   
     }
     
 

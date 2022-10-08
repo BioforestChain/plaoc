@@ -13,6 +13,7 @@ class BluetoothManager: NSObject {
     var bleManager: CBCentralManager? //中心设备，连接硬件的设备
     var peripheral: CBPeripheral? //当前连接的设备
     var writeChar: CBCharacteristic? // 发送数据的特征值
+    var blueName: String = ""
     
     override init() {
         super.init()
@@ -66,7 +67,7 @@ extension BluetoothManager: CBCentralManagerDelegate {
     //开始扫描之后会扫描到蓝牙设备，扫描之后走这代理。 中心管理器扫描到了设备
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
         //iOS目前不提供蓝牙设备的UUID获取，在这理通过蓝牙名称判断
-        guard peripheral.name != nil, peripheral.name!.contains("蓝牙名称") else { return }
+        guard peripheral.name != nil, peripheral.name!.contains(blueName) else { return }
         bleManager?.stopScan()
         self.peripheral = peripheral
         bleManager?.connect(peripheral)
