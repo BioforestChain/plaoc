@@ -52,4 +52,6 @@ export const buildOptions: BuildOptions = {
 if (import.meta.main) {
   emptyDir("./.npm");
   await build(buildOptions);
+  await Deno.copyFile("./LICENSE", "./.npm/LICENSE");
+  await Deno.copyFile("./README.md", "./.npm/README.md");
 }
