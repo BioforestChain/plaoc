@@ -274,8 +274,7 @@ function genLinkJson(
     icon: `file:///boot/${iconName}`,
     author: manifest.author || [],
     autoUpdate: {
-      // maxAge: manifest.maxAge || 6 * 60,
-      maxAge: 6 * 60,
+      maxAge: manifest.maxAge || 6 * 60,
       provider: 1,
       url: `https://shop.plaoc.com/${bfsAppId}.bfsa`,
       version: manifest.version,
