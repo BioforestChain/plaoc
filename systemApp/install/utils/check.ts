@@ -45,7 +45,7 @@ const WEIGHTED_FACTORS = [1, 3, 9, 27, 19, 26, 16];
  * @param bfsAppId 应用id
  * @returns
  */
-export function checkSign(bfsAppId: string): boolean {
+export function checkSign(bfsAppId: string): Promise<boolean> {
   return new Promise<boolean>((resolve) => {
     let flags = false;
     if (bfsAppId.length !== 8) {
@@ -98,8 +98,8 @@ export function genBfsAppId(): Promise<string> {
   return new Promise<string>((resolve) => {
     let checkStr = "";
 
-    for (var i = 0; i < n; i++) {
-      var id = Math.ceil(Math.random() * 30);
+    for (let i = 0; i < 7; i++) {
+      const id = Math.ceil(Math.random() * 30);
       checkStr += STR[id];
     }
 

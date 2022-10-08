@@ -13,6 +13,7 @@
     "crypto": "./utils/crypto.ts",
     "path": "./utils/path.ts",
     "check": "./utils/check.ts",
+    "compress": "./utils/compress.ts",
     "cmd_bundle": "./cmd/bundle.ts"
   }
 }

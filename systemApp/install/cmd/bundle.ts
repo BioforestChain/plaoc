@@ -5,7 +5,7 @@ import { Files, LinkMetadata, MetaData } from "@bfsx/metadata";
 import { path, slash } from "path";
 import { checksumFile } from "crypto";
 import { genBfsAppId } from "check";
-import tar from "tar";
+import { compressToSuffixesBfsa } from "compress";
 
 import "@bfsx/typings";
 
@@ -39,19 +39,7 @@ export async function bundle(options: {
   await writeConfigJson(bootPath, bfsAppId, metadata);
 
   // 对文件进行压缩
-  const prefixPath = path.resolve(destPath, "../");
-  const compressFile = path.resolve(destPath, "../", `./${bfsAppId}.bfsa`);
-  await tar.c(
-    {
-      gzip: true,
-      preservePaths: false,
-      // 设置工作目录，不设置的话，会在压缩包中带上绝对路径
-      cwd: prefixPath,
-      // 设置压缩文件名，设置后会使用promise方式，否则是流的方式
-      file: `${compressFile}`,
-    },
-    [`${bfsAppId}`]
-  );
+  await compressToSuffixesBfsa(destPath, bfsAppId);
 
   console.log("compress done!");
 }
