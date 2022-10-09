@@ -354,8 +354,8 @@ async function fileListHash(
       const fileStat = await stat(filePath);
       const fileHash = await checksumFile(filePath, "sha512", "hex");
       const file: Files = {
-        url: `https://shop.plaoc.com/${bfsAppId}${filePath.slice(
-          filePath.lastIndexOf(bfsAppId) + bfsAppId.length
+        url: `https://shop.plaoc.com/${bfsAppId}${slash(
+          filePath.slice(filePath.lastIndexOf(bfsAppId) + bfsAppId.length)
         )}`,
         size: fileStat.size,
         sha512: fileHash,
