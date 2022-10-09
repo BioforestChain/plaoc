@@ -57,7 +57,10 @@ export async function bundle(options: {
   // 压缩完成，删除目录
   await rm(destPath, { recursive: true });
 
-  console.log("compress bfsa application done!!!");
+  // 生成appversion.json
+  await genAppVersionJson(bfsAppId, metadata, destPath);
+
+  console.log("bundle bfsa application done!!!");
 }
 
 /**
@@ -168,16 +171,14 @@ async function getBfsaMetaDataJson(
   const jsonConfig = (await import(jsonPath.href, { assert: { type: "json" } }))
     .default;
   const backDir = path.dirname(packageJsonPath);
+  const rootPath = path.resolve(bootPath, "../");
   let bfsaEntry = "";
 
   if (jsonConfig.main) {
-    bfsaEntry = path.relative(
-      path.resolve(bootPath, "../"),
-      path.resolve(backDir, jsonConfig.main)
-    );
+    bfsaEntry = path.relative(rootPath, path.resolve(backDir, jsonConfig.main));
   } else if (jsonConfig.module) {
     bfsaEntry = path.relative(
-      path.resolve(bootPath, "../"),
+      rootPath,
       path.resolve(backDir, jsonConfig.module)
     );
   } else if (jsonConfig.exports?.["."]?.import) {
@@ -185,10 +186,7 @@ async function getBfsaMetaDataJson(
       typeof jsonConfig.exports["."].import === "string"
         ? jsonConfig.exports["."].import
         : jsonConfig.exports["."].import.default;
-    bfsaEntry = path.relative(
-      path.resolve(bootPath, "../"),
-      path.resolve(backDir, entry)
-    );
+    bfsaEntry = path.relative(rootPath, path.resolve(backDir, entry));
   }
 
   const _metadata: MetaData = {
@@ -280,6 +278,13 @@ function genLinkJson(
   const { manifest } = metadata;
 
   const iconName = path.basename(manifest.icon);
+  // 最大缓存时间，一般6小时更新一次。最快不能快于1分钟，否则按1分钟算。
+  const maxAge = manifest.maxAge
+    ? manifest.maxAge < 1
+      ? 1
+      : manifest.maxAge
+    : 6 * 60;
+
   const linkJson: LinkMetadata = {
     version: manifest.version,
     bfsAppId: bfsAppId,
@@ -287,9 +292,9 @@ function genLinkJson(
     icon: `file:///boot/${iconName}`,
     author: manifest.author || [],
     autoUpdate: {
-      maxAge: manifest.maxAge || 6 * 60,
+      maxAge: maxAge,
       provider: 1,
-      url: `https://shop.plaoc.com/${bfsAppId}.bfsa`,
+      url: `https://shop.plaoc.com/${bfsAppId}/appversion.json`,
       version: manifest.version,
       files: filesList,
       releaseNotes: manifest.releaseNotes || "",
@@ -299,6 +304,50 @@ function genLinkJson(
   };
 
   return linkJson;
+}
+
+/**
+ * 生成appversion.json
+ * @param bfsAppId 应用id
+ * @param metadata 应用配置信息
+ * @param destPath 应用目录
+ * @returns
+ */
+async function genAppVersionJson(
+  bfsAppId: string,
+  metadata: MetaData,
+  destPath: string
+) {
+  const { manifest } = metadata;
+  const compressFile = path.resolve(destPath, `../${bfsAppId}.bfsa`);
+  const fileStat = await stat(compressFile);
+  const fileHash = await checksumFile(compressFile, "sha512", "hex");
+
+  const appVersionJson = `
+  {
+    "data": {
+        "version": "${manifest.version}",
+        "files": [{
+            "url": "https://shop.plaoc.com/${bfsAppId}/${bfsAppId}.bfsa",
+            "size": ${fileStat.size},
+            "sha512": "${fileHash}"
+        }],
+        "releaseNotes": "${manifest.releaseNotes || ""}",
+        "releaseName": "${manifest.releaseName || ""}",
+        "releaseDate": "${manifest.releaseDate || ""}"
+    },
+    "errorCode":0,
+    "errorMsg":"success"
+  }
+  `;
+
+  await writeFile(
+    path.resolve(destPath, "../appversion.json"),
+    appVersionJson,
+    "utf-8"
+  );
+
+  return;
 }
 
 /**
