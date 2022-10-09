@@ -31,7 +31,9 @@ class ApiServiceImpl(private val client: HttpClient) : ApiService {
     DLProgress: (Long, Long) -> Unit
   ) {
     val builder = HttpRequestBuilder().apply {
-      url("$BASE_URL_PATH$path")
+      url("$BASE_URL_PATH$path") {
+        protocol = URLProtocol.HTTPS
+      }
     }
     val httpStatement = HttpStatement(builder, client)
     httpStatement.execute { response: HttpResponse ->

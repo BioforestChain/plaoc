@@ -1,14 +1,14 @@
 {
     "version": "1.0.0",
-    "bfsAppId": "bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj",
+    "bfsAppId": "KEJPMHLA",
     "name": "AR扫码",
-    "icon": "file:///sys/mzt.png",
-    "author": "kzf,kezhaofeng@bnqkl.cn,https://bnqkl.cn/developer/kzf",
+    "icon": "file:///sys/vite.svg",
+    "author": ["kzf,kezhaofeng@bnqkl.cn,https://bnqkl.cn/developer/kzf"],
     "homepage": "NULL",
     "autoUpdate": {
         "maxAge": 3,
         "provider": 1,
-        "url": "bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj/appversion.json",
+        "url": "KEJPMHLA/appversion.json",
         "version": "1.0.1",
         "files": [{
             "url": "https://www.google.cn",
