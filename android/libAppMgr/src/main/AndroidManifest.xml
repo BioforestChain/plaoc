@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.bfchain.libappmgr">
+  package="org.bfchain.libappmgr">
 
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <application android:requestLegacyExternalStorage = "true" />
+  <uses-permission android:name="android.permission.INTERNET" />
+  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+  <application android:requestLegacyExternalStorage="true">
+    <provider
+      android:name=".database.AppProvider"
+      android:authorities="org.bfchain.rust.plaoc"
+      android:exported="true" />
+  </application>
 </manifest>

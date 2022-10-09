@@ -1,8 +1,5 @@
 package org.bfchain.libappmgr.entity
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-
 /**
  * version: {Semantic Version} 该文件格式的版本号，用于告知解析器该如何认知接下来的字段。以下字段是 1.0.0 的字段描述（未来默认向下兼容）
  * bfsAppId: {string} 唯一标识，也就是 bfs-app-id，跟文件夹一致。未来该数据需要从链上申请，所以格式需要保持一致：长度为7+1（校验位）的大写英文字母或数字（链就是系统的“证书颁发机构”，资深用户可以配置不同的的链来安装那些未知来源的应用）
@@ -49,14 +46,14 @@ data class AppInfo(
   val bfsAppId: String, // 唯一标识，也就是 bfs-app-id，跟文件夹一致。长度为7+1（校验位）的大写英文字母或数字
   val name: String, // 应用名词（没有i18n的支持）
   val icon: String, // 应用图标（没有不同主题的支持），一般是 file:///sys/icon.png
-  val author: String, // 作者名称与TA的链接，用“,”进行分割，比如： ["kzf,kezhaofeng@bnqkl.cn,https://bnqkl.cn/developer/kzf"]
+  val author: Array<String>, // 作者名称与TA的链接，用“,”进行分割，比如： ["kzf,kezhaofeng@bnqkl.cn,https://bnqkl.cn/developer/kzf"]
   val homepage: String = "", // 应用网络主页，一般是https网站。用户可以通过一些特定的操作来访问应用主页了解更多应用信息
   val autoUpdate: AutoUpdateInfo, // 自动更新的相关配置
   var isSystemApp: Boolean = false, // 判断是recommend-app还是system-app
   var iconPath: String = "", // 将icon转为实际路径
 )
 
-enum class DownLoadState { IDLE, LOADING, PAUSE, COMPLETED}
+enum class DownLoadState { IDLE, LOADING, PAUSE, COMPLETED }
 
 /**
  * 解析bfsa-metadata.json
@@ -72,13 +69,42 @@ enum class DownLoadState { IDLE, LOADING, PAUSE, COMPLETED}
  *       }
  */
 data class DAppInfo(
+  val manifest: MANIFEST,
+  val dwebview: DWebView,
+  val whitelist: Array<String>
+)
+
+data class MANIFEST(
   val version: String, // version: {Semantic Version} 该应用的版本号
-  val id: String, // 唯一标识。和 link.json 中的 bfsAppId 一样
   val name: String, // 应用名词（没有i18n的支持）
-  val engines: ENGINES, // 依赖的版本号
   val icon: String, // 图标链接，这里暂时不能是传统 https:// 网络链接，只能是本地文件路径： file://
-  val enter: ENTER
-) {
-  data class ENGINES(val dwebview: String)
-  data class ENTER(val main: String)
-}
+  val engines: ENGINES, // 依赖的版本号
+  val origin: String, // 唯一标识。和 link.json 中的 bfsAppId 一样
+  val author: Array<String>, // 作者名称与TA的链接，用“,”进行分割，比如： ["kzf,kezhaofeng@bnqkl.cn,https://bnqkl.cn/developer/kzf"]
+  val description: String,
+  val keywords: Array<String>,
+  val privateKey: String,
+  val homepage: String,
+  val maxAge: Int,
+  val enters: Array<String>,
+  val releaseNotes: String,
+  val releaseName: String,
+  val releaseDate: String,
+  val bfsaEntry: String,
+)
+
+data class ENGINES(
+  val dwebview: String
+)
+
+data class DWebView(
+  val importmap: ArrayList<ImportData>
+)
+
+data class ImportData(
+  val url: String,
+  val response: String,
+)
+
+
+

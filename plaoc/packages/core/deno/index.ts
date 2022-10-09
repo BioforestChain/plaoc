@@ -39,6 +39,7 @@ export class Deno {
   callFunction(handleFn: string, data = "''") {
     const uint8Array = this.structureBinary(handleFn, data);
     js_to_rust_buffer(uint8Array);
+    return { versionView, headView }
   }
   /**
    * 调用evaljs 执行js
@@ -68,7 +69,7 @@ export class Deno {
    * 第三块分区：数据主体 动态创建
    */
   structureBinary(fn: string, data: string | Uint8Array = "") {
-    const message = `{"function":["${fn}"],"data":${data}}`;
+    const message = `{"function":"${fn}","data":${data}}`;
 
     // 字符 转 Uint8Array
     const encoder = new TextEncoder();

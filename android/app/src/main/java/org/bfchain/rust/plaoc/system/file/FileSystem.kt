@@ -3,6 +3,9 @@ package org.bfchain.rust.plaoc.system.file
 import com.king.mlkit.vision.camera.util.LogUtils
 import org.bfchain.libappmgr.utils.JsonUtil
 import org.bfchain.rust.plaoc.App
+import org.bfchain.rust.plaoc.DenoService
+import org.bfchain.rust.plaoc.ExportNative
+import org.bfchain.rust.plaoc.createBytesFactory
 import org.bfchain.rust.plaoc.webView.network.dWebView_host
 import java.io.File
 
@@ -52,8 +55,11 @@ class FileSystem {
     }
     return rType && rName
   }
-
-  fun ls(path: String, filter: String? = null, recursive: Boolean = false): String {
+/**
+ * filter：
+ * recursive：是否递归遍历目录默认false
+ * */
+  fun ls(path: String, filter: String? = null, recursive: Boolean = false) {
     val rootPath = getRootPath()
     val file = File(rootPath + File.separator + path)
     val fileList = arrayListOf<String>()
@@ -73,15 +79,21 @@ class FileSystem {
         }
       }
     }
-    return JsonUtil.toJson(fileList)
+    createBytesFactory(ExportNative.FileSystemLs,  JsonUtil.toJson(fileList))
   }
 
-  fun mkdir(path: String, recursive: Boolean = false): Boolean {
-    var file = getFileByPath(path)
-    return when (recursive) {
-      true -> file.mkdirs()
-      false -> file.mkdir()
+  fun mkdir(path: String, recursive: Boolean = false) {
+    val file = getFileByPath(path)
+    var bool = false;
+    bool = when (recursive) {
+      true -> {
+        file.mkdirs()
+      }
+      false -> {
+        file.mkdir()
+      }
     }
+    createBytesFactory(ExportNative.FileSystemMkdir,  bool.toString())
   }
 
   fun write(
@@ -89,10 +101,10 @@ class FileSystem {
     content: String,
     append: Boolean = false,
     autoCreate: Boolean = true
-  ): Boolean {
+  ) {
     val file = getFileByPath(path)
     if (!file.exists() && autoCreate) {
-      file.parentFile.mkdirs()
+      file.parentFile?.mkdirs()
     }
     try {
       when (append) {
@@ -101,22 +113,24 @@ class FileSystem {
       }
     } catch (e : Exception) {
       LogUtils.d("write fail -> ${e.message}")
-      return false
+      return createBytesFactory(ExportNative.FileSystemWrite, false.toString())
     }
-    return true
+    createBytesFactory(ExportNative.FileSystemWrite, true.toString())
   }
 
-  fun read(path: String): String {
+  fun read(path: String) {
     val file = getFileByPath(path)
-    return file.bufferedReader().use { it.readText() }
+    file.bufferedReader().use {
+      createBytesFactory(ExportNative.FileSystemRead, it.readText())
+    }
   }
 
-  fun rm(path:String, deepDelete: Boolean = true): Boolean {
+  fun rm(path:String, deepDelete: Boolean = true) {
     val file = getFileByPath(path)
     when (deepDelete) {
       true -> file.deleteRecursively()
       false -> file.delete()
     }
-    return true
+    createBytesFactory(ExportNative.FileSystemRm, true.toString())
   }
 }

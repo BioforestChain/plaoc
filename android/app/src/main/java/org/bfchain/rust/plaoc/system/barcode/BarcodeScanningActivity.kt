@@ -35,7 +35,7 @@ class BarcodeScanningActivity : BarcodeCameraScanActivity() {
                 buffer.append("[$index] ").append(data.displayValue).append("\n")
                 data.boundingBox?.let {
                   Log.d("条形码扫码数据.xxxxxxxx", it.toString())
-                  DenoService().backDataToRust(createBytesFactory(ExportNative.OpenQrScanner, it.toString()))
+                  createBytesFactory(ExportNative.OpenQrScanner, it.toString())
                   canvas.drawRect(it, paint)
                 }
             }

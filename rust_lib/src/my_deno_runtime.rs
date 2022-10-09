@@ -48,7 +48,6 @@ fn create_web_worker_callback(
         let preload_module_cb = create_web_worker_preload_module_callback();
 
         let extensions = cli_exts();
-
         let options = WebWorkerOptions {
             bootstrap: BootstrapOptions {
                 args: vec![],
@@ -95,7 +94,6 @@ fn create_web_worker_callback(
             // maybe_exit_code: args.maybe_exit_code,
             stdio: stdio.clone(),
         };
-
         // log::info!("bootstrap_from_options: {:?}", args.name);
 
         WebWorker::bootstrap_from_options(
@@ -161,7 +159,6 @@ pub fn create_main_worker(
         stdio: stdio.clone(),
     };
 
-    log::info!("6");
     MainWorker::bootstrap_from_options(main_module, permissions, options)
 }
 
@@ -190,13 +187,9 @@ pub async fn bootstrap_deno_runtime(
 
 // --------------------fs-----------------------
 
-
-fn create_web_worker_fs_callback(
-    stdio: deno_runtime::ops::io::Stdio,
-) -> Arc<CreateWebWorkerCb> {
+fn create_web_worker_fs_callback(stdio: deno_runtime::ops::io::Stdio) -> Arc<CreateWebWorkerCb> {
     Arc::new(move |args| {
-        let create_web_worker_cb =
-        create_web_worker_fs_callback(stdio.clone());
+        let create_web_worker_cb = create_web_worker_fs_callback(stdio.clone());
         let preload_module_cb = create_web_worker_preload_module_callback();
 
         let extensions = cli_exts();
@@ -221,7 +214,7 @@ fn create_web_worker_fs_callback(
             unsafely_ignore_certificate_errors: None,
             root_cert_store: None,
             seed: None,
-            module_loader:Rc::new(FsModuleLoader),
+            module_loader: Rc::new(FsModuleLoader),
             create_web_worker_cb,
             preload_module_cb,
             source_map_getter: None,
@@ -248,7 +241,6 @@ fn create_web_worker_fs_callback(
         )
     })
 }
-
 
 pub fn create_main_fs_worker(
     main_module: ModuleSpecifier,
@@ -301,18 +293,15 @@ pub fn create_main_fs_worker(
 }
 
 // #[tokio::main]
-pub async fn bootstrap_deno_fs_runtime(
-    entry_js_path: &str,
-) -> Result<(), AnyError> {
-    log::info!("start deno runtime for entry_js_path FsModuleLoader!!!{:}", &entry_js_path);
+pub async fn bootstrap_deno_fs_runtime(entry_js_path: &str) -> Result<(), AnyError> {
+    log::info!(
+        "start deno runtime for entry_js_path FsModuleLoader!!!{:}",
+        &entry_js_path
+    );
     let main_module = deno_core::resolve_path(entry_js_path)?;
     let permissions = Permissions::allow_all();
 
-    let mut worker = create_main_fs_worker(
-        main_module.clone(),
-        permissions,
-        Default::default(),
-    );
+    let mut worker = create_main_fs_worker(main_module.clone(), permissions, Default::default());
     worker.execute_main_module(&main_module).await?;
     worker.run_event_loop(false).await?;
     Ok(())

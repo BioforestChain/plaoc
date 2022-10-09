@@ -77,12 +77,12 @@ class DenoService : IntentService("DenoService") {
 
     private external fun denoSetCallback(callback: IDenoCallback)
     private external fun nativeSetCallback(callback: IHandleCallback)
-    private external fun onlyReadRuntime(assets: AssetManager,target:String) // 只读模式走这里
+    /** 只读模式走这里*/
+    private external fun onlyReadRuntime(assets: AssetManager,target:String)
     /** 这里负责返回数据到deno-js*/
-    external fun backDataToRust(
-        bufferData: ByteArray,
-    )
-
+    external fun backDataToRust(bufferData: ByteArray)
+    /** 这里负责返回数据到deno-js*/
+    external fun backSystemDataToRust(bufferData: ByteArray)
     external fun denoRuntime(path: String)
 
     @RequiresApi(Build.VERSION_CODES.S)
@@ -108,7 +108,7 @@ fun warpCallback(bytes: ByteArray, store: Boolean = true) {
     mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true) //允许出现特殊字符和转义符
     mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true) //允许使用单引号
     val handle = mapper.readValue(stringData, RustHandle::class.java)
-    val funName = ExportNative.valueOf((handle.function[0]))
+    val funName = ExportNative.valueOf((handle.function))
     if (store) {
         rust_call_map[funName] = headId     // 存一下头部标记，返回数据的时候才知道给谁,存储的调用的函数名跟头部标记一一对应
     }
@@ -130,7 +130,7 @@ fun parseBytesFactory(bytes: ByteArray): ByteData {
 
 
 /*** 创建二进制数据返回*/
-fun createBytesFactory(callFun: ExportNative, message: String): ByteArray {
+fun createBytesFactory(callFun: ExportNative, message: String) {
     val headId = rust_call_map[callFun] ?: ByteArray(2).plus(0x00)
     val versionId = version_head_map[headId] ?: ByteArray(1).plus(0x01)
     val msgBit = message.encodeToByteArray()
@@ -141,16 +141,16 @@ fun createBytesFactory(callFun: ExportNative, message: String): ByteArray {
     // 移除使用完的标记
     rust_call_map.remove(callFun)
     version_head_map.remove(headId)
-    return result.array()
+    DenoService().backSystemDataToRust(result.array())
 }
 
 
 data class RustHandle(
-    val function: Array<String> = arrayOf(""),
+    val function: String = "",
     val data: String = ""
 )
 
-data class jsHandle(
+data class JsHandle(
     val function: String = "",
     val data: String = "",
     val channelId: String? = ""

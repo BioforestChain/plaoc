@@ -21,11 +21,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.VectorPath
+import androidx.compose.ui.graphics.vector.addPathNodes
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.imageResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.bfchain.libappmgr.R
@@ -71,6 +77,7 @@ fun AppInfoMode.updateDLState(state: DownLoadState): AppInfoMode {
 
 @Composable
 fun BoxScope.AppIcon(appInfoMode: AppInfoMode) {
+  Log.d("lin.huang", "$appInfoMode")
   Image(
     bitmap = BitmapFactory.decodeFile(appInfoMode.iconPath.value)?.asImageBitmap()
       ?: ImageBitmap.imageResource(id = R.drawable.ic_launcher),
@@ -89,6 +96,33 @@ fun BoxScope.AppIcon(appInfoMode: AppInfoMode) {
         .background(Color.Red)
         .align(Alignment.TopEnd)
     )
+  }
+}
+
+fun makeIconFromXMLPath(
+  pathStr: String,
+  viewportWidth: Float = 24f,
+  viewportHeight: Float = 24f,
+  defaultWidth: Dp = 24.dp,
+  defaultHeight: Dp = 24.dp,
+  fillColor: Color = Color.White,
+): ImageVector {
+  val fillBrush = SolidColor(fillColor)
+  val strokeBrush = SolidColor(fillColor)
+
+  return ImageVector.Builder(
+    defaultWidth = defaultWidth,
+    defaultHeight = defaultHeight,
+    viewportWidth = viewportWidth,
+    viewportHeight = viewportHeight,
+  ).run {
+    addPath(
+      pathData = addPathNodes(pathStr),
+      name = "",
+      fill = fillBrush,
+      stroke = strokeBrush,
+    )
+    build()
   }
 }
 
@@ -134,7 +168,8 @@ fun AppInfoView(
     Box(
       modifier = Modifier
         .fillMaxWidth()
-        .height(36.dp).padding(0.dp, 3.dp, 0.dp, 0.dp)
+        .height(36.dp)
+        .padding(0.dp, 3.dp, 0.dp, 0.dp)
         .align(Alignment.BottomCenter)
     ) {
       AppName(appInfoMode)
