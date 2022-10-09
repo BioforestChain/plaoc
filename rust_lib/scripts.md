@@ -1,3 +1,16 @@
+## m1电脑需要配置的环境
+
+
+```shell
+export RUSTY_V8_ARCHIVE="$PWD/assets/rusty_v8_mirror/v0.48.1/librusty_v8_release_aarch64-linux-android.a"
+
+export ANDROID_NDK_ROOT="/Users/bngj/Library/Android/sdk/ndk/22.0.7026061"
+
+export PATH="$PATH:$ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/darwin-x86_64/bin"
+
+export RUSTY_V8_MIRROR="$PWD/assets/rusty_v8_mirror/"
+```
+
 ### 基础rust项目命令
 
 直接执行 main.rs
