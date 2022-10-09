@@ -1,12 +1,6 @@
 import { network } from "@bfsx/core"
-import { IsOption } from "./lsType.ts";
+import { IsOption } from "./vfsType.ts";
 import { vfsHandle } from '../vfsHandle.ts';
-
-/**获取文件根目录 */
-export async function getRootPath() {
-
-}
-
 
 /// const list: string[] = await fs.ls("./", { // list
 ///   filter: [{ // 声明筛选方式
@@ -15,14 +9,17 @@ export async function getRootPath() {
 ///   }],
 ///   recursive: true, // 是否要递归遍历目录，默认是 false
 /// });
+
 /**
  * 获取目录下有哪些文件
  * @param path 
- * @param option 
+ * @param option:{filter: [{type: "file", name: ["*.ts"]}],recursive: true // 是否要递归遍历目录，默认是 false}
+ * @returns file string[]
  */
-
 export async function ls(path: string, option: IsOption) {
-  await network.asyncCallDenoFunction(vfsHandle.FileSystemLs, { path, option })
+  const fileList = await network.asyncCallDenoFunction(vfsHandle.FileSystemLs, { path, option })
+  console.log("ls: ", fileList)
+  return fileList;
 }
 
 // for await (const entry of fs.list("./")) { // 也可以用异步迭代器来访问，避免列表过大
@@ -44,5 +41,7 @@ export async function ls(path: string, option: IsOption) {
 //   await entry.open("/") // 与FileSystem.open类似，使用绝对路径打开，同时会继承第二参数的部分配置
 //   entry.relativeTo("./" | otherEntry) // {string} 获取相对路径
 // }
-export function list() {
+export async function list(path: string) {
+  const fileList = await network.asyncCallDenoFunction(vfsHandle.FileSystemLs, { path })
+  console.log("list: ", fileList)
 }

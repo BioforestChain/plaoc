@@ -130,7 +130,7 @@ fun parseBytesFactory(bytes: ByteArray): ByteData {
 
 
 /*** 创建二进制数据返回*/
-fun createBytesFactory(callFun: ExportNative, message: String): ByteArray {
+fun createBytesFactory(callFun: ExportNative, message: String) {
     val headId = rust_call_map[callFun] ?: ByteArray(2).plus(0x00)
     val versionId = version_head_map[headId] ?: ByteArray(1).plus(0x01)
     val msgBit = message.encodeToByteArray()
@@ -141,7 +141,7 @@ fun createBytesFactory(callFun: ExportNative, message: String): ByteArray {
     // 移除使用完的标记
     rust_call_map.remove(callFun)
     version_head_map.remove(headId)
-    return result.array()
+    DenoService().backSystemDataToRust(result.array())
 }
 
 
