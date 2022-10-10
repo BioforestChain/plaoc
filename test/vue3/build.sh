@@ -16,7 +16,7 @@ check_results=`bfsa -V`
 
 if [[ $check_results =~ "0." ]]
 then
-    bfsa bundle -f ./build  -b ./bfsa-service/dist -i $bfs_id
+    bfsa bundle -f ./build/  -b ./bfsa-service/dist/ -i $bfs_id
     tar -cf KEJPMHLA.bfsa ./dist
 else
     echo "you need install @bfsx/install run  npm install -g @bfsx/install ,then try again."

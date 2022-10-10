@@ -50,17 +50,17 @@ export class BfcsTopBar extends DwebPlugin {
     return await this._ffi.topBarNavigationBack();
   }
   /**
-   * 设置是否可点击
+   * 设置是否隐藏
    * @param isEnabled boolean
    * @returns
    */
-  async setTopBarEnabled(isEnabled: boolean): Promise<void> {
-    await this._ffi.setTopBarEnabled(isEnabled);
+  async setTopBarShow(isEnabled: boolean): Promise<void> {
+    await this._ffi.setTopBarShow(isEnabled);
     return;
   }
-  /**获取是否可点击的状态 */
-  async getTopBarEnabled(): Promise<boolean> {
-    const isEnabled = await this._ffi.getTopBarEnabled();
+  /**获取是否隐藏的状态 */
+  async getTopBarShow(): Promise<boolean> {
+    const isEnabled = await this._ffi.getTopBarShow();
     return isEnabled;
   }
   /**获取标题 */

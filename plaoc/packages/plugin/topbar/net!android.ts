@@ -10,21 +10,21 @@ export class TopBarFFI implements TopBar.ITopBarFFI {
     return await netCallNativeUi(NativeUI.TopBarNavigationBack);
   }
 
-  async getTopBarEnabled(): Promise<boolean> {
-    const isEnabled = await netCallNativeUi(NativeUI.GetTopBarEnabled);
-    return Boolean(isEnabled);
+  async getTopBarShow(): Promise<boolean> {
+    const isShow = await netCallNativeUi(NativeUI.GetTopBarShow);
+    return Boolean(isShow);
   }
 
-  async setTopBarEnabled(isEnabled: boolean): Promise<void> {
-    await netCallNativeUi(NativeUI.SetTopBarEnabled, isEnabled);
+  async setTopBarShow(isShow: boolean): Promise<void> {
+    await netCallNativeUi(NativeUI.SetTopBarShow, isShow);
     return;
   }
 
   async setTopBarHidden(): Promise<void> {
-    const isEnabled = await this.getTopBarEnabled();
+    const isShow = await this.getTopBarShow();
 
-    if (isEnabled) {
-      await this.setTopBarEnabled(false);
+    if (isShow) {
+      await this.setTopBarShow(false);
     }
 
     return;

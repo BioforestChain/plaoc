@@ -21,11 +21,11 @@ class TopBarFFI(
       return true
     }
 
-    fun getTopBarEnabled(): Boolean {
+    fun getTopBarShow(): Boolean {
         return state.enabled.value
     }
 
-    fun setTopBarEnabled(isEnabled: Boolean): Boolean {
+    fun setTopBarShow(isEnabled: Boolean): Boolean {
         state.enabled.value = isEnabled
 //        Log.i(TAG, "toggleEnabled:${state.enabled.value}")
         return state.enabled.value
