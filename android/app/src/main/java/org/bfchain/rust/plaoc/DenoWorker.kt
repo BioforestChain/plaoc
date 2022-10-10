@@ -36,7 +36,6 @@ class DenoWorker(appContext: Context, workerParams: WorkerParameters) :
     }
     return Result.success()
   }
-
 }
 
 /** 创建后台线程worker，来运行Service*/
@@ -47,11 +46,6 @@ fun createWorker(funName: WorkerNative, data: String = "") {
   if(done) {
     return
   }
-
-//  WorkManager.getInstance(App.appContext.applicationContext).enqueueUniquePeriodicWork(
-//    fnName,
-//    ExistingPeriodicWorkPolicy.KEEP, request
-//  )
   // 创建worker
   val denoWorkRequest: WorkRequest =
     OneTimeWorkRequestBuilder<DenoWorker>()
@@ -70,3 +64,8 @@ fun createWorker(funName: WorkerNative, data: String = "") {
     .getInstance(App.appContext)
     .enqueue(denoWorkRequest)
 }
+
+//  WorkManager.getInstance(App.appContext.applicationContext).enqueueUniquePeriodicWork(
+//    fnName,
+//    ExistingPeriodicWorkPolicy.KEEP, request
+//  )

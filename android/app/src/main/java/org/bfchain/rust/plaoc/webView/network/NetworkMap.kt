@@ -51,7 +51,7 @@ fun interceptNetworkRequests(
         return viewGateWay(customUrlScheme, request)
       }
       // 映射本地文件的资源文件 https://bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj.dweb/index.mjs -> /plaoc/index.mjs
-      if (Regex(dWebView_host).containsMatchIn(url)) {
+      if (Regex(dWebView_host.lowercase(Locale.ROOT)).containsMatchIn(url)) {
         val path = URL(url).path
         return customUrlScheme.handleRequest(request, path)
       }
@@ -200,7 +200,7 @@ fun initMetaData(metaData: String) {
 
 /** 返回应用的虚拟路径 "https://$dWebView_host.dweb$path"*/
 fun resolveUrl(path: String): String {
-  return "https://$dWebView_host.dweb${shakeUrl(path)}"
+  return "https://${dWebView_host.lowercase(Locale.ROOT)}.dweb${shakeUrl(path)}"
 }
 
 /** 适配路径没有 / 的尴尬情况，没有的话会帮你加上*/
