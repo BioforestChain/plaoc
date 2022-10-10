@@ -2,6 +2,9 @@ package org.bfchain.libappmgr.ui.download
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import io.ktor.client.statement.*
+import io.ktor.http.*
+import io.ktor.utils.io.jvm.javaio.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
@@ -11,7 +14,10 @@ import org.bfchain.libappmgr.network.ApiService
 import org.bfchain.libappmgr.network.base.ApiResultData
 import org.bfchain.libappmgr.network.base.IApiResult
 import org.bfchain.libappmgr.network.base.fold
+import java.io.BufferedInputStream
 import java.io.File
+import java.io.FileOutputStream
+import java.io.InputStream
 
 class DownLoadViewModel : ViewModel() {
 
@@ -48,8 +54,9 @@ class DownLoadViewModel : ViewModel() {
           })
         }
     }
+  }
 
-    /*fun downloadAndSave(url: String, outputFile: String, apiResult: IApiResult<Nothing>) {
+  /*fun downloadAndSave(url: String, outputFile: String, apiResult: IApiResult<Nothing>) {
     viewModelScope.launch {
       flow {
         emit(ApiResultData.prepare())
@@ -104,5 +111,4 @@ class DownLoadViewModel : ViewModel() {
         }
     }
   }*/
-  }
 }
