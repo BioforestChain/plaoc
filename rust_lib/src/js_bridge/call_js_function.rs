@@ -68,3 +68,9 @@ pub fn op_rust_to_js_app_notification() -> Result<Vec<u8>, AnyError> {
         None => Err(custom_error("op_rust_to_js_buffer", "未找到数据")),
     }
 }
+
+/// 负责存储消息
+#[op]
+pub fn op_rust_to_js_set_app_notification(buffer: ZeroCopyBuf) {
+    BUFFER_NOTIFICATION.lock().push(buffer.to_vec());
+}

@@ -9,6 +9,14 @@ export function eval_js(data: Uint8Array) {
   Deno.core.opSync("op_eval_js", data);
 }
 
+/**
+ * 发送系统通知
+ * @param data 
+ */
+export function setNotification(data: Uint8Array) {
+  Deno.core.opSync("op_rust_to_js_set_app_notification", data)
+}
+
 /**循环从rust里拿数据 */
 export function loopRustBuffer(opFunction: string) {
   return {
