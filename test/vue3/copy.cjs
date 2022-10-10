@@ -61,20 +61,20 @@ function mkdirsSync(dirname) {
 // 创建目录
 mkdirsSync('../../android/app/src/main/assets/system-app/bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj');
 // 复制前端
-copyDir('./test/vue3/build', '../../android/app/src/main/assets/system-app/bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj', (e) => {
+copyDir('./build', '../../android/app/src/main/assets/system-app/bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj/sys', (e) => {
   console.log(e)
 })
 // 复制后端
-copyDir('./test/vue3/bfs-service/dist/esm', '../../android/app/src/main/assets/system-app/bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj', (e) => {
+copyDir('./bfsa-service/dist', '../../android/app/src/main/assets/system-app/bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj/boot/dist', (e) => {
   console.log(e)
 })
 
 
 // 创建读取流
-readable = fs.createReadStream("./test/vue3/node_modules/@bfsx/plugin/dist/esm/common/serverWorker.mjs");
+readable = fs.createReadStream("./node_modules/@bfsx/plugin/esm/gateway/serverWorker.js");
 
 // 创建写入流
-writable = fs.createWriteStream("../../android/app/src/main/assets/system-app/bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj/serverWorker.mjs");
+writable = fs.createWriteStream("../../android/app/src/main/assets/system-app/bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj/sys/serverWorker.js");
 // 通过管道来传输流
 readable.pipe(writable);
 

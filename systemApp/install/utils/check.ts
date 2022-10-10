@@ -1,3 +1,5 @@
+import { webcrypto } from "node_crypto";
+
 /**
  * 统一社会信用代码校验规则
  * 不用I、O、S、V、Z
@@ -98,8 +100,11 @@ export function genBfsAppId(): Promise<string> {
   return new Promise<string>((resolve) => {
     let checkStr = "";
 
+    const randomArray = new Uint8Array(7);
+    webcrypto.getRandomValues(randomArray);
+
     for (let i = 0; i < 7; i++) {
-      const id = Math.ceil(Math.random() * 30);
+      const id = randomArray[i] % 31;
       checkStr += STR[id];
     }
 

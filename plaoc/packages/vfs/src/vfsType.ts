@@ -13,3 +13,14 @@ export enum EFilterType {
   file = "file",
   directroy = "directroy",
 }
+
+
+export interface MkdirOption {
+  recursive: boolean
+}
+
+export interface WriteOption {
+  content: string,
+  append: boolean,
+  autoCreate: boolean
+}

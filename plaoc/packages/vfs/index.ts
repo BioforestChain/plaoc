@@ -13,3 +13,6 @@ const fs = {
   rm,
 };
 export { fs, list, ls, mkdir, read, rm, write };
+
+
+export { EFilterType } from "./src/vfsType.ts"
