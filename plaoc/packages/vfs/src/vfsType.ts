@@ -24,3 +24,7 @@ export interface WriteOption {
   append: boolean,
   autoCreate: boolean
 }
+
+export interface RmOption {
+  deepDelete: boolean
+}

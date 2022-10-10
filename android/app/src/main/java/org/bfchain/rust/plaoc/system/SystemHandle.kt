@@ -29,39 +29,55 @@ private val fileSystem = FileSystem()
   callable_map[ExportNative.FileSystemLs] = {
 //    val handle = mapper.readValue(it, object : TypeReference<SystemHandle<FileLs>>() {})
     val handle = mapper.readValue(it, FileLs::class.java)
-    fileSystem.ls(handle.path,handle.filter, handle.recursive)
+    fileSystem.ls(handle.path,handle.option.filter, handle.option.recursive)
   }
   callable_map[ExportNative.FileSystemMkdir] = {
     val handle = mapper.readValue(it, FileLs::class.java)
-    fileSystem.mkdir(handle.path,handle.recursive)
+    fileSystem.mkdir(handle.path,handle.option.recursive)
   }
   callable_map[ExportNative.FileSystemWrite] = {
     val handle = mapper.readValue(it, FileWrite::class.java)
-    fileSystem.write(handle.path,handle.content, handle.append,handle.autoCreate)
+    fileSystem.write(handle.path,handle.option.content, handle.option.append,handle.option.autoCreate)
   }
   callable_map[ExportNative.FileSystemRead] = {
-    val handle = mapper.readValue(it, FileLs::class.java)
+    val handle = mapper.readValue(it, FileRead::class.java)
     fileSystem.read(handle.path)
   }
   callable_map[ExportNative.FileSystemRm] = {
     val handle = mapper.readValue(it, FileRm::class.java)
-    fileSystem.rm(handle.path)
+    fileSystem.rm(handle.path,handle.option.deepDelete)
   }
 }
 
 data class FileLs (
   val path: String = "",
+  val option: LsOption = LsOption()
+  )
+
+data class LsOption(
   val filter: String = "",
   val recursive: Boolean = false
-  )
+)
+
+data class FileRead (
+  val path: String = "",
+)
 
 data class FileWrite (
   val path: String = "",
+  val option: WriteOption = WriteOption()
+)
+
+data class WriteOption(
   val content: String = "",
   val append: Boolean = false,
   val autoCreate: Boolean = true
 )
 data class FileRm (
   val path: String = "",
+  val option: RmOption = RmOption()
+)
+
+data class RmOption(
   val deepDelete: Boolean = true
 )
