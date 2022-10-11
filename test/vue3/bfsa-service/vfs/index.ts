@@ -4,7 +4,7 @@ try {
   const fs = await ls("/", {
     filter: {
       type: EFilterType.file,
-      name: ["*\.ts)"]
+      name: ["*.ts"]
     },
     recursive: true
   })

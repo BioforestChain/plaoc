@@ -18,21 +18,13 @@ class DenoWorker(appContext: Context, workerParams: WorkerParameters) :
     Log.i(TAG, "WorkerName=$funName,WorkerData=$data")
     if (funName !== null) {
       val calFn = ExportNative.valueOf(funName)
-      // TODO 这样处理是不得已为之，因为denoRuntime在主线程起会导致无响应,而现在使用WorkManager处理的话是可以运行的。
-      // TODO 但是测试多次打开关闭后发现WorkManager状态一直没有结束，而是卡在了`it(data)`这里(卡在了runtime运行时).await。
-      // TODO 所以只能再加一个线程，主动引发报错，让代码走到外部的success,从而释放一个后台线程的状态。
-      try {
         thread {
           callable_map[calFn]?.let { it ->
             if (data != null) {
               it(data)
             }
           }
-        }.start()
-      } catch (e:Exception) {
-        e.printStackTrace()
-        return Result.failure()
-      }
+        }
     }
     return Result.success()
   }

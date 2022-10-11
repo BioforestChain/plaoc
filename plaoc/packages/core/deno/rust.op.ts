@@ -22,12 +22,12 @@ export function loopRustBuffer(opFunction: string) {
   return {
     async next() {
       let buffer: number[] = [];
-      let versionView;
-      let headView;
+      let versionView: number[] = [];
+      let headView:number[] = [];
       try {
         buffer = await Deno.core.opAsync(opFunction);
         console.log("rust发送消息给deno_js:", buffer);
-        if (buffer[0] === 0) {
+        if (buffer[0] === 1) {
           versionView = buffer.splice(0, 1); //拿到版本号
           headView = buffer.splice(0, 2); // 拿到头部标记
         }
@@ -42,6 +42,8 @@ export function loopRustBuffer(opFunction: string) {
       } catch (_e) {
         return {
           value: "",
+          versionView,
+          headView,
           done: true,
         };
       }

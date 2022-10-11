@@ -26,16 +26,20 @@ class Network {
       if (data instanceof Object) {
         data = JSON.stringify(data); // stringify 两次转义一下双引号
       }
-      const { versionView } = deno.callFunction(handleFn, JSON.stringify(data)) // 发送请求
+      const { headView } = deno.callFunction(handleFn, JSON.stringify(data)) // 发送请求
       do {
         const data = await loopRustBuffer("op_rust_to_js_system_buffer").next();
         if (data.done) {
           continue;
         }
-        console.log("asyncCallDenoFunction versionView  ====> ", data.value, versionView);
+        console.log("asyncCallDenoFunction headView  ====> ", data.value);
+        console.log("data.headView:", data.headView, " xxxx ", headView)
         // 如果请求是返回了是同一个表示头则返回成功
-        if (data.versionView === Array.from(versionView)) {
-          resolve(data.value)
+        const isCur = data!.headView.filter((byte, index) => {
+          return byte === Array.from(headView)[index]
+        })
+        if (isCur.length === 2) {
+          resolve(data.value);
           break;
         }
       } while (true);
