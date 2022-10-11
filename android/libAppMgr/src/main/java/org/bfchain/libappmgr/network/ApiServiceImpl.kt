@@ -7,15 +7,11 @@ import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import io.ktor.util.*
 import io.ktor.utils.io.*
 import io.ktor.utils.io.core.*
 import org.bfchain.libappmgr.entity.AppVersion
 import org.bfchain.libappmgr.network.base.ApiResultData
-import org.bfchain.libappmgr.network.base.BASE_URL
-import org.bfchain.libappmgr.network.base.BASE_URL_PATH
 import org.bfchain.libappmgr.network.base.BaseData
-import org.bfchain.libappmgr.utils.FilesUtil
 import java.io.File
 
 class ApiServiceImpl(private val client: HttpClient) : ApiService {

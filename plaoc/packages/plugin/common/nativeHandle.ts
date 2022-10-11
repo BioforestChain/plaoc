@@ -27,8 +27,8 @@ export enum NativeUI {
   HideKeyBoard = "HideKeyBoard",
   // Top Bar
   TopBarNavigationBack = "TopBarNavigationBack",
-  GetTopBarEnabled = "GetTopBarEnabled",
-  SetTopBarEnabled = "SetTopBarEnabled",
+  GetTopBarShow = "GetTopBarShow",
+  SetTopBarShow = "SetTopBarShow",
   GetTopBarOverlay = "GetTopBarOverlay",
   SetTopBarOverlay = "SetTopBarOverlay",
   GetTopBarTitle = "GetTopBarTitle",
