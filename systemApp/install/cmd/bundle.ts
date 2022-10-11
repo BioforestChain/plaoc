@@ -7,7 +7,7 @@ import { checksumFile } from "crypto";
 import { genBfsAppId, checkSign } from "check";
 import { compressToSuffixesBfsa } from "compress";
 
-import "@bfsx/typings";
+import type * as types from "@bfsx/typings";
 
 const { existsSync } = fs;
 const { mkdir, writeFile, copyFile, readdir, stat, rm, readFile } = fs.promises;

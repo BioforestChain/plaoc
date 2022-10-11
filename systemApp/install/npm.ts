@@ -44,8 +44,8 @@ export const buildOptions: BuildOptions = {
       "@types/node": "latest",
       "@types/tar": "^6.1.3",
       "@bfsx/typings": "^0.0.3",
-      "@bfsx/metadata": "^0.0.3",
-      "@bfsx/gateway": "^0.0.1",
+      "@bfsx/metadata": "^0.0.4",
+      "@bfsx/gateway": "^0.0.4",
     },
   },
 };
