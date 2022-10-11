@@ -7,11 +7,13 @@
 
 import UIKit
 import RxSwift
+import WebKit
 
 
 let operateMonitor = OperateMonitor()
 class OperateMonitor: NSObject {
 
     let tabBarMonitor = PublishSubject<Void>()
+    let interceptMonitor = PublishSubject<(WKURLSchemeTask,String,String)>()
     
 }

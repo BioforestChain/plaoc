@@ -7,8 +7,11 @@
   "resolved" "https://registry.npmjs.org/@babel/parser/-/parser-7.19.3.tgz"
   "version" "7.19.3"
 
-"@bfsx/plugin@file:../../plaoc/build/plugin":
-  "resolved" "file:../../plaoc/build/plugin"
+"@bfsx/plugin@file:../../plaoc/build/plugin/esm/plugin/index.js":
+  "resolved" "file:../../plaoc/build/plugin/esm/plugin/index.js"
+
+"@bfsx/typings@file:../../plaoc/build/typings":
+  "resolved" "file:../../plaoc/build/typings"
   "version" "0.0.3"
   dependencies:
     "tslib" "2.3.1"

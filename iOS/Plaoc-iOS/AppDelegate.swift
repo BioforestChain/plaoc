@@ -18,7 +18,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window?.rootViewController = CustomNaviViewController(rootViewController: ViewController())
         
         let str = NSString(string: Bundle.main.bundlePath)
-        let path = str.appendingPathComponent("resource_3rd/assets/www")
+        let path = str.appendingPathComponent("resource_3rd/bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj/sys")
         Schemehandler.setupHTMLCache(fromPath: path)
         
         window?.makeKeyAndVisible()
@@ -32,11 +32,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //        }
         
         
+     
         return true
     }
-
     
-
 
 }
 

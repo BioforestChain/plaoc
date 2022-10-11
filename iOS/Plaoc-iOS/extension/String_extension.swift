@@ -27,4 +27,23 @@ extension String {
     public func utf8Data() -> Data? {
         return self.data(using: .utf8)
     }
+    
+    //16进制转string
+    public func hexStringToString(symbol: String) -> String {
+        
+        guard self.contains(symbol) else { return "" }
+        let contentList = self.components(separatedBy: symbol)
+        var array: [UInt8] = []
+        for text in contentList {
+            if UInt8(text) != nil {
+                array.append(UInt8(text)!)
+            }
+        }
+        guard array.count > 0 else { return "" }
+        let data = Data(bytes: array, count: array.count)
+        let result = String(data: data, encoding: .utf8)
+        return result ?? ""
+    }
+    
+   
 }
