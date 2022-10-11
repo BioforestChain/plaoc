@@ -89,7 +89,7 @@ async function getFactory(event: FetchEvent, dataBuffer: Uint8Array) {
   return response;
 }
 /** 根据file.size进行循环切割. */
-function fileChunk(fileBuff: Uint8Array) {
+export function fileChunk(fileBuff: Uint8Array) {
   let index = 0;
   const oneM = 1024 * 512 * 1; // 不要再增大了，native端处理不来
   const bufferList = [];
@@ -101,5 +101,4 @@ function fileChunk(fileBuff: Uint8Array) {
 }
 
 // 不要删除，serverWorker没有window对象
-(self as any).export = "";
-export { };
+

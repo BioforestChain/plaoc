@@ -2,7 +2,7 @@
 
 # 快速npm link 方便测试
 
-dirctory=("core" "plugin" "metadata" "typings" "vfs")
+dirctory=("core" "plugin" "metadata" "typings" "vfs","gateway")
 
 for dir in ${dirctory[@]}
 do
@@ -10,6 +10,6 @@ do
 done
 
 
-cd ../test/vue3/ && npm link @bfsx/plugin
+cd ../test/vue3/ && npm link @bfsx/plugin && npm link @bfsx/gateway
 
 cd ./bfsa-service && pwd && npm link @bfsx/core && npm link @bfsx/metadata && npm link @bfsx/typings

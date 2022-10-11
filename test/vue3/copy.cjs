@@ -71,13 +71,13 @@ copyDir('./bfsa-service/dist', './dist/KEJPMHLA/boot/dist', (e) => {
 })
 
 
-// 创建读取流
-readable = fs.createReadStream("./node_modules/@bfsx/gateway/esm/serverWorker.js");
+// // 创建读取流
+// readable = fs.createReadStream("./node_modules/@bfsx/gateway/esm/serverWorker.mjs");
 
-// 创建写入流
-writable = fs.createWriteStream("./dist/KEJPMHLA/sys/serverWorker.js");
-// 通过管道来传输流
-readable.pipe(writable);
+// // 创建写入流
+// writable = fs.createWriteStream("./dist/KEJPMHLA/sys/serverWorker.mjs");
+// // 通过管道来传输流
+// readable.pipe(writable);
 
 /*
  * 复制目录、子目录，及其中的文件

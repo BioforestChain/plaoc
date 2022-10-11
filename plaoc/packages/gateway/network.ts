@@ -1,5 +1,6 @@
 // deno-lint-ignore-file no-explicit-any
 /// <reference lib="dom" />
+
 /**
  * 注册serverWorker方法
  */
@@ -7,7 +8,7 @@ export function registerServerWorker() {
   addEventListener("load", () => {
     // 能力检测
     if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("serverWorker.js", { scope: "/" }).then(
+      navigator.serviceWorker.register("serverWorker.mjs", { scope: "/" }).then(
         () => {
           console.log("Service Worker register success");
         },

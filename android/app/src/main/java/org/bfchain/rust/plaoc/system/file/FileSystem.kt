@@ -58,7 +58,7 @@ class FileSystem {
       }
     } catch (e: PatternSyntaxException) {
       val msg = "正则表达式语法错误";
-      Log.i("regex", msg);
+      Log.i("regex", e.toString());
       return msg
     }
     return "ok"
