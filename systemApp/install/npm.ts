@@ -43,9 +43,9 @@ export const buildOptions: BuildOptions = {
     devDependencies: {
       "@types/node": "latest",
       "@types/tar": "^6.1.3",
-      "@bfsx/typings": "link:../../../plaoc/build/typings",
-      "@bfsx/metadata": "link:../../../plaoc/build/metadata",
-      "@bfsx/gateway": "link:../../../plaoc/build/gateway",
+      "@bfsx/typings": "^0.0.3",
+      "@bfsx/metadata": "^0.0.3",
+      "@bfsx/gateway": "^0.0.1",
     },
   },
 };

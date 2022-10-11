@@ -127,7 +127,7 @@ async function copyDir(src: string, dest: string) {
  * @returns
  */
 async function writeServiceWorkder(destPath: string): Promise<boolean> {
-  const file = path.join(destPath, "serverWorker.js");
+  const file = path.join(destPath, "serverWorker.mjs");
 
   // TODO: 暂时没想到好的方法
   const url = new URL("./bundle.js", import.meta.url);
