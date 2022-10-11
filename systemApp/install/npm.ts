@@ -39,13 +39,13 @@ export const buildOptions: BuildOptions = {
     dependencies: {
       tar: "^6.1.11",
       commander: "^9.4.0",
+      "@bfsx/gateway": "^0.0.4",
     },
     devDependencies: {
       "@types/node": "latest",
       "@types/tar": "^6.1.3",
       "@bfsx/typings": "^0.0.3",
       "@bfsx/metadata": "^0.0.4",
-      "@bfsx/gateway": "^0.0.4",
     },
   },
 };
