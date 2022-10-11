@@ -11,8 +11,8 @@ export namespace TopBar {
 
   export interface TopBarAndroidFFI {
     topBarNavigationBack(): void;
-    getTopBarEnabled(): boolean;
-    setTopBarEnabled(isEnabled: number): void;
+    getTopBarShow(): boolean;
+    setTopBarShow(isShow: boolean): void;
     getTopBarOverlay(): boolean;
     setTopBarOverlay(alpha: string): void;
     getTopBarTitle(): string;
@@ -110,8 +110,8 @@ export namespace TopBar {
 
   export interface ITopBarFFI {
     topBarNavigationBack(): Promise<boolean>;
-    getTopBarEnabled(): Promise<boolean>;
-    setTopBarEnabled(isEnabled: boolean): Promise<void>;
+    getTopBarShow(): Promise<boolean>;
+    setTopBarShow(isShow: boolean): Promise<void>;
     setTopBarHidden(): Promise<void>;
     getTopBarOverlay(): Promise<boolean>;
     setTopBarOverlay(alpha: string): Promise<void>;

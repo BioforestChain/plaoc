@@ -59,22 +59,23 @@ function mkdirsSync(dirname) {
 }
 
 // 创建目录
-mkdirsSync('../../android/app/src/main/assets/system-app/bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj');
+mkdirsSync('./dist/KEJPMHLA/boot');
+mkdirsSync('./dist/KEJPMHLA/sys');
 // 复制前端
-copyDir('./build', '../../android/app/src/main/assets/system-app/bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj/sys', (e) => {
+copyDir('./build', './dist/KEJPMHLA/sys', (e) => {
   console.log(e)
 })
 // 复制后端
-copyDir('./bfsa-service/dist', '../../android/app/src/main/assets/system-app/bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj/boot/dist', (e) => {
+copyDir('./bfsa-service/dist', './dist/KEJPMHLA/boot/dist', (e) => {
   console.log(e)
 })
 
 
 // 创建读取流
-readable = fs.createReadStream("./node_modules/@bfsx/plugin/esm/gateway/serverWorker.js");
+readable = fs.createReadStream("./node_modules/@bfsx/gateway/esm/serverWorker.js");
 
 // 创建写入流
-writable = fs.createWriteStream("../../android/app/src/main/assets/system-app/bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj/sys/serverWorker.js");
+writable = fs.createWriteStream("./dist/KEJPMHLA/sys/serverWorker.js");
 // 通过管道来传输流
 readable.pipe(writable);
 
@@ -108,25 +109,25 @@ readable.pipe(writable);
 
 // // 创建test-vue3链接到android项目
 // const sourcePath = path.join(__dirname, "./build");
-// const targetPath = path.join(__dirname, "../android/app/src/main/assets/system-app/bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj");
+// const targetPath = path.join(__dirname, "../android/app/src/main/assets/system-app/KEJPMHLA");
 
 // createSymlink(sourcePath, targetPath);
 
 
 // // 创建serverWorker链接到android项目
 // const workerSrcPath = path.join(__dirname, "./node_modules/@bfsx/plugin/dist/default/esm/common/serverWorker.mjs");
-// const workerDistPath = path.join(__dirname, "../android/app/src/main/assets/system-app/bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj/serverWorker.mjs");
+// const workerDistPath = path.join(__dirname, "../android/app/src/main/assets/system-app/KEJPMHLA/serverWorker.mjs");
 
 // createSymlink(workerSrcPath, workerDistPath);
 
 // // 创建bfs-service链接到android项目
 // const plaocSrcPath = path.join(__dirname, "./bfs-service/dist/esm/plaoc");
-// const plaocDistPath = path.join(__dirname, "../android/app/src/main/assets/system-app/bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj/plaoc");
+// const plaocDistPath = path.join(__dirname, "../android/app/src/main/assets/system-app/KEJPMHLA/plaoc");
 
 // createSymlink(plaocSrcPath, plaocDistPath);
 
 // const vueSrcPath = path.join(__dirname, "./bfs-service/dist/esm/test-vue3");
-// const vueDistPath = path.join(__dirname, "../android/app/src/main/assets/system-app/bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj/test-vue3");
+// const vueDistPath = path.join(__dirname, "../android/app/src/main/assets/system-app/KEJPMHLA/test-vue3");
 
 // createSymlink(vueSrcPath, vueDistPath);
 

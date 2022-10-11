@@ -11,19 +11,21 @@ pub fn cli_exts() -> Vec<Extension> {
             call_js_function::op_eval_js::decl(),
             // call_js_function::op_rust_to_js_hander::decl(),
             call_js_function::op_rust_to_js_buffer::decl(),
+            call_js_function::op_rust_to_js_system_buffer::decl(),
+            call_js_function::op_rust_to_js_app_notification::decl(),
+            call_js_function::op_rust_to_js_set_app_notification::decl(),
         ])
         .build();
     log::info!("cli_exts 2");
     vec![ext]
 }
 
-
 // use crate::proc_state::ProcState;
 
 // pub fn cli_exts(ps: ProcState) -> Vec<Extension> {
 //     vec![init_proc_state(ps)]
 //   }
-  
+
 //   fn init_proc_state(ps: ProcState) -> Extension {
 //     Extension::builder()
 //         .ops(vec![
@@ -38,4 +40,3 @@ pub fn cli_exts() -> Vec<Extension> {
 //       })
 //       .build()
 //   }
-  

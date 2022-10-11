@@ -1,9 +1,8 @@
 package org.bfchain.rust.plaoc.system
 
-import com.fasterxml.jackson.core.JsonProcessingException
-import com.fasterxml.jackson.core.type.TypeReference
+import android.util.Log
 import org.bfchain.rust.plaoc.*
-import org.bfchain.rust.plaoc.system.file.FileSystem
+import org.bfchain.rust.plaoc.system.file.*
 import org.bfchain.rust.plaoc.webView.network.initMetaData
 import org.bfchain.rust.plaoc.webView.sendToJavaScript
 
@@ -28,40 +27,25 @@ private val fileSystem = FileSystem()
   /** fs System*/
   callable_map[ExportNative.FileSystemLs] = {
 //    val handle = mapper.readValue(it, object : TypeReference<SystemHandle<FileLs>>() {})
+    Log.i("xxxx1:",it)
     val handle = mapper.readValue(it, FileLs::class.java)
-    fileSystem.ls(handle.path,handle.filter, handle.recursive)
+    fileSystem.ls(handle.path,handle.option.filter, handle.option.recursive)
   }
   callable_map[ExportNative.FileSystemMkdir] = {
     val handle = mapper.readValue(it, FileLs::class.java)
-    fileSystem.mkdir(handle.path,handle.recursive)
+    fileSystem.mkdir(handle.path,handle.option.recursive)
   }
   callable_map[ExportNative.FileSystemWrite] = {
     val handle = mapper.readValue(it, FileWrite::class.java)
-    fileSystem.write(handle.path,handle.content, handle.append,handle.autoCreate)
+    fileSystem.write(handle.path,handle.option.content, handle.option.append,handle.option.autoCreate)
   }
   callable_map[ExportNative.FileSystemRead] = {
-    val handle = mapper.readValue(it, FileLs::class.java)
+    val handle = mapper.readValue(it, FileRead::class.java)
     fileSystem.read(handle.path)
   }
   callable_map[ExportNative.FileSystemRm] = {
     val handle = mapper.readValue(it, FileRm::class.java)
-    fileSystem.rm(handle.path)
+    fileSystem.rm(handle.path,handle.option.deepDelete)
   }
 }
 
-data class FileLs (
-  val path: String = "",
-  val filter: String = "",
-  val recursive: Boolean = false
-  )
-
-data class FileWrite (
-  val path: String = "",
-  val content: String = "",
-  val append: Boolean = false,
-  val autoCreate: Boolean = true
-)
-data class FileRm (
-  val path: String = "",
-  val deepDelete: Boolean = true
-)

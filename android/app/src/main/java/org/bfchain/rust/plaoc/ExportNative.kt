@@ -46,8 +46,8 @@ enum class ExportNativeUi(val type: String) {
   HideKeyBoard("hideKeyBoard"),
   // Top Bar
   TopBarNavigationBack("topBarNavigationBack"),
-  GetTopBarEnabled("getTopBarEnabled"),
-  SetTopBarEnabled("setTopBarEnabled"),
+  GetTopBarShow("getTopBarShow"),
+  SetTopBarShow("setTopBarShow"),
   GetTopBarOverlay("getTopBarOverlay"),
   SetTopBarOverlay("setTopBarOverlay"),
   GetTopBarTitle("getTopBarTitle"),

@@ -1,5 +1,6 @@
 package org.bfchain.libappmgr.network
 
+import android.util.Log
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.plugins.*
@@ -7,11 +8,10 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.utils.io.*
+import io.ktor.utils.io.core.*
 import org.bfchain.libappmgr.entity.AppVersion
 import org.bfchain.libappmgr.network.base.ApiResultData
-import org.bfchain.libappmgr.network.base.BASE_URL_PATH
 import org.bfchain.libappmgr.network.base.BaseData
-import org.bfchain.libappmgr.utils.FilesUtil
 import java.io.File
 
 class ApiServiceImpl(private val client: HttpClient) : ApiService {
@@ -30,8 +30,23 @@ class ApiServiceImpl(private val client: HttpClient) : ApiService {
     file: File?,
     DLProgress: (Long, Long) -> Unit
   ) {
-    val builder = HttpRequestBuilder().apply {
-      url("$BASE_URL_PATH$path") {
+    client.prepareGet(path).execute { httpResponse->
+      val channel: ByteReadChannel = httpResponse.body()
+      val contentLength = httpResponse.contentLength() // 文件大小
+      var currentLength = 0L
+      while (!channel.isClosedForRead) {
+        val packet = channel.readRemaining(DEFAULT_BUFFER_SIZE.toLong())
+        while (!packet.isEmpty) {
+          val bytes = packet.readBytes()
+          currentLength += bytes.size
+          file?.appendBytes(bytes)
+          DLProgress(currentLength, contentLength!!) // 将下载进度回调
+        }
+      }
+    }
+
+    /*val builder = HttpRequestBuilder().apply {
+      url(getUrlPath(path)) {
         protocol = URLProtocol.HTTPS
       }
     }
@@ -41,22 +56,21 @@ class ApiServiceImpl(private val client: HttpClient) : ApiService {
         throw Exception("网络请求异常[$path]->${response.status}")
       }
       // 下载放在这边实现
-      val channel = response.body<ByteReadChannel>()
+      val channel = response.content//response.body<ByteReadChannel>()
       val contentLength = response.contentLength() // 文件大小
       requireNotNull(contentLength) { "Header needs to be set by server" }
 
       var currentLength = 0
       var readBytes: Int
-      val bufferSize = 1024 * 8
-      var buffer = ByteArray(bufferSize)
+      var buffer = ByteArray(DEFAULT_BUFFER_SIZE)
       var outputStream = file?.let { it.outputStream() }
       // 读取buffer大小的数据，然后写入文件中，并返回当前进度
-      while (channel.readAvailable(buffer, offset = 0, bufferSize).also { readBytes = it } != -1) {
+      while (channel.readAvailable(buffer, offset = 0, DEFAULT_BUFFER_SIZE).also { readBytes = it } != -1) {
         currentLength += readBytes
         outputStream?.let { it.write(buffer, 0, readBytes) } // 将获取的数据保存到文件
         DLProgress(currentLength.toLong(), contentLength) // 将下载进度回调
       }
-      outputStream?.let { it.close() } // 写入完成，关闭*/
-    }
+      outputStream?.let { it.close() } // 写入完成，关闭
+    }*/
   }
 }

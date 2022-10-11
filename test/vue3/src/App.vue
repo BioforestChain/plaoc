@@ -6,31 +6,31 @@ import System_api from './view/system_api.vue';
 import Dialogs from './view/dialogs.vue';
 import { ref, defineComponent, reactive } from 'vue';
 import { OpenScanner } from '@bfsx/plugin';
-import { IonFab, IonFabButton, IonFabList,IonIcon } from '@ionic/vue';
-import { 
+import { IonFab, IonFabButton, IonFabList, IonIcon } from '@ionic/vue';
+import {
   cartOutline,
-  logoFacebook, 
-  logoTwitter, 
-  logoVimeo, 
+  logoFacebook,
+  logoTwitter,
+  logoVimeo,
 } from 'ionicons/icons';
 
 defineComponent({
-  components: { IonFab, IonFabButton, IonFabList,IonIcon }
+  components: { IonFab, IonFabButton, IonFabList, IonIcon }
 });
 
 let scannerData = ref("DwebView-js ♻️ Deno-js");
 
 async function openQrScanner() {
-const scanner = document.querySelector<OpenScanner>('dweb-scanner')!;
+  const scanner = document.querySelector<OpenScanner>('dweb-scanner')!;
   const iter = await scanner.openQrCodeScanner()
-  console.log("scannerData.value = await scanner.openQrCodeScanner() -->",JSON.stringify(iter))
+  console.log("scannerData.value = await scanner.openQrCodeScanner() -->", JSON.stringify(iter))
   scannerData.value = iter
 }
 
 async function openBarScanner() {
-   const scanner = document.querySelector<OpenScanner>('dweb-scanner')!;
+  const scanner = document.querySelector<OpenScanner>('dweb-scanner')!;
   const iter = await scanner.openBarCodeScanner()
-  console.log("scannerData.value = await scanner.openBarCodeScanner() -->",JSON.stringify(iter))
+  console.log("scannerData.value = await scanner.openBarCodeScanner() -->", JSON.stringify(iter))
   scannerData.value = iter
 }
 
@@ -44,14 +44,14 @@ const bottomBarImg = reactive({
   three: "https://objectjson.waterbang.top/test-vue3/home-not.svg"
 })
 
-function onBottomBar(serial:string) {
+function onBottomBar(serial: string) {
   bottomBarImg.one = 'https://objectjson.waterbang.top/test-vue3/land-not.svg'
   bottomBarImg.three = 'https://objectjson.waterbang.top/test-vue3/home-not.svg'
-  if (serial=== 'one') {
+  if (serial === 'one') {
     bottomBarImg[serial] = "https://objectjson.waterbang.top/test-vue3/land.svg"
   }
-  if (serial=== 'three') {
-     bottomBarImg[serial] = "https://objectjson.waterbang.top/test-vue3/home.svg"
+  if (serial === 'three') {
+    bottomBarImg[serial] = "https://objectjson.waterbang.top/test-vue3/home.svg"
   }
 }
 

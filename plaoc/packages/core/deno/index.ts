@@ -2,12 +2,12 @@
 /// 这里封装调用deno的方法，然后暴露出去
 /////////////////////////////
 
-import { eval_js, js_to_rust_buffer } from "./rust.op.ts";
+import { eval_js, js_to_rust_buffer, setNotification } from "./rust.op.ts";
 
 const versionView = new Uint8Array(new ArrayBuffer(1));
 const headView = new Uint8Array(new ArrayBuffer(2)); // 初始化头部标记
 versionView[0] = 0x01; // 版本号都是1，表示消息
-export class Deno {
+class Deno {
 
   constructor() {
     // 创建头部消息
@@ -109,3 +109,7 @@ export class Deno {
   }
 }
 
+export {
+  Deno,
+  setNotification
+}

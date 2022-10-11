@@ -35,6 +35,7 @@ import org.bfchain.rust.plaoc.ui.theme.RustApplicationTheme
 import org.bfchain.rust.plaoc.webView.network.dWebView_host
 import org.bfchain.rust.plaoc.webView.network.shakeUrl
 import org.bfchain.rust.plaoc.webView.openDWebWindow
+import java.util.*
 
 
 val callable_map = mutableMapOf<ExportNative, (data: String) -> Unit>()
@@ -204,8 +205,8 @@ class MainActivity : AppCompatActivity() {
     if (dWebView_host == "") {
       return
     }
-    val url = "https://$dWebView_host.dweb${shakeUrl(path)}"
-    LogUtils.d("启动了DWebView:$path")
+    val url = "https://${dWebView_host.lowercase(Locale.ROOT)}.dweb${shakeUrl(path)}"
+    LogUtils.d("启动了DWebView:$url")
     openDWebWindow(
       activity = getContext(),
       url = url

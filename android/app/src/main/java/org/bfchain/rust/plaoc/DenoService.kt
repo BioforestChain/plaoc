@@ -14,6 +14,7 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.bfchain.rust.plaoc.system.deeplink.DWebReceiver
 import java.nio.ByteBuffer
+import kotlin.concurrent.thread
 
 private const val TAG = "DENO_SERVICE"
 
@@ -79,10 +80,10 @@ class DenoService : IntentService("DenoService") {
     private external fun nativeSetCallback(callback: IHandleCallback)
     /** 只读模式走这里*/
     private external fun onlyReadRuntime(assets: AssetManager,target:String)
-    /** 这里负责返回数据到deno-js*/
-    external fun backDataToRust(bufferData: ByteArray)
-    /** 这里负责返回数据到deno-js*/
-    external fun backSystemDataToRust(bufferData: ByteArray)
+    /** 传递dwebView到deno-js的消息*/
+    external fun backDataToRust(byteData: ByteArray)
+    /** 这里负责直接返回数据到deno-js*/
+    external fun backSystemDataToRust(byteData: ByteArray)
     external fun denoRuntime(path: String)
 
     @RequiresApi(Build.VERSION_CODES.S)
@@ -135,13 +136,16 @@ fun createBytesFactory(callFun: ExportNative, message: String) {
     val versionId = version_head_map[headId] ?: ByteArray(1).plus(0x01)
     val msgBit = message.encodeToByteArray()
     val result = ByteBuffer.allocate(headId.size + versionId.size + msgBit.size)
-        .put(headId)
-        .put(versionId)
-        .put(msgBit)
+      .put(versionId)
+      .put(headId)
+      .put(msgBit)
     // 移除使用完的标记
     rust_call_map.remove(callFun)
     version_head_map.remove(headId)
-    DenoService().backSystemDataToRust(result.array())
+    Log.d("", "now message says:${msgBit.size}")
+  thread {
+    denoService.backSystemDataToRust(result.array())
+  }
 }
 
 

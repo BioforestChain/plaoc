@@ -1,7 +1,6 @@
 package org.bfchain.libappmgr.ui.download
 
 import android.annotation.SuppressLint
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -20,6 +19,7 @@ import org.bfchain.libappmgr.ui.view.*
 import org.bfchain.libappmgr.utils.AppContextUtil
 import org.bfchain.libappmgr.utils.FilesUtil
 import org.bfchain.libappmgr.utils.JsonUtil
+import org.bfchain.libappmgr.utils.ZipUtil
 import java.io.File
 
 /**
@@ -79,7 +79,12 @@ fun DownloadAppInfoView(
         // 1.打开应用
         dAppInfo = FilesUtil.getDAppInfo(appInfo)
         dAppInfo?.let { dApp ->
-          onOpenApp?.let { onOpenApp(appInfo.bfsAppId, getDAppInfoUrl(appInfo, dApp)) } // 回调dweb请求的地址
+          onOpenApp?.let {
+            onOpenApp(
+              appInfo.bfsAppId,
+              getDAppInfoUrl(appInfo, dApp)
+            )
+          } // 回调dweb请求的地址
           Toast.makeText(
             AppContextUtil.sInstance, "直接打开应用-->${dApp.manifest.bfsaEntry}", Toast.LENGTH_SHORT
           ).show()
@@ -115,11 +120,7 @@ fun DownloadAppInfoView(
               // 显示当前状态
               appInfoMode.updateDLState(DownLoadState.LOADING).updateName("正在解压")
               // 解压耗时
-              FilesUtil.UnzipFile(
-                file.absolutePath,
-                desDirectory = FilesUtil.getAppUnzipPath(appInfo)
-              )
-              file.delete() // 解压后，删除压缩包
+              ZipUtil.decompress(file.absolutePath, FilesUtil.getAppUnzipPath(appInfo))
               appInfo.isSystemApp = true
               maskProgressMode.updateState(DownLoadState.IDLE)
               appInfoMode.updateShowBadge(true).updateDLState(DownLoadState.COMPLETED)
@@ -190,7 +191,12 @@ fun DownloadDialogView(
         // 1.打开应用
         dAppInfo = FilesUtil.getDAppInfo(appInfo)
         dAppInfo?.let { dApp ->
-          onOpenApp?.let { onOpenApp(appInfo.bfsAppId, getDAppInfoUrl(appInfo, dApp)) } // 回调dweb请求的地址
+          onOpenApp?.let {
+            onOpenApp(
+              appInfo.bfsAppId,
+              getDAppInfoUrl(appInfo, dApp)
+            )
+          } // 回调dweb请求的地址
           Toast.makeText(
             AppContextUtil.sInstance, "直接打开应用-->${dApp.manifest.bfsaEntry}", Toast.LENGTH_SHORT
           ).show()
@@ -234,11 +240,7 @@ fun DownloadDialogView(
 
           override fun downloadSuccess(file: File) {
             GlobalScope.launch {
-              FilesUtil.UnzipFile(
-                file.absolutePath,
-                desDirectory = FilesUtil.getAppUnzipPath(appInfo)
-              )
-              file.delete() // 解压后，删除压缩包
+              ZipUtil.decompress(file.absolutePath, FilesUtil.getAppUnzipPath(appInfo))
               // 隐藏下载进度界面，显示对话框界面
               dialogState.updateState(customShow = true).customDialog.update(
                 content = "下载完成", confirmText = "打开"
@@ -270,7 +272,7 @@ fun DownloadDialogView(
   ProgressDialog(dialogState, onCancel = { appInfoMode.downLoadState.value = DownLoadState.IDLE })
 }
 
-private fun getDAppInfoUrl(appInfo:AppInfo, dAppInfo: DAppInfo): String {
+private fun getDAppInfoUrl(appInfo: AppInfo, dAppInfo: DAppInfo): String {
   // return FilesUtil.getDAppInfo(appInfo)?.let { it.enter.main } ?: ""
   return FilesUtil.getAppDenoUrl(appInfo, dAppInfo)
 }
