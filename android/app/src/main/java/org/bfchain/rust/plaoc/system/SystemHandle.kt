@@ -1,9 +1,8 @@
 package org.bfchain.rust.plaoc.system
 
-import com.fasterxml.jackson.core.JsonProcessingException
-import com.fasterxml.jackson.core.type.TypeReference
+import android.util.Log
 import org.bfchain.rust.plaoc.*
-import org.bfchain.rust.plaoc.system.file.FileSystem
+import org.bfchain.rust.plaoc.system.file.*
 import org.bfchain.rust.plaoc.webView.network.initMetaData
 import org.bfchain.rust.plaoc.webView.sendToJavaScript
 
@@ -28,6 +27,7 @@ private val fileSystem = FileSystem()
   /** fs System*/
   callable_map[ExportNative.FileSystemLs] = {
 //    val handle = mapper.readValue(it, object : TypeReference<SystemHandle<FileLs>>() {})
+    Log.i("xxxx1:",it)
     val handle = mapper.readValue(it, FileLs::class.java)
     fileSystem.ls(handle.path,handle.option.filter, handle.option.recursive)
   }
@@ -49,35 +49,3 @@ private val fileSystem = FileSystem()
   }
 }
 
-data class FileLs (
-  val path: String = "",
-  val option: LsOption = LsOption()
-  )
-
-data class LsOption(
-  val filter: String = "",
-  val recursive: Boolean = false
-)
-
-data class FileRead (
-  val path: String = "",
-)
-
-data class FileWrite (
-  val path: String = "",
-  val option: WriteOption = WriteOption()
-)
-
-data class WriteOption(
-  val content: String = "",
-  val append: Boolean = false,
-  val autoCreate: Boolean = true
-)
-data class FileRm (
-  val path: String = "",
-  val option: RmOption = RmOption()
-)
-
-data class RmOption(
-  val deepDelete: Boolean = true
-)

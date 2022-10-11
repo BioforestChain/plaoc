@@ -1,6 +1,6 @@
 import metaData from "./bfsa-metadata.ts";
 import { DWebView } from "@bfsx/core";
-// export * from "./vfs/index.ts"
+export * from "./vfs/index.ts"
 
 const webView = new DWebView(metaData);
 

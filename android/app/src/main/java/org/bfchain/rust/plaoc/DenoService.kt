@@ -79,9 +79,9 @@ class DenoService : IntentService("DenoService") {
     private external fun nativeSetCallback(callback: IHandleCallback)
     /** 只读模式走这里*/
     private external fun onlyReadRuntime(assets: AssetManager,target:String)
-    /** 这里负责返回数据到deno-js*/
+    /** 传递dwebView到deno-js的消息*/
     external fun backDataToRust(bufferData: ByteArray)
-    /** 这里负责返回数据到deno-js*/
+    /** 这里负责直接返回数据到deno-js*/
     external fun backSystemDataToRust(bufferData: ByteArray)
     external fun denoRuntime(path: String)
 
@@ -141,6 +141,7 @@ fun createBytesFactory(callFun: ExportNative, message: String) {
     // 移除使用完的标记
     rust_call_map.remove(callFun)
     version_head_map.remove(headId)
+    Log.d("", "now message says:${msgBit.size}")
     DenoService().backSystemDataToRust(result.array())
 }
 

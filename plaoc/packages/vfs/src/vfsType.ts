@@ -1,5 +1,5 @@
 export interface IsOption {
-  filter: IsFilter[]; //声明筛选方式
+  filter: IsFilter; //声明筛选方式
   recursive: boolean; // 是否要递归遍历目录，默认是 false
 }
 

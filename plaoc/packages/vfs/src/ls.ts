@@ -3,17 +3,17 @@ import { IsOption } from "./vfsType.ts";
 import { vfsHandle } from '../vfsHandle.ts';
 
 /// const list: string[] = await fs.ls("./", { // list
-///   filter: [{ // 声明筛选方式
+///   filter: { // 声明筛选方式
 ///     type: "file",
 ///     name: ["*.ts"]
-///   }],
+///   },
 ///   recursive: true, // 是否要递归遍历目录，默认是 false
 /// });
 
 /**
  * 获取目录下有哪些文件
  * @param path 
- * @param option:{filter: [{type: "file", name: ["*.ts"]}],recursive: true // 是否要递归遍历目录，默认是 false}
+ * @param option:{filter: {type: "file", name: ["*.ts"]},recursive: true // 是否要递归遍历目录，默认是 false}
  * @returns file string[]
  */
 export async function ls(path: string, option: IsOption) {
