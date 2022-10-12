@@ -18,7 +18,7 @@ const { mkdir, writeFile, copyFile, readdir, stat, rm, readFile } = fs.promises;
  */
 export async function bundle(options: {
   bfsAppId: string;
-  frontPath: string;
+  frontPath?: string;
   backPath: string;
 }) {
   let bfsAppId = options.bfsAppId;
@@ -34,14 +34,16 @@ export async function bundle(options: {
     bfsAppId = await genBfsAppId();
   }
 
-  // const bfsAppId = options.bfsAppId ?? (await genBfsAppId());
   const { frontPath, backPath } = options;
   const destPath = await createBfsaDir(bfsAppId);
 
   // 将前端项目移动到sys目录
-  const sysPath = path.join(destPath, "sys");
-  await copyDir(frontPath, sysPath);
-  await writeServiceWorkder(sysPath);
+  // 无界面应用不包含前端
+  if (frontPath) {
+    const sysPath = path.join(destPath, "sys");
+    await copyDir(frontPath, sysPath);
+    await writeServiceWorkder(sysPath);
+  }
 
   // 将后端项目移动到boot目录
   const bootPath = path.join(destPath, "boot");
@@ -242,7 +244,11 @@ async function writeConfigJson(
   // 复制icon到boot目录
   const { manifest } = metadata;
   const iconName = path.basename(manifest.icon);
-  await copyIcon(bootPath, iconName);
+
+  // 无界面应用没有icon
+  if (iconName !== "") {
+    await copyIcon(bootPath, iconName);
+  }
 
   // 文件列表生成校验码
   const destPath = path.resolve(bootPath, "../");
@@ -277,7 +283,10 @@ function genLinkJson(
 ): LinkMetadata {
   const { manifest } = metadata;
 
-  const iconName = path.basename(manifest.icon);
+  // 无界面应用没有icon
+  const iconName = manifest.icon
+    ? `file:///boot/${path.basename(manifest.icon)}`
+    : "";
   // 最大缓存时间，一般6小时更新一次。最快不能快于1分钟，否则按1分钟算。
   const maxAge = manifest.maxAge
     ? manifest.maxAge < 1
@@ -289,7 +298,7 @@ function genLinkJson(
     version: manifest.version,
     bfsAppId: bfsAppId,
     name: manifest.name,
-    icon: `file:///boot/${iconName}`,
+    icon: iconName,
     author: manifest.author || [],
     autoUpdate: {
       maxAge: maxAge,
