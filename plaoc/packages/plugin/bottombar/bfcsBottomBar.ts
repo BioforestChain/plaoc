@@ -2,7 +2,7 @@
 
 import { convertToRGBAHex } from "../util/index.ts";
 import { DwebPlugin } from "../native/dweb-plugin.ts";
-import { BottomBarFFI } from "!bottomBar/net";
+import { BottomBarFFI } from "@bottomBar/net";
 import { BottomBar } from "./bfcsBottomBarType.ts";
 import { Icon } from "../icon/bfspIconType.ts";
 import { Color } from "../types/colorType.ts";
