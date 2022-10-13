@@ -1,4 +1,4 @@
-import { VirtualKeyboardFFI } from "!keyboard/net";
+import { VirtualKeyboardFFI } from "@keyboard/net";
 import { Keyboard } from "./bfcsKeyboardType.ts";
 import { DwebPlugin } from "../native/dweb-plugin.ts";
 

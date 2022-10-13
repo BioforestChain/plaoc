@@ -1,7 +1,6 @@
 package org.bfchain.rust.plaoc
 
 import android.app.IntentService
-import android.app.Notification
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.res.AssetManager
@@ -12,7 +11,7 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.bfchain.rust.plaoc.system.deeplink.DWebReceiver
+import org.bfchain.rust.plaoc.system.deepLink.DWebReceiver
 import java.nio.ByteBuffer
 import kotlin.concurrent.thread
 

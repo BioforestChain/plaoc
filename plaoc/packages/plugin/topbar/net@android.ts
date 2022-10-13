@@ -5,7 +5,7 @@ import { getColorHex, hexToIntColor } from "../util/index.ts";
 import { TopBar } from "./bfcsTopBarType.ts";
 
 // 禁止传递float 因为不管传递什么，到android都会变0。
-export class TopBarFFI implements TopBar.ITopBarFFI {
+export class TopBarFFI implements TopBar.ITopBarNet {
   async topBarNavigationBack(): Promise<boolean> {
     return await netCallNativeUi(NativeUI.TopBarNavigationBack);
   }
@@ -15,19 +15,16 @@ export class TopBarFFI implements TopBar.ITopBarFFI {
     return Boolean(isShow);
   }
 
-  async setTopBarShow(isShow: boolean): Promise<void> {
-    await netCallNativeUi(NativeUI.SetTopBarShow, isShow);
-    return;
+  async setTopBarShow(isShow: boolean): Promise<boolean> {
+    return await netCallNativeUi(NativeUI.SetTopBarShow, isShow);
   }
 
-  async setTopBarHidden(): Promise<void> {
+  async setTopBarHidden(): Promise<boolean> {
     const isShow = await this.getTopBarShow();
-
     if (isShow) {
       await this.setTopBarShow(false);
     }
-
-    return;
+    return isShow;
   }
 
   async getTopBarOverlay(): Promise<boolean> {
@@ -36,10 +33,19 @@ export class TopBarFFI implements TopBar.ITopBarFFI {
     return Boolean(isOverlay);
   }
 
-  async setTopBarOverlay(alpha: string): Promise<void> {
-    await netCallNativeUi(NativeUI.SetTopBarOverlay, Number(alpha));
+  async setTopBarOverlay(alpha: string): Promise<boolean> {
+    return await netCallNativeUi(NativeUI.SetTopBarOverlay, Number(alpha));
+  }
 
-    return;
+
+  async getTopBarAlpha(): Promise<number> {
+    const alpha = await netCallNativeUi(NativeUI.GetTopBarAlpha);
+
+    return alpha;
+  }
+
+  async setTopBarAlpha(alpha: string): Promise<boolean> {
+    return await netCallNativeUi(NativeUI.SetTopBarAlpha, Number(alpha));
   }
 
   async getTopBarTitle(): Promise<string> {

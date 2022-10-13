@@ -102,6 +102,12 @@ fun initTopBarFn(topBarFFI: TopBarFFI) {
   call_ui_map[ExportNativeUi.SetTopBarOverlay] = {
     topBarFFI.setTopBarOverlay(it)!!
   }
+  call_ui_map[ExportNativeUi.GetTopBarAlpha] = {
+    topBarFFI.getTopBarOverlay()!!
+  }
+  call_ui_map[ExportNativeUi.SetTopBarAlpha] = {
+    topBarFFI.setTopBarOverlay(it)!!
+  }
   call_ui_map[ExportNativeUi.GetTopBarTitle] = {
     topBarFFI.getTopBarTitle()
   }

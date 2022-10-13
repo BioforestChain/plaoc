@@ -5,19 +5,19 @@
   "type": "module",
   "scripts": {
     "dev": "vite && node ./copy-to-build.cjs",
-    "build": "vue-tsc --noEmit && vite build && node ./copy.cjs",
+    "build": "vue-tsc --noEmit && vite build",
     "bundle": "vue-tsc --noEmit && vite build",
     "preview": "vite preview"
   },
   "dependencies": {
     "@ionic/vue": "^6.2.5",
     "@ionic/vue-router": "^6.2.5",
+    "@bfsx/plugin": "file:../../plaoc/build/plugin",
+    "@bfsx/gateway": "file:../../plaoc/build/gateway",
     "vue": "^3.2.37",
     "vue-router": "4"
   },
   "devDependencies": {
-    "@bfsx/plugin": "file:../../plaoc/build/plugin",
-    "@bfsx/gateway": "file:../../plaoc/build/gateway",
     "@types/node": "^18.7.14",
     "@vitejs/plugin-vue": "^3.0.0",
     "typescript": "^4.6.4",

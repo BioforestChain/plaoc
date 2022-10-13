@@ -2,9 +2,8 @@ import { Color } from "../types/colorType.ts";
 import { TopBar } from "./bfcsTopBarType.ts";
 import { NativeUI } from "../common/nativeHandle.ts";
 import { netCallNativeUi } from "@bfsx/gateway";
-import { getColorHex, hexToIntColor } from "../util/index.ts";
 
-export class TopBarFFI implements TopBar.ITopBarFFI {
+export class TopBarFFI implements TopBar.ITopBarNet {
   async topBarNavigationBack(): Promise<boolean> {
     return await netCallNativeUi(NativeUI.TopBarNavigationBack);
   }
@@ -14,19 +13,18 @@ export class TopBarFFI implements TopBar.ITopBarFFI {
     return Boolean(isEnabled);
   }
 
-  async setTopBarShow(isEnabled: boolean): Promise<void> {
-    await netCallNativeUi(NativeUI.SetTopBarShow, isEnabled);
-    return;
+  async setTopBarShow(isEnabled: boolean): Promise<boolean> {
+    return await netCallNativeUi(NativeUI.SetTopBarShow, isEnabled);
   }
 
-  async setTopBarHidden(): Promise<void> {
+  async setTopBarHidden(): Promise<boolean> {
     const isEnabled = await this.getTopBarShow();
 
     if (isEnabled) {
       await this.setTopBarShow(false);
     }
 
-    return;
+    return isEnabled;
   }
 
   async getTopBarOverlay(): Promise<boolean> {
@@ -35,10 +33,18 @@ export class TopBarFFI implements TopBar.ITopBarFFI {
     return Boolean(isOverlay);
   }
 
-  async setTopBarOverlay(alpha: string): Promise<void> {
-    await netCallNativeUi(NativeUI.SetTopBarOverlay, Number(alpha));
+  async setTopBarOverlay(alpha: string): Promise<boolean> {
+    return await netCallNativeUi(NativeUI.SetTopBarOverlay, Number(alpha));
+  }
 
-    return;
+  async getTopBarAlpha(): Promise<number> {
+    const alpha = await netCallNativeUi(NativeUI.GetTopBarAlpha);
+
+    return alpha;
+  }
+
+  async setTopBarAlpha(alpha: string): Promise<boolean> {
+    return await netCallNativeUi(NativeUI.SetTopBarAlpha, Number(alpha));
   }
 
   async getTopBarTitle(): Promise<string> {
@@ -58,7 +64,6 @@ export class TopBarFFI implements TopBar.ITopBarFFI {
 
   async getTopBarHeight(): Promise<number> {
     const height = await netCallNativeUi(NativeUI.GetTopBarHeight);
-
     return Number(height);
   }
 
@@ -76,34 +81,18 @@ export class TopBarFFI implements TopBar.ITopBarFFI {
   }
 
   async getTopBarBackgroundColor(): Promise<Color.RGBAHex> {
-    const stringColor = (await netCallNativeUi(
-      NativeUI.GetTopBarBackgroundColor,
-    )) as string;
-    const colorHex = getColorHex(parseFloat(stringColor));
-
-    return colorHex;
+    return await netCallNativeUi(NativeUI.GetTopBarBackgroundColor)
   }
 
   async setTopBarBackgroundColor(color: Color.RGBAHex): Promise<void> {
-    const colorHex = hexToIntColor(color);
-    await netCallNativeUi(NativeUI.SetTopBarBackgroundColor, colorHex);
-
-    return;
+    return await netCallNativeUi(NativeUI.SetTopBarBackgroundColor, color);
   }
 
   async getTopBarForegroundColor(): Promise<Color.RGBAHex> {
-    const stringColor = (await netCallNativeUi(
-      NativeUI.GetTopBarForegroundColor,
-    )) as string;
-    const colorHex = getColorHex(parseFloat(stringColor));
-
-    return colorHex;
+    return await netCallNativeUi(NativeUI.GetTopBarForegroundColor)
   }
 
   async setTopBarForegroundColor(color: Color.RGBAHex): Promise<void> {
-    const colorHex = hexToIntColor(color);
-    await netCallNativeUi(NativeUI.SetTopBarForegroundColor, colorHex);
-
-    return;
+    return await netCallNativeUi(NativeUI.SetTopBarForegroundColor, color);
   }
 }
