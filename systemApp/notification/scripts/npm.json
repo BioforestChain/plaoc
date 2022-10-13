@@ -1,0 +1,7 @@
+{
+  "buildFromRootDir": "./",
+  "buildToRootDir": "./.npm",
+  "importMap": "./import_map.json",
+  "name": "@bfsx/notification",
+  "version": "0.0.1"
+}

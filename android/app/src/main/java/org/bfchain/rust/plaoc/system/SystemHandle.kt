@@ -26,10 +26,14 @@ private val fileSystem = FileSystem()
     { sendToJavaScript(it) }
   /** fs System*/
   callable_map[ExportNative.FileSystemLs] = {
-//    val handle = mapper.readValue(it, object : TypeReference<SystemHandle<FileLs>>() {})
-    Log.i("xxxx1:",it)
+//    Log.i("FileSystemLs:",it)
     val handle = mapper.readValue(it, FileLs::class.java)
     fileSystem.ls(handle.path,handle.option.filter, handle.option.recursive)
+  }
+  callable_map[ExportNative.FileSystemList] = {
+//    Log.i("FileSystemList:",it)
+    val handle = mapper.readValue(it, FileLs::class.java)
+    fileSystem.list(handle.path)
   }
   callable_map[ExportNative.FileSystemMkdir] = {
     val handle = mapper.readValue(it, FileLs::class.java)

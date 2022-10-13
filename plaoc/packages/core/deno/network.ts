@@ -21,7 +21,8 @@ class Network {
  * @param data 
  * @returns 
  */
-  asyncCallDenoFunction(handleFn: string, data: TNative = "''", timeout = 3000): Promise<string> {
+  // deno-lint-ignore no-explicit-any
+  asyncCallDenoFunction(handleFn: string, data: TNative = "''", timeout = 3000): Promise<any> {
     return new Promise(async (resolve, reject) => {
       if (data instanceof Object) {
         data = JSON.stringify(data); // stringify 两次转义一下双引号

@@ -7,7 +7,7 @@ import { checksumFile } from "crypto";
 import { genBfsAppId, checkSign } from "check";
 import { compressToSuffixesBfsa } from "compress";
 
-import "@bfsx/typings";
+import type * as types from "@bfsx/typings";
 
 const { existsSync } = fs;
 const { mkdir, writeFile, copyFile, readdir, stat, rm, readFile } = fs.promises;
@@ -18,7 +18,7 @@ const { mkdir, writeFile, copyFile, readdir, stat, rm, readFile } = fs.promises;
  */
 export async function bundle(options: {
   bfsAppId: string;
-  frontPath: string;
+  frontPath?: string;
   backPath: string;
 }) {
   let bfsAppId = options.bfsAppId;
@@ -34,14 +34,16 @@ export async function bundle(options: {
     bfsAppId = await genBfsAppId();
   }
 
-  // const bfsAppId = options.bfsAppId ?? (await genBfsAppId());
   const { frontPath, backPath } = options;
   const destPath = await createBfsaDir(bfsAppId);
 
   // 将前端项目移动到sys目录
-  const sysPath = path.join(destPath, "sys");
-  await copyDir(frontPath, sysPath);
-  await writeServiceWorkder(sysPath);
+  // 无界面应用不包含前端
+  if (frontPath) {
+    const sysPath = path.join(destPath, "sys");
+    await copyDir(frontPath, sysPath);
+    await writeServiceWorkder(sysPath);
+  }
 
   // 将后端项目移动到boot目录
   const bootPath = path.join(destPath, "boot");
@@ -127,19 +129,19 @@ async function copyDir(src: string, dest: string) {
  * @returns
  */
 async function writeServiceWorkder(destPath: string): Promise<boolean> {
-  const file = path.join(destPath, "serverWorker.js");
+  const file = path.join(destPath, "serverWorker.mjs");
 
   // TODO: 暂时没想到好的方法
   const url = new URL("./bundle.js", import.meta.url);
   const filePath = path.dirname(fileURLToPath(url.href));
-  const content = await readFile(
+  let content = await readFile(
     path.resolve(
       filePath,
       "../../node_modules/@bfsx/gateway/esm/serverWorker.js"
     ),
     "utf-8"
   );
-
+  content = content.replace(/export/g, "");
   // const content =
   //   'const t=self,n=[];t.addEventListener("install",(function(n){n.waitUntil(t.skipWaiting())})),t.addEventListener("activate",(function(n){n.waitUntil(t.clients.claim())})),t.addEventListener("fetch",(async function(t){const e=t.request;e.method.match(/POST/i)?function(t){t.respondWith(async function(){await async function(t,e){if(null===t.body)return;const a=await t.arrayBuffer(),s=function(t){let n=0,e=524288;const a=[];do{a.push(t.subarray(n,n+e)),n+=e}while(t.byteLength>n);return a}(new Uint8Array(a)),i=[];await Promise.all(s.map((async t=>{const n=await async function(t,n){const e=t.request;return await fetch(`${e.url}?upload=${n}`,{headers:e.headers,method:"GET",mode:"cors"})}(e,t);i.push(await n.text())}))),n.push(new Response(String(i)))}(t.request,t);const e={next:async()=>{const t=n.shift();return t?{value:t,done:!1}:{value:new Response,done:!0}}},{value:a,done:s}=await e.next();return a}())}(t):t.respondWith(async function(){return await fetch(e)}())})),self.export="";';
 
@@ -242,7 +244,11 @@ async function writeConfigJson(
   // 复制icon到boot目录
   const { manifest } = metadata;
   const iconName = path.basename(manifest.icon);
-  await copyIcon(bootPath, iconName);
+
+  // 无界面应用没有icon
+  if (iconName !== "") {
+    await copyIcon(bootPath, iconName);
+  }
 
   // 文件列表生成校验码
   const destPath = path.resolve(bootPath, "../");
@@ -277,7 +283,10 @@ function genLinkJson(
 ): LinkMetadata {
   const { manifest } = metadata;
 
-  const iconName = path.basename(manifest.icon);
+  // 无界面应用没有icon
+  const iconName = manifest.icon
+    ? `file:///boot/${path.basename(manifest.icon)}`
+    : "";
   // 最大缓存时间，一般6小时更新一次。最快不能快于1分钟，否则按1分钟算。
   const maxAge = manifest.maxAge
     ? manifest.maxAge < 1
@@ -289,7 +298,7 @@ function genLinkJson(
     version: manifest.version,
     bfsAppId: bfsAppId,
     name: manifest.name,
-    icon: `file:///boot/${iconName}`,
+    icon: iconName,
     author: manifest.author || [],
     autoUpdate: {
       maxAge: maxAge,
