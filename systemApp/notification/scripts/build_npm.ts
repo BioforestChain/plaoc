@@ -1,7 +1,6 @@
 import { build, emptyDir } from "dnt";
 
 export const doBuild = async (npmFile: string) => {
-  console.log(npmFile);
   const config = (await import(npmFile, { assert: { type: "json" } })).default;
   const { buildToRootDir, importMap, name, version, buildFromRootDir } = config;
 

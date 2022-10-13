@@ -204,26 +204,7 @@ async function getBfsaMetaDataJson(
 }
 
 /**
- * 复制icon到boot目录
- * @param bootPath boot目录
- * @param iconName icon名
- * @returns
- */
-async function copyIcon(bootPath: string, iconName: string) {
-  const reg = new RegExp(iconName);
-  const iconPath = await searchFile(path.resolve(bootPath, "../"), reg);
-
-  if (!iconPath) {
-    throw new Error("未找到应用icon");
-  }
-
-  await copyFile(iconPath, path.join(bootPath, iconName));
-
-  return;
-}
-
-/**
- * 在boot目录写入bfs-metadata.json和link.json，复制icon
+ * 在boot目录写入bfs-metadata.json和link.json
  * @param bootPath boot目录
  * @param bfsAppId 应用id
  * @param metadata bfs-metadata数据
@@ -240,15 +221,6 @@ async function writeConfigJson(
     JSON.stringify(metadata),
     "utf-8"
   );
-
-  // 复制icon到boot目录
-  const { manifest } = metadata;
-  const iconName = path.basename(manifest.icon);
-
-  // 无界面应用没有icon
-  if (iconName !== "") {
-    await copyIcon(bootPath, iconName);
-  }
 
   // 文件列表生成校验码
   const destPath = path.resolve(bootPath, "../");
@@ -283,10 +255,6 @@ function genLinkJson(
 ): LinkMetadata {
   const { manifest } = metadata;
 
-  // 无界面应用没有icon
-  const iconName = manifest.icon
-    ? `file:///boot/${path.basename(manifest.icon)}`
-    : "";
   // 最大缓存时间，一般6小时更新一次。最快不能快于1分钟，否则按1分钟算。
   const maxAge = manifest.maxAge
     ? manifest.maxAge < 1
@@ -298,7 +266,7 @@ function genLinkJson(
     version: manifest.version,
     bfsAppId: bfsAppId,
     name: manifest.name,
-    icon: iconName,
+    icon: manifest.icon,
     author: manifest.author || [],
     autoUpdate: {
       maxAge: maxAge,

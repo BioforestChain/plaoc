@@ -25,8 +25,6 @@ program
     "bfsAppId: app unique identification，new app ignore."
   )
   .action((options: any) => {
-    console.log(options);
-
     bundle({
       bfsAppId: options.bfsAppid,
       frontPath: options.frontPath,
