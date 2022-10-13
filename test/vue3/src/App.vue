@@ -4,8 +4,8 @@
 import HelloWorld from './components/HelloWorld.vue'
 import System_api from './view/system_api.vue';
 import Dialogs from './view/dialogs.vue';
-import { ref, defineComponent, reactive } from 'vue';
-import { OpenScanner } from '@bfsx/plugin';
+import { ref, defineComponent, reactive, onMounted } from 'vue';
+import { BfcsTopBar, OpenScanner } from '@bfsx/plugin';
 import { IonFab, IonFabButton, IonFabList, IonIcon } from '@ionic/vue';
 import {
   cartOutline,
@@ -33,6 +33,17 @@ async function openBarScanner() {
   console.log("scannerData.value = await scanner.openBarCodeScanner() -->", JSON.stringify(iter))
   scannerData.value = iter
 }
+
+onMounted(async () => {
+  const topBar = document.querySelector<BfcsTopBar>('dweb-top-bar')!;
+  console.log("getTopBarAlpha: ", await topBar.getTopBarAlpha())
+  console.log("getTopBarShow: ", await topBar.getTopBarShow())
+  console.log("getTopBarTitle: ", await topBar.getTopBarTitle())
+  console.log("getTopBarHeight: ", await topBar.getTopBarHeight())
+  console.log("getTopBarBackgroundColor: ", await topBar.getTopBarBackgroundColor())
+  console.log("getTopBarForegroundColor: ", await topBar.getTopBarForegroundColor())
+  console.log("getTopBarActions: ", await topBar.getTopBarActions())
+})
 
 function pop() {
   console.log("冒泡")

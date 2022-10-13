@@ -5,15 +5,13 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import com.king.mlkit.vision.camera.util.LogUtils
 import org.bfchain.rust.plaoc.App
 import org.bfchain.rust.plaoc.MainActivity
 import org.bfchain.rust.plaoc.R
-import org.bfchain.rust.plaoc.system.deeplink.DWebReceiver
+import org.bfchain.rust.plaoc.system.deepLink.DWebReceiver
 
 class NotifyManager() {
   enum class ChannelType(

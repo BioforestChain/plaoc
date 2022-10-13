@@ -9,22 +9,25 @@ export namespace TopBar {
     disabled?: boolean;
   }
 
-  export interface TopBarAndroidFFI {
-    topBarNavigationBack(): void;
-    getTopBarShow(): boolean;
-    setTopBarShow(isShow: boolean): void;
-    getTopBarOverlay(): boolean;
-    setTopBarOverlay(alpha: string): void;
-    getTopBarTitle(): string;
-    setTopBarTitle(title: string): void;
-    hasTopBarTitle(): boolean;
-    getTopBarHeight(): number;
-    getTopBarActions(): Data.DataString<TopBarItem[]>;
-    setTopBarActions(actionList: Data.DataString<TopBarItem[]>): void;
-    getTopBarBackgroundColor(): number;
-    setTopBarBackgroundColor(color: number): void;
-    getTopBarForegroundColor(): number;
-    setTopBarForegroundColor(color: number): void;
+  export interface ITopBarNet {
+    topBarNavigationBack(): Promise<boolean>;
+    getTopBarShow(): Promise<boolean>;
+    setTopBarShow(isShow: boolean): Promise<boolean>;
+    setTopBarHidden(): Promise<boolean>;
+    getTopBarOverlay(): Promise<boolean>;
+    setTopBarOverlay(alpha: string): Promise<boolean>;
+    getTopBarAlpha(): Promise<number>;
+    setTopBarAlpha(alpha: string): Promise<boolean>
+    getTopBarTitle(): Promise<string>;
+    setTopBarTitle(title: string): Promise<void>;
+    hasTopBarTitle(): Promise<boolean>;
+    getTopBarHeight(): Promise<number>;
+    getTopBarActions(): Promise<TopBarItem[]>;
+    setTopBarActions(actionList: TopBarItem[]): Promise<void>;
+    getTopBarBackgroundColor(): Promise<Color.RGBAHex>;
+    setTopBarBackgroundColor(color: Color.RGBAHex): Promise<void>;
+    getTopBarForegroundColor(): Promise<Color.RGBAHex>;
+    setTopBarForegroundColor(color: Color.RGBAHex): Promise<void>;
   }
 
   export interface TopBarIosFFI {
@@ -108,13 +111,15 @@ export namespace TopBar {
     getTopbarForegroundColor(): Promise<Color.ColorFormatType>;
   }
 
-  export interface ITopBarFFI {
+  export interface ITopBarNet {
     topBarNavigationBack(): Promise<boolean>;
     getTopBarShow(): Promise<boolean>;
-    setTopBarShow(isShow: boolean): Promise<void>;
-    setTopBarHidden(): Promise<void>;
+    setTopBarShow(isShow: boolean): Promise<boolean>;
+    setTopBarHidden(): Promise<boolean>;
     getTopBarOverlay(): Promise<boolean>;
-    setTopBarOverlay(alpha: string): Promise<void>;
+    setTopBarOverlay(alpha: string): Promise<boolean>;
+    getTopBarAlpha(): Promise<number>;
+    setTopBarAlpha(alpha: string): Promise<boolean>
     getTopBarTitle(): Promise<string>;
     setTopBarTitle(title: string): Promise<void>;
     hasTopBarTitle(): Promise<boolean>;

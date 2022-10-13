@@ -51,6 +51,8 @@ enum class ExportNativeUi(val type: String) {
   SetTopBarShow("setTopBarShow"),
   GetTopBarOverlay("getTopBarOverlay"),
   SetTopBarOverlay("setTopBarOverlay"),
+  GetTopBarAlpha("GetTopBarAlpha"),
+  SetTopBarAlpha("SetTopBarAlpha"),
   GetTopBarTitle("getTopBarTitle"),
   SetTopBarTitle("setTopBarTitle"),
   HasTopBarTitle("hasTopBarTitle"),

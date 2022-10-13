@@ -1,4 +1,4 @@
-package org.bfchain.rust.plaoc.system.deeplink
+package org.bfchain.rust.plaoc.system.deepLink
 
 import android.content.BroadcastReceiver
 import android.content.Context

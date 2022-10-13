@@ -1,6 +1,6 @@
 import { convertToRGBAHex } from "../util/index.ts";
 import { DwebPlugin } from "../native/dweb-plugin.ts";
-import { StatusBarFFI } from "!statusbar/net";
+import { StatusBarFFI } from "@statusbar/net";
 import { StatusBar } from "./bfcsStatusBarType.ts";
 import { Color } from "../types/colorType.ts";
 

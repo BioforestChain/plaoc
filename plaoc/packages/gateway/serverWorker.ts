@@ -99,6 +99,3 @@ export function fileChunk(fileBuff: Uint8Array) {
   } while (fileBuff.byteLength > index);
   return bufferList;
 }
-
-// 不要删除，serverWorker没有window对象
-

@@ -6,11 +6,11 @@
     "@bfsx/plugin": "./packages/plugin/index.ts",
     "@bfsx/vfs": "./packages/vfs/index.ts",
     "@bfsx/gateway": "./packages/gateway/index.ts",
-    "!bottomBar/net": "./packages/plugin/bottombar/net!android.ts",
-    "!dialogs/net": "./packages/plugin/dialogs/net!android.ts",
-    "!icon/net": "./packages/plugin/icon/net!android.ts",
-    "!keyboard/net": "./packages/plugin/keyboard/net!android.ts",
-    "!statusbar/net": "./packages/plugin/statusbar/net!android.ts",
-    "!topbar/net": "./packages/plugin/topbar/net!android.ts"
+    "@bottomBar/net": "./packages/plugin/bottombar/net@android.ts",
+    "@dialogs/net": "./packages/plugin/dialogs/net@android.ts",
+    "@icon/net": "./packages/plugin/icon/net@android.ts",
+    "@keyboard/net": "./packages/plugin/keyboard/net@android.ts",
+    "@statusbar/net": "./packages/plugin/statusbar/net@android.ts",
+    "@topbar/net": "./packages/plugin/topbar/net@android.ts"
   }
 }

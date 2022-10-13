@@ -1,6 +1,6 @@
 /// <reference lib="dom" />
 
-import { DialogsFFI } from "!dialogs/net";
+import { DialogsFFI } from "@dialogs/net";
 import { DwebPlugin } from "../native/dweb-plugin.ts";
 import { Dialogs } from "./bfcsDialogsType.ts";
 
