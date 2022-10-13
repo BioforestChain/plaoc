@@ -9,6 +9,7 @@ enum class ExportNative(val type: String) {
   DenoRuntime("denoRuntime"),
   EvalJsRuntime("evalJsRuntime"),
   FileSystemLs("fileSystemLs"),
+  FileSystemList("fileSystemList"),
   FileSystemMkdir("fileSystemMkdir"),
   FileSystemWrite("fileSystemWrite"),
   FileSystemRead("fileSystemRead"),

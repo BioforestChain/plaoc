@@ -3,7 +3,7 @@ import { metaConfig } from "@bfsx/metadata";
 
 export default metaConfig({
   manifest: {
-    version: "1.0.0",
+    version: "1.4.0",
     name: "ar扫码",
     icon: "file:///sys/vite.svg",
     engines: {
