@@ -1,11 +1,10 @@
 import { NativeUI } from "../common/nativeHandle.ts";
 import { netCallNativeUi } from "@bfsx/gateway";
 import { Color } from "../types/colorType.ts";
-import { getColorHex, hexToIntColor } from "../util/index.ts";
+import { convertToRGBAHex } from "../util/index.ts";
 import { TopBar } from "./bfcsTopBarType.ts";
 
-// 禁止传递float 因为不管传递什么，到android都会变0。
-export class TopBarFFI implements TopBar.ITopBarNet {
+export class TopBarNet implements TopBar.ITopBarNet {
   async topBarNavigationBack(): Promise<boolean> {
     return await netCallNativeUi(NativeUI.TopBarNavigationBack);
   }
@@ -53,9 +52,8 @@ export class TopBarFFI implements TopBar.ITopBarNet {
     return title.toString();
   }
 
-  async setTopBarTitle(title: string): Promise<void> {
-    await netCallNativeUi(NativeUI.SetTopBarTitle, title);
-    return;
+  async setTopBarTitle(title: string): Promise<boolean> {
+    return await netCallNativeUi(NativeUI.SetTopBarTitle, title);
   }
 
   async hasTopBarTitle(): Promise<boolean> {
@@ -65,7 +63,6 @@ export class TopBarFFI implements TopBar.ITopBarNet {
 
   async getTopBarHeight(): Promise<number> {
     const height = await netCallNativeUi(NativeUI.GetTopBarHeight);
-
     return Number(height);
   }
 
@@ -82,35 +79,22 @@ export class TopBarFFI implements TopBar.ITopBarNet {
     return;
   }
 
-  async getTopBarBackgroundColor(): Promise<Color.RGBAHex> {
-    const stringColor = (await netCallNativeUi(
-      NativeUI.GetTopBarBackgroundColor,
-    )) as string;
-    const colorHex = getColorHex(parseFloat(stringColor));
 
-    return colorHex;
+  async getTopBarBackgroundColor(): Promise<Color.RGBAHex> {
+    return await netCallNativeUi(NativeUI.GetTopBarBackgroundColor)
   }
 
-  async setTopBarBackgroundColor(color: Color.RGBAHex): Promise<void> {
-    const colorHex = hexToIntColor(color);
-    await netCallNativeUi(NativeUI.SetTopBarBackgroundColor, colorHex);
-
-    return;
+  async setTopBarBackgroundColor(color: Color.RGBAHex): Promise<boolean> {
+    return await netCallNativeUi(NativeUI.SetTopBarBackgroundColor, convertToRGBAHex(color));
   }
 
   async getTopBarForegroundColor(): Promise<Color.RGBAHex> {
-    const stringColor = (await netCallNativeUi(
-      NativeUI.GetTopBarForegroundColor,
-    )) as string;
-    const colorHex = getColorHex(parseFloat(stringColor));
-
-    return colorHex;
+    return await netCallNativeUi(NativeUI.GetTopBarForegroundColor)
   }
 
-  async setTopBarForegroundColor(color: Color.RGBAHex): Promise<void> {
-    const colorHex = hexToIntColor(color);
-    await netCallNativeUi(NativeUI.SetTopBarForegroundColor, colorHex);
-
-    return;
+  async setTopBarForegroundColor(color: Color.RGBAHex): Promise<boolean> {
+    return await netCallNativeUi(NativeUI.SetTopBarForegroundColor, convertToRGBAHex(color));
   }
+
+
 }

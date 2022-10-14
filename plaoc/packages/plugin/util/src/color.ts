@@ -21,7 +21,11 @@ export function getColorHex(color: number): Color.RGBAHex {
   return ("#" + colorHex.slice(2) + colorHex.slice(0, 2)) as Color.RGBAHex;
 }
 
-// 将rgba(r, b, g, a)或#rrbbggaa或#rgba转为#rrbbggaa 十六进制
+/**
+ * 将rgba(r, b, g, a)或#rrbbggaa或#rgba转为#rrbbggaa 十六进制
+ * @param color 
+ * @returns  #rrbbggaa
+ */
 export function convertToRGBAHex(color: string): Color.RGBAHex {
   let colorHex = "#";
 

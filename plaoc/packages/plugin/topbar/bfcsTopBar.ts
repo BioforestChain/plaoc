@@ -1,4 +1,4 @@
-import { TopBarFFI } from "@topbar/net";
+import { TopBarNet } from "@topbar/net";
 import { TopBar } from "./bfcsTopBarType.ts";
 import { Icon } from "../icon/bfspIconType.ts";
 import { Color } from "../types/colorType.ts";
@@ -13,7 +13,7 @@ export class BfcsTopBar extends DwebPlugin {
   constructor() {
     super();
 
-    this.net = new TopBarFFI();
+    this.net = new TopBarNet();
     this._observer = new MutationObserver(async () => {
       await this.collectActions();
     });
