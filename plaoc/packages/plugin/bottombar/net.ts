@@ -3,21 +3,22 @@ import { netCallNativeUi } from "@bfsx/gateway";
 import { Color } from "../types/colorType.ts";
 import { convertToRGBAHex, getColorHex, getColorInt } from "../util/index.ts";
 import { BottomBar } from "./bfcsBottomBarType.ts";
-export class BottomBarFFI implements BottomBar.IBottomBarFFI {
+export class BottomBarNet implements BottomBar.IBottomBarNet {
+
   async getHidden(): Promise<boolean> {
     return await netCallNativeUi(NativeUI.GetBottomBarEnabled);
   }
 
-  async setHidden(isEnabled = true): Promise<void> {
+  async setHidden(isEnabled = true): Promise<boolean> {
     return await netCallNativeUi(NativeUI.SetBottomBarEnabled, isEnabled);
   }
 
-  async getOverlay(): Promise<number> {
-    return await netCallNativeUi(NativeUI.GetBottomBarOverlay);
+  async getBottomBarAlpha(): Promise<number> {
+    return await netCallNativeUi(NativeUI.GetBottomBarAlpha);
   }
 
-  async setOverlay(alpha: string): Promise<number> {
-    return await netCallNativeUi(NativeUI.SetBottomBarOverlay, alpha);
+  async setBottomBarAlpha(alpha: string): Promise<number> {
+    return await netCallNativeUi(NativeUI.SetBottomBarAlpha, alpha);
   }
 
   async getHeight(): Promise<number> {
@@ -29,30 +30,20 @@ export class BottomBarFFI implements BottomBar.IBottomBarFFI {
   }
 
   async getBackgroundColor(): Promise<Color.RGBAHex> {
-    const color = await netCallNativeUi(NativeUI.GetBottomBarBackgroundColor);
-    const colorHex = getColorHex(color);
+    const colorHex = await netCallNativeUi(NativeUI.GetBottomBarBackgroundColor);
     return colorHex;
   }
 
-  async setBackgroundColor(color: Color.RGBAHex): Promise<void> {
-    const colorHex = getColorInt(
-      color.slice(0, -2) as Color.RGBHex,
-      color.slice(-2) as Color.AlphaValueHex,
-    );
+  async setBackgroundColor(colorHex: Color.RGBAHex): Promise<void> {
     return await netCallNativeUi(NativeUI.SetBottomBarBackgroundColor, colorHex);
   }
 
   async getForegroundColor(): Promise<Color.RGBAHex> {
-    const color = await netCallNativeUi(NativeUI.GetBottomBarForegroundColor);
-    const colorHex = getColorHex(color);
+    const colorHex = await netCallNativeUi(NativeUI.GetBottomBarForegroundColor);
     return colorHex;
   }
 
-  async setForegroundColor(color: Color.RGBAHex): Promise<void> {
-    const colorHex = getColorInt(
-      color.slice(0, -2) as Color.RGBHex,
-      color.slice(-2) as Color.AlphaValueHex,
-    );
+  async setForegroundColor(colorHex: Color.RGBAHex): Promise<void> {
     return await netCallNativeUi(NativeUI.SetBottomBarForegroundColor, colorHex);
   }
 

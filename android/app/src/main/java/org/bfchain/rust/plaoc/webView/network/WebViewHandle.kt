@@ -150,10 +150,10 @@ fun initBottomFn(bottomBarFFI: BottomBarFFI) {
   call_ui_map[ExportNativeUi.SetBottomBarEnabled] = {
     bottomBarFFI.setEnabled(it)
   }
-  call_ui_map[ExportNativeUi.GetBottomBarOverlay] = {
+  call_ui_map[ExportNativeUi.GetBottomBarAlpha] = {
     bottomBarFFI.getOverlay()
   }
-  call_ui_map[ExportNativeUi.SetBottomBarOverlay] = {
+  call_ui_map[ExportNativeUi.SetBottomBarAlpha] = {
     bottomBarFFI.setOverlay(it)
   }
   call_ui_map[ExportNativeUi.GetBottomBarHeight] = {
@@ -172,13 +172,13 @@ fun initBottomFn(bottomBarFFI: BottomBarFFI) {
     bottomBarFFI.getBackgroundColor()
   }
   call_ui_map[ExportNativeUi.SetBottomBarBackgroundColor] = {
-    bottomBarFFI.setBackgroundColor(it.toInt())
+    bottomBarFFI.setBackgroundColor(it)
   }
   call_ui_map[ExportNativeUi.GetBottomBarForegroundColor] = {
     bottomBarFFI.getForegroundColor()
   }
   call_ui_map[ExportNativeUi.SetBottomBarForegroundColor] = {
-    bottomBarFFI.setForegroundColor(it.toInt())
+    bottomBarFFI.setForegroundColor(it)
   }
 }
 /**

@@ -66,8 +66,8 @@ enum class ExportNativeUi(val type: String) {
   // bottomBar
   GetBottomBarEnabled("getBottomBarEnabled"),
   SetBottomBarEnabled("getBottomBarEnabled"),
-  GetBottomBarOverlay("getBottomBarOverlay"),
-  SetBottomBarOverlay("setBottomBarOverlay"),
+  GetBottomBarAlpha("getBottomBarAlpha"),
+  SetBottomBarAlpha("setBottomBarAlpha"),
   GetBottomBarHeight("getBottomBarHeight"),
   SetBottomBarHeight("setBottomBarHeight"),
   GetBottomBarActions("getBottomBarActions"),
