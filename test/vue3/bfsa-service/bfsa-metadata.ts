@@ -5,7 +5,7 @@ export default metaConfig({
   manifest: {
     version: "1.4.0",
     name: "ar扫码",
-    icon: "/vite.svg", //或者 /icon/vite.svg
+    icon: "/vite.svg", //或者 /icon/vite.svg ，/vite.svg , ./vite.svg , vite.svg 
     engines: {
       dwebview: "~1.0.0",
     },
