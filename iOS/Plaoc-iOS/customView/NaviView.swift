@@ -85,19 +85,21 @@ class NaviView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    lazy var backButton: UIButton = {
+    lazy private var backButton: UIButton = {
         let button = UIButton(type: .system)
         button.frame = CGRect(x: 16, y: 0, width: 50, height: self.frame.height)
         button.setTitle("返回", for: .normal)
+        button.setTitleColor(UIColor.black, for: .normal)
         button.contentHorizontalAlignment = .left
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16)
         button.addTarget(self, action: #selector(backAction), for: .touchUpInside)
         return button
     }()
     
-    lazy var titleLabel: UILabel = {
+    lazy private var titleLabel: UILabel = {
         let label = UILabel(frame: CGRect(x: (self.frame.width - 200) * 0.5, y: 0, width: 200, height: self.frame.height))
         label.font = UIFont.systemFont(ofSize: 18)
+        label.textColor = .black
         label.textAlignment = .center
         return label
     }()

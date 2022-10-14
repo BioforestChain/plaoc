@@ -20,14 +20,20 @@ class Schemehandler: NSObject, WKURLSchemeHandler {
     func webView(_ webView: WKWebView, start urlSchemeTask: WKURLSchemeTask) {
         guard var urlstring = urlSchemeTask.request.url?.absoluteString else { return }
         schemeTasksDict[urlSchemeTask.description] = true
+        if urlstring.contains("setUi?data") {
+            
+            let result = fetchFunctionAndParam(content: urlstring)
+            let function = result.0
+            let param = result.1
+            print(result)
+            let dict = ["scheme":urlSchemeTask,"function":function!,"param":param] as [String : Any]
+            NotificationCenter.default.post(name: NSNotification.Name("haha"), object: nil, userInfo: dict)
+            return
+        }
+        
         guard let filename = urlSchemeTask.request.url?.path else { return }
-//        let markstring = Schemehandler.fileName() + "/"
-//        let range = urlstring.range(of: markstring)
-//        if range != nil {
-//            filename = String(urlstring[range!.lowerBound..<urlstring.endIndex])
-//        }
         let mainPath = Schemehandler.filePath()
-        let htmlPath = mainPath + "/www"
+        let htmlPath = mainPath + "/" + Schemehandler.fileName()
         let filepath = htmlPath + filename
         print(filepath)
         let manager = FileManager.default
@@ -41,6 +47,7 @@ class Schemehandler: NSObject, WKURLSchemeHandler {
             self.typestring = type
             
             let response = URLResponse(url: urlSchemeTask.request.url!, mimeType: type, expectedContentLength: data.count, textEncodingName: nil)
+            print(response)
             urlSchemeTask.didReceive(response)
             
             //            print(Date().timeIntervalSince1970)
@@ -59,8 +66,6 @@ class Schemehandler: NSObject, WKURLSchemeHandler {
             urlSchemeTask.didReceive(data)
             urlSchemeTask.didFinish()
             
-            print("11111111")
-            print(Date.timeIntervalSinceReferenceDate)
         } else {
             if urlstring.hasPrefix(schemeString) {
                 urlstring = urlstring.replacingOccurrences(of: schemeString, with: "http")
@@ -87,9 +92,6 @@ class Schemehandler: NSObject, WKURLSchemeHandler {
                     } else {
                         urlSchemeTask.didFinish()
                     }
-                    
-                    print("11111111")
-                    print(Date.timeIntervalSinceReferenceDate)
                 }
             }
             task.resume()
@@ -125,7 +127,7 @@ class Schemehandler: NSObject, WKURLSchemeHandler {
     }
     
     static func fileName() -> String {
-        return "www"
+        return "bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj"
     }
 
     static func filePath() -> String {
@@ -145,5 +147,26 @@ class Schemehandler: NSObject, WKURLSchemeHandler {
               let mimeType = UTTypeCopyPreferredTagWithClass(uti, kUTTagClassMIMEType)?.takeRetainedValue()
         else { return defaultMIMEType }
         return mimeType as String
+    }
+    
+    //得到返回的数据
+    private func analysisAbsoluteString(urlString: String) -> String {
+        
+        guard urlString.contains("=") else { return "" }
+        let array = urlString.components(separatedBy: "=")
+        if let last = array.last {
+            let result = last.hexStringToString(symbol: ",")
+            return result
+        }
+        return ""
+    }
+    //获取函数名和参数
+    private func fetchFunctionAndParam(content: String) -> (String?,Any) {
+        
+        let result = analysisAbsoluteString(urlString: content)
+        let dict = ChangeTools.stringValueDic(result)
+        let function = dict?["function"] as? String
+        let param = dict?["data"] as Any
+        return (function,param)
     }
 }

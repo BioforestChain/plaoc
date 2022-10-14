@@ -55,6 +55,7 @@ class BottomView: UIView {
                     color = "#000000FF"
                 }
                 button.setTitleColor(UIColor(color), for: .normal)
+                button.setTitleColor(UIColor.black, for: .normal)
                 button.imagePosition(style: .top, spacing: 8)
 //                button.menu = menuAction()
                 button.addTarget(self, action: #selector(clickAction(sender:)), for: .touchUpInside)
