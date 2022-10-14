@@ -27,4 +27,61 @@ extension String {
     public func utf8Data() -> Data? {
         return self.data(using: .utf8)
     }
+    
+    //16进制转string
+    public func hexStringToString(symbol: String) -> String {
+        
+        guard self.contains(symbol) else { return "" }
+        let contentList = self.components(separatedBy: symbol)
+        var array: [UInt8] = []
+        for text in contentList {
+            if UInt8(text) != nil {
+                array.append(UInt8(text)!)
+            }
+        }
+        guard array.count > 0 else { return "" }
+        let data = Data(bytes: array, count: array.count)
+        let result = String(data: data, encoding: .utf8)
+        return result ?? ""
+    }
+    
+    //版本号比较
+    func versionCompare(oldVersion: String) -> ComparisonResult {
+        
+        let delimiter = "."
+        var currentComponents = self.components(separatedBy: delimiter)
+        var oldComponents = oldVersion.components(separatedBy: delimiter)
+        
+        let diff = currentComponents.count - oldComponents.count
+        let zeros = Array(repeating: "0", count: abs(diff))
+        if diff > 0 {
+            oldComponents.append(contentsOf: zeros)
+        } else if diff < 0 {
+            currentComponents.append(contentsOf: zeros)
+        }
+        
+        for i in stride(from: 0, to: currentComponents.count, by: 1) {
+            let current = currentComponents[i]
+            let old = oldComponents[i]
+            if Int(current)! > Int(old)! {
+                return .orderedAscending
+            } else if Int(current)! < Int(old)! {
+                return .orderedDescending
+            }
+        }
+        return .orderedDescending
+    }
+    
+    //正则替换
+    func regexReplacePattern(pattern: String) -> String {
+        
+        do {
+            let regex = try NSRegularExpression(pattern: pattern, options: .caseInsensitive)
+            let finalStr = regex.stringByReplacingMatches(in: self, options: NSRegularExpression.MatchingOptions(rawValue: 0), range: NSMakeRange(0, self.count), withTemplate: "")
+            return finalStr
+        } catch {
+            print(error)
+        }
+        return ""
+    }
 }
