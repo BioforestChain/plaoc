@@ -8,6 +8,8 @@ import com.google.gson.JsonDeserializer
 import com.google.gson.reflect.TypeToken
 import org.bfchain.rust.plaoc.webView.icon.DWebIcon
 import org.bfchain.rust.plaoc.webView.jsutil.*
+import org.bfchain.rust.plaoc.webView.network.getColorHex
+import org.bfchain.rust.plaoc.webView.network.hexToIntColor
 
 
 private const val TAG = "TopBarFFI"
@@ -70,18 +72,21 @@ class TopBarFFI(
 //      }
     }
 
-    fun getTopBarBackgroundColor(): Int {
-        return state.backgroundColor.value.toArgb()
+    fun getTopBarBackgroundColor(): String {
+        return getColorHex(state.backgroundColor.value.toArgb())
     }
-
-    fun setTopBarBackgroundColor(color: ColorInt) {
+    fun setTopBarBackgroundColor(hexColor: String): Boolean {
+        val color = hexToIntColor(hexColor);
         state.backgroundColor.value = Color(color)
+        return true
     }
-    fun getTopBarForegroundColor(): Int {
-        return state.foregroundColor.value.toArgb()
+    fun getTopBarForegroundColor(): String {
+        return  getColorHex(state.foregroundColor.value.toArgb())
     }
-    fun setTopBarForegroundColor(color: ColorInt) {
+    fun setTopBarForegroundColor(hexColor: String): Boolean {
+        val color = hexToIntColor(hexColor);
         state.foregroundColor.value = Color(color)
+        return true
     }
 
     companion object {
