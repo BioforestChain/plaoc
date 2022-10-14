@@ -2,20 +2,20 @@
 
 import { convertToRGBAHex } from "../util/index.ts";
 import { DwebPlugin } from "../native/dweb-plugin.ts";
-import { BottomBarFFI } from "@bottomBar/net";
+import { BottomBarNet } from "@bottomBar/net";
 import { BottomBar } from "./bfcsBottomBarType.ts";
 import { Icon } from "../icon/bfspIconType.ts";
 import { Color } from "../types/colorType.ts";
 
 export class BfcsBottomBar extends DwebPlugin {
-  private _ffi: BottomBarFFI;
+  private _ffi: BottomBarNet;
   private _observer: MutationObserver;
   private _actionList: BottomBar.BottomBarItem[] = [];
 
   constructor() {
     super();
 
-    this._ffi = new BottomBarFFI();
+    this._ffi = new BottomBarNet();
     this._observer = new MutationObserver(async () => {
       await this.collectActions();
     });
@@ -64,7 +64,7 @@ export class BfcsBottomBar extends DwebPlugin {
    * @param isEnabled true隐藏
    * @returns
    */
-  async setHidden(isEnabled = true): Promise<void> {
+  async setHidden(isEnabled = true): Promise<boolean> {
     return await this._ffi.setHidden(isEnabled);
   }
   /**获取bottomBar是否隐藏 */
@@ -75,7 +75,7 @@ export class BfcsBottomBar extends DwebPlugin {
   }
   /**获取bottomBar透明度 */
   async getOverlay(): Promise<number> {
-    return await this._ffi.getOverlay();
+    return await this._ffi.getBottomBarAlpha();
   }
   /**
    * 设置bottomBar是否透明
@@ -83,7 +83,7 @@ export class BfcsBottomBar extends DwebPlugin {
    * @returns
    */
   async setOverlay(alpha = "1"): Promise<number> {
-    return await this._ffi.setOverlay(alpha);
+    return await this._ffi.setBottomBarAlpha(alpha);
   }
   /**获取bottomBar高度 */
   async getHeight(): Promise<number> {

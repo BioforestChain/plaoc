@@ -46,8 +46,6 @@ export enum NativeUI {
   // Bottom bar
   GetBottomBarEnabled = "GetBottomBarEnabled",
   SetBottomBarEnabled = "SetBottomBarEnabled",
-  GetBottomBarOverlay = "GetBottomBarOverlay",
-  SetBottomBarOverlay = "SetBottomBarOverlay",
   GetBottomBarAlpha = "GetBottomBarAlpha",
   SetBottomBarAlpha = "SetBottomBarAlpha",
   GetBottomBarHeight = "GetBottomBarHeight",

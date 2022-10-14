@@ -79,11 +79,11 @@ export namespace BottomBar {
     getBottombarBackgroundColor(): Promise<Color.ColorFormatType>;
   }
 
-  export interface IBottomBarFFI {
+  export interface IBottomBarNet {
     getHidden(): Promise<boolean>;
-    setHidden(isEnabled: boolean): Promise<void>;
-    getOverlay(): Promise<number>;
-    setOverlay(alpha: string): Promise<number>;
+    setHidden(isEnabled: boolean): Promise<boolean>;
+    getBottomBarAlpha(): Promise<number>;
+    setBottomBarAlpha(alpha: string): Promise<number>;
     getHeight(): Promise<number>;
     setHeight(heightDp: number): Promise<void>;
     getActions(): Promise<BottomBarItem[]>;

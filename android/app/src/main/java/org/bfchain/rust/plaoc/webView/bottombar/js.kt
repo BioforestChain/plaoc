@@ -15,181 +15,184 @@ import com.google.gson.JsonDeserializer
 import com.google.gson.reflect.TypeToken
 import org.bfchain.rust.plaoc.webView.icon.DWebIcon
 import org.bfchain.rust.plaoc.webView.jsutil.*
+import org.bfchain.rust.plaoc.webView.network.getColorHex
+import org.bfchain.rust.plaoc.webView.network.hexToIntColor
 
 
 private const val TAG = "BottomBarFFI"
 
 class BottomBarFFI(
-    private val state: BottomBarState,
+  private val state: BottomBarState,
 ) {
-    fun getEnabled() = state.isEnabled
+  fun getEnabled() = state.isEnabled
 
-   // 控制是否隐藏bottom bar, 此方法如果不传不会调用，一传肯定是true，也就是不显示bottom bar
-    fun setEnabled(isEnabledBool: String): Boolean {
-        state.enabled.value = !isEnabledBool.toBoolean()
-        return getEnabled()
-    }
+  // 控制是否隐藏bottom bar, 此方法如果不传不会调用，一传肯定是true，也就是不显示bottom bar
+  fun setEnabled(isEnabledBool: String): Boolean {
+    state.enabled.value = !isEnabledBool.toBoolean()
+    return getEnabled()
+  }
 
-    fun getOverlay(): Float {
-        return state.overlay.value?: 1F
-    }
-    // 控制是开启bottom bar 遮罩。
-    fun setOverlay(isOverlay: String): Float {
-      state.overlay.value = isOverlay.toFloat()
-        return state.overlay.value ?: 1F
-    }
+  fun getOverlay(): Float {
+    return state.overlay.value ?: 1F
+  }
 
-    fun getHeight(): Float {
-        return state.height.value ?: 0F
-    }
+  // 控制是开启bottom bar 遮罩。
+  fun setOverlay(isOverlay: String): Float {
+    state.overlay.value = isOverlay.toFloat()
+    return state.overlay.value ?: 1F
+  }
 
-    fun setHeight(heightDp: String) {
-        state.height.value = heightDp.toFloat()
-    }
+  fun getHeight(): Float {
+    return state.height.value ?: 0F
+  }
 
-    fun getActions(): DataString<List<BottomBarAction>> {
-        return DataString_From(state.actions)//.map { action -> toDataString(action) }
-    }
+  fun setHeight(heightDp: String) {
+    state.height.value = heightDp.toFloat()
+  }
 
-    fun setActions(actionListJson: DataString<List<BottomBarAction>>) {
-        state.actions.clear()
+  fun getActions(): DataString<List<BottomBarAction>> {
+    return DataString_From(state.actions)//.map { action -> toDataString(action) }
+  }
+
+  fun setActions(actionListJson: DataString<List<BottomBarAction>>) {
+    state.actions.clear()
 //      Log.i(TAG, "actionListJson:${actionListJson}")
-      val actionList = actionListJson.toData<List<BottomBarAction>>(object :
-            TypeToken<List<BottomBarAction>>() {}.type)
-        actionList.toCollection(state.actions)
+    val actionList = actionListJson.toData<List<BottomBarAction>>(object :
+      TypeToken<List<BottomBarAction>>() {}.type)
+    actionList.toCollection(state.actions)
 //      actionList.forEach{
 //        Log.i(TAG, "actionList:${it.colors}")
 //      }
-    }
+  }
 
-    fun getBackgroundColor(): Int {
-        return state.backgroundColor.value.toArgb()
-    }
+  fun getBackgroundColor(): String {
+    return getColorHex(state.backgroundColor.value.toArgb())
+  }
 
-    fun setBackgroundColor(color: ColorInt) {
-        state.backgroundColor.value = Color(color)
-    }
+  fun setBackgroundColor(color: String) {
+    state.backgroundColor.value = Color(hexToIntColor(color))
+  }
 
-    fun getForegroundColor(): Int {
-        return state.foregroundColor.value.toArgb()
-    }
+  fun getForegroundColor(): String {
+    return getColorHex(state.foregroundColor.value.toArgb())
+  }
 
-    fun setForegroundColor(color: ColorInt) {
-        state.foregroundColor.value = Color(color)
-    }
+  fun setForegroundColor(color: String) {
+    state.foregroundColor.value = Color(hexToIntColor(color))
+  }
 
-    companion object {
-        private val _x = BottomBarAction._gson
-    }
+  companion object {
+    private val _x = BottomBarAction._gson
+  }
 }
 
 
 data class BottomBarAction(
-    val icon: DWebIcon,
-    val onClickCode: String,
-    val label: String,
-    val alwaysShowLabel:Boolean,
-    val selected: Boolean,
-    val selectable: Boolean,
-    val disabled: Boolean,
-    val colors: Colors?
+  val icon: DWebIcon,
+  val onClickCode: String,
+  val label: String,
+  val alwaysShowLabel: Boolean,
+  val selected: Boolean,
+  val selectable: Boolean,
+  val disabled: Boolean,
+  val colors: Colors?
 ) {
 
   data class Colors(
-        val indicatorColor: ColorInt?,
-        val iconColor: ColorInt?,
-        val iconColorSelected: ColorInt?,
-        val textColor: ColorInt?,
-        val textColorSelected: ColorInt?
-    ) {
-        data class ColorState(override val value: Color) : State<Color>
+    val indicatorColor: ColorInt?,
+    val iconColor: ColorInt?,
+    val iconColorSelected: ColorInt?,
+    val textColor: ColorInt?,
+    val textColorSelected: ColorInt?
+  ) {
+    data class ColorState(override val value: Color) : State<Color>
 
+    @Composable
+    fun toNavigationBarItemColors(): NavigationBarItemColors {
+      val defaultColors = NavigationBarItemDefaults.colors()
+      // indicatorColor 无法控制透明度
+      val indicatorColor = indicatorColor?.toComposeColor() ?: defaultColors.indicatorColor
+      val iconColor =
+        ColorState(iconColor?.toComposeColor() ?: defaultColors.iconColor(false).value)
+      val iconColorSelected = ColorState(
+        textColorSelected?.toComposeColor() ?: defaultColors.indicatorColor
+      )
+      val textColor =
+        ColorState(textColor?.toComposeColor() ?: defaultColors.textColor(false).value)
+      val textColorSelected = ColorState(
+        textColorSelected?.toComposeColor() ?: defaultColors.indicatorColor
+      )
+
+      val colors = @Stable object : NavigationBarItemColors {
+        override val indicatorColor: Color
+          @Composable get() = indicatorColor
+
+        /**
+         * 表示该项的图标颜色，取决于它是否被[选中]。
+         *
+         * @param selected 项目是否被选中
+         */
         @Composable
-        fun toNavigationBarItemColors(): NavigationBarItemColors {
-            val defaultColors = NavigationBarItemDefaults.colors()
-           // indicatorColor 无法控制透明度
-            val indicatorColor = indicatorColor?.toComposeColor() ?: defaultColors.indicatorColor
-            val iconColor =
-                ColorState(iconColor?.toComposeColor()?: defaultColors.iconColor(false).value)
-            val iconColorSelected = ColorState(
-                textColorSelected?.toComposeColor() ?: defaultColors.indicatorColor
-            )
-            val textColor =
-                ColorState(textColor?.toComposeColor() ?: defaultColors.textColor(false).value)
-            val textColorSelected = ColorState(
-                textColorSelected?.toComposeColor()  ?: defaultColors.indicatorColor
-            )
-
-            val colors = @Stable object : NavigationBarItemColors {
-                override val indicatorColor: Color
-                    @Composable get() = indicatorColor
-
-                /**
-                 * 表示该项的图标颜色，取决于它是否被[选中]。
-                 *
-                 * @param selected 项目是否被选中
-                 */
-                @Composable
-                override fun iconColor(selected: Boolean) = if (selected) {
-                    iconColorSelected
-                } else {
-                    iconColor
-                }
-
-                /**
-                 * 表示该项的文本颜色，取决于它是否被[选中]。
-                 *
-                 * @param selected 项目是否被选中
-                 */
-                @Composable
-                override fun textColor(selected: Boolean) = if (selected) {
-                    textColorSelected
-                } else {
-                    textColor
-                }
-            }
-            return colors
+        override fun iconColor(selected: Boolean) = if (selected) {
+          iconColorSelected
+        } else {
+          iconColor
         }
-    }
 
-    companion object {
-        operator fun invoke(
-            icon: DWebIcon,
-            onClickCode: String,
-            label: String? = null,
-            alwaysShowLabel:Boolean = true,
-            selected: Boolean? = null,
-            selectable: Boolean? = null,
-            disabled: Boolean? = null,
-            colors: Colors? = null
-        ) = BottomBarAction(
-            icon,
-            onClickCode,
-            label ?: "",
-          alwaysShowLabel,
-          selected ?: false,
-            selectable ?: true,
-            disabled ?: false,
-            colors,
-        )
-
-        val _gson = JsUtil.registerGsonDeserializer(
-            BottomBarAction::class.java, JsonDeserializer { json, typeOfT, context ->
-                val jsonObject = json.asJsonObject
-                BottomBarAction(
-                    context.deserialize(jsonObject["icon"], DWebIcon::class.java),
-                    jsonObject["onClickCode"].asString,
-                    jsonObject["label"]?.asString,
-                  jsonObject["alwaysShowLabel"].asBoolean,
-                    jsonObject["selected"]?.asBoolean,
-                    jsonObject["selectable"]?.asBoolean,
-                    jsonObject["disabled"]?.asBoolean,
-                    jsonObject["colors"]?.let {
-                        context.deserialize(jsonObject["colors"], Colors::class.java)
-                    }
-                )
-            }
-        )
-        private val _icon_gson = DWebIcon._gson
+        /**
+         * 表示该项的文本颜色，取决于它是否被[选中]。
+         *
+         * @param selected 项目是否被选中
+         */
+        @Composable
+        override fun textColor(selected: Boolean) = if (selected) {
+          textColorSelected
+        } else {
+          textColor
+        }
+      }
+      return colors
     }
+  }
+
+  companion object {
+    operator fun invoke(
+      icon: DWebIcon,
+      onClickCode: String,
+      label: String? = null,
+      alwaysShowLabel: Boolean = true,
+      selected: Boolean? = null,
+      selectable: Boolean? = null,
+      disabled: Boolean? = null,
+      colors: Colors? = null
+    ) = BottomBarAction(
+      icon,
+      onClickCode,
+      label ?: "",
+      alwaysShowLabel,
+      selected ?: false,
+      selectable ?: true,
+      disabled ?: false,
+      colors,
+    )
+
+    val _gson = JsUtil.registerGsonDeserializer(
+      BottomBarAction::class.java, JsonDeserializer { json, typeOfT, context ->
+        val jsonObject = json.asJsonObject
+        BottomBarAction(
+          context.deserialize(jsonObject["icon"], DWebIcon::class.java),
+          jsonObject["onClickCode"].asString,
+          jsonObject["label"]?.asString,
+          jsonObject["alwaysShowLabel"].asBoolean,
+          jsonObject["selected"]?.asBoolean,
+          jsonObject["selectable"]?.asBoolean,
+          jsonObject["disabled"]?.asBoolean,
+          jsonObject["colors"]?.let {
+            context.deserialize(jsonObject["colors"], Colors::class.java)
+          }
+        )
+      }
+    )
+    private val _icon_gson = DWebIcon._gson
+  }
 }
