@@ -15,6 +15,8 @@ import org.bfchain.rust.plaoc.webView.jsutil.*
 import org.bfchain.rust.plaoc.webView.systemui.js.VirtualKeyboardFFI
 import org.bfchain.rust.plaoc.webkit.AdWebViewHook
 import org.bfchain.rust.plaoc.webView.jsutil.DataString_From
+import org.bfchain.rust.plaoc.webView.network.getColorHex
+import org.bfchain.rust.plaoc.webView.network.hexToIntColor
 
 
 private const val TAG = "SystemUiFFI"
@@ -39,18 +41,18 @@ class SystemUiFFI(
     }
 
     /**第一个参数是颜色HEX。第二个是图标是否更期望于使用深色*/
-    fun setStatusBarColor( colorHex: ColorInt, darkIcons: Boolean):Boolean {
+    fun setStatusBarColor( colorHex: String, darkIcons: Boolean):Boolean {
         systemUIState.statusBar.apply {
-            color.value = Color(colorHex)
+            color.value = Color(hexToIntColor(colorHex))
             isDarkIcons.value = darkIcons
         }
       return true
     }
   /** 获取状态栏背景颜色*/
-  fun getStatusBarColor(): ColorInt {
+  fun getStatusBarColor(): String {
     val color = systemUIState.statusBar.color.value;
     val colorInt = android.graphics.Color.argb(color.alpha, color.red, color.green, color.blue);
-    return colorInt
+    return getColorHex(colorInt)
   }
     /** 获取状态栏是否更期望使用深色*/
     fun getStatusBarIsDark(): Boolean {

@@ -54,9 +54,8 @@ export class BfcsTopBar extends DwebPlugin {
    * @param isEnabled boolean
    * @returns
    */
-  async setTopBarShow(isEnabled: boolean): Promise<void> {
-    await this.net.setTopBarShow(isEnabled);
-    return;
+  async setTopBarShow(isShow: boolean): Promise<boolean> {
+    return await this.net.setTopBarShow(isShow);
   }
   /**获取是否隐藏的状态 */
   async getTopBarShow(): Promise<boolean> {
@@ -73,9 +72,8 @@ export class BfcsTopBar extends DwebPlugin {
    * @param title string
    * @returns
    */
-  async setTopBarTitle(title: string): Promise<void> {
-    await this.net.setTopBarTitle(title);
-    return;
+  async setTopBarTitle(title: string): Promise<boolean> {
+    return await this.net.setTopBarTitle(title);
   }
   /**查看是否设置了标题 */
   async hasTopBarTitle(): Promise<boolean> {
@@ -113,11 +111,9 @@ export class BfcsTopBar extends DwebPlugin {
    * @param color
    * @returns
    */
-  async setTopBarBackgroundColor(color: string): Promise<void> {
+  async setTopBarBackgroundColor(color: string): Promise<boolean> {
     const colorHex = convertToRGBAHex(color);
-    await this.net.setTopBarBackgroundColor(colorHex);
-
-    return;
+    return await this.net.setTopBarBackgroundColor(colorHex);
   }
   /**获取状态栏文字和图标颜色 */
   async getTopBarForegroundColor(): Promise<Color.RGBAHex> {
@@ -129,10 +125,9 @@ export class BfcsTopBar extends DwebPlugin {
    * @param color
    * @returns
    */
-  async setTopBarForegroundColor(color: string): Promise<void> {
+  async setTopBarForegroundColor(color: string): Promise<boolean> {
     const colorHex = convertToRGBAHex(color);
-    await this.net.setTopBarForegroundColor(colorHex);
-    return;
+    return await this.net.setTopBarForegroundColor(colorHex);
   }
 
   async getTopBarActions(): Promise<TopBar.TopBarItem[]> {
