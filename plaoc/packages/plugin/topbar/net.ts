@@ -85,7 +85,7 @@ export class TopBarNet implements TopBar.ITopBarNet {
   }
 
   async setTopBarBackgroundColor(color: Color.RGBAHex): Promise<boolean> {
-    return await netCallNativeUi(NativeUI.SetTopBarBackgroundColor, convertToRGBAHex(color));
+    return await netCallNativeUi(NativeUI.SetTopBarBackgroundColor, color);
   }
 
   async getTopBarForegroundColor(): Promise<Color.RGBAHex> {
@@ -93,7 +93,7 @@ export class TopBarNet implements TopBar.ITopBarNet {
   }
 
   async setTopBarForegroundColor(color: Color.RGBAHex): Promise<boolean> {
-    return await netCallNativeUi(NativeUI.SetTopBarForegroundColor, convertToRGBAHex(color));
+    return await netCallNativeUi(NativeUI.SetTopBarForegroundColor, color);
   }
 
 

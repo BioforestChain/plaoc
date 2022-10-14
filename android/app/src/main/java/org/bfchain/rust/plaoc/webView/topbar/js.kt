@@ -50,8 +50,9 @@ class TopBarFFI(
         return state.title.value != null
     }
 
-    fun setTopBarTitle(str: String) {
+    fun setTopBarTitle(str: String): Boolean {
         state.title.value = str
+      return true;
     }
     fun getTopBarHeight(): Float {
         return state.height.value
