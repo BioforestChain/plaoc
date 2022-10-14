@@ -3,9 +3,9 @@
     "buildFromRootDir": "./packages/plugin",
     "mainExports": ".",
     "buildToRootDir": "./build/plugin",
-    "importMap": "./import_map_android.json",
+    "importMap": "./import_map.json",
     "name": "@bfsx/plugin",
-    "version": "0.0.4",
+    "version": "0.0.5",
     "lib": [
       "es2020",
       "dom"
