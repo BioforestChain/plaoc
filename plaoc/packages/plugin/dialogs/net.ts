@@ -2,7 +2,7 @@ import { netCallNativeUi } from "@bfsx/gateway";
 import { Dialogs } from "./bfcsDialogsType.ts";
 import { NativeUI } from "../common/nativeHandle.ts";
 
-export class DialogsFFI implements Dialogs.IDialogsFFI {
+export class DialogsNet implements Dialogs.IDialogsNet {
   async openAlert(
     config: Dialogs.IAlertConfig,
     confirmFunc: string,

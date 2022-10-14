@@ -79,7 +79,7 @@ fun initSystemUiFn(systemUiFFI:SystemUiFFI) {
 }
 
 data class NavigationBarColor(
-  val colorHex: ColorInt = 16777215,
+  val colorHex: String = "#ffffffff",
   val darkIcons: Boolean = true,
   val isNavigationBarContrastEnforced: Boolean = true
 )
@@ -130,13 +130,13 @@ fun initTopBarFn(topBarFFI: TopBarFFI) {
     topBarFFI.getTopBarBackgroundColor()
   }
   call_ui_map[ExportNativeUi.SetTopBarBackgroundColor] = {
-    topBarFFI.setTopBarBackgroundColor(it.toInt())
+    topBarFFI.setTopBarBackgroundColor(it)
   }
   call_ui_map[ExportNativeUi.GetTopBarForegroundColor] = {
     topBarFFI.getTopBarForegroundColor()
   }
   call_ui_map[ExportNativeUi.SetTopBarForegroundColor] = {
-    topBarFFI.setTopBarForegroundColor(it.toInt())
+    topBarFFI.setTopBarForegroundColor(it)
   }
 }
 
