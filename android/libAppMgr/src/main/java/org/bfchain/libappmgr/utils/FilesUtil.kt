@@ -128,9 +128,12 @@ object FilesUtil {
     var directory = getAppUpdateDirectory(appInfo)
     var file = File(directory)
     if (file.exists()) {
-      return file.listFiles()?.let {
-        getFileContent(it.last().absolutePath)
-      } ?: null
+      var files = file.listFiles()
+      return if (files.isNotEmpty()) {
+        getFileContent(files.last().absolutePath)
+      } else {
+        null
+      }
     }
     return null
   }
@@ -152,7 +155,7 @@ object FilesUtil {
         file.mkdirs()
       }*/
       var childrenMap: HashMap<String, String> = HashMap<String, String>()
-      file.listFiles().forEach {
+      file.listFiles()?.forEach {
         if (it.isDirectory) {
           // Log.d(TAG, "name=${it.name}, absolutePath=${it.absolutePath}")
           childrenMap[it.name] = it.absolutePath
