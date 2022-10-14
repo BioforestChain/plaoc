@@ -80,12 +80,12 @@ class SystemUiFFI(
 
   /**设置系统导航栏颜色*/
     fun setNavigationBarColor(
-        colorHex: ColorInt,
+        colorHex: String,
         darkIcons: Boolean,
         isNavigationBarContrastEnforced: Boolean
     ):Boolean {
         systemUIState.navigationBar.apply {
-            color.value = Color(colorHex)
+            color.value = Color(hexToIntColor(colorHex))
             isDarkIcons.value = darkIcons
             isContrastEnforced.value = isNavigationBarContrastEnforced
         }

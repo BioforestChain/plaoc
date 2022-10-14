@@ -1,16 +1,16 @@
 /// <reference lib="dom" />
 
-import { DialogsFFI } from "@dialogs/net";
+import { DialogsNet } from "@dialogs/net";
 import { DwebPlugin } from "../native/dweb-plugin.ts";
 import { Dialogs } from "./bfcsDialogsType.ts";
 
 class BfcsDialogs extends DwebPlugin {
-  protected _ffi: Dialogs.IDialogsFFI;
+  protected _ffi: Dialogs.IDialogsNet;
 
   constructor() {
     super();
 
-    this._ffi = new DialogsFFI();
+    this._ffi = new DialogsNet();
   }
 
   static get observedAttributes() {
