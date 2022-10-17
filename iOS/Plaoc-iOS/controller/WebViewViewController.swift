@@ -42,6 +42,23 @@ class WebViewViewController: UIViewController {
         
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+//        webView.openWebView(html: "iosqmkkx:/index.html")
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        let str = NSString(string: Bundle.main.bundlePath)
+        let path = str.appendingPathComponent("resource_3rd/assets/www")
+//        Schemehandler.setupHTMLCache(fromPath: path)
+        
+//        webView.recycleWebView()
+        
+//        webView.removeUserScripts()
+        NotificationCenter.default.removeObserver(self)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -231,23 +248,6 @@ class WebViewViewController: UIViewController {
         urlSchemeTask.didReceive(response)
         urlSchemeTask.didReceive(data)
         urlSchemeTask.didFinish()
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-//        webView.openWebView(html: "iosqmkkx:/index.html")
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        let str = NSString(string: Bundle.main.bundlePath)
-        let path = str.appendingPathComponent("resource_3rd/assets/www")
-//        Schemehandler.setupHTMLCache(fromPath: path)
-        
-//        webView.recycleWebView()
-        
-//        webView.removeUserScripts()
-        NotificationCenter.default.removeObserver(self)
     }
 
     lazy private var statusView: StatusView = {
@@ -504,11 +504,11 @@ extension WebViewViewController {
     private func bottombarOverlay() -> String {
         return bottomOverlay ? "true" : "false"
     }
-    
+    //设置底部alpha
     private func setBottomViewAlpha(alpha: CGFloat) {
         bottomView.alpha = alpha
     }
-    
+    //返回底部alpha
     private func bottomViewAlpha() -> String {
         return "\(bottomView.alpha)"
     }
