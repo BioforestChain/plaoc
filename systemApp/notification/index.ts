@@ -1,12 +1,21 @@
+import { EventEmitter } from "node_event";
+
 import "./bfsa-metadata.ts";
-import { NOTIFICATION_MESSAGE_QUEUE } from "./src/constants.ts";
-import { asyncCallDenoFunction } from "./src/message_source.ts";
-import { messageToQueue } from "./src/message_queue.ts";
+import {
+  NOTIFICATION_MESSAGE_QUEUE,
+  NOTIFICATION_MESSAGE_PUSH,
+} from "./src/constants.ts";
+import { asyncPollingCallDenoNotification } from "./src/message_source.ts";
 
-export async function messagePush() {
-  const messageInfo = await asyncCallDenoFunction(1000);
+export function messagePush() {
+  const ee = new EventEmitter();
+  asyncPollingCallDenoNotification(1000, ee);
 
-  messageToQueue(messageInfo);
+  ee.on(NOTIFICATION_MESSAGE_PUSH, () => {
+    // TODO: 消息推送
+    // NOTIFICATION_MESSAGE_QUEUE
+    // 通过notification system api
+  });
 }
 
 messagePush();

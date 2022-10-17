@@ -11,6 +11,7 @@ export const doBuild = async (npmFile: string) => {
     entryPoints: [
       {
         kind: "export",
+        name: ".",
         path: "./index.ts",
       },
     ],
@@ -45,6 +46,9 @@ export const doBuild = async (npmFile: string) => {
       },
       bugs: {
         url: "https://github.com/BioforestChain/plaoc/issues",
+      },
+      dependencies: {
+        "@bfsx/core": "^0.0.4",
       },
       devDependencies: {
         "@bfsx/typings": "^0.0.3",

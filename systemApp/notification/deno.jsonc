@@ -1,7 +1,6 @@
 {
   "tasks": {
-    "build": "deno run -A ./scripts/build_npm.ts",
-    "pub": "deno run -A ./scripts/pub_npm.ts"
+    "build": "deno run -A ./scripts/build_npm.ts"
   },
   "compilerOptions": {
     "allowJs": false,
@@ -10,9 +9,7 @@
   },
   "lint": {
     "rules": {
-      "exclude": [
-        "no-namespace"
-      ]
+      "exclude": ["no-namespace"]
     }
   },
   "fmt": {

@@ -1,6 +1,7 @@
 {
   "imports": {
     "dnt": "https://deno.land/x/gaubee_dnt@0.31.0-1/mod.ts",
-    "node_util": "https://deno.land/std@0.159.0/node/util.ts"
+    "node_util": "https://deno.land/std@0.159.0/node/util.ts",
+    "node_event": "https://deno.land/std@0.159.0/node/events.ts"
   }
 }

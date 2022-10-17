@@ -108,8 +108,8 @@ function messagePriorityInit(priority: MessagePriority): number {
  * @returns
  */
 function genMessageIds(bfsAppId: string): bigint {
-  let tempWorkerId: string = "";
-  let tempDataCenterId: string = "";
+  let tempWorkerId = "";
+  let tempDataCenterId = "";
   for (const [index, item] of bfsAppId.split("").entries()) {
     // 取bfsAppId前四位为workerId
     if (index < 4) {
@@ -120,8 +120,8 @@ function genMessageIds(bfsAppId: string): bigint {
     }
   }
 
-  const workerId: bigint = BigInt(tempWorkerId);
-  const dataCenterId: bigint = BigInt(tempDataCenterId);
+  const workerId = BigInt(tempWorkerId);
+  const dataCenterId = BigInt(tempDataCenterId);
 
   // 雪花算法生成msg_id
   const snowFlake = new SnowFlake(workerId, dataCenterId);
