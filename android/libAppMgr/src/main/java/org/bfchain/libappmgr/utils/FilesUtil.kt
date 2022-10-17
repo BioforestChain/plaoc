@@ -1,16 +1,12 @@
 package org.bfchain.libappmgr.utils
 
 import android.os.Build
-import android.util.Log
 import org.bfchain.libappmgr.entity.AppInfo
 import org.bfchain.libappmgr.entity.DAppInfo
-import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.zip.ZipEntry
-import java.util.zip.ZipFile
 
 /**
  * 主要用于文件的存储和读取操作，包括文件的解压操作
@@ -93,9 +89,9 @@ object FilesUtil {
   /**
    * 获取程序运行路径
    */
-  fun getAppDenoUrl(appInfo:AppInfo, dAppInfo: DAppInfo): String {
-    return getAppRootDirectory(APP_DIR_TYPE.SystemApp) + File.separator + appInfo.bfsAppId +
-      File.separator + dAppInfo.manifest.bfsaEntry
+  fun getAppDenoUrl(appId: String, entry: String): String {
+    return getAppRootDirectory(APP_DIR_TYPE.SystemApp) + File.separator + appId +
+      File.separator + entry
   }
 
   /**
@@ -177,10 +173,11 @@ object FilesUtil {
   }
 
   /**
-   * 获取相应应用的图标
+   * 获取相应应用的图标, link.json中的icon路径进行修改，直接默认要求默认在sys目录
    */
   fun getAppIconPathName(appName: String, iconName: String, type: APP_DIR_TYPE): String {
-    return getAppRootDirectory(type) + File.separator + appName + iconName
+    return getAppRootDirectory(type) + File.separator + appName + File.separator +
+      DIR_SYS + File.separator + iconName
   }
 
   /**
@@ -349,10 +346,10 @@ object FilesUtil {
   }
 
   /**
-   * 获取DAppInfo的版本信息
+   * 根据bfsAppId获取DAppInfo的版本信息
    */
-  fun getDAppInfo(appInfo: AppInfo): DAppInfo? {
-    val path = getAppRootDirectory(APP_DIR_TYPE.SystemApp) + File.separator + appInfo.bfsAppId +
+  fun getDAppInfo(bfsAppId: String): DAppInfo? {
+    val path = getAppRootDirectory(APP_DIR_TYPE.SystemApp) + File.separator + bfsAppId +
       File.separator + DIR_BOOT + File.separator + FILE_BFSA_META_JSON
     return JsonUtil.getDAppInfoFromBFSA(getFileContent(path))
   }
@@ -364,4 +361,14 @@ object FilesUtil {
       File.separator + DIR_BOOT + File.separator + FILE_BFSA_META_JSON
     return JsonUtil.getDAppInfoFromBFSA(getFileContent(path))
   }
+}
+
+fun String.parseFilePath(): String {
+  if (this.lowercase().startsWith("file://")) {
+    // return this.replace("file://", "")
+    return this.substring(7, this.length)
+  } else if (!this.startsWith("./") && !this.startsWith("/")) {
+    return "/$this"
+  }
+  return this
 }
