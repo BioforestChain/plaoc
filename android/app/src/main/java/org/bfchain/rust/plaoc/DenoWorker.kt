@@ -33,7 +33,8 @@ class DenoWorker(appContext: Context, workerParams: WorkerParameters) :
 /** 创建后台线程worker，来运行Service*/
 fun createWorker(funName: WorkerNative, data: String = "") {
   val fnName = funName.toString()
-  val done = WorkManager.getInstance(App.appContext.applicationContext).getWorkInfosByTag(fnName).isDone
+  val done = WorkManager.getInstance(App.appContext.applicationContext)
+    .getWorkInfosByTag(fnName).isDone
     Log.i("xx","workManager=> $done")
   if(done) {
     return

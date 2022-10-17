@@ -27,10 +27,10 @@ class DialogFFI(
 
     fun openPrompt(config: DataString<JsPromptConfiguration>, cb: CallbackString) {
         promptConfig.value = config.toData(JsPromptConfiguration::class.java).bindCallback({
-            cb.callJs("dialog_ffi-prompt", jsUtil, JsUtil.gson.toJson(it))
+          Log.i(TAG,"openPrompt1:$it")
+          cb.callJs("dialog_ffi-prompt", jsUtil, JsUtil.gson.toJson(it))
         }, {
-          Log.i(TAG,"openPrompt2:${jsUtil}")
-            cb.callJs("dialog_ffi-prompt", jsUtil, "null")
+            cb.callJs("dialog_ffi-prompt", jsUtil, "false")
         })
     }
 

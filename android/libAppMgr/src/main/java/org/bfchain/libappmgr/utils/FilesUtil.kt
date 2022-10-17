@@ -99,6 +99,14 @@ object FilesUtil {
   }
 
   /**
+   * 获取程序运行路径
+   */
+  fun getAppDenoUrl(bfsAppId: String, bfsaEntry: String): String {
+    return getAppRootDirectory(APP_DIR_TYPE.SystemApp) + File.separator + bfsAppId +
+      File.separator + bfsaEntry
+  }
+
+  /**
    * 获取应用更新路径
    */
   fun getAppVersionSaveFile(appInfo: AppInfo): String {
@@ -345,6 +353,14 @@ object FilesUtil {
    */
   fun getDAppInfo(appInfo: AppInfo): DAppInfo? {
     val path = getAppRootDirectory(APP_DIR_TYPE.SystemApp) + File.separator + appInfo.bfsAppId +
+      File.separator + DIR_BOOT + File.separator + FILE_BFSA_META_JSON
+    return JsonUtil.getDAppInfoFromBFSA(getFileContent(path))
+  }
+  /**
+   * 获取DAppInfo的版本信息
+   */
+  fun getDAppInfo(bfsAppId: String): DAppInfo? {
+    val path = getAppRootDirectory(APP_DIR_TYPE.SystemApp) + File.separator + bfsAppId +
       File.separator + DIR_BOOT + File.separator + FILE_BFSA_META_JSON
     return JsonUtil.getDAppInfoFromBFSA(getFileContent(path))
   }

@@ -1,9 +1,7 @@
 package org.bfchain.rust.plaoc.webView.bottombar
 
 
-import android.R.color
 import android.util.Log
-import android.webkit.JavascriptInterface
 import androidx.compose.material3.NavigationBarItemColors
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.runtime.Composable
@@ -46,8 +44,9 @@ class BottomBarFFI(
     return state.height.value ?: 0F
   }
 
-  fun setHeight(heightDp: String) {
+  fun setHeight(heightDp: String): Float {
     state.height.value = heightDp.toFloat()
+    return heightDp.toFloat()
   }
 
   fun getActions(): DataString<List<BottomBarAction>> {
@@ -56,7 +55,7 @@ class BottomBarFFI(
 
   fun setActions(actionListJson: DataString<List<BottomBarAction>>) {
     state.actions.clear()
-//      Log.i(TAG, "actionListJson:${actionListJson}")
+      Log.i(TAG, "actionListJson:${actionListJson}")
     val actionList = actionListJson.toData<List<BottomBarAction>>(object :
       TypeToken<List<BottomBarAction>>() {}.type)
     actionList.toCollection(state.actions)
@@ -69,16 +68,18 @@ class BottomBarFFI(
     return getColorHex(state.backgroundColor.value.toArgb())
   }
 
-  fun setBackgroundColor(color: String) {
+  fun setBackgroundColor(color: String): Boolean {
     state.backgroundColor.value = Color(hexToIntColor(color))
+    return true
   }
 
   fun getForegroundColor(): String {
     return getColorHex(state.foregroundColor.value.toArgb())
   }
 
-  fun setForegroundColor(color: String) {
+  fun setForegroundColor(color: String): Boolean {
     state.foregroundColor.value = Color(hexToIntColor(color))
+    return true
   }
 
   companion object {
@@ -99,11 +100,11 @@ data class BottomBarAction(
 ) {
 
   data class Colors(
-    val indicatorColor: ColorInt?,
-    val iconColor: ColorInt?,
-    val iconColorSelected: ColorInt?,
-    val textColor: ColorInt?,
-    val textColorSelected: ColorInt?
+    val indicatorColor: String?,
+    val iconColor: String?,
+    val iconColorSelected: String?,
+    val textColor: String?,
+    val textColorSelected: String?
   ) {
     data class ColorState(override val value: Color) : State<Color>
 
@@ -111,16 +112,16 @@ data class BottomBarAction(
     fun toNavigationBarItemColors(): NavigationBarItemColors {
       val defaultColors = NavigationBarItemDefaults.colors()
       // indicatorColor 无法控制透明度
-      val indicatorColor = indicatorColor?.toComposeColor() ?: defaultColors.indicatorColor
+      val indicatorColor = indicatorColor?.let { hexToIntColor(it).toComposeColor() } ?: defaultColors.indicatorColor
       val iconColor =
-        ColorState(iconColor?.toComposeColor() ?: defaultColors.iconColor(false).value)
+        ColorState(iconColor?.let { hexToIntColor(it).toComposeColor() }?: defaultColors.iconColor(false).value)
       val iconColorSelected = ColorState(
-        textColorSelected?.toComposeColor() ?: defaultColors.indicatorColor
+        iconColorSelected?.let { hexToIntColor(it).toComposeColor() } ?: defaultColors.indicatorColor
       )
       val textColor =
-        ColorState(textColor?.toComposeColor() ?: defaultColors.textColor(false).value)
+        ColorState(textColor?.let { hexToIntColor(it).toComposeColor() } ?: defaultColors.textColor(false).value)
       val textColorSelected = ColorState(
-        textColorSelected?.toComposeColor() ?: defaultColors.indicatorColor
+        textColorSelected?.let { hexToIntColor(it).toComposeColor() } ?: defaultColors.indicatorColor
       )
 
       val colors = @Stable object : NavigationBarItemColors {
