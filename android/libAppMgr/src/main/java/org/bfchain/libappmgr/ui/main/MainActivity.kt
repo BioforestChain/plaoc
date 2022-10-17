@@ -9,15 +9,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import org.bfchain.libappmgr.data.PreferencesHelper
 import org.bfchain.libappmgr.entity.AppInfo
 import org.bfchain.libappmgr.schedule.CoroutineUpdateTask
 import org.bfchain.libappmgr.ui.theme.AppMgrTheme
 import org.bfchain.libappmgr.ui.view.AppInfoGridView
+import org.bfchain.libappmgr.utils.AppContextUtil
 import org.bfchain.libappmgr.utils.FilesUtil
 
 class MainActivity : ComponentActivity() {
@@ -57,16 +56,15 @@ fun Gretting(name: String) {
 @SuppressLint("UnrememberedMutableState")
 @Composable
 fun Home(onOpenDWebview: ((appId:String, url: String) -> Unit)? = null) {
-  var appInfoList: MutableList<AppInfo> = mutableStateListOf()
   LaunchedEffect(Unit) {
     if (PreferencesHelper.isFirstIn()) {
       FilesUtil.copyAssetsToRecommendAppDir()
       PreferencesHelper.saveFirstState(false)
     }
     // 拷贝完成后，通过app目录下的remember-app和system-app获取最新列表数据
-    appInfoList.clear()
-    appInfoList.addAll(FilesUtil.getAppInfoList())
+    AppContextUtil.appInfoList.clear()
+    AppContextUtil.appInfoList.addAll(FilesUtil.getAppInfoList())
     CoroutineUpdateTask().scheduleUpdate(1000 * 60) // 轮询执行
   }
-  AppInfoGridView(appInfoList = appInfoList, downModeDialog = false, onOpenApp = onOpenDWebview)
+  AppInfoGridView(appInfoList = AppContextUtil.appInfoList, downModeDialog = false, onOpenApp = onOpenDWebview)
 }

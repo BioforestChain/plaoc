@@ -6,10 +6,14 @@
   <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
   <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
-  <application android:requestLegacyExternalStorage="true">
+  <application
+    android:requestLegacyExternalStorage="true">
     <provider
       android:name=".database.AppProvider"
       android:authorities="org.bfchain.rust.plaoc"
       android:exported="true" />
+
+    <activity android:name=".ui.main.MainActivity" />
+    <activity android:name=".ui.dcim.DCIMActivity" />
   </application>
 </manifest>
