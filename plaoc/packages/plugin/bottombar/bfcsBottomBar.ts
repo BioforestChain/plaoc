@@ -8,14 +8,14 @@ import { Icon } from "../icon/bfspIconType.ts";
 import { Color } from "../types/colorType.ts";
 
 export class BfcsBottomBar extends DwebPlugin {
-  private _ffi: BottomBarNet;
+  private net: BottomBarNet;
   private _observer: MutationObserver;
   private _actionList: BottomBar.BottomBarItem[] = [];
 
   constructor() {
     super();
 
-    this._ffi = new BottomBarNet();
+    this.net = new BottomBarNet();
     this._observer = new MutationObserver(async () => {
       await this.collectActions();
     });
@@ -65,17 +65,17 @@ export class BfcsBottomBar extends DwebPlugin {
    * @returns
    */
   async setHidden(isEnabled = true): Promise<boolean> {
-    return await this._ffi.setHidden(isEnabled);
+    return await this.net.setHidden(isEnabled);
   }
   /**获取bottomBar是否隐藏 */
   async getHidden(): Promise<boolean> {
-    const isEnabled = await this._ffi.getHidden();
+    const isEnabled = await this.net.getHidden();
 
     return isEnabled;
   }
   /**获取bottomBar透明度 */
   async getOverlay(): Promise<number> {
-    return await this._ffi.getBottomBarAlpha();
+    return await this.net.getBottomBarAlpha();
   }
   /**
    * 设置bottomBar是否透明
@@ -83,11 +83,11 @@ export class BfcsBottomBar extends DwebPlugin {
    * @returns
    */
   async setOverlay(alpha = "1"): Promise<number> {
-    return await this._ffi.setBottomBarAlpha(alpha);
+    return await this.net.setBottomBarAlpha(alpha);
   }
   /**获取bottomBar高度 */
   async getHeight(): Promise<number> {
-    const height = await this._ffi.getHeight();
+    const height = await this.net.getHeight();
     return height;
   }
   /**
@@ -95,14 +95,13 @@ export class BfcsBottomBar extends DwebPlugin {
    * @param height
    * @returns
    */
-  async setHeight(height: number): Promise<void> {
+  async setHeight(height: number): Promise<boolean> {
     this.setAttribute("height", `${height}`);
-    await this._ffi.setHeight(height);
-    return;
+    return await this.net.setHeight(height);
   }
   /**获取bottomBar背景颜色 */
   async getBackgroundColor(): Promise<Color.RGBAHex> {
-    const color = await this._ffi.getBackgroundColor();
+    const color = await this.net.getBackgroundColor();
 
     return color;
   }
@@ -111,34 +110,31 @@ export class BfcsBottomBar extends DwebPlugin {
    * @param color
    * @returns
    */
-  async setBackgroundColor(color: string): Promise<void> {
+  async setBackgroundColor(color: string): Promise<boolean> {
     const colorHex = convertToRGBAHex(color);
-    await this._ffi.setBackgroundColor(colorHex);
-
-    return;
+    return await this.net.setBackgroundColor(colorHex);
   }
 
   async getForegroundColor(): Promise<Color.RGBAHex> {
-    const color = await this._ffi.getForegroundColor();
+    const color = await this.net.getForegroundColor();
 
     return color;
   }
 
-  async setForegroundColor(color: string): Promise<void> {
+  async setForegroundColor(color: string): Promise<boolean> {
     const colorHex = convertToRGBAHex(color);
-    await this._ffi.setForegroundColor(colorHex);
+    return await this.net.setForegroundColor(colorHex);
 
-    return;
   }
 
   async getActions(): Promise<BottomBar.BottomBarItem[]> {
-    this._actionList = await this._ffi.getActions();
+    this._actionList = await this.net.getActions();
 
     return this._actionList;
   }
 
   async setActions(): Promise<void> {
-    await this._ffi.setActions(this._actionList);
+    await this.net.setActions(this._actionList);
 
     return;
   }

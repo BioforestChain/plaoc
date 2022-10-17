@@ -87,7 +87,7 @@ function onBottomBar(serial: string) {
     </ion-fab-list>
   </ion-fab>
 
-  <dweb-top-bar id="topbar" title="Ar 扫雷" background-color="#eeee" foreground-color="#000" overlay="0.4">
+  <dweb-top-bar id="topbar" title="Ar 扫雷" background-color="#eee" foreground-color="#000" overlay="0.4">
 
     <dweb-top-bar-button id="aaa" @click="openBarScanner">
       <dweb-icon source="Filled.AddCircle"></dweb-icon>
