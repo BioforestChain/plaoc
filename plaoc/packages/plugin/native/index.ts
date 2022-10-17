@@ -2,7 +2,6 @@
 import { netCallNativeUi } from "@bfsx/gateway";
 import { DwebPlugin } from "./dweb-plugin.ts";
 import { NativeHandle, NativeUI } from "../common/nativeHandle.ts";
-import { hexToIntColor } from "../util/index.ts";
 
 export class DWebMessager extends DwebPlugin {
   constructor() {
@@ -30,11 +29,10 @@ export class Navigation extends DwebPlugin {
    * @returns Promise<true>
    */
   setNavigationBarColor(
-    color: string,
+    colorHex: string,
     darkIcons = false,
     isNavigationBarContrastEnforced = true,
   ) {
-    const colorHex = hexToIntColor(color);
     return netCallNativeUi(NativeUI.SetNavigationBarColor, {
       colorHex,
       darkIcons,

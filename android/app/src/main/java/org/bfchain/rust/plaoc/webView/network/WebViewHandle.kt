@@ -79,7 +79,7 @@ fun initSystemUiFn(systemUiFFI:SystemUiFFI) {
 }
 
 data class NavigationBarColor(
-  val colorHex: ColorInt = 16777215,
+  val colorHex: String = "#ffffffff",
   val darkIcons: Boolean = true,
   val isNavigationBarContrastEnforced: Boolean = true
 )
@@ -100,6 +100,12 @@ fun initTopBarFn(topBarFFI: TopBarFFI) {
     topBarFFI.getTopBarOverlay()!!
   }
   call_ui_map[ExportNativeUi.SetTopBarOverlay] = {
+    topBarFFI.setTopBarOverlay(it)!!
+  }
+  call_ui_map[ExportNativeUi.GetTopBarAlpha] = {
+    topBarFFI.getTopBarOverlay()!!
+  }
+  call_ui_map[ExportNativeUi.SetTopBarAlpha] = {
     topBarFFI.setTopBarOverlay(it)!!
   }
   call_ui_map[ExportNativeUi.GetTopBarTitle] = {
@@ -124,13 +130,13 @@ fun initTopBarFn(topBarFFI: TopBarFFI) {
     topBarFFI.getTopBarBackgroundColor()
   }
   call_ui_map[ExportNativeUi.SetTopBarBackgroundColor] = {
-    topBarFFI.setTopBarBackgroundColor(it.toInt())
+    topBarFFI.setTopBarBackgroundColor(it)
   }
   call_ui_map[ExportNativeUi.GetTopBarForegroundColor] = {
     topBarFFI.getTopBarForegroundColor()
   }
   call_ui_map[ExportNativeUi.SetTopBarForegroundColor] = {
-    topBarFFI.setTopBarForegroundColor(it.toInt())
+    topBarFFI.setTopBarForegroundColor(it)
   }
 }
 
@@ -144,10 +150,10 @@ fun initBottomFn(bottomBarFFI: BottomBarFFI) {
   call_ui_map[ExportNativeUi.SetBottomBarEnabled] = {
     bottomBarFFI.setEnabled(it)
   }
-  call_ui_map[ExportNativeUi.GetBottomBarOverlay] = {
+  call_ui_map[ExportNativeUi.GetBottomBarAlpha] = {
     bottomBarFFI.getOverlay()
   }
-  call_ui_map[ExportNativeUi.SetBottomBarOverlay] = {
+  call_ui_map[ExportNativeUi.SetBottomBarAlpha] = {
     bottomBarFFI.setOverlay(it)
   }
   call_ui_map[ExportNativeUi.GetBottomBarHeight] = {
@@ -166,13 +172,13 @@ fun initBottomFn(bottomBarFFI: BottomBarFFI) {
     bottomBarFFI.getBackgroundColor()
   }
   call_ui_map[ExportNativeUi.SetBottomBarBackgroundColor] = {
-    bottomBarFFI.setBackgroundColor(it.toInt())
+    bottomBarFFI.setBackgroundColor(it)
   }
   call_ui_map[ExportNativeUi.GetBottomBarForegroundColor] = {
     bottomBarFFI.getForegroundColor()
   }
   call_ui_map[ExportNativeUi.SetBottomBarForegroundColor] = {
-    bottomBarFFI.setForegroundColor(it.toInt())
+    bottomBarFFI.setForegroundColor(it)
   }
 }
 /**

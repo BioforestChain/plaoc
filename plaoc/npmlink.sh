@@ -2,7 +2,7 @@
 
 # 快速npm link 方便测试
 
-dirctory=("core" "plugin" "metadata" "typings" "vfs","gateway")
+dirctory=("core" "plugin" "metadata" "typings" "vfs" "gateway")
 
 for dir in ${dirctory[@]}
 do

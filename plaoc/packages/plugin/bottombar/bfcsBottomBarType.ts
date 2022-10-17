@@ -56,42 +56,20 @@ export namespace BottomBar {
     };
   }
 
-  export interface BottomBarDesktopFFI {
-    setBottombarHidden(
-      scopedValue: boolean | undefined,
-      globalValue?: boolean,
-    ): Promise<void>;
-    getBottombarHidden(): Promise<boolean>;
-    setBottombarOverlay(
-      scopedValue: string | undefined,
-      globalValue?: boolean,
-    ): Promise<number>;
-    getBottombarOverlay(): Promise<number>;
-    setBottombarHeight(
-      scopedValue: string | undefined,
-      globalValue?: string,
-    ): Promise<void>;
-    getBottombarHeight(): Promise<string>;
-    setBottombarBackgroundColor(
-      scopedValue: string | undefined,
-      globalValue?: string,
-    ): Promise<void>;
-    getBottombarBackgroundColor(): Promise<Color.ColorFormatType>;
-  }
 
-  export interface IBottomBarFFI {
+  export interface IBottomBarNet {
     getHidden(): Promise<boolean>;
-    setHidden(isEnabled: boolean): Promise<void>;
-    getOverlay(): Promise<number>;
-    setOverlay(alpha: string): Promise<number>;
+    setHidden(isEnabled: boolean): Promise<boolean>;
+    getBottomBarAlpha(): Promise<number>;
+    setBottomBarAlpha(alpha: string): Promise<number>;
     getHeight(): Promise<number>;
-    setHeight(heightDp: number): Promise<void>;
+    setHeight(heightDp: number): Promise<boolean>;
     getActions(): Promise<BottomBarItem[]>;
     setActions(actionList: BottomBarItem[]): Promise<void>;
     getBackgroundColor(): Promise<Color.RGBAHex>;
-    setBackgroundColor(color: Color.RGBAHex): Promise<void>;
+    setBackgroundColor(color: Color.RGBAHex): Promise<boolean>;
     getForegroundColor(): Promise<Color.RGBAHex>;
-    setForegroundColor(color: Color.RGBAHex): Promise<void>;
+    setForegroundColor(color: Color.RGBAHex): Promise<boolean>;
   }
 
   export type BottomBarColorType = number | Color.RGBAHex;

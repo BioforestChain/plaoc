@@ -1,25 +1,21 @@
 import { NativeUI } from "../common/nativeHandle.ts";
 import { netCallNativeUi } from "@bfsx/gateway";
 import { Color } from "../types/colorType.ts";
-import { getColorHex, getColorInt } from "../util/index.ts";
 import { StatusBar } from "./bfcsStatusBarType.ts";
 
-export class StatusBarFFI implements StatusBar.IStatusBarFFI {
+export class StatusBarNet implements StatusBar.IStatusBarNet {
   async setStatusBarColor(
-    color?: Color.RGBAHex,
+    colorHex?: Color.RGBAHex,
     barStyle?: StatusBar.StatusBarStyle,
   ): Promise<void> {
-    let colorHex: number;
     let darkIcons: boolean;
 
-    if (!color) {
-      const stringColor = await netCallNativeUi(NativeUI.GetStatusBarColor);
-      colorHex = Number(stringColor);
-    } else {
-      colorHex = getColorInt(
-        color.slice(0, -2) as Color.RGBHex,
-        color.slice(-2) as Color.AlphaValueHex,
-      );
+    if (!colorHex) {
+      await netCallNativeUi(NativeUI.GetStatusBarColor).then(res => {
+        colorHex = res
+      }).catch(_err => {
+        colorHex = "#fff" // 适配ios没有设置statsBar的情况
+      })
     }
 
     if (!barStyle) {
@@ -42,10 +38,7 @@ export class StatusBarFFI implements StatusBar.IStatusBarFFI {
   }
 
   async getStatusBarColor(): Promise<Color.RGBAHex> {
-    const stringColor = (await netCallNativeUi(
-      NativeUI.GetStatusBarColor,
-    )) as string;
-    const colorHex = getColorHex(parseFloat(stringColor));
+    const colorHex = await netCallNativeUi(NativeUI.GetStatusBarColor)
     return colorHex;
   }
 
@@ -80,6 +73,10 @@ export class StatusBarFFI implements StatusBar.IStatusBarFFI {
     return Boolean(isOver);
   }
 
+  /**
+   * 是否是深色
+   * @returns 
+   */
   async getStatusBarIsDark(): Promise<StatusBar.StatusBarStyle> {
     const isDarkIcons = await netCallNativeUi(NativeUI.GetStatusBarIsDark);
     let barStyle: StatusBar.StatusBarStyle;

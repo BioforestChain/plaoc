@@ -2,7 +2,7 @@ import { netCallNativeUi } from "@bfsx/gateway";
 import { Keyboard } from "./bfcsKeyboardType.ts";
 import { NativeUI } from "../common/nativeHandle.ts";
 
-export class VirtualKeyboardFFI implements Keyboard.IVirtualKeyboardFFI {
+export class VirtualKeyboardNet implements Keyboard.IVirtualKeyboardNet {
   async getKeyboardSafeArea(): Promise<Keyboard.IKeyboardSafeArea> {
     const safeArea = await netCallNativeUi(NativeUI.GetKeyBoardSafeArea);
     return JSON.parse(safeArea);
@@ -18,15 +18,15 @@ export class VirtualKeyboardFFI implements Keyboard.IVirtualKeyboardFFI {
     return overlay;
   }
 
-  async toggleKeyboardOverlay(isOver = true): Promise<void> {
+  async setKeyboardOverlay(isOver = true): Promise<boolean> {
     const overlay = await netCallNativeUi(NativeUI.SetKeyBoardOverlay, isOver);
     return overlay;
   }
 
-  async setKeyboardOverlay(): Promise<boolean> {
+  async toggleKeyboardOverlay(): Promise<boolean> {
     const overlay = await this.getKeyboardOverlay();
     if (!overlay) {
-      await this.toggleKeyboardOverlay(true);
+      await this.setKeyboardOverlay(true);
     }
     return overlay;
   }

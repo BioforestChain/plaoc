@@ -1,16 +1,16 @@
 /// <reference lib="dom" />
 
-import { DialogsFFI } from "!dialogs/net";
+import { DialogsNet } from "@dialogs/net";
 import { DwebPlugin } from "../native/dweb-plugin.ts";
 import { Dialogs } from "./bfcsDialogsType.ts";
 
 class BfcsDialogs extends DwebPlugin {
-  protected _ffi: Dialogs.IDialogsFFI;
+  protected net: Dialogs.IDialogsNet;
 
   constructor() {
     super();
 
-    this._ffi = new DialogsFFI();
+    this.net = new DialogsNet();
   }
 
   static get observedAttributes() {
@@ -77,7 +77,7 @@ export class BfcsDialogAlert extends BfcsDialogs {
 
       const cb =
         `document.querySelector('dweb-dialog-alert[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
-      this._ffi.openAlert(alertConfig, cb);
+      this.net.openAlert(alertConfig, cb);
 
       resolve();
     });
@@ -161,7 +161,7 @@ export class BfcsDialogPrompt extends BfcsDialogs {
             if (childNode.getAttribute("aria-label") === "confirm") {
               promptConfig.confirmText = childNode.getAttribute("label") ?? "";
               confirmFunc =
-                `document.querySelector('dweb-dialog-prompt[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+                `document.querySelector('dweb-dialog-prompt[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click',{detail: {result: result}}))`;
             } else {
               promptConfig.cancelText = childNode.getAttribute("label") ?? "";
               cancelFunc =
@@ -171,7 +171,7 @@ export class BfcsDialogPrompt extends BfcsDialogs {
             if (index === 0) {
               promptConfig.confirmText = childNode.getAttribute("label") ?? "";
               confirmFunc =
-                `document.querySelector('dweb-dialog-prompt[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+                `document.querySelector('dweb-dialog-prompt[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click',{detail: {result: result}}))`;
             } else {
               promptConfig.cancelText = childNode.getAttribute("label") ?? "";
               cancelFunc =
@@ -181,7 +181,7 @@ export class BfcsDialogPrompt extends BfcsDialogs {
         },
       );
 
-      this._ffi.openPrompt(promptConfig, confirmFunc, cancelFunc);
+      this.net.openPrompt(promptConfig, confirmFunc, cancelFunc);
 
       resolve();
     });
@@ -283,7 +283,7 @@ export class BfcsDialogConfirm extends BfcsDialogs {
         },
       );
 
-      this._ffi.openConfirm(confirmConfig, confirmFunc, cancelFunc);
+      this.net.openConfirm(confirmConfig, confirmFunc, cancelFunc);
 
       resolve();
     });
@@ -385,7 +385,7 @@ export class BfcsDialogWarning extends BfcsDialogs {
         },
       );
 
-      this._ffi.openWarning(confirmConfig, confirmFunc, cancelFunc);
+      this.net.openWarning(confirmConfig, confirmFunc, cancelFunc);
 
       resolve();
     });
