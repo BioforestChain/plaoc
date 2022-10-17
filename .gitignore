@@ -20,7 +20,9 @@
 local.properties
 **build
 /plaoc/yarn-error.log
-
+resource_3rd
+recommend-app
+Pods
 
 rust_lib/assets/rusty_v8_mirror/
 
