@@ -11,6 +11,7 @@ import kotlinx.coroutines.launch
 import org.bfchain.libappmgr.data.*
 import org.bfchain.libappmgr.entity.AppInfo
 import org.bfchain.libappmgr.entity.AppVersion
+import org.bfchain.libappmgr.entity.DAppInfo
 import org.bfchain.libappmgr.entity.DownLoadState
 import org.bfchain.libappmgr.network.base.IApiResult
 import org.bfchain.libappmgr.ui.main.MainViewModel
@@ -18,6 +19,7 @@ import org.bfchain.libappmgr.ui.view.*
 import org.bfchain.libappmgr.utils.AppContextUtil
 import org.bfchain.libappmgr.utils.FilesUtil
 import org.bfchain.libappmgr.utils.JsonUtil
+import org.bfchain.libappmgr.utils.ZipUtil
 import java.io.File
 
 /**
@@ -38,6 +40,7 @@ fun DownloadAppInfoView(
   var maskProgressMode = rememberMaskProgressMode()
   var appInfoMode = createAppInfoMode(appInfo.iconPath, appInfo.name)
   var appVersion: AppVersion? = null
+  var dAppInfo: DAppInfo? = null
 
   AppInfoView(
     appInfoMode = appInfoMode,
@@ -74,18 +77,23 @@ fun DownloadAppInfoView(
         })
       } else {
         // 1.打开应用
-        var dappInfo = FilesUtil.getDAppInfo(appInfo)
-        dappInfo?.let { dApp ->
-          onOpenApp?.let { onOpenApp(appInfo.bfsAppId, getDAppInfoUrl(appInfo)) } // 回调dweb请求的地址
+        dAppInfo = FilesUtil.getDAppInfo(appInfo)
+        dAppInfo?.let { dApp ->
+          onOpenApp?.let {
+            onOpenApp(
+              appInfo.bfsAppId,
+              getDAppInfoUrl(appInfo, dApp)
+            )
+          } // 回调dweb请求的地址
           Toast.makeText(
-            AppContextUtil.sInstance, "直接打开应用-->${dApp.enter.main}", Toast.LENGTH_SHORT
+            AppContextUtil.sInstance, "直接打开应用-->${dApp.manifest.bfsaEntry}", Toast.LENGTH_SHORT
           ).show()
           appInfoMode.showBadge.value = false // 打开后，隐藏小红点
         }
         vmMain.getAppVersion(appInfo, object : IApiResult<AppVersion> {
           override fun onSuccess(errorCode: Int, errorMsg: String, data: AppVersion) {
             // 请求成功后，比对获取的版本号和当前版本号
-            if (dappInfo == null || hasNewVersion(dappInfo.version, data.version)) {
+            if (dAppInfo == null || hasNewVersion(dAppInfo!!.manifest.version, data.version)) {
               appVersion = data
               dialogState.updateState(customShow = true).customDialog.updateNewVersion(appVersion)
             }
@@ -112,11 +120,7 @@ fun DownloadAppInfoView(
               // 显示当前状态
               appInfoMode.updateDLState(DownLoadState.LOADING).updateName("正在解压")
               // 解压耗时
-              FilesUtil.UnzipFile(
-                file.absolutePath,
-                desDirectory = FilesUtil.getAppUnzipPath(appInfo)
-              )
-              file.delete() // 解压后，删除压缩包
+              ZipUtil.decompress(file.absolutePath, FilesUtil.getAppUnzipPath(appInfo))
               appInfo.isSystemApp = true
               maskProgressMode.updateState(DownLoadState.IDLE)
               appInfoMode.updateShowBadge(true).updateDLState(DownLoadState.COMPLETED)
@@ -158,6 +162,7 @@ fun DownloadDialogView(
   var dialogState = rememberDialogAllState(customDialogData)
   var appInfoMode = createAppInfoMode(appInfo.iconPath, appInfo.name)
   var appVersion: AppVersion? = null
+  var dAppInfo: DAppInfo? = null
 
   // 显示界面图标
   AppInfoView(
@@ -184,18 +189,23 @@ fun DownloadDialogView(
         })
       } else {
         // 1.打开应用
-        var dappInfo = FilesUtil.getDAppInfo(appInfo)
-        dappInfo?.let { dApp ->
-          onOpenApp?.let { onOpenApp(appInfo.bfsAppId, getDAppInfoUrl(appInfo)) } // 回调dweb请求的地址
+        dAppInfo = FilesUtil.getDAppInfo(appInfo)
+        dAppInfo?.let { dApp ->
+          onOpenApp?.let {
+            onOpenApp(
+              appInfo.bfsAppId,
+              getDAppInfoUrl(appInfo, dApp)
+            )
+          } // 回调dweb请求的地址
           Toast.makeText(
-            AppContextUtil.sInstance, "直接打开应用-->${dApp.enter.main}", Toast.LENGTH_SHORT
+            AppContextUtil.sInstance, "直接打开应用-->${dApp.manifest.bfsaEntry}", Toast.LENGTH_SHORT
           ).show()
           appInfoMode.showBadge.value = false // 打开后，隐藏小红点
         }
         vmMain.getAppVersion(appInfo, object : IApiResult<AppVersion> {
           override fun onSuccess(errorCode: Int, errorMsg: String, data: AppVersion) {
             // 请求成功后，比对获取的版本号和当前版本号
-            if (dappInfo == null || hasNewVersion(dappInfo.version, data.version)) {
+            if (dAppInfo == null || hasNewVersion(dAppInfo!!.manifest.version, data.version)) {
               appVersion = data
               dialogState.updateState(customShow = true).customDialog.updateNewVersion(appVersion)
             }
@@ -208,11 +218,13 @@ fun DownloadDialogView(
     if (appInfoMode.downLoadState.value == DownLoadState.COMPLETED) {
       dialogState.updateState(customShow = false)
       appInfoMode.downLoadState.value = DownLoadState.IDLE
-      var url = getDAppInfoUrl(appInfo)
-      Toast.makeText(
-        AppContextUtil.sInstance, "直接打开应用-->${appInfo.name} url->$url", Toast.LENGTH_SHORT
-      ).show()
-      onOpenApp?.let { onOpenApp(appInfo.bfsAppId, getDAppInfoUrl(appInfo)) }
+      if (dAppInfo != null) {
+        var url = getDAppInfoUrl(appInfo, dAppInfo!!)
+        Toast.makeText(
+          AppContextUtil.sInstance, "直接打开应用-->${appInfo.name} url->$url", Toast.LENGTH_SHORT
+        ).show()
+        onOpenApp?.let { onOpenApp(appInfo.bfsAppId, url) }
+      }
       appInfoMode.showBadge.value = false // 打开后，隐藏小红点
     } else if (appVersion != null && appVersion!!.files.isNotEmpty()) {
       // 调用下载操作
@@ -228,11 +240,7 @@ fun DownloadDialogView(
 
           override fun downloadSuccess(file: File) {
             GlobalScope.launch {
-              FilesUtil.UnzipFile(
-                file.absolutePath,
-                desDirectory = FilesUtil.getAppUnzipPath(appInfo)
-              )
-              file.delete() // 解压后，删除压缩包
+              ZipUtil.decompress(file.absolutePath, FilesUtil.getAppUnzipPath(appInfo))
               // 隐藏下载进度界面，显示对话框界面
               dialogState.updateState(customShow = true).customDialog.update(
                 content = "下载完成", confirmText = "打开"
@@ -264,10 +272,9 @@ fun DownloadDialogView(
   ProgressDialog(dialogState, onCancel = { appInfoMode.downLoadState.value = DownLoadState.IDLE })
 }
 
-
-private fun getDAppInfoUrl(appInfo: AppInfo): String {
+private fun getDAppInfoUrl(appInfo: AppInfo, dAppInfo: DAppInfo): String {
   // return FilesUtil.getDAppInfo(appInfo)?.let { it.enter.main } ?: ""
-  return FilesUtil.getAppDenoUrl(appInfo)
+  return FilesUtil.getAppDenoUrl(appInfo, dAppInfo)
 }
 
 private fun hasNewVersion(cur: String, net: String): Boolean {

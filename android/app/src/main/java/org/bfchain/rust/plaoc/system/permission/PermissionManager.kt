@@ -1,178 +1,74 @@
 package org.bfchain.rust.plaoc.system.permission
 
+import android.Manifest
 import android.app.Activity
 import android.content.DialogInterface
 import android.content.pm.PackageManager
-import android.util.Log
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
+import org.bfchain.rust.plaoc.App
+import org.bfchain.rust.plaoc.R
 
-
-class PermissionManager : DialogInterface.OnClickListener {
-
-  private val MY_PERMISSIONS = 6666
-
-  private val PERMISSIONS_TAG = "PermissionManager"
-
-  private val DEFAULT_DENY_DIALOG_TITLE = "申请权限"
-  private val DEFAULT_DENY_DIALOG_POS_BTN = "设置"
-  private val DEFAULT_DENY_DIALOG_NEG_BTN = "取消"
+class PermissionManager {
+  private val DEFAULT_DENY_DIALOG_TITLE = App.appContext.getString(R.string.permission_deny_title)
+  private val DEFAULT_DENY_DIALOG_TEXT = App.appContext.getString(R.string.permission_deny_text)
+  private val DEFAULT_DENY_DIALOG_POS_BTN =
+    App.appContext.getString(R.string.permission_go_settings)
+  private val DEFAULT_DENY_DIALOG_NEG_BTN = App.appContext.getString(R.string.permission_cancel)
 
   private var activity: Activity? = null
   private var fragment: Fragment? = null
 
-  private var permissionUtils: PermissionUtils? = null
-  private var permissionCallback: PermissionCallback? = null
+  private lateinit var permissionCallback: PermissionCallback
 
-  private var permission: String? = null
+  // private var permission: String? = null
+  private var permissions = ArrayList<String>()
   private var showDenyDialog = true
   private var showRationale = true
-  private var denyDialogText: String? = null
+  private var denyDialogText = DEFAULT_DENY_DIALOG_TEXT
   private var denyDialogTitle = DEFAULT_DENY_DIALOG_TITLE
   private var denyPosBtnTxt = DEFAULT_DENY_DIALOG_POS_BTN
   private var denyNegBtnTxt = DEFAULT_DENY_DIALOG_NEG_BTN
   private var showNegBtn = true
-  private var isCancellable = true
-
+  private var denyCancellable = true
+  private var requestCode = MY_PERMISSIONS
 
   private var alertDialog: AlertDialog? = null
 
   constructor(fragment: Fragment) {
     this.fragment = fragment
     this.activity = fragment.activity
-    permissionUtils = activity?.let { PermissionUtils(it) }
   }
 
   constructor(activity: Activity) {
     this.activity = activity
-    permissionUtils = PermissionUtils(activity)
   }
 
-  /**
-   * This is the method to be called to display permission dialog
-   * pass the permission string along with this method
-   */
-  fun showPermissionDialog(permission: String): PermissionManager {
-    this.permission = permission
-    return this
-  }
-
-  /**
-   * This should be called in case you want to display
-   * a custom dialog explaining why you require this
-   * permission.
-   * This will be called once the user has denied the
-   * permission and checked the "never show again" button
-   */
-  fun withDenyDialogEnabled(showDenyDialog: Boolean): PermissionManager {
+  fun requestPermissions(
+    permissions: ArrayList<String>,
+    permissionCallback: PermissionCallback = DefaultPermissionCallback,
+    showDenyDialog: Boolean = true,
+    showRationale: Boolean = true,
+    showNegBtn: Boolean = true,
+    denyCancellable: Boolean = true,
+    denyDialogTitle: String = DEFAULT_DENY_DIALOG_TITLE,
+    denyDialogText: String = DEFAULT_DENY_DIALOG_TEXT,
+    denyPosBtnTxt: String = DEFAULT_DENY_DIALOG_POS_BTN,
+    denyNegBtnTxt: String = DEFAULT_DENY_DIALOG_NEG_BTN,
+    requestCode: Int = MY_PERMISSIONS,
+  ) {
+    this.permissions = permissions
     this.showDenyDialog = showDenyDialog
-    return this
-  }
-
-  /**
-   * This should be called in case you want to display
-   * android dialog to users if they have not checked the
-   * "never show again" button
-   * This will be called once the user has denied the
-   * permission the first time
-   */
-  fun withRationaleEnabled(showRationale: Boolean): PermissionManager {
     this.showRationale = showRationale
-    return this
-  }
-
-  /**
-   * This will display the description text explaining to the users
-   * why we need this permission
-   */
-  fun withDenyDialogMsg(denyDialogText: String): PermissionManager {
-    this.denyDialogText = denyDialogText
-    return this
-  }
-
-  /**
-   * This is an option parameter to display the title for the
-   * custom dialog. By default, it will be "Permission required"
-   */
-  fun withDenyDialogTitle(denyDialogTitle: String): PermissionManager {
-    this.denyDialogTitle = denyDialogTitle
-    return this
-  }
-
-
-  /**
-   * This is an option parameter to display the positive button text
-   * for the custom dialog. By default, it will be "GO TO SETTINGS"
-   * This will redirect the users to the settings screen once clicked
-   */
-  fun withDenyDialogPosBtnText(denyPosBtnTxt: String): PermissionManager {
-    this.denyPosBtnTxt = denyPosBtnTxt
-    return this
-  }
-
-  /**
-   * This is an option parameter to display the negative button text
-   * for the custom dialog. By default, it will be "Cancel"
-   */
-  fun withDenyDialogNegBtnText(denyNegBtnTxt: String): PermissionManager {
-    this.denyNegBtnTxt = denyNegBtnTxt
-    return this
-  }
-
-  /**
-   * This is an option parameter to show/hide the negative dialog
-   * button. This is to make sure that the user has no choice but
-   * to grant the permission. By default this flag will be false.
-   */
-  fun withDenyDialogNegBtn(showNegBtn: Boolean): PermissionManager {
     this.showNegBtn = showNegBtn
-    return this
-  }
-
-  /**
-   * This is an option parameter to provide users with an option
-   * to cancel the permission dialog. If this is false the user
-   * has no choice but to grant the permission.
-   * By default this flag will be true.
-   */
-  fun isDialogCancellable(isCancellable: Boolean): PermissionManager {
-    this.isCancellable = isCancellable
-    return this
-  }
-
-  /**
-   * This is an option parameter to receive a callback for the
-   * permission
-   */
-  fun withCallback(permissionCallback: PermissionCallback): PermissionManager {
+    this.denyCancellable = denyCancellable
+    this.denyDialogTitle = denyDialogTitle
+    this.denyDialogText = denyDialogText
+    this.denyPosBtnTxt = denyPosBtnTxt
+    this.denyNegBtnTxt = denyNegBtnTxt
     this.permissionCallback = permissionCallback
-    return this
-  }
-
-  /**
-   * Build method will be invoked only when the permission string is valid
-   * and if the showDenyDialog flag is enabled, you need to pass a dialog text
-   * in order to build the permissions dialog
-   */
-  @Synchronized
-  fun build() {
-    if (permission == null) {
-      throw RuntimeException("You need to set a permission before calling Build method!")
-    }
-
-    if (permissionCallback == null) {
-      throw RuntimeException("You need to set a permissionCallback before calling Build method!")
-    }
-
-    if (showDenyDialog && denyDialogText == null) {
-      throw RuntimeException("You need to set a deny Dialog description message before calling Build method!")
-    }
-
-    if (permissionUtils!!.isPermissionGranted(permission!!)) {
-      Log.d(PERMISSIONS_TAG, String.format("%s permission already granted!", permission))
-      return
-    }
+    this.requestCode = requestCode
     askPermissionDialog()
   }
 
@@ -182,124 +78,155 @@ class PermissionManager : DialogInterface.OnClickListener {
     hasStarted = true
 
     /**
-     * onPermissionResult will only be called inside a fragment
-     * if the permission is asked in this way.
-     * We need to call fragment.requestPermissions when asking
-     * permission in a fragment
+     * 请求权限是fragment还是activity，需要调用不同的方法
      */
-    if (fragment != null) {
-      fragment!!.requestPermissions(arrayOf<String>(permission!!), MY_PERMISSIONS)
-      return
-    }
-
-    /**
-     * If permission is not called inside a fragment and called only
-     * in the activity, then the below code is executed
-     */
-    ActivityCompat.requestPermissions(activity!!, arrayOf<String>(permission!!), MY_PERMISSIONS)
+    fragment?.requestPermissions(
+      PermissionUtil.getActualPermissions(this.permissions).toTypedArray(), requestCode
+    ) ?: ActivityCompat.requestPermissions(
+      activity!!,
+      PermissionUtil.getActualPermissions(this.permissions).toTypedArray(),
+      requestCode
+    )
   }
 
   @Synchronized
-  fun handleResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-    if (permissions.isEmpty()) return
-    val permission = permissions[0]
+  fun onRequestPermissionsResult(
+    requestCode: Int, permissions: Array<out String>, grantResults: IntArray
+  ) {
     when (requestCode) {
-      MY_PERMISSIONS -> if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-        /**
-         * Permission is granted
-         */
+      this.requestCode -> {
+        if (permissions.isNotEmpty() && grantResults.isNotEmpty() && permissions.size == grantResults.size) {
+          for (i in 1..permissions.size) {
+            if (grantResults[i - 1] != PackageManager.PERMISSION_GRANTED) {
+              if (activity!!.shouldShowRequestPermissionRationale(permissions[i - 1]) && showRationale) {
+                hasStarted = false
+                // 如果用户选择了拒绝授权，并且没有选中“不再显示”，那么就会重复弹出Android授权界面
+                askPermissionDialog()
+                return
+              } else if (showDenyDialog) {
+                // 如果用户选择了拒绝授权，并且选中了“不再显示”，那么就会显示自定义对话框，告知用户为什么需要授权，并且有跳转到设置功能。默认是允许显示的
+                displayDenyDialog(permissions[i - 1])
+                return
+              } else {
+                hasStarted = false
+                // 用户在解释后仍拒绝了该权限。 调用了拒绝的回调
+                permissionCallback.onPermissionDismissed(permissions[i - 1])
+                return
+              }
+            }
+          }
+        }
         hasStarted = false
-        if (permissionCallback != null) permissionCallback!!.onPermissionGranted(
-          permissions,
-          grantResults
-        )
-
-      } else if (activity!!.shouldShowRequestPermissionRationale(permission) && showRationale) {
-        hasStarted = false
-        /**
-         * Show permission dialog again but only if "deny show again" button is not checked by user
-         * and if the user has specifically allowed to display the permission
-         */
-        askPermissionDialog()
-
-      } else if (showDenyDialog) {
-        /**
-         * Show custom permission dialog explaining to the user why the app requires the permission
-         * This should only be displayed if the app developer has specified it
-         * It will be displayed by default and it will open the settings page by default
-         */
-        displayDenyDialog()
-
-      } else {
-        /**
-         * User has denied the permission even after explanation.
-         * Denied callback is invoked
-         */
-        if (permissionCallback != null) permissionCallback!!.onPermissionDismissed(permission)
+        permissionCallback.onPermissionGranted(permissions, grantResults)
       }
     }
   }
 
+  /**
+   * 如果权限被拒绝并且不在提醒时，根据条件确认是否要弹出当前确认对话框
+   */
   @Synchronized
-  private fun displayDenyDialog() {
+  private fun displayDenyDialog(permission: String) {
     val alertDialogBuilder = AlertDialog.Builder(activity!!)
-      /**
-       * dialog Title
-       */
-      .setTitle(denyDialogTitle)
-      /**
-       * dialog description
-       * *  */
-      .setMessage(denyDialogText)
-      /**
-       * dialog should be cancellable
-       * *  */
-      .setCancelable(isCancellable)
-      /**
-       * dialog Postive Button text
-       * *  */
-      .setPositiveButton(denyPosBtnTxt, this)
+      .setTitle(denyDialogTitle) // 自定义对话框的 标题
+      .setMessage(getDenyDialogText(permission)) // 自定义对话框的 说明
+      .setCancelable(denyCancellable) // 自定义对话框是否可被取消
+      .setPositiveButton(denyPosBtnTxt) { dialog, which ->
+        dialog.dismiss()
+        permissionCallback.onPositiveButtonClicked(dialog, which)
+      } // 自定义对话框确认按钮的响应
+      .setOnDismissListener {
+        hasStarted = false
+      }
 
-    /**
-     * dialog Negative Button button
-     * By default this will be displayed to the user
-     * *  */
+    // 默认是显示的，用于用户取消操作
     if (showNegBtn) {
-      alertDialogBuilder.setNegativeButton(denyNegBtnTxt, this)
+      alertDialogBuilder.setNegativeButton(denyNegBtnTxt) { dialog, which ->
+        dialog.dismiss()
+        permissionCallback.onNegativeButtonClicked(dialog, which)
+      }
     }
 
-    /**
-     * create alert dialog
-     * *  */
+    // 创建对话框
     alertDialog = alertDialogBuilder.show()
   }
 
-  override fun onClick(dialog: DialogInterface, which: Int) {
-    hasStarted = false
-    if (alertDialog != null && alertDialog!!.isShowing)
-      alertDialog!!.dismiss()
-
-    if (which == DialogInterface.BUTTON_POSITIVE) {
-      permissionCallback!!.onPositiveButtonClicked(dialog, which)
-    } else if (which == DialogInterface.BUTTON_NEGATIVE) {
-      permissionCallback!!.onNegativeButtonClicked(dialog, which)
+  /**
+   * 用于获取对话框显示的内容
+   */
+  @Synchronized
+  private fun getDenyDialogText(permission: String): String {
+    return when (permission) {
+      Manifest.permission.READ_CALENDAR, Manifest.permission.WRITE_CALENDAR -> {
+        App.appContext.getString(R.string.permission_deny_calendar)
+      }
+      Manifest.permission.CAMERA -> {
+        App.appContext.getString(R.string.permission_deny_camera)
+      }
+      Manifest.permission.READ_CONTACTS, Manifest.permission.WRITE_CONTACTS,
+      Manifest.permission.GET_ACCOUNTS -> {
+        App.appContext.getString(R.string.permission_deny_contacts)
+      }
+      Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION -> {
+        App.appContext.getString(R.string.permission_deny_location)
+      }
+      Manifest.permission.RECORD_AUDIO -> {
+        App.appContext.getString(R.string.permission_deny_record_audio)
+      }
+      Manifest.permission.READ_PHONE_STATE -> {
+        App.appContext.getString(R.string.permission_deny_device)
+      }
+      Manifest.permission.BODY_SENSORS -> {
+        App.appContext.getString(R.string.permission_deny_sensor)
+      }
+      Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE -> {
+        App.appContext.getString(R.string.permission_deny_storage)
+      }
+      Manifest.permission.CALL_PHONE, Manifest.permission.READ_CALL_LOG,
+      Manifest.permission.WRITE_CALL_LOG, Manifest.permission.ADD_VOICEMAIL,
+      Manifest.permission.USE_SIP, Manifest.permission.PROCESS_OUTGOING_CALLS -> {
+        App.appContext.getString(R.string.permission_deny_call)
+      }
+      Manifest.permission.SEND_SMS, Manifest.permission.RECEIVE_SMS,
+      Manifest.permission.READ_SMS, Manifest.permission.RECEIVE_WAP_PUSH,
+      Manifest.permission.RECEIVE_MMS -> {
+        App.appContext.getString(R.string.permission_deny_sms)
+      }
+      else -> {
+        App.appContext.getString(R.string.permission_deny_text)
+      }
     }
   }
 
-
   /**
-   * Custom callback interface users can invoke to receive status
-   * about the permissions.
-   * This is an optional parameter
+   * 自定义对话框的回调接口，通过这些接口能够接收权限的状态
+   * 这是一个可选参数
    */
   interface PermissionCallback {
-    fun onPermissionGranted(permissions: Array<String>, grantResults: IntArray)
+    fun onPermissionGranted(permissions: Array<out String>, grantResults: IntArray)
     fun onPermissionDismissed(permission: String)
     fun onPositiveButtonClicked(dialog: DialogInterface, which: Int)
     fun onNegativeButtonClicked(dialog: DialogInterface, which: Int)
   }
 
+  object DefaultPermissionCallback : PermissionCallback {
+    override fun onPermissionGranted(permissions: Array<out String>, grantResults: IntArray) {
+    }
+
+    override fun onPermissionDismissed(permission: String) {
+    }
+
+    override fun onPositiveButtonClicked(dialog: DialogInterface, which: Int) {
+      PermissionUtil.openAppSettings()
+    }
+
+    override fun onNegativeButtonClicked(dialog: DialogInterface, which: Int) {
+    }
+  }
+
   companion object {
     private var hasStarted = false
+    const val MY_PERMISSIONS = 6666
   }
 }
+

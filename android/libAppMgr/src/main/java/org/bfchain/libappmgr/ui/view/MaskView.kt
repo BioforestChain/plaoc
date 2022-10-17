@@ -72,7 +72,6 @@ fun MaskProgressView(
         .background(Color.Black.copy(alpha = 0.6f))
         .padding(7.dp)
         .clickable {
-          Log.d("lin.huang", "MaskProgressView -> onClick")
           onClick?.let { onClick() }
         }
     ) {

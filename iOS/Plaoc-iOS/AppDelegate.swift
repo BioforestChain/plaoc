@@ -15,7 +15,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
         window = UIWindow(frame: UIScreen.main.bounds)
-        window?.rootViewController = CustomNaviViewController(rootViewController: ViewController())
+        window?.rootViewController = CustomNaviViewController(rootViewController: FirstViewController())
         
         let str = NSString(string: Bundle.main.bundlePath)
         let path = str.appendingPathComponent("resource_3rd/bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj/sys")

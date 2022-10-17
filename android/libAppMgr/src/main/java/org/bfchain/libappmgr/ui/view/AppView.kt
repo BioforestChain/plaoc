@@ -1,9 +1,7 @@
 package org.bfchain.libappmgr.ui.view
 
 import android.annotation.SuppressLint
-import android.graphics.BitmapFactory
 import android.util.Log
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -20,19 +18,27 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.addPathNodes
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.imageResource
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.ImageLoader
+import coil.compose.AsyncImage
+import coil.decode.SvgDecoder
+import coil.request.ImageRequest
 import org.bfchain.libappmgr.R
 import org.bfchain.libappmgr.entity.AppInfo
 import org.bfchain.libappmgr.entity.DownLoadState
 import org.bfchain.libappmgr.ui.download.DownloadAppInfoView
 import org.bfchain.libappmgr.ui.download.DownloadDialogView
+import org.bfchain.libappmgr.utils.FilesUtil
 
 data class AppInfoMode(
   val iconPath: MutableState<String> = mutableStateOf(""),
@@ -71,7 +77,7 @@ fun AppInfoMode.updateDLState(state: DownLoadState): AppInfoMode {
 
 @Composable
 fun BoxScope.AppIcon(appInfoMode: AppInfoMode) {
-  Image(
+  /*Image(
     bitmap = BitmapFactory.decodeFile(appInfoMode.iconPath.value)?.asImageBitmap()
       ?: ImageBitmap.imageResource(id = R.drawable.ic_launcher),
     contentDescription = "icon",
@@ -80,7 +86,24 @@ fun BoxScope.AppIcon(appInfoMode: AppInfoMode) {
       .padding(3.dp)
       .clip(RoundedCornerShape(12.dp))
       .align(Alignment.Center)
+  )*/
+  AsyncImage(
+    model = appInfoMode.iconPath.value,
+    contentDescription = null,
+    imageLoader = ImageLoader.Builder(LocalContext.current)
+      .components {
+        add(SvgDecoder.Factory()) // 为了支持 SVG 图片加载
+      }.build(),
+    onError = {
+      // appInfoMode.iconPath.value = 默认地址
+    },
+    contentScale = ContentScale.Fit,
+    modifier = Modifier
+      .padding(3.dp)
+      .clip(RoundedCornerShape(12.dp))
+      .align(Alignment.Center)
   )
+
   if (appInfoMode.showBadge.value) {
     Box(
       modifier = Modifier
@@ -89,6 +112,33 @@ fun BoxScope.AppIcon(appInfoMode: AppInfoMode) {
         .background(Color.Red)
         .align(Alignment.TopEnd)
     )
+  }
+}
+
+fun makeIconFromXMLPath(
+  pathStr: String,
+  viewportWidth: Float = 24f,
+  viewportHeight: Float = 24f,
+  defaultWidth: Dp = 24.dp,
+  defaultHeight: Dp = 24.dp,
+  fillColor: Color = Color.White,
+): ImageVector {
+  val fillBrush = SolidColor(fillColor)
+  val strokeBrush = SolidColor(fillColor)
+
+  return ImageVector.Builder(
+    defaultWidth = defaultWidth,
+    defaultHeight = defaultHeight,
+    viewportWidth = viewportWidth,
+    viewportHeight = viewportHeight,
+  ).run {
+    addPath(
+      pathData = addPathNodes(pathStr),
+      name = "",
+      fill = fillBrush,
+      stroke = strokeBrush,
+    )
+    build()
   }
 }
 
@@ -134,7 +184,8 @@ fun AppInfoView(
     Box(
       modifier = Modifier
         .fillMaxWidth()
-        .height(36.dp).padding(0.dp, 3.dp, 0.dp, 0.dp)
+        .height(36.dp)
+        .padding(0.dp, 3.dp, 0.dp, 0.dp)
         .align(Alignment.BottomCenter)
     ) {
       AppName(appInfoMode)
@@ -146,7 +197,7 @@ fun AppInfoView(
 fun AppInfoGridView(
   appInfoList: List<AppInfo>,
   downModeDialog: Boolean = false,
-  onOpenApp: ((appId:String, url: String) -> Unit)? = null
+  onOpenApp: ((appId: String, url: String) -> Unit)? = null
 ) {
   LazyVerticalGrid(
     columns = GridCells.Fixed(5),//GridCells.Adaptive(minSize = 60.dp), // 一行五个，或者指定大小

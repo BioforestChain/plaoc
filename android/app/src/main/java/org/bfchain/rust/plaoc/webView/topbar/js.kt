@@ -6,8 +6,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.google.gson.JsonDeserializer
 import com.google.gson.reflect.TypeToken
-import org.bfchain.rust.plaoc.jsHandle
-import org.bfchain.rust.plaoc.mapper
 import org.bfchain.rust.plaoc.webView.icon.DWebIcon
 import org.bfchain.rust.plaoc.webView.jsutil.*
 
@@ -23,11 +21,11 @@ class TopBarFFI(
       return true
     }
 
-    fun getTopBarEnabled(): Boolean {
+    fun getTopBarShow(): Boolean {
         return state.enabled.value
     }
 
-    fun setTopBarEnabled(isEnabled: Boolean): Boolean {
+    fun setTopBarShow(isEnabled: Boolean): Boolean {
         state.enabled.value = isEnabled
 //        Log.i(TAG, "toggleEnabled:${state.enabled.value}")
         return state.enabled.value

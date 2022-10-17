@@ -24,7 +24,6 @@ object FilesUtil {
   private val DIR_AUTO_UPDATE: String = "tmp" + File.separator + "autoUpdate" // 存放最新版本的路径
   private val FILE_LINK_JSON: String = "link.json"
   private val FILE_BFSA_META_JSON: String = "bfsa-metadata.json"
-  private val DENO_FILE: String = "bfs-service/index.mjs"
 
   enum class APP_DIR_TYPE(val rootName: String) {
     // 内置应用
@@ -73,7 +72,7 @@ object FilesUtil {
    * 获取应用的解压路径
    */
   fun getAppUnzipPath(appInfo: AppInfo): String {
-    return getAppRootDirectory(APP_DIR_TYPE.SystemApp) + File.separator + appInfo.bfsAppId
+    return getAppRootDirectory(APP_DIR_TYPE.SystemApp) + File.separator //+ appInfo.bfsAppId
   }
 
   /**
@@ -94,9 +93,9 @@ object FilesUtil {
   /**
    * 获取程序运行路径
    */
-  fun getAppDenoUrl(appInfo: AppInfo): String {
+  fun getAppDenoUrl(appInfo:AppInfo, dAppInfo: DAppInfo): String {
     return getAppRootDirectory(APP_DIR_TYPE.SystemApp) + File.separator + appInfo.bfsAppId +
-      File.separator + DIR_BOOT + File.separator + DENO_FILE
+      File.separator + dAppInfo.manifest.bfsaEntry
   }
 
   /**
@@ -233,6 +232,10 @@ object FilesUtil {
     file.bufferedWriter().append(content)
   }
 
+  fun deleteQuietly(file: File) {
+    file.delete()
+  }
+
   /**
    * 将assert目录下的文件拷贝到app目录remember-app目录下
    */
@@ -341,38 +344,5 @@ object FilesUtil {
     val path = getAppRootDirectory(APP_DIR_TYPE.SystemApp) + File.separator + appInfo.bfsAppId +
       File.separator + DIR_BOOT + File.separator + FILE_BFSA_META_JSON
     return JsonUtil.getDAppInfoFromBFSA(getFileContent(path))
-  }
-
-  /**
-   * 解压文件，并保存到desDirectory
-   */
-  fun UnzipFile(zipFile: String, desDirectory: String) {
-    Log.d(TAG, "UnzipFile zipFile->$zipFile, desDirectory->$desDirectory")
-    var fileZip = ZipFile(zipFile)
-    var entries = fileZip.entries()
-    File(desDirectory).mkdirs()
-    while (entries.hasMoreElements()) {
-      var zipEntry = entries.nextElement() as ZipEntry
-      if ("__MACOSX" == zipEntry.name) continue // 这个文件是多余的，不解压
-      // Log.d(TAG, "UnzipFile name->${zipEntry.name}")
-      var unzipFilePath = desDirectory + File.separator + zipEntry.name
-      if (zipEntry.isDirectory) {
-        File(unzipFilePath).mkdirs()
-      } else {
-        var file = File(unzipFilePath)
-        file.parentFile.mkdirs() // 确保上级目录存在
-        var bufferedOutputStream = BufferedOutputStream(FileOutputStream(unzipFilePath))
-        val bytes = ByteArray(1024 * 8)
-        var readLen: Int
-        // Java 与 Kotlin的不同之处，需要特别关注。
-        // while ((readLen = zipInputStream.read(bytes))!=-1){
-        var inputStream = fileZip.getInputStream(zipEntry)
-        while (inputStream.read(bytes).also { readLen = it } > 0) {
-          bufferedOutputStream.write(bytes, 0, readLen)
-        }
-        bufferedOutputStream.close()
-        inputStream.close()
-      }
-    }
   }
 }

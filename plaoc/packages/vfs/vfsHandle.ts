@@ -1,4 +1,8 @@
 export enum vfsHandle {
-  GetRootPath = "GetRootPath",
-
+  FileSystemLs = "FileSystemLs",
+  FileSystemList = "FileSystemList",
+  FileSystemMkdir = "FileSystemMkdir",
+  FileSystemWrite = "FileSystemWrite",
+  FileSystemRead = "FileSystemRead",
+  FileSystemRm = "FileSystemRm",
 }

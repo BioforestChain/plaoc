@@ -15,5 +15,8 @@ class OperateMonitor: NSObject {
 
     let tabBarMonitor = PublishSubject<Void>()
     let interceptMonitor = PublishSubject<(WKURLSchemeTask,String,String)>()
+    let refreshCompleteMonitor = PublishSubject<String>()
+    let startAnimationMonitor = PublishSubject<String>()
+    let backMonitor = PublishSubject<String>()
     
 }

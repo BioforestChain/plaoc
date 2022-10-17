@@ -1,0 +1,7 @@
+{
+  "name": "@bfsx/install",
+  "version": "0.0.8",
+  "description": ".bfsa application install service.",
+  "importMap": "./import_map.json",
+  "outDir": "./.npm"
+}

@@ -90,11 +90,11 @@ fun initTopBarFn(topBarFFI: TopBarFFI) {
   call_ui_map[ExportNativeUi.TopBarNavigationBack] = {
     topBarFFI.topBarNavigationBack()
   }
-  call_ui_map[ExportNativeUi.GetTopBarEnabled] = {
-    topBarFFI.getTopBarEnabled()
+  call_ui_map[ExportNativeUi.GetTopBarShow] = {
+    topBarFFI.getTopBarShow()
   }
-  call_ui_map[ExportNativeUi.SetTopBarEnabled] = {
-    topBarFFI.setTopBarEnabled(it.toBoolean())
+  call_ui_map[ExportNativeUi.SetTopBarShow] = {
+    topBarFFI.setTopBarShow(it.toBoolean())
   }
   call_ui_map[ExportNativeUi.GetTopBarOverlay] = {
     topBarFFI.getTopBarOverlay()!!

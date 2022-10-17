@@ -21,18 +21,28 @@ class Network {
  * @param data 
  * @returns 
  */
-  asyncCallDenoFunction(handleFn: string, data?: string, timeout = 3000): Promise<string> {
+  // deno-lint-ignore no-explicit-any
+  asyncCallDenoFunction(handleFn: string, data: TNative = "''", timeout = 3000): Promise<any> {
     return new Promise(async (resolve, reject) => {
-      deno.callFunction(handleFn, data) // 发送请求
+      if (data instanceof Object) {
+        data = JSON.stringify(data); // stringify 两次转义一下双引号
+      }
+      const { headView } = deno.callFunction(handleFn, JSON.stringify(data)) // 发送请求
       do {
-        const data = await loopRustBuffer().next(); // TODO 这里不能用这个方法，需要跟返回前端的隔离
-        /// 忽略策略:如果队列大于高水位或者没有数据，直接忽略
+        const data = await loopRustBuffer("op_rust_to_js_system_buffer").next();
         if (data.done) {
           continue;
         }
-        console.log("waterOverflow====>", data.value);
-        resolve(data.value)
-        break;
+        console.log("asyncCallDenoFunction headView  ====> ", data.value);
+        console.log("data.headView:", data.headView, " xxxx ", headView)
+        // 如果请求是返回了是同一个表示头则返回成功
+        const isCur = data!.headView.filter((byte, index) => {
+          return byte === Array.from(headView)[index]
+        })
+        if (isCur.length === 2) {
+          resolve(data.value);
+          break;
+        }
       } while (true);
       setTimeout(() => {
         reject("call function timeout")
@@ -55,7 +65,7 @@ class Network {
   */
   async waterOverflow() {
     do {
-      const data = await loopRustBuffer().next();
+      const data = await loopRustBuffer("op_rust_to_js_buffer").next();
       /// 忽略策略:如果队列大于高水位或者没有数据，直接忽略
       if (data.done || this.isWaitingData > this.hightWaterMark) {
         continue;
@@ -126,6 +136,7 @@ class Network {
   }
 
 }
-
+// deno-lint-ignore ban-types
+type TNative = boolean | object | string | number;
 
 export const network = new Network()

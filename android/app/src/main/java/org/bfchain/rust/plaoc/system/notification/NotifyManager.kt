@@ -5,9 +5,11 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import com.king.mlkit.vision.camera.util.LogUtils
 import org.bfchain.rust.plaoc.App
 import org.bfchain.rust.plaoc.MainActivity
 import org.bfchain.rust.plaoc.R
@@ -31,8 +33,8 @@ class NotifyManager() {
     // 紧急消息，需要及时弹出提示
     IMPORTANT(
       typeName = "紧急通知",
-      channelID = "plaoc_cid_important",
-      property = NotificationCompat.PRIORITY_HIGH,
+      channelID = "plaoc_cid_high",
+      property = NotificationCompat.PRIORITY_MAX,
       importance = NotificationManager.IMPORTANCE_HIGH,
     ),
   }
@@ -50,7 +52,7 @@ class NotifyManager() {
         flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
       }
       return PendingIntent.getActivity(
-        App.appContext, ++requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT
+        App.appContext, ++requestCode, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
       )
     }
 
@@ -65,7 +67,7 @@ class NotifyManager() {
         flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
       }
       return PendingIntent.getBroadcast(
-        App.appContext, ++requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT
+        App.appContext, ++requestCode, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
       )
     }
   }
@@ -81,20 +83,29 @@ class NotifyManager() {
   ) {
     var context = App.appContext
     var builder = NotificationCompat.Builder(context, channelType.channelID)
-      .setSmallIcon(smallIcon)
-      .setContentTitle(title)
-      .setContentText(text)
+      .setContentTitle(title) // 通知标题
+      .setContentText(text) // 通知内容
+      .setSmallIcon(smallIcon) // 设置通知的小图标
+      //.setLargeIcon(BitmapFactory.decodeResource(context.resources, R.mipmap.ic_launcher)) // 设置通知的大图标
       .setStyle(
-        NotificationCompat.BigTextStyle()
-          .bigText(bigText)
+        NotificationCompat.BigTextStyle().bigText(bigText)
       )
       .setContentIntent(intent)
-      .setPriority(channelType.property)
+      .setPriority(channelType.property) // 设置通知的优先级
+      .setAutoCancel(true) // 设置点击通知之后通知是否消失
+      .setWhen(System.currentTimeMillis()) // 设定通知显示的时间
+      .setDefaults(NotificationCompat.DEFAULT_ALL)
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) { // 创建渠道，针对不同类别的消息进行独立管理
       val channel =
         NotificationChannel(channelType.channelID, channelType.typeName, channelType.importance)
-      // Register the channel with the system
+      // channel.setBypassDnd(true) // 是否绕过勿打扰模式
+      // channel.enableLights(true) // 是否允许呼吸灯闪烁
+      // channel.lightColor = Color.RED // 闪关灯的灯光颜色
+      // channel.canShowBadge() // 桌面launcher的消息角标
+      // channel.enableVibration(true) // 是否允许震动
+      // channel.vibrationPattern = LongArray(3) { 1000L; 500L; 2000L } // //先震动1秒，然后停止0.5秒，再震动2秒则可设置数组为：new long[]{1000, 500, 2000}
+
       val notificationManager =
         context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
       notificationManager.createNotificationChannel(channel)

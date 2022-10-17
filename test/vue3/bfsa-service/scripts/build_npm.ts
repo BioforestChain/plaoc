@@ -71,8 +71,6 @@ export const doBuid = async (config: {
       },
       bugs: {
         url: "https://github.com/BioforestChain/plaoc/issues",
-      },
-      devDependencies: {
       }
     },
   });

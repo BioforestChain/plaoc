@@ -44,7 +44,7 @@ function copyDir(src, dist, callback) {
     }
   }
 }
-copyDir('./bfs-service/dist/esm', '../android/app/src/main/assets/user-app/bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj', function (err) {
+copyDir('./bfsa-service/dist/esm', '../android/app/src/main/assets/system-app/KEJPMHLA', function (err) {
   if (err) {
     console.log(err);
   }

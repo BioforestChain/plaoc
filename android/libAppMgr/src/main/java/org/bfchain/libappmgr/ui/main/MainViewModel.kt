@@ -22,6 +22,7 @@ class MainViewModel : ViewModel() {
       flow {
         emit(ApiResultData.prepare())
         try {
+          Log.d("MainViewModel", "getAppVersion->${appInfo.autoUpdate.url}")
           emit(ApiService.instance.getAppVersion(appInfo.autoUpdate.url))
         } catch (e: Exception) {
           emit(ApiResultData.failure(e))
@@ -60,7 +61,7 @@ class MainViewModel : ViewModel() {
       flow {
         emit(ApiResultData.prepare())
         try {
-          Log.d("MainViewModel", "${appInfo.autoUpdate.url}")
+          Log.d("MainViewModel", "getAppVersionAndSave->${appInfo.autoUpdate.url}")
           emit(ApiService.instance.getAppVersion(appInfo.autoUpdate.url))
           // emit(ApiService.instance.getAppVersion(AppVersionPath))
         } catch (e: Exception) {
@@ -88,7 +89,8 @@ class MainViewModel : ViewModel() {
               }
             },
             onFailure = { e ->
-              //Log.d("MainViewModel", "fail->$e")
+              Log.d("MainViewModel", "fail->$e")
+              e?.printStackTrace()
               e?.let { e1 -> apiResult?.let { apiResult.onError(-1, "fail", e1) } }
             },
             onLoading = {}, onPrepare = {}

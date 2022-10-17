@@ -1,18 +1,17 @@
 {
-  "tasks": {},
+  "tasks": {
+    "build": "deno run --unstable -A ./npm.ts",
+    "pub": "deno run --unstable -A ./pub.ts"
+  },
   "compilerOptions": {
     "allowJs": false,
-    "lib": [
-      "deno.window"
-    ],
+    "lib": ["deno.unstable", "deno.window"],
     "strict": true,
     "strictNullChecks": true
   },
   "lint": {
     "rules": {
-      "exclude": [
-        "no-namespace"
-      ]
+      "exclude": ["no-namespace"]
     }
   },
   "fmt": {

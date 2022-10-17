@@ -51,7 +51,7 @@ fun interceptNetworkRequests(
         return viewGateWay(customUrlScheme, request)
       }
       // 映射本地文件的资源文件 https://bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj.dweb/index.mjs -> /plaoc/index.mjs
-      if (Regex(dWebView_host).containsMatchIn(url)) {
+      if (Regex(dWebView_host.lowercase(Locale.ROOT)).containsMatchIn(url)) {
         val path = URL(url).path
         return customUrlScheme.handleRequest(request, path)
       }
@@ -126,7 +126,7 @@ fun uiGateWay(
   val stringData = String(hexStrToByteArray(byteData))
 //  Log.i(TAG, " uiGateWay: $stringData")
   mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true) // 允许使用单引号包裹字符串
-  val handle = mapper.readValue(stringData, jsHandle::class.java)
+  val handle = mapper.readValue(stringData, JsHandle::class.java)
   val funName = ExportNativeUi.valueOf(handle.function);
   // 执行函数
   val result = call_ui_map[funName]?.let { it ->
@@ -200,7 +200,7 @@ fun initMetaData(metaData: String) {
 
 /** 返回应用的虚拟路径 "https://$dWebView_host.dweb$path"*/
 fun resolveUrl(path: String): String {
-  return "https://$dWebView_host.dweb${shakeUrl(path)}"
+  return "https://${dWebView_host.lowercase(Locale.ROOT)}.dweb${shakeUrl(path)}"
 }
 
 /** 适配路径没有 / 的尴尬情况，没有的话会帮你加上*/
