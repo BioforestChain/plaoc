@@ -13,7 +13,7 @@ let screen_height = UIScreen.main.bounds.height
 
 class ViewController: UIViewController, UIGestureRecognizerDelegate {
 
-    private let dataSource: [String] = ["example","statusbar","https://www.qq.com"]
+    private let dataSource: [String] = ["example","statusbar","https://www.sina.com.cn"]
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = .white
@@ -74,14 +74,13 @@ extension ViewController: UITableViewDelegate {
         } else {
             urlString = dataSource[indexPath.row];
         }
-        let controller = CustomTabbarViewController()
+        let controller = WebViewViewController()
 //        controller.modalPresentationStyle = .fullScreen
         controller.urlString = urlString
 //        self.present(controller, animated: true)
         self.navigationController?.pushViewController(controller, animated: true)
         
-//        permissionManager.startPermissionAuthenticate(type: .contact, isSet: true) { result in
-//            print(result)
-//        }
+//        CacheManager.shared.preserveData(data: "dfdfdf" as AnyObject, key: "test" as AnyObject, type: .disk)
+        
     }
 }

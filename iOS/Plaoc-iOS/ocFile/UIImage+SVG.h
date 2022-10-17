@@ -12,6 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface UIImage (SVG)
 
 + (UIImage *)svgImageNamed:(NSString *)name size:(CGSize)size;
++ (UIImage*)svgImageWithContentsOfFile:(NSString *)path size:(CGSize)size;
 + (UIImage *)svgImageNamed:(NSString *)name size:(CGSize)size tintColor:(UIColor *)tintColor;
 
 @end

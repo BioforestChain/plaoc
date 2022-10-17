@@ -1,36 +1,58 @@
 PODS:
+  - Alamofire (5.6.2)
   - CocoaLumberjack (3.7.4):
     - CocoaLumberjack/Core (= 3.7.4)
   - CocoaLumberjack/Core (3.7.4)
+  - Moya (15.0.0):
+    - Moya/Core (= 15.0.0)
+  - Moya/Core (15.0.0):
+    - Alamofire (~> 5.0)
+  - RxSwift (6.5.0)
   - SDWebImage (5.12.6):
     - SDWebImage/Core (= 5.12.6)
   - SDWebImage/Core (5.12.6)
   - SnapKit (5.6.0)
+  - SSZipArchive (2.4.3)
   - SVGKit (3.0.0):
     - CocoaLumberjack (~> 3.0)
   - SwiftyJSON (5.0.1)
+  - UIColor_Hex_Swift (5.1.7)
 
 DEPENDENCIES:
+  - Moya
+  - RxSwift
   - SDWebImage
   - SnapKit
+  - SSZipArchive
   - SVGKit
   - SwiftyJSON
+  - UIColor_Hex_Swift
 
 SPEC REPOS:
   trunk:
+    - Alamofire
     - CocoaLumberjack
+    - Moya
+    - RxSwift
     - SDWebImage
     - SnapKit
+    - SSZipArchive
     - SVGKit
     - SwiftyJSON
+    - UIColor_Hex_Swift
 
 SPEC CHECKSUMS:
+  Alamofire: d368e1ff8a298e6dde360e35a3e68e6c610e7204
   CocoaLumberjack: 543c79c114dadc3b1aba95641d8738b06b05b646
+  Moya: 138f0573e53411fb3dc17016add0b748dfbd78ee
+  RxSwift: 5710a9e6b17f3c3d6e40d6e559b9fa1e813b2ef8
   SDWebImage: a47aea9e3d8816015db4e523daff50cfd294499d
   SnapKit: e01d52ebb8ddbc333eefe2132acf85c8227d9c25
+  SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
   SVGKit: 1ad7513f8c74d9652f94ed64ddecda1a23864dea
   SwiftyJSON: 2f33a42c6fbc52764d96f13368585094bfd8aa5e
+  UIColor_Hex_Swift: 31cd3e47440f07a20d2503a36bb0437a445b3c29
 
-PODFILE CHECKSUM: 91a88b024fb0a3597adac42bd9bfc5116cbb1fcb
+PODFILE CHECKSUM: 7e54c3b477d67e9092626e5975dddfbb7e8855f9
 
 COCOAPODS: 1.11.3

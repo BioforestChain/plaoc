@@ -1,4 +1,4 @@
-import { TopBarFFI } from "!topbar/net";
+import { TopBarNet } from "@topbar/net";
 import { TopBar } from "./bfcsTopBarType.ts";
 import { Icon } from "../icon/bfspIconType.ts";
 import { Color } from "../types/colorType.ts";
@@ -6,14 +6,14 @@ import { DwebPlugin } from "../native/dweb-plugin.ts";
 import { convertToRGBAHex } from "../util/index.ts";
 
 export class BfcsTopBar extends DwebPlugin {
-  private _ffi: TopBar.ITopBarFFI;
+  private net: TopBar.ITopBarNet;
   private _observer: MutationObserver;
   private _actionList: TopBar.TopBarItem[] = [];
 
   constructor() {
     super();
 
-    this._ffi = new TopBarFFI();
+    this.net = new TopBarNet();
     this._observer = new MutationObserver(async () => {
       await this.collectActions();
     });
@@ -47,25 +47,24 @@ export class BfcsTopBar extends DwebPlugin {
   }
   /**返回上一级 */
   async topBarNavigationBack(): Promise<boolean> {
-    return await this._ffi.topBarNavigationBack();
+    return await this.net.topBarNavigationBack();
   }
   /**
    * 设置是否隐藏
    * @param isEnabled boolean
    * @returns
    */
-  async setTopBarShow(isEnabled: boolean): Promise<void> {
-    await this._ffi.setTopBarShow(isEnabled);
-    return;
+  async setTopBarShow(isShow: boolean): Promise<boolean> {
+    return await this.net.setTopBarShow(isShow);
   }
   /**获取是否隐藏的状态 */
   async getTopBarShow(): Promise<boolean> {
-    const isEnabled = await this._ffi.getTopBarShow();
+    const isEnabled = await this.net.getTopBarShow();
     return isEnabled;
   }
   /**获取标题 */
   async getTopBarTitle(): Promise<string> {
-    const title = await this._ffi.getTopBarTitle();
+    const title = await this.net.getTopBarTitle();
     return title;
   }
   /**
@@ -73,37 +72,38 @@ export class BfcsTopBar extends DwebPlugin {
    * @param title string
    * @returns
    */
-  async setTopBarTitle(title: string): Promise<void> {
-    await this._ffi.setTopBarTitle(title);
-    return;
+  async setTopBarTitle(title: string): Promise<boolean> {
+    return await this.net.setTopBarTitle(title);
   }
   /**查看是否设置了标题 */
   async hasTopBarTitle(): Promise<boolean> {
-    const has = await this._ffi.hasTopBarTitle();
+    const has = await this.net.hasTopBarTitle();
     return has;
   }
-  /**获取状态栏的透明度 */
-  async getTopBarOverlay(): Promise<boolean> {
-    const overlay = await this._ffi.getTopBarOverlay();
-    return overlay;
+  /**
+   * 获取状态栏的透明度
+   * @returns number
+   */
+  async getTopBarAlpha(): Promise<number> {
+    const alpha = await this.net.getTopBarAlpha();
+    return alpha;
   }
   /**
    * 设置状态栏的透明度
    * @param alpha
    * @returns
    */
-  async setTopBarOverlay(alpha: string): Promise<void> {
-    await this._ffi.setTopBarOverlay(alpha);
-    return;
+  async setTopBarAlpha(alpha: string): Promise<boolean> {
+    return await this.net.setTopBarAlpha(alpha);
   }
   /**获取状态栏高度 */
   async getTopBarHeight(): Promise<number> {
-    const height = await this._ffi.getTopBarHeight();
+    const height = await this.net.getTopBarHeight();
     return height;
   }
   /**获取状态栏背景颜色 */
   async getTopBarBackgroundColor(): Promise<Color.RGBAHex> {
-    const color = await this._ffi.getTopBarBackgroundColor();
+    const color = await this.net.getTopBarBackgroundColor();
     return color;
   }
   /**
@@ -111,15 +111,13 @@ export class BfcsTopBar extends DwebPlugin {
    * @param color
    * @returns
    */
-  async setTopBarBackgroundColor(color: string): Promise<void> {
+  async setTopBarBackgroundColor(color: string): Promise<boolean> {
     const colorHex = convertToRGBAHex(color);
-    await this._ffi.setTopBarBackgroundColor(colorHex);
-
-    return;
+    return await this.net.setTopBarBackgroundColor(colorHex);
   }
   /**获取状态栏文字和图标颜色 */
   async getTopBarForegroundColor(): Promise<Color.RGBAHex> {
-    const color = await this._ffi.getTopBarForegroundColor();
+    const color = await this.net.getTopBarForegroundColor();
     return color;
   }
   /**
@@ -127,19 +125,18 @@ export class BfcsTopBar extends DwebPlugin {
    * @param color
    * @returns
    */
-  async setTopBarForegroundColor(color: string): Promise<void> {
+  async setTopBarForegroundColor(color: string): Promise<boolean> {
     const colorHex = convertToRGBAHex(color);
-    await this._ffi.setTopBarForegroundColor(colorHex);
-    return;
+    return await this.net.setTopBarForegroundColor(colorHex);
   }
 
   async getTopBarActions(): Promise<TopBar.TopBarItem[]> {
-    this._actionList = await this._ffi.getTopBarActions();
+    this._actionList = await this.net.getTopBarActions();
     return this._actionList;
   }
 
   async setTopBarActions(): Promise<void> {
-    await this._ffi.setTopBarActions(this._actionList);
+    await this.net.setTopBarActions(this._actionList);
     return;
   }
 
@@ -201,11 +198,11 @@ export class BfcsTopBar extends DwebPlugin {
       await this.setTopBarForegroundColor(newVal as string);
     } else if (attrName === "overlay") {
       if (this.hasAttribute(attrName)) {
-        await this._ffi.setTopBarOverlay(newVal as string);
+        await this.net.setTopBarAlpha(newVal as string);
       }
     } else if (attrName === "hidden") {
       if (this.hasAttribute(attrName)) {
-        await this._ffi.setTopBarHidden();
+        await this.net.setTopBarHidden();
       }
     }
   }

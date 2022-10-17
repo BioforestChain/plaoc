@@ -11,6 +11,8 @@ target 'Plaoc-iOS' do
   pod 'SnapKit'
   pod 'UIColor_Hex_Swift'
   pod 'RxSwift'
+  pod 'Moya'
+  pod 'SSZipArchive'
 
   # Pods for Plaoc-iOS
 

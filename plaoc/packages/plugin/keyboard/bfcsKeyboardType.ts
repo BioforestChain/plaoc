@@ -36,12 +36,12 @@ export namespace Keyboard {
     };
   }
 
-  export interface IVirtualKeyboardFFI {
+  export interface IVirtualKeyboardNet {
     getKeyboardSafeArea(): Promise<IKeyboardSafeArea>;
     getKeyboardHeight(): Promise<number>;
     getKeyboardOverlay(): Promise<boolean>;
-    toggleKeyboardOverlay(): Promise<void>;
-    setKeyboardOverlay(): Promise<boolean>;
+    toggleKeyboardOverlay(): Promise<boolean>;
+    setKeyboardOverlay(isOverlay: boolean): Promise<boolean>;
     showKeyboard(): Promise<boolean>;
     hideKeyboard(): Promise<boolean>;
   }

@@ -54,38 +54,38 @@ class CustomWebView: UIView {
         }
     }
     
-    private lazy var webView: XXWebView = {
+    private lazy var webView: WKWebView = {
         
-//        let config = WKWebViewConfiguration()
-//        config.userContentController = WKUserContentController()
-//        addScriptMessageHandler(config: config)
-//        addScriptMessageHandlerWithReply(config: config)
-//        if self.scripts != nil {
-//            for script in self.scripts! {
-//                config.userContentController.addUserScript(script)
-//            }
-//        }
-//        let prefreen = WKPreferences()
-//        prefreen.javaScriptCanOpenWindowsAutomatically = true
-//        config.preferences = prefreen
-//        config.setValue(true, forKey: "allowUniversalAccessFromFileURLs")
-//        config.setURLSchemeHandler(Schemehandler(), forURLScheme: schemeString)
-//        let webView = WKWebView(frame: self.bounds, configuration: config)
-//        webView.navigationDelegate = self
-//        webView.uiDelegate = self
-//        webView.allowsBackForwardNavigationGestures = true
-//        if #available(iOS 11.0, *) {
-//            webView.scrollView.contentInsetAdjustmentBehavior = .never
-//        } else {
-//
-//        }
-        
-        let webView = WebViewPool.shared.getReusedWebView(forHolder: self)
-        webView.frame = self.bounds
-        webView.uiDelegate = self
+        let config = WKWebViewConfiguration()
+        config.userContentController = WKUserContentController()
+        addScriptMessageHandler(config: config)
+        addScriptMessageHandlerWithReply(config: config)
+        if self.scripts != nil {
+            for script in self.scripts! {
+                config.userContentController.addUserScript(script)
+            }
+        }
+        let prefreen = WKPreferences()
+        prefreen.javaScriptCanOpenWindowsAutomatically = true
+        config.preferences = prefreen
+        config.setValue(true, forKey: "allowUniversalAccessFromFileURLs")
+        config.setURLSchemeHandler(Schemehandler(), forURLScheme: schemeString)
+        let webView = WKWebView(frame: self.bounds, configuration: config)
         webView.navigationDelegate = self
-        addScriptMessageHandler(config: webView.configuration)
-        addScriptMessageHandlerWithReply(config: webView.configuration)
+        webView.uiDelegate = self
+        webView.allowsBackForwardNavigationGestures = true
+        if #available(iOS 11.0, *) {
+            webView.scrollView.contentInsetAdjustmentBehavior = .never
+        } else {
+
+        }
+        
+//        let webView = WebViewPool.shared.getReusedWebView(forHolder: self)
+//        webView.frame = self.bounds
+//        webView.uiDelegate = self
+//        webView.navigationDelegate = self
+//        addScriptMessageHandler(config: webView.configuration)
+//        addScriptMessageHandlerWithReply(config: webView.configuration)
         return webView
     }()
     
@@ -99,7 +99,7 @@ class CustomWebView: UIView {
     private func addScriptMessageHandlerWithReply(config: WKWebViewConfiguration) {
         let array = ["calendar","naviHeight","bottomHeight","getNaviEnabled","hasNaviTitle","getNaviOverlay","getNaviBackgroundColor","getNaviForegroundColor","getBottomBarEnabled","getBottomBarOverlay","getBottomActions","getBottomBarBackgroundColor","getKeyboardOverlay","getForegroundColor","getNaviTitle","getNaviActions","keyHeight","keyboardSafeArea","getBottomViewForegroundColor","statusBackgroundColor","getStatusBarVisible","getStatusBarOverlay","statusBarStyle"]
         for name in array {
-            config.userContentController.addScriptMessageHandler(self, contentWorld: .page, name: name)
+//            config.userContentController.addScriptMessageHandler(self, contentWorld: .page, name: name)
         }
     }
     
@@ -191,14 +191,14 @@ extension CustomWebView {
     }
     
     func recycleWebView() {
-        WebViewPool.shared.recycleReusedWebView(webView: webView)
+//        WebViewPool.shared.recycleReusedWebView(webView: webView)
     }
 }
 
 extension CustomWebView:  WKScriptMessageHandler {
     //通过js调取原生操作
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        
+        /*
         if message.name == "startLoad" {
             //点击网页按钮 开始加载
         } else if message.name == "jumpWeb" {
@@ -229,7 +229,7 @@ extension CustomWebView:  WKScriptMessageHandler {
             let list = JSON(array)
             print(list)
             let buttons = list.arrayValue.map { ButtonModel(dict: $0) }
-            controller?.fetchCustomButtons(buttons: buttons)
+//            controller?.fetchCustomButtons(buttons: buttons)
         } else if message.name == "updateNaviBarBackgroundColor" {
             guard let color = message.body as? String else { return }
             let controller = currentViewController() as? WebViewViewController
@@ -237,7 +237,7 @@ extension CustomWebView:  WKScriptMessageHandler {
         } else if message.name == "updateNaviBarTintColor" {
             guard let color = message.body as? String else { return }
             let controller = currentViewController() as? WebViewViewController
-            controller?.updateNavigationBarTintColor(colorString: color)
+//            controller?.updateNavigationBarTintColor(colorString: color)
         } else if message.name == "updateStatusBackgroundColor" {
             guard let color = message.body as? String else { return }
             let controller = currentViewController() as? WebViewViewController
@@ -287,7 +287,7 @@ extension CustomWebView:  WKScriptMessageHandler {
             let controller = currentViewController() as? WebViewViewController
             let list = JSON(array)
             let buttons = list.arrayValue.map { BottomBarModel(dict: $0) }
-            controller?.fetchBottomButtons(buttons: buttons)
+//            controller?.fetchBottomButtons(buttons: buttons)
         } else if message.name == "openAlert" {
             guard let body = message.body as? String else { return }
             guard let bodyDict = ChangeTools.stringValueDic(body) else { return }
@@ -361,6 +361,7 @@ extension CustomWebView:  WKScriptMessageHandler {
         } else if message.name == "hideKeyboard" {
             self.endEditing(true)
         }
+        */
     }
     
     func updateFrame(frame: CGRect) {
@@ -368,7 +369,7 @@ extension CustomWebView:  WKScriptMessageHandler {
     }
 }
 
-
+/*
 extension CustomWebView: WKScriptMessageHandlerWithReply {
     
     
@@ -464,7 +465,7 @@ extension CustomWebView: WKScriptMessageHandlerWithReply {
         }
     }
 }
-
+*/
 extension CustomWebView: UIDocumentPickerDelegate {
     
     func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
@@ -480,10 +481,10 @@ extension CustomWebView: UIDocumentPickerDelegate {
 extension CustomWebView: WKNavigationDelegate {
     
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-       
+        print(navigationAction.request.url?.absoluteString)
         decisionHandler(.allow)
     }
-    
+
     func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
         
         decisionHandler(.allow)

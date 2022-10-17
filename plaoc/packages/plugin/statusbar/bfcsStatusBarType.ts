@@ -12,33 +12,6 @@ export namespace StatusBar {
     getStatusBarStyle(): boolean;
   }
 
-  // ios端ffi
-  export interface StatusBarIosFFI {
-    updateStatusBackgroundColor: {
-      postMessage(colorHex: Color.RGBAHex): void;
-    };
-    statusBackgroundColor: {
-      postMessage(noValue: null): Promise<Color.RGBAHex>;
-    };
-    getStatusBarVisible: {
-      postMessage(noValue: null): Promise<boolean>;
-    };
-    updateStatusHidden: {
-      postMessage(isHidden: string): void;
-    };
-    getStatusBarOverlay: {
-      postMessage(noValue: null): Promise<boolean>;
-    };
-    updateStatusBarOverlay: {
-      postMessage(overlay: number): void;
-    };
-    statusBarStyle: {
-      postMessage(noValue: null): StatusBarIosStyle;
-    };
-    updateStatusStyle: {
-      postMessage(state: StatusBarIosStyle): void;
-    };
-  }
 
   // desktop-dev端ffi
   export interface StatusBarDesktopFFI {
@@ -65,8 +38,7 @@ export namespace StatusBar {
     getStatusbarStyle(): Promise<StatusBarStyle>;
   }
 
-  // 三端最后统一封装ffi
-  export interface IStatusBarFFI {
+  export interface IStatusBarNet {
     setStatusBarColor(
       colorHex?: string,
       barStyle?: StatusBarStyle,

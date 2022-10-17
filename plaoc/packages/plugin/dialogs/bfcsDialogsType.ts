@@ -59,7 +59,7 @@ export namespace Dialogs {
     };
   }
 
-  export interface IDialogsFFI {
+  export interface IDialogsNet {
     openAlert(config: IAlertConfig, confirmFunc: string): Promise<void>;
     openPrompt(
       config: IPromptConfig,
