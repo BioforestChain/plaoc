@@ -1,5 +1,6 @@
 package org.bfchain.libappmgr.network
 
+import android.util.Log
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.plugins.*
@@ -29,7 +30,7 @@ class ApiServiceImpl(private val client: HttpClient) : ApiService {
     file: File?,
     DLProgress: (Long, Long) -> Unit
   ) {
-    client.prepareGet(path).execute { httpResponse ->
+    client.prepareGet(path).execute { httpResponse->
       val channel: ByteReadChannel = httpResponse.body()
       val contentLength = httpResponse.contentLength() // 文件大小
       var currentLength = 0L

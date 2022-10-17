@@ -7,15 +7,14 @@ import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
 import io.ktor.http.*
 import io.ktor.serialization.gson.*
-import org.bfchain.libappmgr.network.base.BASE_PORT
 import org.bfchain.libappmgr.network.base.BASE_URL
 
 object KtorManager {
 
   val apiService = HttpClient(CIO) {
-    defaultRequest {
+    defaultRequest { // 给每个HTTP请求加上BaseUrl
       host = BASE_URL
-      //port = BASE_PORT
+      // port = BASE_PORT
       url { protocol = URLProtocol.HTTPS }
     }
     install(ContentNegotiation) { // 引入数据转换插件
@@ -23,7 +22,6 @@ object KtorManager {
     }
     install(Logging)
     {
-      //logger = Logger.SIMPLE // 用于显示本机请求信息
       level = LogLevel.ALL
     }
     install(HttpTimeout) {

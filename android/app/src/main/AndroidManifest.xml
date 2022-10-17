@@ -97,14 +97,7 @@
     <activity
       android:name="org.bfchain.rust.plaoc.system.barcode.QRCodeScanningActivity"
       android:screenOrientation="portrait"
-      android:theme="@style/CameraScanTheme"
-      android:exported="true">
-
-      <intent-filter>
-        <action android:name="org.bfchain.rust.plaoc.qrcodescan" />
-        <category android:name="android.intent.category.LAUNCHER" />
-      </intent-filter>
-    </activity>
+      android:theme="@style/CameraScanTheme" />
     <activity
       android:name="org.bfchain.rust.plaoc.system.barcode.BarcodeScanningActivity"
       android:screenOrientation="portrait"

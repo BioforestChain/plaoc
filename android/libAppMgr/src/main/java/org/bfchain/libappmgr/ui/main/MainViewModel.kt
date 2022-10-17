@@ -42,41 +42,7 @@ class MainViewModel : ViewModel() {
               }
             },
             onFailure = { e ->
-              apiResult?.let {api -> api.onError(-1, "fail", e) }
-            },
-            onLoading = {}, onPrepare = {}
-          )
-        }
-    }
-  }
-
-  fun getAppVersion(path: String, apiResult: IApiResult<AppVersion>? = null) {
-    viewModelScope.launch {
-      flow {
-        emit(ApiResultData.prepare())
-        try {
-          Log.d("MainViewModel", "getAppVersion(path)->$path")
-          emit(ApiService.instance.getAppVersion(path))
-        } catch (e: Exception) {
-          Log.d("MainViewModel", " 异常 ${e.printStackTrace()}")
-          emit(ApiResultData.failure(e))
-        }
-      }.flowOn(Dispatchers.IO)
-        .collect {
-          it.fold(
-            onSuccess = { baseData ->
-              baseData.data?.let {
-                apiResult?.let {
-                  apiResult.onSuccess(
-                    baseData.errorCode,
-                    baseData.errorMsg,
-                    baseData.data
-                  )
-                }
-              }
-            },
-            onFailure = { e ->
-              apiResult?.let {api -> api.onError(-1, "fail", e) }
+              e?.let { e1 -> apiResult?.let { apiResult.onError(-1, "fail", e1) } }
             },
             onLoading = {}, onPrepare = {}
           )
@@ -110,7 +76,6 @@ class MainViewModel : ViewModel() {
               baseData.data?.let {
                 // 将改内容存储到 recommend-app/bfs-id-app/tmp/autoUpdate 中
                 FilesUtil.writeFileContent(
-
                   FilesUtil.getAppVersionSaveFile(appInfo),
                   JsonUtil.toJson(it)
                 )
@@ -126,12 +91,11 @@ class MainViewModel : ViewModel() {
             onFailure = { e ->
               Log.d("MainViewModel", "fail->$e")
               e?.printStackTrace()
-              apiResult?.let {api -> api.onError(-1, "fail", e) }
+              e?.let { e1 -> apiResult?.let { apiResult.onError(-1, "fail", e1) } }
             },
             onLoading = {}, onPrepare = {}
           )
         }
     }
   }
-
 }

@@ -20,9 +20,8 @@ object JsonUtil {
         else -> false
       }
       appInfo.iconPath = FilesUtil.getAppIconPathName(
-        appInfo.bfsAppId, appInfo.icon.parseFilePath(), type
+        appInfo.bfsAppId, appInfo.icon.replace("file://", ""), type
       )
-      Log.d(TAG, "getAppInfoFromLinkJson ${appInfo.iconPath}")
       return appInfo
     } catch (e: Exception) {
       Log.d(TAG, "getAppInfoFromLinkJson e->$e")

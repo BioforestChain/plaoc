@@ -54,8 +54,6 @@ dependencies {
   implementation 'io.coil-kt:coil:2.2.2'
   implementation 'io.coil-kt:coil-svg:2.2.2'
   implementation 'io.coil-kt:coil-compose:2.2.2'
-  implementation 'io.coil-kt:coil-video:2.2.2'
-  implementation 'io.coil-kt:coil-gif:2.2.2'
   implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.0' // 因为导入coil后，编译失败，duplicate
   // 解压文件
   implementation 'org.apache.commons:commons-compress:1.21'
@@ -72,23 +70,13 @@ dependencies {
   implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
   implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha07'
 
-  // ktor 网络请求模块 // 将implementation改为api是为了让app主应用能够调用到
-  /*api "io.ktor:ktor-server-core:$ktor_version"
-  api "io.ktor:ktor-server-netty:$ktor_version"*/
-  api "io.ktor:ktor-client-core:$ktor_version"
-  api "io.ktor:ktor-client-cio:$ktor_version"
-  api "io.ktor:ktor-client-okhttp:$ktor_version"
-  api "io.ktor:ktor-client-content-negotiation:$ktor_version"
-  //api "io.ktor:ktor-serialization-kotlinx-json:$ktor_version"
-  api("io.ktor:ktor-serialization-gson:$ktor_version")
-  api "io.ktor:ktor-client-logging:$ktor_version"
-
-  // 增加注入ViewModel // 将implementation改为api是为了让app主应用能够调用到
-  //api('io.insert-koin:koin-core:3.2.2')
-  //api('io.insert-koin:koin-core-ext:3.2.2')
-  //api 'io.insert-koin:koin-androidx-ext:2.2.3'
-  //api('io.insert-koin:koin-android:3.2.2')
-  //api 'io.insert-koin:koin-androidx-compose:3.2.1'
-  api "io.insert-koin:koin-android:3.1.2"
-  api "io.insert-koin:koin-android-compat:3.1.2"
+  // ktor 网络请求模块
+  /*implementation "io.ktor:ktor-server-core:$ktor_version"
+  implementation "io.ktor:ktor-server-netty:$ktor_version"*/
+  implementation "io.ktor:ktor-client-core:$ktor_version"
+  implementation "io.ktor:ktor-client-cio:$ktor_version"
+  implementation "io.ktor:ktor-client-content-negotiation:$ktor_version"
+  //implementation "io.ktor:ktor-serialization-kotlinx-json:$ktor_version"
+  implementation("io.ktor:ktor-serialization-gson:$ktor_version")
+  implementation "io.ktor:ktor-client-logging:$ktor_version"
 }

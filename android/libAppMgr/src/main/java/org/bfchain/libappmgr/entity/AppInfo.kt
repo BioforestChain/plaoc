@@ -23,22 +23,16 @@ package org.bfchain.libappmgr.entity
 
 data class FileInfo(
   val url: String, // 链接
-  val type: String, // 类型，例如 Beta，Release，Dev等
   val size: Int, // 大小
-  val sha512: String, // 校验码
-  val releaseNotes: String? = null, // 本次发布的信息，一般存放更新信息
-  val releaseName: String? = null, // 本次发布的标题，用于展示更新信息时的标题
-  val releaseDate: String? = null, // 发布日期
+  val sha512: String // 校验码
 )
 
 data class AppVersion(
   val version: String, // 版本号
-  val bfsAppId: String, // 唯一标识，也就是 bfs-app-id，跟文件夹一致。长度为7+1（校验位）的大写英文字母或数字
-  val icon: String, // 图标，用于新增下载时的图标显示
   val files: List<FileInfo>, // 文件列表
-  val releaseNotes: String? = null, // 本次发布的信息，一般存放更新信息
-  val releaseName: String? = null, // 本次发布的标题，用于展示更新信息时的标题
-  val releaseDate: String? = null, // 发布日期
+  val releaseNotes: String, // 本次发布的信息，一般存放更新信息
+  val releaseName: String, // 本次发布的标题，用于展示更新信息时的标题
+  val releaseDate: String // 发布日期
 )
 
 data class AutoUpdateInfo(

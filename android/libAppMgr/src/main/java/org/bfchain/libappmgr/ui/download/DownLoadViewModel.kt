@@ -40,7 +40,7 @@ class DownLoadViewModel : ViewModel() {
       }.flowOn(Dispatchers.IO)
         .collect() {
           it.fold(onFailure = { e ->
-            e?.let { it1 -> apiResult.onError(-1, it1.message?:"", it1) }
+            e?.let { it1 -> apiResult.onError(-1, it1.message!!, it1) }
           }, onSuccess = { file ->
             apiResult.downloadSuccess(file)
           }, onLoading = { progress ->

@@ -1,7 +1,6 @@
 package org.bfchain.libappmgr.ui.download
 
 import android.annotation.SuppressLint
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -66,7 +65,6 @@ fun DownloadAppInfoView(
           }
           if (!requestFinish) {
             appVersion = version
-            Log.d("lin.huang", "version=$version")
             customDialogData.updateNewVersion(appVersion = appVersion)
           }
         }
@@ -79,7 +77,7 @@ fun DownloadAppInfoView(
         })
       } else {
         // 1.打开应用
-        dAppInfo = FilesUtil.getDAppInfo(appInfo.bfsAppId)
+        dAppInfo = FilesUtil.getDAppInfo(appInfo)
         dAppInfo?.let { dApp ->
           onOpenApp?.let {
             onOpenApp(
@@ -191,7 +189,7 @@ fun DownloadDialogView(
         })
       } else {
         // 1.打开应用
-        dAppInfo = FilesUtil.getDAppInfo(appInfo.bfsAppId)
+        dAppInfo = FilesUtil.getDAppInfo(appInfo)
         dAppInfo?.let { dApp ->
           onOpenApp?.let {
             onOpenApp(
@@ -276,7 +274,7 @@ fun DownloadDialogView(
 
 private fun getDAppInfoUrl(appInfo: AppInfo, dAppInfo: DAppInfo): String {
   // return FilesUtil.getDAppInfo(appInfo)?.let { it.enter.main } ?: ""
-  return FilesUtil.getAppDenoUrl(appInfo.bfsAppId, dAppInfo.manifest.bfsaEntry)
+  return FilesUtil.getAppDenoUrl(appInfo, dAppInfo)
 }
 
 private fun hasNewVersion(cur: String, net: String): Boolean {
