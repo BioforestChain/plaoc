@@ -113,7 +113,7 @@ extension ScanPhotoViewController: AVCaptureMetadataOutputObjectsDelegate {
     func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
         if let metadataObj = metadataObjects.first as? AVMetadataMachineReadableCodeObject {
             let result = metadataObj.stringValue  //扫描结果
-            
+                
             if result != nil {
                 self.session?.stopRunning()
             }
