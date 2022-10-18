@@ -7,7 +7,9 @@ import org.bfchain.libappmgr.utils.JsonUtil
 import org.bfchain.rust.plaoc.ExportNative
 import org.bfchain.rust.plaoc.createBytesFactory
 import org.bfchain.rust.plaoc.webView.network.dWebView_host
+import java.io.BufferedWriter
 import java.io.File
+import java.io.FileWriter
 import java.util.regex.PatternSyntaxException
 
 
@@ -133,14 +135,25 @@ class FileSystem {
     if (!file.exists() && autoCreate) {
       file.parentFile?.mkdirs()
     }
+    LogUtils.d("write  file->${file.absolutePath}，content->$content，append->$append，autoCreate->$autoCreate")
     try {
-      when (append) {
-        true -> file.bufferedWriter().append(content)
-        false -> file.bufferedWriter().use { out -> out.write(content) }
-      }
+      val fileWriter = FileWriter(file,append)
+      val bufferedWriter = BufferedWriter(fileWriter)
+      bufferedWriter.write(content)
+      bufferedWriter.close()
+//     when (append) {
+//        true -> file.bufferedWriter().use { out ->
+//          out.append(content)
+//          out.close()
+//        }
+//        false -> file.bufferedWriter().use { out ->
+//          out.write(content)
+//          out.close()
+//        }
+//      }
     } catch (e: Exception) {
       LogUtils.d("write fail -> ${e.message}")
-      return createBytesFactory(ExportNative.FileSystemWrite, false.toString())
+      return createBytesFactory(ExportNative.FileSystemWrite, e.message.toString())
     }
     createBytesFactory(ExportNative.FileSystemWrite, true.toString())
   }

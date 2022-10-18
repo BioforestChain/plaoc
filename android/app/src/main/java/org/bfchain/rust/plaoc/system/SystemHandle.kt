@@ -67,5 +67,6 @@ fun initServiceApp() {
     val handle = mapper.readValue(it, FileRm::class.java)
     fileSystem.rm(handle.path,handle.option.deepDelete)
   }
+
 }
 

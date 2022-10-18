@@ -10,9 +10,6 @@ import { WriteOption } from "./vfsType.ts";
  * @returns 
  */
 export async function write(path: string, option: WriteOption) {
-  option.append = option.append ? false : option.append  // 是否追加内容,默认是false
-  option.autoCreate = option.autoCreate ? true : option.autoCreate // 自动创建不存在的目录，默认是 true
-
-  const fs = await network.asyncCallDenoFunction(vfsHandle.FileSystemLs, { path, option })
+  const fs = await network.asyncCallDenoFunction(vfsHandle.FileSystemWrite, { path, option })
   return fs
 }

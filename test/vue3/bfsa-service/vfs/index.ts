@@ -44,3 +44,18 @@ console.log(`vfs测试：递归删除失败 ${rmFs2}`)
 console.log(`vfs测试：递归删除 ${rmFs3}`)
 
 
+const writeFs1 = await fs.write("./gege.txt", {
+  content: "日射纱窗风撼扉，"
+})
+console.log(`vfs测试：写入信息 ${writeFs1}`)
+const writeFs2 = await fs.write("./gege.txt", {
+  content: "香罗拭手春事违。",
+  append: true,
+})
+console.log(`vfs测试：追加写入信息 ${writeFs2}`)
+const readFs1 = await fs.read("./gege.txt")
+console.log(`vfs测试：读取信息 ${readFs1}`);
+const writeFs3 = await fs.write("/book/book.js", {
+  content: "console.log(`十年花骨东风泪，几点螺香素壁尘。`)"
+})
+console.log(`vfs测试：创建不存在的文件写入信息 ${writeFs3}`)
