@@ -35,7 +35,7 @@ fun createWorker(funName: WorkerNative, data: String = "") {
   val fnName = funName.toString()
   val done = WorkManager.getInstance(App.appContext.applicationContext)
     .getWorkInfosByTag(fnName).isDone
-    Log.i("xx","workManager=> $done")
+//    Log.i("xx","workManager=> $done")
   if(done) {
     return
   }

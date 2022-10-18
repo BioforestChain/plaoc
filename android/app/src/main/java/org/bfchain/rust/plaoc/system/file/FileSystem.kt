@@ -141,16 +141,6 @@ class FileSystem {
       val bufferedWriter = BufferedWriter(fileWriter)
       bufferedWriter.write(content)
       bufferedWriter.close()
-//     when (append) {
-//        true -> file.bufferedWriter().use { out ->
-//          out.append(content)
-//          out.close()
-//        }
-//        false -> file.bufferedWriter().use { out ->
-//          out.write(content)
-//          out.close()
-//        }
-//      }
     } catch (e: Exception) {
       LogUtils.d("write fail -> ${e.message}")
       return createBytesFactory(ExportNative.FileSystemWrite, e.message.toString())
