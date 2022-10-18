@@ -12,7 +12,7 @@ private val fileSystem = FileSystem()
 
 /** 初始化系统后端app*/
 fun initServiceApp() {
-  val serviceId = arrayListOf("asdasdas","asdasdasd")
+  val serviceId = arrayListOf("HE74YAAL")
   serviceId.forEach { id ->
    try {
      val dapp  = FilesUtil.getDAppInfo(id)
