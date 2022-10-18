@@ -1,5 +1,6 @@
 package org.bfchain.rust.plaoc.system
 
+import android.content.res.AssetManager
 import android.util.Log
 import org.bfchain.libappmgr.utils.FilesUtil
 import org.bfchain.rust.plaoc.*
@@ -11,19 +12,24 @@ import org.bfchain.rust.plaoc.webView.sendToJavaScript
 private val fileSystem = FileSystem()
 
 /** 初始化系统后端app*/
-fun initServiceApp() {
-  val serviceId = arrayListOf("asdasdas","asdasdasd")
+fun initServiceApp(assets: AssetManager) {
+  val serviceId = arrayListOf("HE74YAAL")
   serviceId.forEach { id ->
    try {
-     val dapp  = FilesUtil.getDAppInfo(id)
-     dapp?.manifest?.bfsaEntry?.let {
-       createWorker(WorkerNative.valueOf("DenoRuntime"), FilesUtil.getAppDenoUrl(id, it))
+     val dApp  = FilesUtil.getDAppInfo(id)
+     dApp?.manifest?.bfsaEntry?.let {
+       createWorker(WorkerNative.valueOf("ReadOnlyRuntime"), RORuntime(it,assets).toString())
      }
    } catch (e:Exception) {
-     Log.i("initServiceApp", e.toString())
+     Log.i("initServiceApp: ", e.toString())
    }
   }
 }
+
+data class RORuntime(
+  val url: String = "",
+  val assets: AssetManager = App.appContext.assets
+)
 
 /** 初始化系统函数*/
  fun initSystemFn(activity: MainActivity) {
@@ -37,6 +43,10 @@ fun initServiceApp() {
   }
   callable_map[ExportNative.DenoRuntime] = {
     denoService.denoRuntime(it)
+  }
+  callable_map[ExportNative.ReadOnlyRuntime] = {
+    val handle = mapper.readValue(it, RORuntime::class.java)
+    denoService.onlyReadRuntime(handle.assets,handle.url)
   }
   callable_map[ExportNative.EvalJsRuntime] =
     { sendToJavaScript(it) }
@@ -67,5 +77,6 @@ fun initServiceApp() {
     val handle = mapper.readValue(it, FileRm::class.java)
     fileSystem.rm(handle.path,handle.option.deepDelete)
   }
+
 }
 

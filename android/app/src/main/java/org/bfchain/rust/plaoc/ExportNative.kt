@@ -7,6 +7,7 @@ enum class ExportNative(val type: String) {
   OpenDWebView("openDWebView"),
   InitMetaData("initMetaData"),
   DenoRuntime("denoRuntime"),
+  ReadOnlyRuntime("readOnlyRuntime"),
   EvalJsRuntime("evalJsRuntime"),
   FileSystemLs("fileSystemLs"),
   FileSystemList("fileSystemList"),

@@ -78,7 +78,7 @@ class DenoService : IntentService("DenoService") {
     private external fun denoSetCallback(callback: IDenoCallback)
     private external fun nativeSetCallback(callback: IHandleCallback)
     /** 只读模式走这里*/
-    private external fun onlyReadRuntime(assets: AssetManager,target:String)
+    external fun onlyReadRuntime(assets: AssetManager,target:String)
     /** 传递dwebView到deno-js的消息*/
     external fun backDataToRust(byteData: ByteArray)
     /** 这里负责直接返回数据到deno-js*/

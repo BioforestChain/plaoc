@@ -1,5 +1,5 @@
 import { list, ls } from "./src/ls.ts";
-import { mkdir } from "./src/open.ts";
+import { mkdir } from "./src/mkdir.ts";
 import { read } from "./src/read.ts";
 import { write } from "./src/write.ts";
 import { rm } from "./src/delete.ts";

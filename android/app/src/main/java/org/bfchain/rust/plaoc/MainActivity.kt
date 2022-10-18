@@ -2,12 +2,8 @@ package org.bfchain.rust.plaoc
 
 
 import android.Manifest
-import android.content.ComponentName
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.IBinder
-import android.os.UserHandle
 import android.provider.MediaStore
 import android.widget.ImageView
 import android.widget.Toast
@@ -26,11 +22,10 @@ import com.king.mlkit.vision.camera.CameraScan
 import com.king.mlkit.vision.camera.analyze.Analyzer.OnAnalyzeListener
 import com.king.mlkit.vision.camera.util.LogUtils
 import com.king.mlkit.vision.camera.util.PermissionUtils
+import org.bfchain.libappmgr.ui.main.Home
 import org.bfchain.rust.plaoc.lib.drawRect
 import org.bfchain.rust.plaoc.system.barcode.BarcodeScanningActivity
 import org.bfchain.rust.plaoc.system.barcode.QRCodeScanningActivity
-import org.bfchain.libappmgr.ui.main.Home
-import org.bfchain.libappmgr.utils.FilesUtil
 import org.bfchain.rust.plaoc.system.initServiceApp
 import org.bfchain.rust.plaoc.system.initSystemFn
 import org.bfchain.rust.plaoc.ui.theme.RustApplicationTheme
@@ -56,7 +51,7 @@ class MainActivity : AppCompatActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     // 初始化无界面APP
-    initServiceApp()
+    initServiceApp(this.assets)
     // 初始化系统函数map
     initSystemFn(this)
     setContent {
