@@ -49,10 +49,10 @@ export const doBuild = async (npmFile: string) => {
       },
       dependencies: {
         "@bfsx/core": "^0.0.4",
+        "@bfsx/metadata": "^0.0.4",
       },
       devDependencies: {
         "@bfsx/typings": "^0.0.3",
-        "@bfsx/metadata": "^0.0.4",
       },
     },
   });

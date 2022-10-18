@@ -3,7 +3,7 @@ import { EventEmitter } from "node_event";
 
 import type { IMessageInfo } from "../typings/message.type.ts";
 import {
-  NOTIFICATION_MESSAGE_QUEUE,
+  // NOTIFICATION_MESSAGE_QUEUE,
   NOTIFICATION_MESSAGE_PUSH,
 } from "./constants.ts";
 import { messageToQueue } from "./message_queue.ts";
@@ -45,6 +45,8 @@ export function asyncPollingCallDenoNotification(
        * break;
        */
       // } while (NOTIFICATION_MESSAGE_QUEUE.length === 0);
+      ee.emit(NOTIFICATION_MESSAGE_PUSH);
+      break;
     } while (true);
   };
 
