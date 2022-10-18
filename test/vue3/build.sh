@@ -12,6 +12,8 @@ echo "编译前端"
 
 yarn build
 
+mkdir -p ./dist
+
 check_results=`bfsa -V`
 
 if [[ $check_results =~ "0." ]]
