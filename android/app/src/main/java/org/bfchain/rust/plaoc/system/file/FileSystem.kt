@@ -104,7 +104,7 @@ class FileSystem {
     val file = File(rootPath + File.separator + path)
     val fileList = arrayListOf<String>()
     file.listFiles()?.forEach {
-      Log.i("FileSystemList, ${rootPath.toString()}:", it.absolutePath.toString())
+//      Log.i("FileSystemList, ${rootPath.toString()}:", it.absolutePath.toString())
       fileList.add(it.absolutePath.replace(rootPath, ""))
     }
     createBytesFactory(ExportNative.FileSystemList, JsonUtil.toJson(fileList))
@@ -112,8 +112,7 @@ class FileSystem {
 
   fun mkdir(path: String, recursive: Boolean = false) {
     val file = getFileByPath(path)
-    var bool = false;
-    bool = when (recursive) {
+    val bool = when (recursive) {
       true -> {
         file.mkdirs()
       }
@@ -155,11 +154,11 @@ class FileSystem {
 
   fun rm(path: String, deepDelete: Boolean = true) {
     val file = getFileByPath(path)
-    when (deepDelete) {
+    val bool = when (deepDelete) {
       true -> file.deleteRecursively()
       false -> file.delete()
     }
-    createBytesFactory(ExportNative.FileSystemRm, true.toString())
+    createBytesFactory(ExportNative.FileSystemRm, bool.toString())
   }
 }
 

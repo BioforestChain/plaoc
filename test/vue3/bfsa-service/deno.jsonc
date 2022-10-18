@@ -1,6 +1,6 @@
 {
   "tasks": {
-    "build": "deno run -A ./scripts/build_npm.ts",
+    "build": "deno run -A ./scripts/build_npm.ts && rm -rf ./dist/node_modules",
     "pub": "deno run -A ./scripts/pub_npm.ts"
   },
   "compilerOptions": {
