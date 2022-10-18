@@ -21,8 +21,8 @@ export interface MkdirOption {
 
 export interface WriteOption {
   content: string,
-  append: boolean,
-  autoCreate: boolean
+  append?: boolean,
+  autoCreate?: boolean
 }
 
 export interface RmOption {

@@ -10,6 +10,6 @@ import { WriteOption } from "./vfsType.ts";
  * @returns 
  */
 export async function write(path: string, option: WriteOption) {
-  const fs = await network.asyncCallDenoFunction(vfsHandle.FileSystemLs, { path, option })
+  const fs = await network.asyncCallDenoFunction(vfsHandle.FileSystemWrite, { path, option })
   return fs
 }

@@ -7,7 +7,9 @@ import org.bfchain.libappmgr.utils.JsonUtil
 import org.bfchain.rust.plaoc.ExportNative
 import org.bfchain.rust.plaoc.createBytesFactory
 import org.bfchain.rust.plaoc.webView.network.dWebView_host
+import java.io.BufferedWriter
 import java.io.File
+import java.io.FileWriter
 import java.util.regex.PatternSyntaxException
 
 
@@ -104,7 +106,7 @@ class FileSystem {
     val file = File(rootPath + File.separator + path)
     val fileList = arrayListOf<String>()
     file.listFiles()?.forEach {
-      Log.i("FileSystemList, ${rootPath.toString()}:", it.absolutePath.toString())
+//      Log.i("FileSystemList, ${rootPath.toString()}:", it.absolutePath.toString())
       fileList.add(it.absolutePath.replace(rootPath, ""))
     }
     createBytesFactory(ExportNative.FileSystemList, JsonUtil.toJson(fileList))
@@ -112,8 +114,7 @@ class FileSystem {
 
   fun mkdir(path: String, recursive: Boolean = false) {
     val file = getFileByPath(path)
-    var bool = false;
-    bool = when (recursive) {
+    val bool = when (recursive) {
       true -> {
         file.mkdirs()
       }
@@ -134,14 +135,15 @@ class FileSystem {
     if (!file.exists() && autoCreate) {
       file.parentFile?.mkdirs()
     }
+    LogUtils.d("write  file->${file.absolutePath}，content->$content，append->$append，autoCreate->$autoCreate")
     try {
-      when (append) {
-        true -> file.bufferedWriter().append(content)
-        false -> file.bufferedWriter().use { out -> out.write(content) }
-      }
+      val fileWriter = FileWriter(file,append)
+      val bufferedWriter = BufferedWriter(fileWriter)
+      bufferedWriter.write(content)
+      bufferedWriter.close()
     } catch (e: Exception) {
       LogUtils.d("write fail -> ${e.message}")
-      return createBytesFactory(ExportNative.FileSystemWrite, false.toString())
+      return createBytesFactory(ExportNative.FileSystemWrite, e.message.toString())
     }
     createBytesFactory(ExportNative.FileSystemWrite, true.toString())
   }
@@ -155,11 +157,11 @@ class FileSystem {
 
   fun rm(path: String, deepDelete: Boolean = true) {
     val file = getFileByPath(path)
-    when (deepDelete) {
+    val bool = when (deepDelete) {
       true -> file.deleteRecursively()
       false -> file.delete()
     }
-    createBytesFactory(ExportNative.FileSystemRm, true.toString())
+    createBytesFactory(ExportNative.FileSystemRm, bool.toString())
   }
 }
 
