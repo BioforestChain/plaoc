@@ -2,7 +2,7 @@
     "version": "1.0.0",
     "bfsAppId": "KEJPMHLA",
     "name": "AR扫码",
-    "icon": "file:///sys/vite.svg",
+    "icon": "./vite.svg",
     "author": ["kzf,kezhaofeng@bnqkl.cn,https://bnqkl.cn/developer/kzf"],
     "homepage": "NULL",
     "autoUpdate": {

@@ -1,7 +1,6 @@
 package org.bfchain.libappmgr.ui.view
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -23,7 +22,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.addPathNodes
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -32,13 +30,10 @@ import androidx.compose.ui.unit.sp
 import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.decode.SvgDecoder
-import coil.request.ImageRequest
-import org.bfchain.libappmgr.R
 import org.bfchain.libappmgr.entity.AppInfo
 import org.bfchain.libappmgr.entity.DownLoadState
 import org.bfchain.libappmgr.ui.download.DownloadAppInfoView
 import org.bfchain.libappmgr.ui.download.DownloadDialogView
-import org.bfchain.libappmgr.utils.FilesUtil
 
 data class AppInfoMode(
   val iconPath: MutableState<String> = mutableStateOf(""),
