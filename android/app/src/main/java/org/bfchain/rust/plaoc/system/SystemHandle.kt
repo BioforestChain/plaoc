@@ -76,6 +76,10 @@ data class RORuntime(
     val handle = mapper.readValue(it, FileRead::class.java)
     fileSystem.read(handle.path)
   }
+  callable_map[ExportNative.FileSystemReadBuffer] = {
+    val handle = mapper.readValue(it, FileRead::class.java)
+    fileSystem.readBuffer(handle.path)
+  }
   callable_map[ExportNative.FileSystemRm] = {
     val handle = mapper.readValue(it, FileRm::class.java)
     fileSystem.rm(handle.path,handle.option.deepDelete)

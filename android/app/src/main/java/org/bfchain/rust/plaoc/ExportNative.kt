@@ -14,6 +14,7 @@ enum class ExportNative(val type: String) {
   FileSystemMkdir("fileSystemMkdir"),
   FileSystemWrite("fileSystemWrite"),
   FileSystemRead("fileSystemRead"),
+  FileSystemReadBuffer("fileSystemReadBuffer"),
   FileSystemRm("fileSystemRm"),
   CreateNotificationMsg("createNotificationMsg"),
 }
