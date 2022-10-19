@@ -2,7 +2,7 @@ import * as fs from "node_fs";
 import * as process from "node_process";
 import { fileURLToPath, pathToFileURL, URL } from "node_url";
 import { Files, LinkMetadata, MetaData } from "@bfsx/metadata";
-import { path, slash } from "path";
+import { path, slash, appendForwardSlash } from "path";
 import { checksumFile } from "crypto";
 import { genBfsAppId, checkSign } from "check";
 import { compressToSuffixesBfsa } from "compress";
@@ -34,7 +34,12 @@ export async function bundle(options: {
     bfsAppId = await genBfsAppId();
   }
 
-  const { frontPath, backPath } = options;
+  // 目录以/结尾
+  // const { frontPath, backPath } = options;
+  const frontPath = options.frontPath
+    ? appendForwardSlash(options.frontPath)
+    : "";
+  const backPath = appendForwardSlash(options.backPath);
   const destPath = await createBfsaDir(bfsAppId);
 
   // 将前端项目移动到sys目录

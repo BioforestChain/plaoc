@@ -18,3 +18,12 @@ export function slash(path: string) {
 
   return path.replace(/\\+/g, "/");
 }
+
+/**
+ * 追加 /
+ * @param pth
+ * @returns
+ */
+export function appendForwardSlash(pth: string) {
+  return pth.endsWith("/") ? pth : pth + "/";
+}
