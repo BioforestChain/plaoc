@@ -21,7 +21,7 @@ class BatchSystemManager: BatchReadManager {
     }
     
     override func iconImagePath(fileName: String) -> String {
-        return filePath() + "/\(fileName)"
+        return filePath() + "/\(fileName)/sys/"
     }
     
     //读取matedata.json文件

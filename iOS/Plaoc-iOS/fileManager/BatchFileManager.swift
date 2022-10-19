@@ -11,6 +11,7 @@ import RxSwift
 enum FilePathType {
     case system
     case recommend
+    case scan
     case none
 }
 
@@ -21,9 +22,8 @@ class BatchFileManager: NSObject {
     private let disposeBag = DisposeBag()
     private let sysManager = BatchSystemManager()
     private let recommendManager = BatchRecommendManager()
+    private let scanManager = BatchScanManager()
     private var fileType: [String:FilePathType] = [:]
-    private var recommendFiles: [String] = []
-    private var systemFiles: [String] = []
     private var appNames: [String:String] = [:]
     private var appImages: [String:UIImage?] = [:]
     private var fileLinkDict: [String:String] = [:]
@@ -32,9 +32,10 @@ class BatchFileManager: NSObject {
     
     func initBatchFile() {
         
-        recommendFiles = recommendManager.readAppSubFile()
-        systemFiles = sysManager.readAppSubFile()
-        fetchFileTypes(recommendFiles: recommendFiles, systemFiles: systemFiles)
+        let recommendFiles = recommendManager.readAppSubFile()
+        let systemFiles = sysManager.readAppSubFile()
+        let scanFiles = scanManager.readAppSubFile()
+        fetchFileTypes(recommendFiles: recommendFiles, systemFiles: systemFiles, scanFiles: scanFiles)
         fetchAppNames()
         fetchAppIcons()
         
@@ -44,6 +45,7 @@ class BatchFileManager: NSObject {
             guard let strongSelf = self else { return }
             strongSelf.downloadNewFile(fileName: fileName)
         }).disposed(by: disposeBag)
+        
     }
     //根据文件名获取app名称
     func currentAppName(fileName: String) -> String {
@@ -74,10 +76,12 @@ class BatchFileManager: NSObject {
             sysManager.writeUpdateInfoToTmpFile(fileName: fileName, json: json!)
         } else if type == .recommend {
             recommendManager.writeUpdateInfoToTmpFile(fileName: fileName, json: json!)
+        } else if type == .scan {
+            scanManager.writeUpdateInfoToTmpFile(fileName: fileName, json: json!)
         }
     }
     
-    //更新文件状态
+    //更新文件状态为已下载
     func updateFileType(fileName: String) {
         if fileType[fileName] != nil {
             fileType[fileName] = .system
@@ -85,7 +89,20 @@ class BatchFileManager: NSObject {
             appImages[fileName] = sysManager.appIcon(fileName: fileName)
         }
     }
-    
+    //更新文件状态为扫码
+    func updateScanType(fileName: String) {
+        fileType[fileName] = .scan
+        appNames[fileName] = scanManager.appName(fileName: fileName)
+    }
+    //获取扫码的图片地址
+    func scanImageURL(fileName: String) -> String {
+        return scanManager.appIconUrlString(fileName: fileName) ?? ""
+    }
+    //获取扫码后app的下载地址
+    func scanDownloadURLString(fileName: String) -> String {
+        return refreshInfoFromCacheInfo(fileName: fileName) ?? ""
+    }
+
     //定时刷新
     func fetchRegularUpdateTime() {
         
@@ -121,6 +138,7 @@ class BatchFileManager: NSObject {
         //system-app升级操作
         //1、点击升级，退回到桌面界面
         //2、开始动画，下载文件
+        operateMonitor.startAnimationMonitor.onNext(fileName)
         BFSNetworkManager.shared.loadAutoUpdateInfo(fileName: fileName, urlString: urlString)
         
     }
@@ -137,6 +155,11 @@ class BatchFileManager: NSObject {
                 RefreshManager.saveLastUpdateTime(fileName: fileName, time: Date().timeStamp)
             }
         }
+    }
+    
+    //扫码添加安装的app数据
+    func addAPPFromScan(fileName: String, dict: [String:Any]) {
+        scanManager.writeLinkJson(fileName: fileName, dict: dict)
     }
     
     //更新信息下载完后，重新下载项目文件,  可能不需要判断system-app 看最后system-app升级时的需求
@@ -158,6 +181,7 @@ class BatchFileManager: NSObject {
         guard let newURLString = refreshInfoFromCacheInfo(fileName: fileName) else { return }
         let currentURLString = fileLinkDict[fileName]
         if currentURLString == nil {
+            operateMonitor.startAnimationMonitor.onNext(fileName)
             BFSNetworkManager.shared.loadAutoUpdateInfo(fileName: fileName, urlString: newURLString)
         } else {
             //5、重新下载
@@ -191,6 +215,8 @@ class BatchFileManager: NSObject {
             return sysManager.readCacheUpdateInfo(fileName: fileName)
         } else if type == .recommend {
             return recommendManager.readCacheUpdateInfo(fileName: fileName)
+        } else if type == .scan {
+            return scanManager.readCacheUpdateInfo(fileName: fileName)
         }
         return nil
     }
@@ -206,6 +232,7 @@ class BatchFileManager: NSObject {
     private func reloadUpdateFile(fileName: String, cancelUrlString: String?, urlString: String?) {
         BFSNetworkManager.shared.cancelNetworkRequest(urlString: cancelUrlString)
         if urlString != nil {
+            operateMonitor.startAnimationMonitor.onNext(fileName)
             BFSNetworkManager.shared.loadAutoUpdateInfo(fileName: fileName, urlString: urlString!)
         }
     }
@@ -217,6 +244,8 @@ class BatchFileManager: NSObject {
             return sysManager.readAutoUpdateURLInfo(fileName: fileName)
         } else if type == .recommend {
             return recommendManager.readAutoUpdateURLInfo(fileName: fileName)
+        } else if type == .scan {
+            return scanManager.readAutoUpdateURLInfo(fileName: fileName)
         }
         return nil
     }
@@ -228,6 +257,8 @@ class BatchFileManager: NSObject {
             return sysManager.readAutoUpdateMaxAge(fileName: fileName)
         } else if type == .recommend {
             return recommendManager.readAutoUpdateMaxAge(fileName: fileName)
+        } else if type == .scan {
+            return scanManager.readAutoUpdateMaxAge(fileName: fileName)
         }
         return nil
     }
@@ -239,6 +270,8 @@ class BatchFileManager: NSObject {
             return sysManager.isNewUpdateInfo(fileName: fileName)
         } else if type == .recommend {
             return recommendManager.isNewUpdateInfo(fileName: fileName)
+        } else if type == .scan {
+            return scanManager.isNewUpdateInfo(fileName: fileName)
         }
         return false
     }
@@ -256,32 +289,34 @@ class BatchFileManager: NSObject {
     }
     
     //获取文件夹的类型
-    private func fetchFileTypes(recommendFiles: [String], systemFiles: [String]) {
+    private func fetchFileTypes(recommendFiles: [String], systemFiles: [String], scanFiles: [String]) {
         
-        guard recommendFiles.count > 0 || systemFiles.count > 0 else { return }
-        if recommendFiles.count == 0 {
-            for fileName in systemFiles {
-                fileType[fileName] = .system
-            }
-            appFilePaths = systemFiles
-            return
-        }
+        guard recommendFiles.count > 0 || systemFiles.count > 0 || scanFiles.count > 0 else { return }
+//        if recommendFiles.count == 0 {
+//            for fileName in systemFiles {
+//                fileType[fileName] = .system
+//            }
+//            appFilePaths = systemFiles
+//            return
+//        }
+//
+//        if systemFiles.count == 0 {
+//            for fileName in recommendFiles {
+//                fileType[fileName] = .recommend
+//            }
+//            appFilePaths = recommendFiles
+//            return
+//        }
         
-        if systemFiles.count == 0 {
-            for fileName in recommendFiles {
-                fileType[fileName] = .recommend
-            }
-            appFilePaths = recommendFiles
-            return
-        }
-        
-        let array = recommendFiles + systemFiles
+        let array = recommendFiles + systemFiles + scanFiles
         let setList = Set(array)
         appFilePaths = Array(setList)
         
         for fileName in setList {
             if systemFiles.contains(fileName) {
                 fileType[fileName] = .system
+            } else if scanFiles.contains(fileName) {
+                fileType[fileName] = .scan
             } else {
                 fileType[fileName] = .recommend
             }
@@ -294,6 +329,8 @@ class BatchFileManager: NSObject {
                 appNames[key] = sysManager.appName(fileName: key)
             } else if type == .recommend {
                 appNames[key] = recommendManager.appName(fileName: key)
+            } else if type == .scan {
+                appNames[key] = scanManager.appName(fileName: key)
             }
         }
     }
@@ -313,6 +350,7 @@ class BatchFileManager: NSObject {
         let alertVC = UIAlertController(title: "确认下载更新吗？", message: nil, preferredStyle: .alert)
         let sureAction = UIAlertAction(title: "确认", style: .default) { action in
             if urlstring != nil {
+                operateMonitor.startAnimationMonitor.onNext(fileName)
                 BFSNetworkManager.shared.loadAutoUpdateInfo(fileName: fileName, urlString: urlstring!)
             }
             let type = self.currentAppType(fileName: fileName)
@@ -323,7 +361,8 @@ class BatchFileManager: NSObject {
                 operateMonitor.backMonitor.onNext(fileName)
             } else if type == .recommend {
                 self.refreshNewAutoUpdateInfo(fileName: fileName, isCompare: true)
-                operateMonitor.startAnimationMonitor.onNext(fileName)
+            } else if type == .scan {
+                self.refreshNewAutoUpdateInfo(fileName: fileName, isCompare: true)
             }
         }
         let cancelAction = UIAlertAction(title: "取消", style: .cancel) { action in

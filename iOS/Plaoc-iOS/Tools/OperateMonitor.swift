@@ -18,5 +18,6 @@ class OperateMonitor: NSObject {
     let refreshCompleteMonitor = PublishSubject<String>()
     let startAnimationMonitor = PublishSubject<String>()
     let backMonitor = PublishSubject<String>()
+    let scanMonitor = PublishSubject<(String,[String:Any])>()
     
 }

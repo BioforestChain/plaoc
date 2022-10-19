@@ -20,7 +20,7 @@ class AlertConfiguration: NSObject {
     init(dict: JSON) {
         super.init()
         title = dict["title"].stringValue
-        content = dict["content"].stringValue
+        content = dict["message"].stringValue
         confirmText = dict["confirmText"].stringValue
         cancelFunc = dict["cancelFunc"].stringValue
         confirmFunc = dict["confirmFunc"].stringValue

@@ -1869,14 +1869,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		FEFBBC2544BA08D9C897050456E32C07 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				5992FA8C6E8CACFD12899BB9ABA88268 /* Foundation.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -2796,27 +2788,6 @@
 			name = iOS;
 			sourceTree = "<group>";
 		};
-		B94D7768568A9992200DB461E8CF687F /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				87253880D0F3EDA5746F8095701D2794 /* iOS */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		C048F5BAE6118EB95570278A910897E8 /* UIColor_Hex_Swift */ = {
-			isa = PBXGroup;
-			children = (
-				BACF9709C19C97091870DF044FDA0B2D /* HEXColor.h */,
-				37B627615752BA84A32A498B23983B45 /* StringExtension.swift */,
-				2F55DC9C35ED830141B02E57C6AC011E /* UIColorExtension.swift */,
-				1D0D1F3FE5692466B91A434643422EF1 /* UIColorInputError.swift */,
-				29A984E5E210F7BF27A7ACE419D252BC /* Support Files */,
-			);
-			name = UIColor_Hex_Swift;
-			path = UIColor_Hex_Swift;
-			sourceTree = "<group>";
-		};
 		C726966D306C834F958B360A41EF30D1 /* Targets Support Files */ = {
 			isa = PBXGroup;
 			children = (
@@ -3003,36 +2974,6 @@
 			);
 			name = "Support Files";
 			path = "../Target Support Files/SSZipArchive";
-			sourceTree = "<group>";
-		};
-		F2CD2BA9FD107B2737102671FE23BB90 /* Support Files */ = {
-			isa = PBXGroup;
-			children = (
-				532555D85C556DD532CBB73073A07A5A /* SwiftyJSON.modulemap */,
-				265F042033366C519228058CC4D16D31 /* SwiftyJSON-dummy.m */,
-				06EE2C0036A9C42A804C0F79F5C330AE /* SwiftyJSON-Info.plist */,
-				3DE26A0A55A31F7B75EC66538C75D670 /* SwiftyJSON-prefix.pch */,
-				D373CBC524552CDAD5E73FC594694626 /* SwiftyJSON-umbrella.h */,
-				BFB647E7763E58996A2B9122287CE8CC /* SwiftyJSON.debug.xcconfig */,
-				F26111C9DEAECF01DEFFD4E419756586 /* SwiftyJSON.release.xcconfig */,
-			);
-			name = "Support Files";
-			path = "../Target Support Files/SwiftyJSON";
-			sourceTree = "<group>";
-		};
-		F59D8904CD1CD4047F4A2F07A75B54BD /* Support Files */ = {
-			isa = PBXGroup;
-			children = (
-				2BF7E6BED734603CF72E37AE5C106A97 /* SDWebImage.modulemap */,
-				1F973F38BD7AE563BAF36F4BA99D66DA /* SDWebImage-dummy.m */,
-				989CF5B81E2E636D0A6FA71284CCF9B1 /* SDWebImage-Info.plist */,
-				D39FDE26CB863F445B6BAA24395BAD4B /* SDWebImage-prefix.pch */,
-				75F175E2CC466737A813BCC808BECAEE /* SDWebImage-umbrella.h */,
-				442D34BA859AD16CA1A682DECA249D0C /* SDWebImage.debug.xcconfig */,
-				7107CE5A3CCA26B76E79818411B98F6F /* SDWebImage.release.xcconfig */,
-			);
-			name = "Support Files";
-			path = "../Target Support Files/SDWebImage";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -3701,13 +3642,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		2331F66A466E5099DC794F685D2F12F4 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		3AC2DB85B7FBCF30461C04F0BC298E61 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -3736,7 +3670,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		C4B0B01332A9E3A1888375A034221B12 /* Resources */ = {
+		B05597C458D738E12F170EAC515F8483 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (

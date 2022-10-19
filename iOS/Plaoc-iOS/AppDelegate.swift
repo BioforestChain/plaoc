@@ -30,8 +30,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 ////                notiManager.sendLocalNotification()
 ////            }
 //        }
-        
-        
      
         return true
     }
