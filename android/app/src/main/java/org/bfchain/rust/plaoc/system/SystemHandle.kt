@@ -5,11 +5,14 @@ import android.util.Log
 import org.bfchain.libappmgr.utils.FilesUtil
 import org.bfchain.rust.plaoc.*
 import org.bfchain.rust.plaoc.system.file.*
+import org.bfchain.rust.plaoc.system.notification.NotificationMsgItem
 import org.bfchain.rust.plaoc.webView.network.initMetaData
 import org.bfchain.rust.plaoc.webView.sendToJavaScript
+import org.bfchain.rust.plaoc.system.notification.NotifyManager
 
 
 private val fileSystem = FileSystem()
+private val notifyManager = NotifyManager()
 
 /** 初始化系统后端app*/
 fun initServiceApp(assets: AssetManager) {
@@ -78,5 +81,17 @@ data class RORuntime(
     fileSystem.rm(handle.path,handle.option.deepDelete)
   }
 
+  /** Notification */
+  callable_map[ExportNative.CreateNotificationMsg] = {
+    val message = mapper.readValue(it, NotificationMsgItem::class.java)
+
+    notifyManager.createNotification(
+      title = message.title,
+      text = message.msg_content,
+      bigText = message.msg_content,
+      channelType = message.priority,
+    )
+  }
 }
+
 

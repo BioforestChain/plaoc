@@ -15,6 +15,7 @@ enum class ExportNative(val type: String) {
   FileSystemWrite("fileSystemWrite"),
   FileSystemRead("fileSystemRead"),
   FileSystemRm("fileSystemRm"),
+  CreateNotificationMsg("createNotificationMsg"),
 }
 
 /** worker */
