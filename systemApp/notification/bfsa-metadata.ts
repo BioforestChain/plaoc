@@ -24,11 +24,11 @@ export default metaConfig({
     // 外部可以使用 DWEB_ID.bfchain (等价同于index.DWEB_ID.bfchain)、admin.DWEB_ID.bfchain 来启动其它页面
     enters: [""],
     //本次发布的信息，一般存放更新信息
-    releaseNotes: "初始化",
+    releaseNotes: "消息中心初始化",
     //  本次发布的标题，用于展示更新信息时的标题
     releaseName: "消息中心0.0.1",
     // 发布日期
-    releaseDate: "2022-10-12 17:00:00",
+    releaseDate: "2022-10-18 17:00:00",
   },
   whitelist: [],
   dwebview: {

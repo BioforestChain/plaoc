@@ -1,7 +1,6 @@
 import { NativeUI } from "../common/nativeHandle.ts";
 import { netCallNativeUi } from "@bfsx/gateway";
 import { Color } from "../types/colorType.ts";
-import { convertToRGBAHex } from "../util/index.ts";
 import { BottomBar } from "./bfcsBottomBarType.ts";
 export class BottomBarNet implements BottomBar.IBottomBarNet {
 

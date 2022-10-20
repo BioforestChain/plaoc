@@ -1,12 +1,23 @@
+import { EventEmitter } from "node_event";
+
+import { NOTIFICATION_MESSAGE_PUSH } from "./src/constants.ts";
+import { asyncPollingCallDenoNotification } from "./src/message_source.ts";
+import { messagePush } from "./src/message_push.ts";
 import "./bfsa-metadata.ts";
-import { NOTIFICATION_MESSAGE_QUEUE } from "./src/constants.ts";
-import { asyncCallDenoFunction } from "./src/message_source.ts";
-import { messageToQueue } from "./src/message_queue.ts";
 
-export async function messagePush() {
-  const messageInfo = await asyncCallDenoFunction(1000);
+// 通过EventEmitter实现消息推送
+export function start() {
+  const ee = new EventEmitter();
+  asyncPollingCallDenoNotification(1000, ee);
 
-  messageToQueue(messageInfo);
+  let locked = false;
+  ee.on(NOTIFICATION_MESSAGE_PUSH, async () => {
+    if (!locked) {
+      locked = true;
+      await messagePush();
+      locked = false;
+    }
+  });
 }
 
-messagePush();
+start();

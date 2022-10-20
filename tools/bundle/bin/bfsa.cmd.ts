@@ -3,9 +3,7 @@
 import * as process from "node_process";
 import { Command } from "commander";
 import { bundle } from "cmd_bundle";
-
-const npmConfig = (await import("../npm.json", { assert: { type: "json" } }))
-  .default;
+import npmConfig from "../npm.json" assert { type: "json" };
 
 const program = new Command();
 program

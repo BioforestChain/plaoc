@@ -1,7 +1,5 @@
 import { build, emptyDir, type BuildOptions } from "dnt";
-
-const npmConfig = (await import("./npm.json", { assert: { type: "json" } }))
-  .default;
+import npmConfig from "./npm.json" assert { type: "json" };
 
 export const buildOptions: BuildOptions = {
   importMap: npmConfig.importMap,

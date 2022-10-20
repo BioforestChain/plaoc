@@ -2,7 +2,7 @@ import * as fs from "node_fs";
 import * as process from "node_process";
 import { fileURLToPath, pathToFileURL, URL } from "node_url";
 import { Files, LinkMetadata, MetaData } from "@bfsx/metadata";
-import { path, slash } from "path";
+import { path, slash, appendForwardSlash } from "path";
 import { checksumFile } from "crypto";
 import { genBfsAppId, checkSign } from "check";
 import { compressToSuffixesBfsa } from "compress";
@@ -34,7 +34,12 @@ export async function bundle(options: {
     bfsAppId = await genBfsAppId();
   }
 
-  const { frontPath, backPath } = options;
+  // 目录以/结尾
+  // const { frontPath, backPath } = options;
+  const frontPath = options.frontPath
+    ? appendForwardSlash(options.frontPath)
+    : "";
+  const backPath = appendForwardSlash(options.backPath);
   const destPath = await createBfsaDir(bfsAppId);
 
   // 将前端项目移动到sys目录
@@ -142,9 +147,6 @@ async function writeServiceWorkder(destPath: string): Promise<boolean> {
     "utf-8"
   );
   content = content.replace(/export/g, "");
-  // const content =
-  //   'const t=self,n=[];t.addEventListener("install",(function(n){n.waitUntil(t.skipWaiting())})),t.addEventListener("activate",(function(n){n.waitUntil(t.clients.claim())})),t.addEventListener("fetch",(async function(t){const e=t.request;e.method.match(/POST/i)?function(t){t.respondWith(async function(){await async function(t,e){if(null===t.body)return;const a=await t.arrayBuffer(),s=function(t){let n=0,e=524288;const a=[];do{a.push(t.subarray(n,n+e)),n+=e}while(t.byteLength>n);return a}(new Uint8Array(a)),i=[];await Promise.all(s.map((async t=>{const n=await async function(t,n){const e=t.request;return await fetch(`${e.url}?upload=${n}`,{headers:e.headers,method:"GET",mode:"cors"})}(e,t);i.push(await n.text())}))),n.push(new Response(String(i)))}(t.request,t);const e={next:async()=>{const t=n.shift();return t?{value:t,done:!1}:{value:new Response,done:!0}}},{value:a,done:s}=await e.next();return a}())}(t):t.respondWith(async function(){return await fetch(e)}())})),self.export="";';
-
   await writeFile(file, content, "utf-8");
 
   return true;
@@ -300,27 +302,29 @@ async function genAppVersionJson(
   const fileStat = await stat(compressFile);
   const fileHash = await checksumFile(compressFile, "sha512", "hex");
 
-  const appVersionJson = `
-  {
-    "data": {
-        "version": "${manifest.version}",
-        "files": [{
-            "url": "https://shop.plaoc.com/${bfsAppId}/${bfsAppId}.bfsa",
-            "size": ${fileStat.size},
-            "sha512": "${fileHash}"
-        }],
-        "releaseNotes": "${manifest.releaseNotes || ""}",
-        "releaseName": "${manifest.releaseName || ""}",
-        "releaseDate": "${manifest.releaseDate || ""}"
-    },
-    "errorCode":0,
-    "errorMsg":"success"
-  }
-  `;
+  const appVersionJson = (
+    await import("../assets/appversion.json", { assert: { type: "json" } })
+  ).default;
+
+  appVersionJson.data = {
+    version: manifest.version,
+    name: manifest.name,
+    icon: manifest.icon,
+    files: [
+      {
+        url: `https://shop.plaoc.com/${bfsAppId}/${bfsAppId}.bfsa`,
+        size: fileStat.size,
+        sha512: fileHash,
+      },
+    ],
+    releaseNotes: manifest.releaseNotes || "",
+    releaseName: manifest.releaseName || "",
+    releaseDate: manifest.releaseDate || "",
+  };
 
   await writeFile(
     path.resolve(destPath, "../appversion.json"),
-    appVersionJson,
+    JSON.stringify(appVersionJson, null, 2),
     "utf-8"
   );
 

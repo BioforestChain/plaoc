@@ -1,10 +1,10 @@
-# bfs base runtime app for modern os
+# bfs 基础操作系统运行时
 
-## main purpose
+## 目标
 
-1. In order to solve the problem of insufficient performance of modern single page application (SPA).
-2. Provide developers with application development on android, ios and desktop.
-3. In order to prepare for role-oriented programming and development of BFS assets, and to build community infrastructure for blockchain development.
+1、为了解决现代单页应用（SPA）性能不足的问题。
+2、为开发者提供android、ios、桌面应用开发。
+3. 为BFS资产的面向角色的编程和开发做准备，为区块链开发搭建社区基础设施。
 
 ## 快速开始
 
@@ -123,12 +123,11 @@ cargo build --target=aarch64-linux-android --release
 
     [😃] 前端和后端使用二进制互传数据
     [😃] 修改 webComponent 的 javascriptinterface 注入的方式
-    [🥳] 更改webview为Chrome内核。
+    [😃] 封装.bfsa 文件，实现应用安装到设备。
     [🥳] 封装系统级服务，编写基础测试代码。
     [🥳] 封装文件系统，权限系统和网络系统
     [🥳] 规范多个 DwebView 之间数据互动的标准
     [🥳] 规范多个 后端服务（deno-js）的数据互动标准
     [❌] 迁移碳元域
-    [❌] 封装.bfsa 文件，实现应用安装到设备。
     [❌] 优化代码的封装，契合面向角色编程。
     [❌] 编写单元测试代码，覆盖率需要达到90%。

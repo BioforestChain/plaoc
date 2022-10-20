@@ -6,6 +6,13 @@ import type { IMessageInfoExtension } from "../typings/message.type.ts";
 
 // 通知消息队列
 export const NOTIFICATION_MESSAGE_QUEUE: IMessageInfoExtension[] = [];
+
+// 消息通知
+export const NOTIFICATION_MESSAGE_PUSH = "notification_message_push";
+
+// native
+export const CREATE_NOTIFICATION_MSG = "createNotificationMsg";
+
 // 用于生成workerId, dataCenterId
 export const CODE_MAP = new Map<string, string>([
   ["0", "0"],

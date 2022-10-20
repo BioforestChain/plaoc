@@ -1,14 +1,14 @@
 import { network } from "@bfsx/core"
-import { IsOption } from "./vfsType.ts";
+import { EFilterType, IsOption } from "./vfsType.ts";
 import { vfsHandle } from '../vfsHandle.ts';
 import { FileEntry } from './vfsType.ts';
-import { EFilterType } from './vfsType.ts';
+import { readBuff, read } from "./read.ts";
 
 /// const list: string[] = await fs.ls("./", { // list
-///   filter: [{ // 声明筛选方式
-///     type: "file",
-///     name: ["*.ts"]
-///   }],
+// /   filter: [{ // 声明筛选方式
+// /     type: "file",
+// /     name: ["*.ts"]
+// /   }],
 ///   recursive: true, // 是否要递归遍历目录，默认是 false
 /// });
 
@@ -50,9 +50,9 @@ export async function ls(path: string, option: IsOption) {
  */
 export async function* list(path: string): AsyncGenerator<FileEntry> {
   const fileList = await network.asyncCallDenoFunction(vfsHandle.FileSystemList, { path })
-  const list = transStringToArray(fileList);
-  for (const filePath of list) {
-    const files = createFileEntry(filePath, path)
+  const list = transStringToJson(fileList);
+  for (const fs of list) {
+    const files = createFileEntry(fs)
     yield files
   }
 }
@@ -65,24 +65,61 @@ export async function* list(path: string): AsyncGenerator<FileEntry> {
  * @param cwd 
  * @returns 
  */
-function createFileEntry(filePath: string, cwd: string) {
+function createFileEntry(file: FileEntry) {
+  console.log("createFileEntry:", file)
   // 去掉两边的"
-  filePath = filePath.replace(/^"/, "").replace(/"$/, "");
-  const file: FileEntry = {} as FileEntry
-  const isFile = /.+\..+/.test(filePath);
-
-  file.name = filePath.slice(filePath.lastIndexOf("/") + 1);
-  file.path = filePath;
-  file.cwd = cwd;
-  file.relativePath = filePath.slice(0, filePath.lastIndexOf("/") + 1);
-  file.type = isFile ? EFilterType.file : EFilterType.directroy;
+  const isFile = file.type === EFilterType.file ? true : false;
   file.basename = isFile
     ? file.name.slice(0, file.name.lastIndexOf(".") + 1)
     : file.name;
-  file.isLink = false;
-  file.extname = "";
-  if (isFile) {
-    file.extname = filePath.slice(filePath.lastIndexOf("."));
+  file.text = async function () {
+    const readText = await read(file.path)
+    return readText
+  }
+  file.stream = async function* () {
+    if (!isFile) {
+      yield new Error("不能读取目录")
+    }
+    const fileBuff = new Uint8Array(await readBuff(file.path))
+    let index = 0;
+    const oneM = 1024 * 512 * 1;
+    // 如果数据不是很大，直接返回
+    if (fileBuff.byteLength < oneM) {
+      yield fileBuff
+    } else {
+      // 迭代返回
+      do {
+        yield fileBuff.subarray(index, index + oneM)
+        index += oneM;
+      } while (fileBuff.byteLength > index);
+    }
+  }
+  file.binary = async function () {
+    if (!isFile) {
+      return new Error("不能读取目录")
+    }
+    const buff = await readBuff(file.path)
+    return buff
+  }
+  file.readAs = function () {
+    return Promise.resolve(file)
+  }
+  file.checkname = function () {
+    return Promise.resolve(true)
+  }
+  file.cd = async function (path: string) {
+    const fs = await list(path).next();
+    return await fs.value
+  }
+  file.open = function () {
+    return Promise.resolve(false)  // todo 
+  }
+  file.relativeTo = async function (path?: string) {
+    if (path) {
+      const fs = await list(path).next();
+      return fs.value.relativePath
+    }
+    return file.relativePath
   }
 
   return file
@@ -98,4 +135,14 @@ function transStringToArray(str: string) {
     str = str.replace(/^\[/i, "").replace(/\]$/i, "");
   }
   return str.split(",");
+}
+
+/**
+ * 字符串转换为json
+ * @param str 
+ * @returns 
+ */
+function transStringToJson(str: string): FileEntry[] {
+  const fs = JSON.parse(str)
+  return fs
 }

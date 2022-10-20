@@ -1,11 +1,11 @@
 /** 消息优先级 */
 export enum MessagePriority {
-  // 重要消息
-  IMPORTANT_MESSAGE = 1,
-  // 即时消息
-  INSTANCE_MESSAGE,
   // 延迟消息
   DELAY_MESSAGE,
+  // 即时消息
+  INSTANCE_MESSAGE,
+  // 重要消息
+  IMPORTANT_MESSAGE,
 }
 
 /** 消息来源 */
@@ -23,7 +23,7 @@ export interface IMessageInfo {
   // 应用id
   app_id: string;
   // 消息标题
-  title?: string;
+  title: string;
   // 消息详情
   msg_content: string;
   // 消息来源
@@ -60,4 +60,10 @@ export interface IMessageInfoExtension extends IMessageInfo {
   msg_status: MessageStatus;
   // 消息处理优先数值 0-100
   msg_priority: number;
+}
+
+/** 推送消息结构 */
+export interface IMessageInfoPush extends IMessageInfo {
+  // 消息id，类似：18100287420699802
+  msg_id: bigint;
 }

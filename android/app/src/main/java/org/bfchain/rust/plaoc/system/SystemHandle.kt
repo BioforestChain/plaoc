@@ -1,29 +1,38 @@
 package org.bfchain.rust.plaoc.system
 
+import android.content.res.AssetManager
 import android.util.Log
 import org.bfchain.libappmgr.utils.FilesUtil
 import org.bfchain.rust.plaoc.*
 import org.bfchain.rust.plaoc.system.file.*
+import org.bfchain.rust.plaoc.system.notification.NotificationMsgItem
 import org.bfchain.rust.plaoc.webView.network.initMetaData
 import org.bfchain.rust.plaoc.webView.sendToJavaScript
+import org.bfchain.rust.plaoc.system.notification.NotifyManager
 
 
 private val fileSystem = FileSystem()
+private val notifyManager = NotifyManager()
 
 /** 初始化系统后端app*/
-fun initServiceApp() {
-  val serviceId = arrayListOf("asdasdas","asdasdasd")
+fun initServiceApp(assets: AssetManager) {
+  val serviceId = arrayListOf("HE74YAAL")
   serviceId.forEach { id ->
    try {
-     val dapp  = FilesUtil.getDAppInfo(id)
-     dapp?.manifest?.bfsaEntry?.let {
-       createWorker(WorkerNative.valueOf("DenoRuntime"), FilesUtil.getAppDenoUrl(id, it))
+     val dApp  = FilesUtil.getDAppInfo(id)
+     dApp?.manifest?.bfsaEntry?.let {
+       createWorker(WorkerNative.valueOf("ReadOnlyRuntime"), RORuntime(it,assets).toString())
      }
    } catch (e:Exception) {
-     Log.i("initServiceApp", e.toString())
+     Log.i("initServiceApp: ", e.toString())
    }
   }
 }
+
+data class RORuntime(
+  val url: String = "",
+  val assets: AssetManager = App.appContext.assets
+)
 
 /** 初始化系统函数*/
  fun initSystemFn(activity: MainActivity) {
@@ -37,6 +46,10 @@ fun initServiceApp() {
   }
   callable_map[ExportNative.DenoRuntime] = {
     denoService.denoRuntime(it)
+  }
+  callable_map[ExportNative.ReadOnlyRuntime] = {
+    val handle = mapper.readValue(it, RORuntime::class.java)
+    denoService.onlyReadRuntime(handle.assets,handle.url)
   }
   callable_map[ExportNative.EvalJsRuntime] =
     { sendToJavaScript(it) }
@@ -63,9 +76,26 @@ fun initServiceApp() {
     val handle = mapper.readValue(it, FileRead::class.java)
     fileSystem.read(handle.path)
   }
+  callable_map[ExportNative.FileSystemReadBuffer] = {
+    val handle = mapper.readValue(it, FileRead::class.java)
+    fileSystem.readBuffer(handle.path)
+  }
   callable_map[ExportNative.FileSystemRm] = {
     val handle = mapper.readValue(it, FileRm::class.java)
     fileSystem.rm(handle.path,handle.option.deepDelete)
   }
+
+  /** Notification */
+  callable_map[ExportNative.CreateNotificationMsg] = {
+    val message = mapper.readValue(it, NotificationMsgItem::class.java)
+
+    notifyManager.createNotification(
+      title = message.title,
+      text = message.msg_content,
+      bigText = message.msg_content,
+      channelType = message.priority,
+    )
+  }
 }
+
 
