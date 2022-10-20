@@ -77,21 +77,21 @@ function createFileEntry(file: FileEntry) {
     return readText
   }
   file.stream = async function* () {
-    if (!isFile) {
-      yield new Error("不能读取目录")
-    }
-    const fileBuff = new Uint8Array(await readBuff(file.path))
-    let index = 0;
-    const oneM = 1024 * 512 * 1;
-    // 如果数据不是很大，直接返回
-    if (fileBuff.byteLength < oneM) {
-      yield fileBuff
-    } else {
-      // 迭代返回
-      do {
-        yield fileBuff.subarray(index, index + oneM)
-        index += oneM;
-      } while (fileBuff.byteLength > index);
+    // 如果是文件再读取内容
+    if (isFile) {
+      const fileBuff = new Uint8Array(await readBuff(file.path))
+      let index = 0;
+      const oneM = 1024 * 512 * 1;
+      // 如果数据不是很大，直接返回
+      if (fileBuff.byteLength < oneM) {
+        yield fileBuff
+      } else {
+        // 迭代返回
+        do {
+          yield fileBuff.subarray(index, index + oneM)
+          index += oneM;
+        } while (fileBuff.byteLength > index);
+      }
     }
   }
   file.binary = async function () {

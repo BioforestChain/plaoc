@@ -4,7 +4,7 @@
 /////////////////////////////
 
 import { callDeno, callDVebView } from "./android.fn.ts";
-import { Deno } from "./index.ts"
+import { Deno } from "./Deno.ts"
 import { loopRustBuffer } from "./rust.op.ts";
 
 const deno = new Deno();
@@ -27,7 +27,11 @@ class Network {
       if (data instanceof Object) {
         data = JSON.stringify(data); // stringify 两次转义一下双引号
       }
-      const { headView } = deno.callFunction(handleFn, JSON.stringify(data)) // 发送请求
+      const { headView, msg } = await deno.callFunction(handleFn, JSON.stringify(data)) // 发送请求
+      // 如果直接有msg返回，那么就代表非denoRuntime环境
+      if (msg) {
+        return resolve(msg);
+      }
       do {
         const data = await loopRustBuffer("op_rust_to_js_system_buffer").next();
         if (data.done) {

@@ -2,12 +2,16 @@
 /// 这里封装调用deno的方法，然后暴露出去
 /////////////////////////////
 
-import { eval_js, js_to_rust_buffer, setNotification } from "./rust.op.ts";
+import { eval_js, js_to_rust_buffer } from "./rust.op.ts";
+import { netCallNativeService } from './net.op.ts';
+import { isDenoRuntime } from "../runtime/device.ts";
+
+export const isDeno = await isDenoRuntime()
 
 const versionView = new Uint8Array(new ArrayBuffer(1));
 const headView = new Uint8Array(new ArrayBuffer(2)); // 初始化头部标记
 versionView[0] = 0x01; // 版本号都是1，表示消息
-class Deno {
+export class Deno {
 
   constructor() {
     // 创建头部消息
@@ -36,10 +40,16 @@ class Deno {
    * @param handleFn
    * @param data
    */
-  callFunction(handleFn: string, data = "''") {
+  async callFunction(handleFn: string, data = "''") {
     const uint8Array = this.structureBinary(handleFn, data);
-    js_to_rust_buffer(uint8Array);
-    return { versionView, headView }
+    if (isDeno) {
+      // android - denoOp
+      js_to_rust_buffer(uint8Array)
+      return { versionView, headView }
+    }
+    //  ios - javascriptCore
+    const msg = await netCallNativeService(handleFn, data);
+    return { versionView, headView, msg }
   }
   /**
    * 调用evaljs 执行js
@@ -48,19 +58,8 @@ class Deno {
    */
   callEvalJsStringFunction(handleFn: string, data = "''") {
     const uint8Array = this.structureBinary(handleFn, data);
-    eval_js(uint8Array);
-  }
-
-  // TODO ...
-  /**
-   * 调用evaljs 执行js
-   * @param handleFn
-   * @param data
-   */
-  callEvalJsByteFunction(handleFn: string, data = "''") {
-    const buffer = new TextEncoder().encode(data);
-    const uint8Array = this.structureBinary(handleFn, buffer);
-    eval_js(uint8Array);
+    // android - denoOp   /  ios - javascriptCore
+    isDeno ? eval_js(uint8Array) : netCallNativeService(handleFn, data);
   }
 
   /** 针对64位
@@ -109,7 +108,5 @@ class Deno {
   }
 }
 
-export {
-  Deno,
-  setNotification
-}
+
+

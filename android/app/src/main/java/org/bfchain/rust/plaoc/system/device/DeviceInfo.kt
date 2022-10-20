@@ -21,6 +21,8 @@ data class DeviceData(
   var storage: StorageSize? = null, // 存储
   var screen: String = "", // 屏幕
   var phone: String = "", // 手机号码
+  var module: String = "default", // 手机模式(silentMode,doNotDisturb,default)
+  var isDeno: Boolean = true
 )
 
 class DeviceInfo {
