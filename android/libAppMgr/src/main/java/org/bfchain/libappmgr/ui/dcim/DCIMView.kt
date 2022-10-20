@@ -118,7 +118,6 @@ fun DCIMInfoViewer(
   onClick: () -> Unit
 ) {
   if (show.value) {
-    Log.d("lin.huang", "DCIMView showViewer ${dcimInfo.value.path}")
     Box(
       modifier = Modifier
         .fillMaxSize()
@@ -129,7 +128,6 @@ fun DCIMInfoViewer(
         },
       contentAlignment = Alignment.Center
     ) {
-      Log.d("lin.huang", "${dcimInfo.value.type}")
       Image(
         painter = rememberAsyncImagePainter(model = dcimInfo.value.path),
         contentScale = ContentScale.FillWidth,
@@ -169,7 +167,6 @@ fun DCIMInfoViewer(
 @SuppressLint("RememberReturnType")
 @Composable
 fun DCIMView(dcimInfoList: List<DCIMInfo>, onGridClick: () -> Unit, onViewerClick: () -> Unit) {
-  Log.d("lin.huang", "DCIMView enter")
   var showViewer = remember { mutableStateOf(false) }
   var curDCIMInfo = remember { mutableStateOf(DCIMInfo("")) }
   Column(modifier = Modifier.fillMaxSize()) {
@@ -178,7 +175,6 @@ fun DCIMView(dcimInfoList: List<DCIMInfo>, onGridClick: () -> Unit, onViewerClic
     }*/
     Box(modifier = Modifier.fillMaxSize()) {
       DCIMGridView(dcimInfoList = dcimInfoList) {
-        Log.d("lin.huang", "DCIMView callback ${it.path}")
         curDCIMInfo.value = it
         showViewer.value = true
         onGridClick()

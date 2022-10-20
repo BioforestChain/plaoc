@@ -2,6 +2,7 @@ package org.bfchain.libappmgr.ui.view
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -9,6 +10,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -96,6 +98,11 @@ fun BoxScope.AppIcon(appInfoMode: AppInfoMode) {
     modifier = Modifier
       .padding(3.dp)
       .clip(RoundedCornerShape(12.dp))
+      /*.border( //描边功能
+        width = 0.5.dp,
+        color = MaterialTheme.colors.onBackground.copy(0.1f),
+        shape = RoundedCornerShape(12.dp)
+      )*/
       .align(Alignment.Center)
   )
 
@@ -142,7 +149,7 @@ fun BoxScope.AppName(appInfoMode: AppInfoMode) {
   Text(
     text = appInfoMode.appName.value,
     maxLines = 2,
-    color = Color.White,
+    color = MaterialTheme.colors.onSurface,
     fontSize = 12.sp,
     textAlign = TextAlign.Center,
     modifier = Modifier.fillMaxWidth()

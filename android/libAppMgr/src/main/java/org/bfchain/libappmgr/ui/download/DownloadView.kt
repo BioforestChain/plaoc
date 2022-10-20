@@ -66,7 +66,6 @@ fun DownloadAppInfoView(
           }
           if (!requestFinish) {
             appVersion = version
-            Log.d("lin.huang", "version=$version")
             customDialogData.updateNewVersion(appVersion = appVersion)
           }
         }
