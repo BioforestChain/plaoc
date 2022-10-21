@@ -21,11 +21,11 @@ object KtorManager {
     install(ContentNegotiation) { // 引入数据转换插件
       gson()
     }
-    install(Logging)
+   /* install(Logging)
     {
-      //logger = Logger.SIMPLE // 用于显示本机请求信息
-      level = LogLevel.ALL
-    }
+      logger = Logger.EMPTY // 用于显示本机请求信息
+      level = LogLevel.BODY
+    }*/
     install(HttpTimeout) {
       connectTimeoutMillis = 5000
       requestTimeoutMillis = 100000

@@ -11,11 +11,14 @@ import io.ktor.utils.io.core.*
 import org.bfchain.libappmgr.entity.AppVersion
 import org.bfchain.libappmgr.network.base.ApiResultData
 import org.bfchain.libappmgr.network.base.BaseData
+import org.bfchain.libappmgr.network.base.checkAndBody
 import java.io.File
 
 class ApiServiceImpl(private val client: HttpClient) : ApiService {
   override suspend fun getAppVersion(path: String): ApiResultData<BaseData<AppVersion>> =
-    org.bfchain.libappmgr.network.base.runCatching { client.get(path).body() }
+    org.bfchain.libappmgr.network.base.runCatching {
+      client.get(path).checkAndBody()
+    }
 
   override suspend fun download(path: String, DLProgress: (Long, Long) -> Unit): HttpResponse =
     client.get(path) {

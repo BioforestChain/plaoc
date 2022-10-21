@@ -4,6 +4,8 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
+import org.bfchain.libappmgr.utils.APP_DIR_TYPE
+import org.bfchain.libappmgr.utils.FilesUtil
 import org.bfchain.rust.plaoc.App
 import org.bfchain.rust.plaoc.MainActivity
 import org.bfchain.rust.plaoc.WorkerNative
@@ -20,7 +22,8 @@ class DWebReceiver : BroadcastReceiver() {
       if (ACTION_OPEN_DWEB == it.action) {
         val appName = it.getStringExtra("AppName")
         val url = it.getStringExtra("URL")
-        val callUrl = "${App.appContext.dataDir.absolutePath}/system-app/$appName/boot/$url"
+        val callUrl =
+          "${App.appContext.dataDir.absolutePath}/${APP_DIR_TYPE.SystemApp}/$appName/${FilesUtil.DIR_HOME}/$url"
         if (File(callUrl).exists()) {
           createWorker(WorkerNative.valueOf("DenoRuntime"), callUrl)
         } else {

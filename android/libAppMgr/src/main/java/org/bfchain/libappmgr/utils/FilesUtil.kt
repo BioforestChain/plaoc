@@ -8,6 +8,17 @@ import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
 
+enum class APP_DIR_TYPE(val rootName: String) {
+  // 内置应用
+  RecommendApp(rootName = "recommend-app"),
+
+  // 下载应用
+  SystemApp(rootName = "system-app"),
+
+  // 客户应用
+  UserApp(rootName = "user-app"),
+}
+
 /**
  * 主要用于文件的存储和读取操作，包括文件的解压操作
  */
@@ -15,22 +26,12 @@ object FilesUtil {
   const val TAG: String = "FilesUtil"
   val simpleDateFormat = SimpleDateFormat("yyyyMMddhhmmss")
 
-  private val DIR_BOOT: String = "boot" // 存放 link.json 数据
-  private val DIR_SYS: String = "sys" // system-app/bfs-id-xxx/sys 是运行程序路径
+  const val DIR_BOOT: String = "boot" // 存放 link.json 数据
+  const val DIR_SYS: String = "sys" // system-app/bfs-id-xxx/sys 是运行程序路径
+  const val DIR_HOME: String = "home" // system-app/bfs-id-xxx/sys 是运行程序路径
   private val DIR_AUTO_UPDATE: String = "tmp" + File.separator + "autoUpdate" // 存放最新版本的路径
   private val FILE_LINK_JSON: String = "link.json"
   private val FILE_BFSA_META_JSON: String = "bfsa-metadata.json"
-
-  enum class APP_DIR_TYPE(val rootName: String) {
-    // 内置应用
-    RecommendApp(rootName = "recommend-app"),
-
-    // 下载应用
-    SystemApp(rootName = "system-app"),
-
-    // 客户应用
-    UserApp(rootName = "user-app"),
-  }
 
   /**
    * 获取app的根目录
