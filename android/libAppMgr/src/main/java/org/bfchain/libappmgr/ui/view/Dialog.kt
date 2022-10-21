@@ -3,10 +3,7 @@ package org.bfchain.libappmgr.ui.view
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,7 +34,7 @@ fun CustomAlertDialog(
       confirmButton = {
         TextButton(onClick = {
           onConfirm?.let { onConfirm() } // 回调通知点击了确认按钮
-        }) {
+        }, colors = ButtonDefaults.textButtonColors(contentColor = Color.Black)) {
           Text(text = state.customDialog.confirmText.value)
         }
       },
@@ -45,7 +42,7 @@ fun CustomAlertDialog(
         TextButton(onClick = {
           state.customShow.value = false
           onCancel?.let { onCancel() }
-        }) {
+        }, colors = ButtonDefaults.textButtonColors(contentColor = Color.Black)) {
           Text(text = state.customDialog.dismissText.value)
         }
       })
