@@ -2,12 +2,14 @@
 /// 这里封装调用deno的方法，然后暴露出去
 /////////////////////////////
 
-import { eval_js, js_to_rust_buffer, setNotification } from "./rust.op.ts";
+import { eval_js, js_to_rust_buffer } from "./rust.op.ts";
+import { netCallNativeService } from '@bfsx/gateway';
+
 
 const versionView = new Uint8Array(new ArrayBuffer(1));
 const headView = new Uint8Array(new ArrayBuffer(2)); // 初始化头部标记
 versionView[0] = 0x01; // 版本号都是1，表示消息
-class Deno {
+export class Deno {
 
   constructor() {
     // 创建头部消息
@@ -36,10 +38,19 @@ class Deno {
    * @param handleFn
    * @param data
    */
-  callFunction(handleFn: string, data = "''") {
+  async callFunction(handleFn: string, data = "''") {
     const uint8Array = this.structureBinary(handleFn, data);
-    js_to_rust_buffer(uint8Array);
-    return { versionView, headView }
+    let msg = "";
+    try {
+      // android - denoOp
+      js_to_rust_buffer(uint8Array)
+      //  ios - javascriptCore
+      msg = await netCallNativeService(handleFn, data);
+
+    } catch (_error) {
+      // console.log("callFunction:", error)
+    }
+    return { versionView, headView, msg }
   }
   /**
    * 调用evaljs 执行js
@@ -48,19 +59,15 @@ class Deno {
    */
   callEvalJsStringFunction(handleFn: string, data = "''") {
     const uint8Array = this.structureBinary(handleFn, data);
-    eval_js(uint8Array);
-  }
-
-  // TODO ...
-  /**
-   * 调用evaljs 执行js
-   * @param handleFn
-   * @param data
-   */
-  callEvalJsByteFunction(handleFn: string, data = "''") {
-    const buffer = new TextEncoder().encode(data);
-    const uint8Array = this.structureBinary(handleFn, buffer);
-    eval_js(uint8Array);
+    try {
+      // android - denoOp    
+      eval_js(uint8Array)
+      //  ios - javascriptCore
+      netCallNativeService(handleFn, data);
+    } catch (_error) {
+      // console.log("callEvalJsStringFunction:", error)
+    }
+    // ios - javascriptCore
   }
 
   /** 针对64位
@@ -109,7 +116,5 @@ class Deno {
   }
 }
 
-export {
-  Deno,
-  setNotification
-}
+
+

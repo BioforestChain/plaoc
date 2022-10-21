@@ -23,7 +23,7 @@ export function loopRustBuffer(opFunction: string) {
     async next() {
       let buffer: number[] = [];
       let versionView: number[] = [];
-      let headView:number[] = [];
+      let headView: number[] = [];
       try {
         buffer = await Deno.core.opAsync(opFunction);
         console.log("rust发送消息给deno_js:", buffer);

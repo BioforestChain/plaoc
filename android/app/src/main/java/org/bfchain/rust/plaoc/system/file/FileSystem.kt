@@ -171,6 +171,7 @@ class FileSystem {
       e.printStackTrace()
       createBytesFactory(ExportNative.FileSystemReadBuffer, e.message.toString())
     }
+    LogUtils.d("read buffer.toString -> ${buffer.toString()}")
     createBytesFactory(ExportNative.FileSystemRead, buffer.toString())
   }
 

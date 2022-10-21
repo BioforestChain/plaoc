@@ -4,6 +4,7 @@ import android.content.res.AssetManager
 import android.util.Log
 import org.bfchain.libappmgr.utils.FilesUtil
 import org.bfchain.rust.plaoc.*
+import org.bfchain.rust.plaoc.system.device.DeviceInfo
 import org.bfchain.rust.plaoc.system.file.*
 import org.bfchain.rust.plaoc.system.notification.NotificationMsgItem
 import org.bfchain.rust.plaoc.webView.network.initMetaData
@@ -83,6 +84,10 @@ data class RORuntime(
   callable_map[ExportNative.FileSystemRm] = {
     val handle = mapper.readValue(it, FileRm::class.java)
     fileSystem.rm(handle.path,handle.option.deepDelete)
+  }
+   /**deviceInfo */
+  callable_map[ExportNative.GetDeviceInfo] = {
+    DeviceInfo().getDeviceInfo()
   }
 
   /** Notification */

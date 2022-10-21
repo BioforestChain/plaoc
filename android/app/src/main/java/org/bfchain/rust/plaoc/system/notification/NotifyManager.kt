@@ -100,7 +100,7 @@ class NotifyManager() {
       // channel.setBypassDnd(true) // 是否绕过勿打扰模式
       // channel.enableLights(true) // 是否允许呼吸灯闪烁
       // channel.lightColor = Color.RED // 闪关灯的灯光颜色
-      // channel.canShowBadge() // 桌面launcher的消息角标
+//      channel.canShowBadge() // 桌面launcher的消息角标
       // channel.enableVibration(true) // 是否允许震动
       // channel.vibrationPattern = LongArray(3) { 1000L; 500L; 2000L } // //先震动1秒，然后停止0.5秒，再震动2秒则可设置数组为：new long[]{1000, 500, 2000}
 
