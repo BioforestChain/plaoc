@@ -8,7 +8,6 @@ import { Deno } from "./Deno.ts"
 import { loopRustBuffer } from "./rust.op.ts";
 
 const deno = new Deno();
-
 class Network {
   private isWaitingData = 0;
   private pool: string[] = [];

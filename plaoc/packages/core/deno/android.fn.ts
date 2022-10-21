@@ -7,7 +7,7 @@ export enum callDeno {
   denoRuntime = "DenoRuntime", // 初始化运行时
   evalJsRuntime = "EvalJsRuntime", // 传递给前端消息
   getDeviceInfo = "GetDeviceInfo", // 获取设备信息 
-  createNotificationMsg = "CreateNotificationMsg", // 创建消息通知
+  sendNotification = "SendNotification", // 创建消息通知
 }
 
 // 回调到对应的组件

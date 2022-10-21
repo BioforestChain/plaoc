@@ -1,7 +1,7 @@
 import { callDeno } from "../deno/android.fn.ts";
-import { isDeno } from "../deno/Deno.ts";
-import { netCallNativeService } from "../deno/net.op.ts";
+import { netCallNativeService } from '@bfsx/gateway';
 import { setNotification } from "../deno/rust.op.ts"
+import { isAndroid } from "./device.ts";
 
 
 /**
@@ -10,7 +10,7 @@ import { setNotification } from "../deno/rust.op.ts"
  * @returns 
  */
 export function sendNotification(data: Uint8Array) {
-  if (isDeno) {
+  if (isAndroid) {
     return setNotification(data)
   }
   return sendNetNotification(data)
@@ -23,6 +23,6 @@ export function sendNotification(data: Uint8Array) {
  * @returns 
  */
 export async function sendNetNotification(data: Uint8Array) {
-  const info = await netCallNativeService(callDeno.createNotificationMsg, data);
+  const info = await netCallNativeService(callDeno.sendNotification, data);
   return info
 }

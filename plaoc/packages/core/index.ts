@@ -7,8 +7,7 @@ export {
   openQrScanner,
   DWebView,
   sendNotification,
-  isDenoRuntime,
+  isAndroid,
   getDeviceInfo
 } from "./runtime/index.ts";
 export { network } from "./deno/network.ts"
-

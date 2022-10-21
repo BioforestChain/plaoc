@@ -28,6 +28,8 @@ import org.bfchain.rust.plaoc.system.barcode.BarcodeScanningActivity
 import org.bfchain.rust.plaoc.system.barcode.QRCodeScanningActivity
 import org.bfchain.rust.plaoc.system.initServiceApp
 import org.bfchain.rust.plaoc.system.initSystemFn
+import org.bfchain.rust.plaoc.system.permission.PermissionManager
+import org.bfchain.rust.plaoc.system.permission.PermissionUtil
 import org.bfchain.rust.plaoc.ui.theme.RustApplicationTheme
 import org.bfchain.rust.plaoc.webView.network.dWebView_host
 import org.bfchain.rust.plaoc.webView.network.shakeUrl

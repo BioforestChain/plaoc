@@ -1,11 +1,12 @@
 import { callDeno } from "../deno/android.fn.ts";
+import { netCallNativeService } from '@bfsx/gateway';
 import { network } from '../deno/network.ts';
-import { netCallNativeService } from '../deno/net.op.ts';
 
+export const isAndroid = await isDenoRuntime()
 
 /**获取设备信息 */
 export async function getDeviceInfo(): Promise<IDeviceInfo> {
-  let info: IDeviceInfo
+  let info: IDeviceInfo = {} as IDeviceInfo
   try {
     info = await network.asyncCallDenoFunction(callDeno.getDeviceInfo);
   } catch (e) {

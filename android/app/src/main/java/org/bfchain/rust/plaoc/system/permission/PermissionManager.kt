@@ -44,7 +44,6 @@ class PermissionManager {
   constructor(activity: Activity) {
     this.activity = activity
   }
-
   fun requestPermissions(
     permissions: ArrayList<String>,
     permissionCallback: PermissionCallback = DefaultPermissionCallback,

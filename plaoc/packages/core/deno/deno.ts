@@ -3,10 +3,8 @@
 /////////////////////////////
 
 import { eval_js, js_to_rust_buffer } from "./rust.op.ts";
-import { netCallNativeService } from './net.op.ts';
-import { isDenoRuntime } from "../runtime/device.ts";
+import { netCallNativeService } from '@bfsx/gateway';
 
-export const isDeno = await isDenoRuntime()
 
 const versionView = new Uint8Array(new ArrayBuffer(1));
 const headView = new Uint8Array(new ArrayBuffer(2)); // 初始化头部标记
@@ -42,13 +40,16 @@ export class Deno {
    */
   async callFunction(handleFn: string, data = "''") {
     const uint8Array = this.structureBinary(handleFn, data);
-    if (isDeno) {
+    let msg = "";
+    try {
       // android - denoOp
       js_to_rust_buffer(uint8Array)
-      return { versionView, headView }
+      //  ios - javascriptCore
+      msg = await netCallNativeService(handleFn, data);
+
+    } catch (_error) {
+      // console.log("callFunction:", error)
     }
-    //  ios - javascriptCore
-    const msg = await netCallNativeService(handleFn, data);
     return { versionView, headView, msg }
   }
   /**
@@ -58,8 +59,15 @@ export class Deno {
    */
   callEvalJsStringFunction(handleFn: string, data = "''") {
     const uint8Array = this.structureBinary(handleFn, data);
-    // android - denoOp   /  ios - javascriptCore
-    isDeno ? eval_js(uint8Array) : netCallNativeService(handleFn, data);
+    try {
+      // android - denoOp    
+      eval_js(uint8Array)
+      //  ios - javascriptCore
+      netCallNativeService(handleFn, data);
+    } catch (_error) {
+      // console.log("callEvalJsStringFunction:", error)
+    }
+    // ios - javascriptCore
   }
 
   /** 针对64位
