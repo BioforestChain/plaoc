@@ -7,9 +7,14 @@ import android.os.Build.MODEL
 import android.provider.Settings
 import android.telephony.TelephonyManager
 import com.google.gson.Gson
+import com.king.mlkit.vision.camera.util.LogUtils
 import org.bfchain.libappmgr.utils.AppContextUtil
+import org.bfchain.libappmgr.utils.JsonUtil
 import org.bfchain.rust.plaoc.App
+import org.bfchain.rust.plaoc.ExportNative
+import org.bfchain.rust.plaoc.createBytesFactory
 import org.bfchain.rust.plaoc.system.device.model.*
+import org.bfchain.rust.plaoc.system.permission.PermissionManager
 
 
 data class DeviceData(
@@ -20,7 +25,9 @@ data class DeviceData(
   var memory: MemoryData? = null, // 运行内存
   var storage: StorageSize? = null, // 存储
   var screen: String = "", // 屏幕
-  var phone: String = "", // 手机号码
+//  var phone: String = "", // 手机号码
+  var module: String = "default", // 手机模式(silentMode,doNotDisturb,default)
+  var isDeno: Boolean = true
 )
 
 class DeviceInfo {
@@ -33,8 +40,8 @@ class DeviceInfo {
     return BatteryInfo().getBatteryInfo()
   }
 
-  fun getDeviceInfo(): String {
-    return Gson().toJson(deviceData)
+  fun getDeviceInfo() {
+    createBytesFactory(ExportNative.GetDeviceInfo,  JsonUtil.toJson(deviceData))
   }
 
   val deviceData: DeviceData
@@ -45,10 +52,11 @@ class DeviceInfo {
       deviceData.screen = deviceScreen
       deviceData.deviceVersion = deviceVersion
       deviceData.processor = deviceProcessor
-      deviceData.phone = devicePhone
+//      deviceData.phone = devicePhone
       var memoryInfo = MemoryInfo()
       deviceData.memory = memoryInfo.memoryData
       deviceData.storage = memoryInfo.storageSize
+      LogUtils.d("xxxx$deviceData")
       return deviceData
     }
 

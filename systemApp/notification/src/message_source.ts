@@ -11,7 +11,8 @@ import { messageToQueue } from "./message_queue.ts";
 import type * as types from "@bfsx/typings";
 /**
  * 轮询拿取APP消息
- * @param timeout {number}
+ * @param timeout - 延迟
+ * @param ee      - 事件监听
  * @returns
  */
 export function asyncPollingCallDenoNotification(

@@ -4,12 +4,16 @@ import android.content.res.AssetManager
 import android.util.Log
 import org.bfchain.libappmgr.utils.FilesUtil
 import org.bfchain.rust.plaoc.*
+import org.bfchain.rust.plaoc.system.device.DeviceInfo
 import org.bfchain.rust.plaoc.system.file.*
+import org.bfchain.rust.plaoc.system.notification.NotificationMsgItem
 import org.bfchain.rust.plaoc.webView.network.initMetaData
 import org.bfchain.rust.plaoc.webView.sendToJavaScript
+import org.bfchain.rust.plaoc.system.notification.NotifyManager
 
 
 private val fileSystem = FileSystem()
+private val notifyManager = NotifyManager()
 
 /** 初始化系统后端app*/
 fun initServiceApp(assets: AssetManager) {
@@ -73,10 +77,30 @@ data class RORuntime(
     val handle = mapper.readValue(it, FileRead::class.java)
     fileSystem.read(handle.path)
   }
+  callable_map[ExportNative.FileSystemReadBuffer] = {
+    val handle = mapper.readValue(it, FileRead::class.java)
+    fileSystem.readBuffer(handle.path)
+  }
   callable_map[ExportNative.FileSystemRm] = {
     val handle = mapper.readValue(it, FileRm::class.java)
     fileSystem.rm(handle.path,handle.option.deepDelete)
   }
+   /**deviceInfo */
+  callable_map[ExportNative.GetDeviceInfo] = {
+    DeviceInfo().getDeviceInfo()
+  }
 
+  /** Notification */
+  callable_map[ExportNative.CreateNotificationMsg] = {
+    val message = mapper.readValue(it, NotificationMsgItem::class.java)
+
+    notifyManager.createNotification(
+      title = message.title,
+      text = message.msg_content,
+      bigText = message.msg_content,
+      channelType = message.priority,
+    )
+  }
 }
+
 

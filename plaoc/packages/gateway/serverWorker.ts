@@ -33,7 +33,7 @@ function handleRequest(event: FetchEvent) {
     async function () {
       await postFactory(event.request, event); // 发送请求
       const reader = iterResponse();
-      const { value, done } = await reader.next();
+      const { value } = await reader.next();
       return value;
     }(),
   );

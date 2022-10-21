@@ -100,7 +100,7 @@ class NotifyManager() {
       // channel.setBypassDnd(true) // 是否绕过勿打扰模式
       // channel.enableLights(true) // 是否允许呼吸灯闪烁
       // channel.lightColor = Color.RED // 闪关灯的灯光颜色
-      // channel.canShowBadge() // 桌面launcher的消息角标
+//      channel.canShowBadge() // 桌面launcher的消息角标
       // channel.enableVibration(true) // 是否允许震动
       // channel.vibrationPattern = LongArray(3) { 1000L; 500L; 2000L } // //先震动1秒，然后停止0.5秒，再震动2秒则可设置数组为：new long[]{1000, 500, 2000}
 
@@ -114,3 +114,19 @@ class NotifyManager() {
     }
   }
 }
+
+/** 消息来源 */
+enum class MessageSource(value: String) {
+  APP("app_message"), PUSH("push_message")
+}
+
+/** 消息中心返回数据结构 */
+data class NotificationMsgItem (
+  val app_id: String,
+  val title: String,
+  val msg_content: String,
+  val msg_src: MessageSource,
+  val priority: NotifyManager.ChannelType,
+  val time: String,
+  val msg_id: Long,
+)

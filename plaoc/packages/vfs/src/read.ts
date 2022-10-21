@@ -12,3 +12,13 @@ export async function read(path: string) {
   const fs = await network.asyncCallDenoFunction(vfsHandle.FileSystemRead, { path })
   return fs
 }
+
+/**
+ * 读取文件buffer
+ * @param path 
+ * @returns 
+ */
+export async function readBuff(path: string): Promise<ArrayBuffer> {
+  const fs = await network.asyncCallDenoFunction(vfsHandle.FileSystemReadBuffer, { path })
+  return fs
+}

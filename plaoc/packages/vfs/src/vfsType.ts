@@ -11,7 +11,7 @@ export interface IsFilter {
 
 export enum EFilterType {
   file = "file",
-  directroy = "directroy",
+  directory = "directory",
 }
 
 
@@ -50,12 +50,12 @@ export interface FileEntry {
 }
 
 type textFn = () => Promise<string>;
-type binaryFn = () => Promise<ArrayBuffer>;
-type readAsFn = () => Promise<string>;
-type streamFn = () => AsyncGenerator<ArrayBuffer>;
+type binaryFn = () => Promise<ArrayBuffer | Error>;
+type readAsFn = () => Promise<FileEntry>;
+type streamFn = () => AsyncGenerator<ArrayBuffer | Error>;
 type checknameFn = () => Promise<boolean>;
 type renameFn = () => Promise<boolean>;
-type cdFn = () => Promise<boolean>;
+type cdFn = (path: string) => Promise<boolean>;
 type openFn = () => Promise<boolean>;
-type relativeToFn = () => Promise<string>;
+type relativeToFn = (path?: string) => Promise<string>;
 

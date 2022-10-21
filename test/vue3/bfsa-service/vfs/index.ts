@@ -7,7 +7,7 @@ const lsFileList = await ls("/", {
       name: ["*.ts", "index"]
     },
     {
-      type: EFilterType.directroy,
+      type: EFilterType.directory,
       name: ["core"]
     }],
   recursive: true
@@ -18,6 +18,10 @@ try {
   for await (const entry of fs.list("./")) { // 也可以用异步迭代器来访问，避免列表过大
     console.log(`vfs测试：获取${entry.type}的各项信息: `, entry.name, entry.extname, entry.basename,
       entry.path, entry.relativePath)
+    for await (const buff of entry.stream()) {
+      console.log("vfs测试：entry.stream():", buff)
+    }
+    console.log("vfs测试：entry.binary():", await entry.binary())
   }
 } catch (e) {
   console.log(e)

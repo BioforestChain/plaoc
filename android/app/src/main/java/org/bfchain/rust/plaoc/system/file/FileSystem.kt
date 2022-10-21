@@ -2,15 +2,15 @@ package org.bfchain.rust.plaoc.system.file
 
 import android.util.Log
 import com.king.mlkit.vision.camera.util.LogUtils
-import org.bfchain.rust.plaoc.App
 import org.bfchain.libappmgr.utils.JsonUtil
+import org.bfchain.rust.plaoc.App
 import org.bfchain.rust.plaoc.ExportNative
 import org.bfchain.rust.plaoc.createBytesFactory
 import org.bfchain.rust.plaoc.webView.network.dWebView_host
-import java.io.BufferedWriter
-import java.io.File
-import java.io.FileWriter
+import java.io.*
 import java.util.regex.PatternSyntaxException
+import kotlin.io.path.Path
+import kotlin.io.path.isSymbolicLink
 
 
 class FileSystem {
@@ -37,12 +37,12 @@ class FileSystem {
       filer.name.forEach { regex ->
         if (regex.toRegex().containsMatchIn(file.name)) {
           rName = true
-          return rType // 找到匹配的正则返回true
         }
       }
+//      Log.i("checkFilter ${file.name}: ", "文件类型=$rType，匹配规则=$rName")
+      if (rType && rName) return true
     }
-//    Log.i("checkFilter: ", "文件类型=$rType，匹配规则=$rName")
-    return rType && rName
+    return false
   }
 
   /**检查正则表达式*/
@@ -104,10 +104,19 @@ class FileSystem {
   fun list(path: String) {
     val rootPath = getRootPath()
     val file = File(rootPath + File.separator + path)
-    val fileList = arrayListOf<String>()
+    val fileList = arrayListOf<Fs>()
     file.listFiles()?.forEach {
-//      Log.i("FileSystemList, ${rootPath.toString()}:", it.absolutePath.toString())
-      fileList.add(it.absolutePath.replace(rootPath, ""))
+//    Log.i("FileSystemList, $rootPath", it.absolutePath)
+      val fs = Fs(
+        it.name,
+        it.extension,
+        it.absolutePath.replace(rootPath, ""), // path
+        it.path.replace(rootPath, ""), // cwd
+        if (it.isFile) "file" else "directory",
+        Path(it.absolutePath).isSymbolicLink(), // 是否是超链接文件
+        it.absolutePath.replace(rootPath, ""), // 相对地址
+      )
+      fileList.add(fs)
     }
     createBytesFactory(ExportNative.FileSystemList, JsonUtil.toJson(fileList))
   }
@@ -135,7 +144,7 @@ class FileSystem {
     if (!file.exists() && autoCreate) {
       file.parentFile?.mkdirs()
     }
-    LogUtils.d("write  file->${file.absolutePath}，content->$content，append->$append，autoCreate->$autoCreate")
+//    LogUtils.d("write  file->${file.absolutePath}，content->$content，append->$append，autoCreate->$autoCreate")
     try {
       val fileWriter = FileWriter(file,append)
       val bufferedWriter = BufferedWriter(fileWriter)
@@ -150,9 +159,38 @@ class FileSystem {
 
   fun read(path: String) {
     val file = getFileByPath(path)
-    file.bufferedReader().use {
-      createBytesFactory(ExportNative.FileSystemRead, it.readText())
+    val buffer = StringBuffer()
+    try {
+      file.bufferedReader().forEachLine {
+        buffer.append(it)
+      }
+    } catch (e: FileNotFoundException) {
+      e.printStackTrace()
+      createBytesFactory(ExportNative.FileSystemReadBuffer, e.message.toString())
+    } catch (e: IOException) {
+      e.printStackTrace()
+      createBytesFactory(ExportNative.FileSystemReadBuffer, e.message.toString())
     }
+    LogUtils.d("read buffer.toString -> ${buffer.toString()}")
+    createBytesFactory(ExportNative.FileSystemRead, buffer.toString())
+  }
+
+  fun readBuffer(path: String) {
+    val file = getFileByPath(path)
+    val buffer = StringBuffer()
+    try {
+      file.bufferedReader().readLine().forEach {
+        buffer.append(it)
+      }
+    } catch (e: FileNotFoundException) {
+      e.printStackTrace()
+      createBytesFactory(ExportNative.FileSystemReadBuffer, e.message.toString())
+    } catch (e: IOException) {
+      e.printStackTrace()
+      createBytesFactory(ExportNative.FileSystemReadBuffer, e.message.toString())
+    }
+
+    createBytesFactory(ExportNative.FileSystemReadBuffer, buffer.toString())
   }
 
   fun rm(path: String, deepDelete: Boolean = true) {
@@ -165,6 +203,15 @@ class FileSystem {
   }
 }
 
+data class Fs(
+  val name:String = "",
+  val extname: String = "",
+  val path: String = "",
+  val cwd: String = "",
+  val type: String = "",
+  val isLink: Boolean = false,
+  val relativePath: String = "",
+)
 
 data class FileLs(
   val path: String = "",

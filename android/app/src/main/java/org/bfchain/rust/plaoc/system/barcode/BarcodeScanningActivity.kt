@@ -10,7 +10,6 @@ import org.bfchain.rust.plaoc.lib.drawRect
 import com.king.mlkit.vision.barcode.BarcodeCameraScanActivity
 import com.king.mlkit.vision.camera.AnalyzeResult
 import com.king.mlkit.vision.camera.config.ResolutionCameraConfig
-import org.bfchain.rust.plaoc.DenoService
 import org.bfchain.rust.plaoc.ExportNative
 import org.bfchain.rust.plaoc.R
 import org.bfchain.rust.plaoc.createBytesFactory

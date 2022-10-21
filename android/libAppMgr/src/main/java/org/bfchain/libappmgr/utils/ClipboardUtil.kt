@@ -41,7 +41,6 @@ object ClipboardUtil {
 
   suspend fun readAndParsingClipboard(context: Context) {
     var content = readFromClipboard(context)
-    Log.d("lin.huang", "readAndParsingClipboard -> $content")
     if (content != null && content!!.startsWith("http")) {
       // 网络请求最新版本
       withContext(Dispatchers.IO) {

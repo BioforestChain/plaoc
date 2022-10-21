@@ -66,4 +66,8 @@ object JsonUtil {
   fun <T> fromJson(type: Class<T>, value: String): T? {
     return Gson().fromJson(value, type)
   }
+
+  fun <T> jsonToList(value: String, type: Class<T>): List<T>? {
+    return Gson().fromJson(value, object : TypeToken<List<T>>() {}.type)
+  }
 }

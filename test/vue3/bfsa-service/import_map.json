@@ -2,6 +2,7 @@
   "imports": {
     "@bfsx/metadata": "../../../plaoc/packages/metadata/index.ts",
     "@bfsx/typings": "../../../plaoc/packages/typings/index.ts",
+    "@bfsx/gateway": "../../../plaoc/packages/gateway/index.ts",
     "@bfsx/core": "../../../plaoc/packages/core/index.ts",
     "@bfsx/vfs": "../../../plaoc/packages/vfs/index.ts"
   }
