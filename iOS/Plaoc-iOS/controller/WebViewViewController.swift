@@ -209,9 +209,11 @@ class WebViewViewController: UIViewController {
             //TODO 不确定具体界面
             break
         case "OpenQrScanner":    //二维码
-            break
+            let scanVC = ScanPhotoViewController()
+            self.navigationController?.pushViewController(scanVC, animated: true)
         case "BarcodeScanner":   //条形码
-            break
+            let scanVC = ScanPhotoViewController()
+            self.navigationController?.pushViewController(scanVC, animated: true)
         default:
             break
         }
@@ -267,7 +269,6 @@ class WebViewViewController: UIViewController {
     lazy private var webView: CustomWebView = {
         let webView = CustomWebView(frame: CGRect(x: 0, y: self.naviView.frame.maxY, width: self.view.bounds.width, height: UIScreen.main.bounds.height - self.naviView.frame.maxY - 49 - UIDevice.current.tabbarSpaceHeight()), jsNames: ["Photo","DWebViewJS"], fileName: fileName)
         webView.superVC = self
-        webView.delegate = self
         webView.callback = { [weak self] title in
             guard let strongSelf = self else { return }
             strongSelf.naviView.titleString = title
@@ -572,82 +573,68 @@ extension WebViewViewController {
     
 }
 
-extension WebViewViewController: KeyboardProtocol {
-    
-    //overlay: false 上移， true 不动
-    func keyboardOverlay(overlay: Bool, keyboardType: KeyboardType, height: CGFloat) {
-        
-        guard !isNaviHidden else { return }
-        var naviFrame = naviView.frame
-        var webFrame = webView.frame
-        var bottomFrame = bottomView.frame
-        if keyboardType == .show {
-            naviFrame.origin.y -= height
-            webFrame.origin.y -= height
-            bottomFrame.origin.y -= height
-        } else if keyboardType == .hidden {
-            naviFrame.origin.y = self.statusView.frame.maxY
-            webFrame.origin.y = naviFrame.maxY
-            bottomFrame.origin.y = UIScreen.main.bounds.height - 49 - UIDevice.current.tabbarSpaceHeight()
-        }
-        UIView.animate(withDuration: 0.25) {
-            self.naviView.frame = naviFrame
-            self.webView.frame = webFrame
-            self.bottomView.frame = bottomFrame
-        }
-    }
-}
-
 extension WebViewViewController {
     
     private func openAlertAction(info: [String:Any]?, content: String) {
         guard let bodyDict = ChangeTools.stringValueDic(content) else { return }
-        let alertModel = AlertConfiguration(dict: JSON(bodyDict))
+        let configString = bodyDict["config"] as? String
+        let cbString = bodyDict["cb"] as? String
+        let configDict = ChangeTools.stringValueDic(configString ?? "")
+        let alertModel = AlertConfiguration(dict: JSON(configDict))
         let alertView = CustomAlertPopView(frame: CGRect(x: 0, y: 0, width: screen_width, height: screen_height))
         alertView.alertModel = alertModel
         alertView.callback = { [weak self] type in
             guard let strongSelf = self else { return }
-            let jsString = alertModel.confirmFunc ?? ""
+            guard cbString != nil, cbString!.count > 0 else { return }
+            let jsString = cbString! + "(\(true))"
             guard jsString.count > 0 else { return }
-            strongSelf.rewriteUrlSchemeTaskResponse(info: info, content: jsString)
+            strongSelf.webView.handleJavascriptString(inputJS: jsString)
         }
         alertView.show()
     }
     
     private func openPromptAction(info: [String:Any]?, content: String) {
         guard let bodyDict = ChangeTools.stringValueDic(content) else { return }
-        let promptModel = PromptConfiguration(dict: JSON(bodyDict))
+        let configString = bodyDict["config"] as? String
+        let cbString = bodyDict["cb"] as? String
+        let configDict = ChangeTools.stringValueDic(configString ?? "")
+        let promptModel = PromptConfiguration(dict: JSON(configDict))
         let alertView = CustomPromptPopView(frame: CGRect(x: 0, y: 0, width: screen_width, height: screen_height))
         alertView.promptModel = promptModel
         alertView.callback = { [weak self] type in
             guard let strongSelf = self else { return }
+            guard cbString != nil, cbString!.count > 0 else { return }
             var jsString: String = ""
             if type == .confirm {
-                jsString = promptModel.confirmFunc ?? ""
+                jsString = cbString! + "(\"\(alertView.textField.text ?? "")\")"
             } else if type == .cancel {
-                jsString = promptModel.cancelFunc ?? ""
+                jsString = cbString! + "(\(false))"
             }
             guard jsString.count > 0 else { return }
-            strongSelf.rewriteUrlSchemeTaskResponse(info: info, content: jsString)
+            strongSelf.webView.handleJavascriptString(inputJS: jsString)
         }
         alertView.show()
     }
     
     private func openConfirmAction(info: [String:Any]?, content: String) {
         guard let bodyDict = ChangeTools.stringValueDic(content) else { return }
-        let confirmModel = ConfirmConfiguration(dict: JSON(bodyDict))
+        let configString = bodyDict["config"] as? String
+        let cbString = bodyDict["cb"] as? String
+        let configDict = ChangeTools.stringValueDic(configString ?? "")
+        let confirmModel = ConfirmConfiguration(dict: JSON(configDict))
         let alertView = CustomConfirmPopView(frame: CGRect(x: 0, y: 0, width: screen_width, height: screen_height))
         alertView.confirmModel = confirmModel
         alertView.callback = { [weak self] type in
             guard let strongSelf = self else { return }
+            guard cbString != nil, cbString!.count > 0 else { return }
             var jsString: String = ""
             if type == .confirm {
-                jsString = confirmModel.confirmFunc ?? ""
+                jsString = cbString! + "(\(true))"
             } else if type == .cancel {
-                jsString = confirmModel.cancelFunc ?? ""
+                jsString = cbString! + "(\(false))"
             }
             guard jsString.count > 0 else { return }
-            strongSelf.rewriteUrlSchemeTaskResponse(info: info, content: jsString)
+            strongSelf.webView.handleJavascriptString(inputJS: jsString)
         }
         alertView.show()
     }

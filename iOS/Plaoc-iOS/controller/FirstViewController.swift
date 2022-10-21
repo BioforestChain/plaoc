@@ -7,6 +7,7 @@
 
 import UIKit
 import RxSwift
+import SDWebImage
 
 class FirstViewController: UIViewController {
 
@@ -24,23 +25,38 @@ class FirstViewController: UIViewController {
         
         appNames = batchManager.appFilePaths
         
-        for i in stride(from: 0, to: appNames.count, by: 1) {
-            let name = appNames[i]
-            let button = UIButton(frame: CGRect(x: 100 + i * 90, y: 200, width: 60, height: 60))
-            button.addTarget(self, action: #selector(tap(sender:)), for: .touchUpInside)
-            button.setImage(batchManager.currentAppImage(fileName: name), for: .normal)
-            button.tag = i
-            button.layer.cornerRadius = 10
-            button.layer.masksToBounds = true
-            self.view.addSubview(button)
-            buttons.append(button)
-            
-            let label = UILabel(frame: CGRect(x: button.frame.minX, y: 280, width: 60, height: 20))
-            label.textAlignment = .center
-            label.textColor = .black
-            label.text = batchManager.currentAppName(fileName: name)
-            self.view.addSubview(label)
-            labels.append(label)
+        for i in stride(from: 0, to: appNames.count + 1, by: 1) {
+            if i == appNames.count {
+                let button = UIButton(frame: CGRect(x: 30 + i * 90, y: 200, width: 60, height: 60))
+                button.addTarget(self, action: #selector(tap(sender:)), for: .touchUpInside)
+                button.setTitle("测试", for: .normal)
+                button.setTitleColor(.black, for: .normal)
+                button.tag = i
+                self.view.addSubview(button)
+            } else {
+                let name = appNames[i]
+                let button = UIButton(frame: CGRect(x: 30 + i * 90, y: 200, width: 60, height: 60))
+                button.addTarget(self, action: #selector(tap(sender:)), for: .touchUpInside)
+                let type = batchManager.currentAppType(fileName: name)
+                if type == .scan {
+                    let urlString = batchManager.scanImageURL(fileName: name)
+                    button.sd_setImage(with: URL(string: urlString), for: .normal)
+                } else {
+                    button.setImage(batchManager.currentAppImage(fileName: name), for: .normal)
+                }
+                button.tag = i
+                button.layer.cornerRadius = 10
+                button.layer.masksToBounds = true
+                self.view.addSubview(button)
+                buttons.append(button)
+                
+                let label = UILabel(frame: CGRect(x: button.frame.minX, y: 280, width: 60, height: 20))
+                label.textAlignment = .center
+                label.textColor = .black
+                label.text = batchManager.currentAppName(fileName: name)
+                self.view.addSubview(label)
+                labels.append(label)
+            }
         }
         
         NotificationCenter.default.addObserver(self, selector: #selector(update(noti:)), name: NSNotification.Name.progressNotification, object: nil)
@@ -49,7 +65,9 @@ class FirstViewController: UIViewController {
             guard let strongSelf = self else { return }
             if let index = strongSelf.appNames.firstIndex(of: fileName) {
                 let button = strongSelf.buttons[index]
-                button.setupForAppleReveal()
+                DispatchQueue.main.async {
+                    button.setupForAppleReveal()
+                }
             }
         }).disposed(by: disposeBag)
     }
@@ -87,7 +105,18 @@ class FirstViewController: UIViewController {
     
     @objc func tap(sender: UIButton) {
 
-        guard sender.tag < appNames.count else { return }
+//        guard sender.tag < appNames.count else { return }
+        if sender.tag == 2 {
+            let third = ThirdViewController()
+            third.callback = { [weak self] name in
+                guard let strongSelf = self else { return }
+                strongSelf.appNames.append(name)
+                strongSelf.addScanAppUI(name: name)
+                strongSelf.addScanAppAction(name: name)
+            }
+            self.navigationController?.pushViewController(third, animated: true)
+            return
+        }
         let name = appNames[sender.tag]
         let type = batchManager.currentAppType(fileName: name)
         if type == .system {
@@ -97,7 +126,29 @@ class FirstViewController: UIViewController {
             self.navigationController?.pushViewController(second, animated: true)
         } else if type == .recommend {
             batchManager.clickRecommendAppAction(fileName: name)
+        } else if type == .scan {
+            batchManager.clickRecommendAppAction(fileName: name)
         }
+    }
+    
+    func addScanAppUI(name: String) {
+        let button = UIButton(frame: CGRect(x: 30 + 3 * 90, y: 200, width: 60, height: 60))
+//                button.addTarget(self, action: #selector(tap(sender:)), for: .touchUpInside)
+        button.setTitle(name, for: .normal)
+        button.setTitleColor(.black, for: .normal)
+        button.tag = 3
+        button.layer.cornerRadius = 10
+        button.layer.masksToBounds = true
+        view.addSubview(button)
+        buttons.append(button)
+    }
+    
+    func addScanAppAction(name: String) {
+        let scanURLString = batchManager.scanDownloadURLString(fileName: name)
+        guard scanURLString.count > 0 else { return }
+        BFSNetworkManager.shared.loadAutoUpdateInfo(fileName: name, urlString: scanURLString)
+        let button = self.view.viewWithTag(3) as? UIButton
+        button!.setupForAppleReveal()
     }
 
 }

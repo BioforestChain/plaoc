@@ -16,14 +16,9 @@ enum KeyboardType {
     case hidden
 }
 
-protocol KeyboardProtocol {
-    func keyboardOverlay(overlay: Bool, keyboardType: KeyboardType, height: CGFloat)
-}
-
 class CustomWebView: UIView {
 
     var callback: UpdateTitleCallback?
-    var delegate: KeyboardProtocol?
     var superVC: UIViewController?
     private var scripts: [WKUserScript]?
     private let imageUrl_key: String = "imageUrl"
@@ -36,11 +31,6 @@ class CustomWebView: UIView {
         scripts = addUserScript(jsNames: jsNames)
         self.fileName = fileName
         self.addSubview(webView)
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(observerShowKeyboard(noti:)), name: UIResponder.keyboardWillShowNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(observerHiddenKeyboard(noti:)), name: UIResponder.keyboardWillHideNotification, object: nil)
-        
-        
     }
     
     required init?(coder: NSCoder) {
@@ -148,34 +138,6 @@ extension CustomWebView {
         }
     }
     
-    @objc private func observerShowKeyboard(noti: Notification) {
-        
-        guard let keyboardBound = noti.userInfo?["UIKeyboardFrameEndUserInfoKey"] as? CGRect else { return }
-        keyHeight = keyboardBound.height
-        
-        guard !isKeyboardOverlay else { return }
-        delegate?.keyboardOverlay(overlay: isKeyboardOverlay, keyboardType: .show, height: keyHeight)
-        
-        let safeArea = UIEdgeInsets(top: 0, left: 0, bottom: keyboardBound.height, right: 0)
-        
-        /**
-         ([AnyHashable("UIKeyboardAnimationCurveUserInfoKey"): 7,
-         AnyHashable("UIKeyboardBoundsUserInfoKey"): NSRect: {{0, 0}, {375, 380}},
-         AnyHashable("UIKeyboardCenterBeginUserInfoKey"): NSPoint: {187.5, 1002},
-         AnyHashable("UIKeyboardIsLocalUserInfoKey"): 1,
-         AnyHashable("UIKeyboardFrameEndUserInfoKey"): NSRect: {{0, 432}, {375, 380}},
-         AnyHashable("UIKeyboardFrameBeginUserInfoKey"): NSRect: {{0, 812}, {375, 380}},
-         AnyHashable("UIKeyboardAnimationDurationUserInfoKey"): 0.25,
-         AnyHashable("UIKeyboardCenterEndUserInfoKey"): NSPoint: {187.5, 622}])
-         */
-    }
-    @objc private func observerHiddenKeyboard(noti: Notification) {
-        let safeArea = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
-        
-        guard !isKeyboardOverlay else { return }
-        delegate?.keyboardOverlay(overlay: isKeyboardOverlay, keyboardType: .hidden, height: keyHeight)
-    }
-    
     func recycleWebView() {
 //        WebViewPool.shared.recycleReusedWebView(webView: webView)
     }
@@ -219,8 +181,6 @@ extension CustomWebView: WKNavigationDelegate {
     
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         print("didFinish")
-        let keyboardString = "setHeight('\(49 + UIDevice.current.tabbarSpaceHeight())')"
-        handleJavascriptString(inputJS: keyboardString)
     }
     
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
