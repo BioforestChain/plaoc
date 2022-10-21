@@ -8,6 +8,7 @@ import { genBfsAppId, checkSign } from "check";
 import { compressToSuffixesBfsa } from "compress";
 
 import type * as types from "@bfsx/typings";
+import type { IAppversion } from "../types/appversion.type.ts";
 
 const { existsSync } = fs;
 const { mkdir, writeFile, copyFile, readdir, stat, rm, readFile } = fs.promises;
@@ -302,24 +303,24 @@ async function genAppVersionJson(
   const fileStat = await stat(compressFile);
   const fileHash = await checksumFile(compressFile, "sha512", "hex");
 
-  const appVersionJson = (
-    await import("../assets/appversion.json", { assert: { type: "json" } })
-  ).default;
-
-  appVersionJson.data = {
-    version: manifest.version,
-    name: manifest.name,
-    icon: manifest.icon,
-    files: [
-      {
-        url: `https://shop.plaoc.com/${bfsAppId}/${bfsAppId}.bfsa`,
-        size: fileStat.size,
-        sha512: fileHash,
-      },
-    ],
-    releaseNotes: manifest.releaseNotes || "",
-    releaseName: manifest.releaseName || "",
-    releaseDate: manifest.releaseDate || "",
+  const appVersionJson: IAppversion = {
+    data: {
+      version: manifest.version,
+      name: manifest.name,
+      icon: manifest.icon,
+      files: [
+        {
+          url: `https://shop.plaoc.com/${bfsAppId}/${bfsAppId}.bfsa`,
+          size: fileStat.size,
+          sha512: fileHash,
+        },
+      ],
+      releaseNotes: manifest.releaseNotes || "",
+      releaseName: manifest.releaseName || "",
+      releaseDate: manifest.releaseDate || "",
+    },
+    errorCode: 0,
+    errorMsg: "success",
   };
 
   await writeFile(
