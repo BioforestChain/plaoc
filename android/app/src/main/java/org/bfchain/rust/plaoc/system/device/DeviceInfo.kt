@@ -50,11 +50,10 @@ class DeviceInfo {
       deviceData.screen = deviceScreen
       deviceData.deviceVersion = deviceVersion
       deviceData.processor = deviceProcessor
-//      deviceData.phone = devicePhone
+      deviceData.module = module
       var memoryInfo = MemoryInfo()
       deviceData.memory = memoryInfo.memoryData
       deviceData.storage = memoryInfo.storageSize
-      LogUtils.d("xxxx$deviceData")
       return deviceData
     }
 
@@ -97,11 +96,24 @@ class DeviceInfo {
       return Build.HARDWARE
     }
 
-  val devicePhone: String
-    @SuppressLint("MissingPermission")
-    get() {
-      return mTelephonyManager.line1Number
+  val module:String // silentMode,doNotDisturb,default
+  get() {
+    // 勿扰
+    if (enableZenMode) {
+      return "doNotDisturb"
     }
+    // 静音
+    if (ringerMode == AudioManager.RINGER_MODE_SILENT) {
+      return "silentMode"
+    }
+    return  "default"
+  }
+
+//  val devicePhone: String
+//    @SuppressLint("MissingPermission")
+//    get() {
+//      return mTelephonyManager.line1Number
+//    }
 
   /**
    * 获取勿扰模式状态，true为开，false为关
@@ -114,12 +126,14 @@ class DeviceInfo {
 
   /**
    * 获取当前声音模式
-   * AudioManager.RINGER_MODE_NORMAL  响铃模式
-   * AudioManager.RINGER_MODE_SILENT  静音模式
-   * AudioManager.RINGER_MODE_VIBRATE 振动模式
+   * AudioManager.RINGER_MODE_NORMAL  响铃模式 2
+   * AudioManager.RINGER_MODE_SILENT  静音模式 0
+   * AudioManager.RINGER_MODE_VIBRATE 振动模式 1
    */
   val ringerMode: Int
     get() {
+      AudioManager.RINGER_MODE_NORMAL
+      AudioManager.RINGER_MODE_NORMAL
       var am = App.appContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
       return am.ringerMode
     }
