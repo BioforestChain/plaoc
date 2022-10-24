@@ -1,6 +1,6 @@
 import { callDeno } from "../deno/android.fn.ts";
 import { netCallNativeService } from '@bfsx/gateway';
-import { js_to_rust_buffer, loopRustBuffer } from "../deno/rust.op.ts";
+import { js_to_rust_buffer, loopRustString } from "../deno/rust.op.ts";
 
 const versionView = new Uint8Array([1]);
 const headView = new Uint8Array([0, 0]);
@@ -32,7 +32,7 @@ function asyncCallNativeFunction(handleFn: string, timeout = 3000): Promise<stri
   return new Promise(async (resolve, reject) => {
     const { headView } = await callNativeFunction(handleFn) // 发送请求
     do {
-      const data = await loopRustBuffer("op_rust_to_js_system_buffer").next();
+      const data = await loopRustString("op_rust_to_js_system_buffer").next();
       if (data.done) {
         continue;
       }

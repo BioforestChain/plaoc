@@ -19,6 +19,6 @@ export async function read(path: string) {
  * @returns 
  */
 export async function readBuff(path: string): Promise<ArrayBuffer> {
-  const fs = await network.asyncCallDenoFunction(vfsHandle.FileSystemReadBuffer, { path })
+  const fs = await network.asyncCallDenoBuffer(vfsHandle.FileSystemReadBuffer, { path })
   return fs
 }

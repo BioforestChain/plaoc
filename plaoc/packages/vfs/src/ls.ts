@@ -95,10 +95,10 @@ function createFileEntry(file: FileEntry) {
     }
   }
   file.binary = async function () {
-    if (!isFile) {
-      return new Error("不能读取目录")
+    let buff = new ArrayBuffer(1);
+    if (isFile) {
+      buff = await readBuff(file.path)
     }
-    const buff = await readBuff(file.path)
     return buff
   }
   file.readAs = function () {

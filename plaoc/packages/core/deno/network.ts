@@ -5,7 +5,7 @@
 
 import { callDeno, callDVebView } from "./android.fn.ts";
 import { Deno } from "./Deno.ts"
-import { loopRustBuffer } from "./rust.op.ts";
+import { loopRustString, loopRustBuffer } from "./rust.op.ts";
 
 const deno = new Deno();
 class Network {
@@ -22,6 +22,21 @@ class Network {
  */
   // deno-lint-ignore no-explicit-any
   asyncCallDenoFunction(handleFn: string, data: TNative = "''", timeout = 3000): Promise<any> {
+    return this.asyncCallDeno(handleFn, data, timeout, loopRustString)
+  }
+
+  /**
+* 异步调用方法,这个是给后端调用的方法，不会传递数据到前端
+* @param handleFn 
+* @param data 
+* @returns  Buffer
+*/
+  // deno-lint-ignore no-explicit-any
+  asyncCallDenoBuffer(handleFn: string, data: TNative = "''", timeout = 3000): Promise<any> {
+    return this.asyncCallDeno(handleFn, data, timeout, loopRustBuffer)
+  }
+
+  asyncCallDeno(handleFn: string, data: TNative = "''", timeout = 3000, fun: loopRustBuffer | loopRustString): Promise<any> {
     return new Promise(async (resolve, reject) => {
       if (data instanceof Object) {
         data = JSON.stringify(data); // stringify 两次转义一下双引号
@@ -32,7 +47,7 @@ class Network {
         return resolve(msg);
       }
       do {
-        const data = await loopRustBuffer("op_rust_to_js_system_buffer").next();
+        const data = await fun("op_rust_to_js_system_buffer").next();
         if (data.done) {
           continue;
         }
@@ -54,10 +69,10 @@ class Network {
   }
 
   /**
-* 同步调用方法没返回值
-* @param handleFn 
-* @param data 
-*/
+  * 同步调用方法没返回值
+  * @param handleFn 
+  * @param data 
+  */
   syncCallDenoFunction(handleFn: string, data?: string): void {
     deno.callFunction(handleFn, data) // 发送请求
   }
@@ -68,7 +83,7 @@ class Network {
   */
   async waterOverflow() {
     do {
-      const data = await loopRustBuffer("op_rust_to_js_buffer").next();
+      const data = await loopRustString("op_rust_to_js_buffer").next();
       /// 忽略策略:如果队列大于高水位或者没有数据，直接忽略
       if (data.done || this.isWaitingData > this.hightWaterMark) {
         continue;
@@ -141,5 +156,33 @@ class Network {
 }
 // deno-lint-ignore ban-types
 type TNative = boolean | object | string | number;
+
+type loopRustBuffer = (opFunction: string) => {
+  next(): Promise<{
+    value: Uint8Array;
+    versionView: number[];
+    headView: number[];
+    done: boolean;
+  }>;
+  return(): void;
+  throw(): void;
+}
+
+type loopRustString = (opFunction: string) => {
+  next(): Promise<{
+    value: Uint8Array;
+    versionView: number[];
+    headView: number[];
+    done: boolean;
+  } | {
+    value: string;
+    versionView: number[];
+    headView: number[];
+    done: boolean;
+  }>;
+  return(): void;
+  throw(): void;
+}
+
 
 export const network = new Network()

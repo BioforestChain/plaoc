@@ -43,18 +43,10 @@ export class Deno {
     const uint8Array = this.structureBinary(handleFn, data);
     let msg = "";
     if (isAndroid) {
-      js_to_rust_buffer(uint8Array)
+      js_to_rust_buffer(uint8Array) // android - denoOp
     } else {
-      msg = await netCallNativeService(handleFn, data);
+      msg = await netCallNativeService(handleFn, data);  //  ios - javascriptCore
     }
-    // try {
-    //   // android - denoOp
-    //   js_to_rust_buffer(uint8Array)
-    // } catch (_error) {
-    //   //  ios - javascriptCore
-    //   msg = await netCallNativeService(handleFn, data);
-    //   // console.log("callFunction:", error)
-    // }
     return { versionView, headView, msg }
   }
   /**
@@ -65,19 +57,10 @@ export class Deno {
   callEvalJsStringFunction(handleFn: string, data = "''") {
     const uint8Array = this.structureBinary(handleFn, data);
     if (isAndroid) {
-      eval_js(uint8Array)
+      eval_js(uint8Array)// android - denoOp    
     } else {
-      netCallNativeService(handleFn, data);
+      netCallNativeService(handleFn, data);  //  ios - javascriptCore
     }
-    // try {
-    //   // android - denoOp    
-    //   eval_js(uint8Array)
-    // } catch (_error) {
-    //   //  ios - javascriptCore
-    //   netCallNativeService(handleFn, data);
-    //   // console.log("callEvalJsStringFunction:", error)
-    // }
-    // ios - javascriptCore
   }
 
   /** 针对64位
