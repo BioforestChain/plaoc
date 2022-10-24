@@ -2,11 +2,11 @@ package org.bfchain.rust.plaoc.system.device
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.media.AudioManager
 import android.os.Build
 import android.os.Build.MODEL
 import android.provider.Settings
 import android.telephony.TelephonyManager
-import com.google.gson.Gson
 import com.king.mlkit.vision.camera.util.LogUtils
 import org.bfchain.libappmgr.utils.AppContextUtil
 import org.bfchain.libappmgr.utils.JsonUtil
@@ -14,7 +14,6 @@ import org.bfchain.rust.plaoc.App
 import org.bfchain.rust.plaoc.ExportNative
 import org.bfchain.rust.plaoc.createBytesFactory
 import org.bfchain.rust.plaoc.system.device.model.*
-import org.bfchain.rust.plaoc.system.permission.PermissionManager
 
 
 data class DeviceData(
@@ -41,7 +40,7 @@ class DeviceInfo {
   }
 
   fun getDeviceInfo() {
-    createBytesFactory(ExportNative.GetDeviceInfo,  JsonUtil.toJson(deviceData))
+    createBytesFactory(ExportNative.GetDeviceInfo, JsonUtil.toJson(deviceData))
   }
 
   val deviceData: DeviceData
@@ -103,5 +102,26 @@ class DeviceInfo {
     @SuppressLint("MissingPermission")
     get() {
       return mTelephonyManager.line1Number
+    }
+
+  /**
+   * 获取勿扰模式状态，true为开，false为关
+   */
+  val enableZenMode: Boolean
+    get() {
+      var zenMode = Settings.Global.getInt(App.appContext.contentResolver, "zen_mode", 0)
+      return zenMode == 1
+    }
+
+  /**
+   * 获取当前声音模式
+   * AudioManager.RINGER_MODE_NORMAL  响铃模式
+   * AudioManager.RINGER_MODE_SILENT  静音模式
+   * AudioManager.RINGER_MODE_VIBRATE 振动模式
+   */
+  val ringerMode: Int
+    get() {
+      var am = App.appContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+      return am.ringerMode
     }
 }
