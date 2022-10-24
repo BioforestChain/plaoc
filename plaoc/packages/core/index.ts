@@ -8,6 +8,7 @@ export {
   DWebView,
   sendNotification,
   isAndroid,
-  getDeviceInfo
+  getDeviceInfo,
+  EDeviceModule
 } from "./runtime/index.ts";
 export { network } from "./deno/network.ts"

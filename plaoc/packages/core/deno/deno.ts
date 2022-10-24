@@ -44,10 +44,9 @@ export class Deno {
     try {
       // android - denoOp
       js_to_rust_buffer(uint8Array)
+    } catch (_error) {
       //  ios - javascriptCore
       msg = await netCallNativeService(handleFn, data);
-
-    } catch (_error) {
       // console.log("callFunction:", error)
     }
     return { versionView, headView, msg }
@@ -62,9 +61,9 @@ export class Deno {
     try {
       // android - denoOp    
       eval_js(uint8Array)
+    } catch (_error) {
       //  ios - javascriptCore
       netCallNativeService(handleFn, data);
-    } catch (_error) {
       // console.log("callEvalJsStringFunction:", error)
     }
     // ios - javascriptCore
@@ -115,6 +114,5 @@ export class Deno {
     return result;
   }
 }
-
 
 

@@ -2,6 +2,7 @@ package org.bfchain.rust.plaoc.system
 
 import android.content.res.AssetManager
 import android.util.Log
+import com.king.mlkit.vision.camera.util.LogUtils
 import org.bfchain.libappmgr.utils.FilesUtil
 import org.bfchain.rust.plaoc.*
 import org.bfchain.rust.plaoc.system.device.DeviceInfo
@@ -10,6 +11,7 @@ import org.bfchain.rust.plaoc.system.notification.NotificationMsgItem
 import org.bfchain.rust.plaoc.webView.network.initMetaData
 import org.bfchain.rust.plaoc.webView.sendToJavaScript
 import org.bfchain.rust.plaoc.system.notification.NotifyManager
+import org.bfchain.rust.plaoc.webView.network.dWebView_host
 
 
 private val fileSystem = FileSystem()
@@ -85,11 +87,14 @@ data class RORuntime(
     val handle = mapper.readValue(it, FileRm::class.java)
     fileSystem.rm(handle.path,handle.option.deepDelete)
   }
+  /**获取appId */
+  callable_map[ExportNative.GetBfsAppId] = {
+    createBytesFactory(ExportNative.GetBfsAppId, dWebView_host)
+  }
    /**deviceInfo */
   callable_map[ExportNative.GetDeviceInfo] = {
     DeviceInfo().getDeviceInfo()
   }
-
   /** Notification */
   callable_map[ExportNative.CreateNotificationMsg] = {
     val message = mapper.readValue(it, NotificationMsgItem::class.java)

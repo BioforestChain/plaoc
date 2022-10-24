@@ -351,7 +351,7 @@ fun DWebView(
               view: WebView?,
               request: WebResourceRequest?
             ): WebResourceResponse? {
-              Log.i(ITAG, "Intercept Request: ${request?.url}")
+//              Log.i(ITAG, "Intercept Request: ${request?.url}")
               if (request !== null) {
                 // 这里出来的url全部都用是小写，serviceWorker没办法一开始就注册，所以还会走一次这里
                 return interceptNetworkRequests(request, customUrlScheme);

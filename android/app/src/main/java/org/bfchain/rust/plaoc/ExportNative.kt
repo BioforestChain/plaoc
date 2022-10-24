@@ -16,6 +16,7 @@ enum class ExportNative(val type: String) {
   FileSystemRead("fileSystemRead"),
   FileSystemReadBuffer("fileSystemReadBuffer"),
   FileSystemRm("fileSystemRm"),
+  GetBfsAppId("getBfsAppId"),
   GetDeviceInfo("getDeviceInfo"),
   CreateNotificationMsg("createNotificationMsg"),
 }

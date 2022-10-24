@@ -38,7 +38,7 @@ class App : Application() {
     }
     PlaocUtil.addShortcut(this) // 添加桌面快捷方式
     // 启动deno runtime
-    //startDenoService()
+    startDenoService()
     // 监听activity状态，获取当前哪个app在前台
     registerActivityLifecycleCallbacks(ActivityLifecycleCallbacksImp())
   }
