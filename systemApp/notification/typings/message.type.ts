@@ -18,6 +18,18 @@ export enum MessageSource {
   // SMS = "sms_message",
 }
 
+/** 用户消息体 */
+export interface IMessageSource {
+  // 应用id
+  app_id: string;
+  // 消息标题
+  title: string;
+  // 消息内容
+  body: string;
+  // 优先级
+  priority: MessagePriority;
+}
+
 /** 消息体 */
 export interface IMessageInfo {
   // 应用id
@@ -30,8 +42,16 @@ export interface IMessageInfo {
   msg_src: MessageSource;
   // 消息优先级
   priority: MessagePriority;
-  // 消息推送时间 YYYYMMDD
-  time: string;
+  // 消息推送时间 YYYY-MM-DD hh:mm:ss
+  // time?: string;
+  // 消息id，类似：18100287420699802
+  msg_id: bigint;
+  // 入队时间：timestamp，用于长时间未能处于优先级较高时，提升优先级，避免饿死
+  entry_queue_time: number;
+  // 当前消息处理状态
+  msg_status: MessageStatus;
+  // 消息处理优先数值 0-100
+  msg_priority: number;
 }
 
 /** 消息处理状态 */
@@ -48,18 +68,6 @@ export enum PhoneStatus {
   SILENT_MODE,
   // 正常模式
   NORMAL_MODE,
-}
-
-/** 扩展消息体，用于队列优先级处理 */
-export interface IMessageInfoExtension extends IMessageInfo {
-  // 消息id，类似：18100287420699802
-  msg_id: bigint;
-  // 入队时间：timestamp，用于长时间未能处于优先级较高时，提升优先级，避免饿死
-  entry_queue_time: number;
-  // 当前消息处理状态
-  msg_status: MessageStatus;
-  // 消息处理优先数值 0-100
-  msg_priority: number;
 }
 
 /** 推送消息结构 */

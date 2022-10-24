@@ -2,7 +2,8 @@ import { network } from "@bfsx/core"
 import { EFilterType, IsOption } from "./vfsType.ts";
 import { vfsHandle } from '../vfsHandle.ts';
 import { FileEntry } from './vfsType.ts';
-import { readBuff, read } from "./read.ts";
+import { readBuff, read, rename } from "./read.ts";
+import { Path } from '@bfsx/vfs/path';
 
 /// const list: string[] = await fs.ls("./", { // list
 // /   filter: [{ // 声明筛选方式
@@ -44,7 +45,7 @@ export async function ls(path: string, option: IsOption) {
 // }
 
 /**
- * 返回文件对象
+ * 迭代返回文件对象
  * @param path 
  * @returns fileSystems
  */
@@ -55,6 +56,22 @@ export async function* list(path: string): AsyncGenerator<FileEntry> {
     const files = createFileEntry(fs)
     yield files
   }
+}
+
+/**
+ * 返回文件对象
+ * @param path 
+ * @returns fileSystems
+ */
+export async function getList(path: string): Promise<FileEntry[]> {
+  const fileList = await network.asyncCallDenoFunction(vfsHandle.FileSystemList, { path })
+  const list = transStringToJson(fileList);
+  const fileEntrys: FileEntry[] = []
+  for (const fs of list) {
+    const files = createFileEntry(fs)
+    fileEntrys.push(files)
+  }
+  return fileEntrys
 }
 
 
@@ -69,13 +86,18 @@ function createFileEntry(file: FileEntry) {
   console.log("createFileEntry:", file)
   // 去掉两边的"
   const isFile = file.type === EFilterType.file ? true : false;
+  // 文件基本名称，不带文件类型
   file.basename = isFile
-    ? file.name.slice(0, file.name.lastIndexOf(".") + 1)
+    ? file.name.slice(0, file.name.lastIndexOf("."))
     : file.name;
+
+  // 读取文件 以文本方式
   file.text = async function () {
     const readText = await read(file.path)
     return readText
   }
+
+  // 读取文件 流方式
   file.stream = async function* () {
     // 如果是文件再读取内容
     if (isFile) {
@@ -94,25 +116,29 @@ function createFileEntry(file: FileEntry) {
       }
     }
   }
+
+  // 读取文件 二进制流方式
   file.binary = async function () {
-    if (!isFile) {
-      return new Error("不能读取目录")
+    let buff = new ArrayBuffer(1);
+    if (isFile) {
+      buff = await readBuff(file.path)
     }
-    const buff = await readBuff(file.path)
     return buff
   }
-  file.readAs = function () {
-    return Promise.resolve(file)
+
+  //重命名文件
+  file.rename = async function (name: string) {
+    return await rename(file.path, name)
   }
-  file.checkname = function () {
-    return Promise.resolve(true)
-  }
+  // file.readAs = function () {
+  //   return Promise.resolve(file)
+  // }
+  // file.checkname = function () {
+  //   return Promise.resolve(true)
+  // }
   file.cd = async function (path: string) {
-    const fs = await list(path).next();
-    return await fs.value
-  }
-  file.open = function () {
-    return Promise.resolve(false)  // todo 
+    const fs = await getList(Path.join(file.cwd, path));
+    return await fs
   }
   file.relativeTo = async function (path?: string) {
     if (path) {

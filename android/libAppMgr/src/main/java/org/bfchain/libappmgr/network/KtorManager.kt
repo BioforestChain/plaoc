@@ -23,7 +23,7 @@ object KtorManager {
     }
     install(Logging)
     {
-      //logger = Logger.SIMPLE // 用于显示本机请求信息
+      // logger = Logger.SIMPLE // 用于显示本机请求信息
       level = LogLevel.ALL
     }
     install(HttpTimeout) {

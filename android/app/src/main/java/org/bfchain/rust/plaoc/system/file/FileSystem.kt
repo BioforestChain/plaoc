@@ -8,6 +8,7 @@ import org.bfchain.rust.plaoc.ExportNative
 import org.bfchain.rust.plaoc.createBytesFactory
 import org.bfchain.rust.plaoc.webView.network.dWebView_host
 import java.io.*
+import java.nio.file.Files
 import java.util.regex.PatternSyntaxException
 import kotlin.io.path.Path
 import kotlin.io.path.isSymbolicLink
@@ -111,7 +112,7 @@ class FileSystem {
         it.name,
         it.extension,
         it.absolutePath.replace(rootPath, ""), // path
-        it.path.replace(rootPath, ""), // cwd
+        it.parent.replace(rootPath, ""), // cwd
         if (it.isFile) "file" else "directory",
         Path(it.absolutePath).isSymbolicLink(), // 是否是超链接文件
         it.absolutePath.replace(rootPath, ""), // 相对地址
@@ -193,6 +194,25 @@ class FileSystem {
     createBytesFactory(ExportNative.FileSystemReadBuffer, buffer.toString())
   }
 
+  fun rename(path:String,newFilePath:String) {
+    println("rename：$path,$newFilePath")
+    val ordFile = getFileByPath(path)
+    val newFile = getFileByPath(newFilePath)
+    if (!ordFile.exists()) {
+      createBytesFactory(ExportNative.FileSystemRename, "重命名文件不存在")
+    }
+    if (newFile.exists()) {
+      createBytesFactory(ExportNative.FileSystemRename, "重命名文件冲突，文件已存在")
+    }
+    try {
+     val bool =  ordFile.renameTo(newFile)
+      createBytesFactory(ExportNative.FileSystemRename, bool.toString())
+    } catch (e: IOException) {
+       e.printStackTrace()
+      createBytesFactory(ExportNative.FileSystemRename, e.message.toString())
+    }
+  }
+
   fun rm(path: String, deepDelete: Boolean = true) {
     val file = getFileByPath(path)
     val bool = when (deepDelete) {
@@ -248,6 +268,11 @@ data class WriteOption(
 data class FileRm(
   val path: String = "",
   val option: RmOption = RmOption()
+)
+
+data class FileRename(
+  val path: String = "",
+  val newPath: String = "",
 )
 
 data class RmOption(

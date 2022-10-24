@@ -5,6 +5,7 @@ export enum callDeno {
   openBarcodeScanner = "BarcodeScanner", // 条形码
   initMetaData = "InitMetaData", //  初始化app数据
   denoRuntime = "DenoRuntime", // 初始化运行时
+  getBfsAppId = "GetBfsAppId", // 获取appid
   evalJsRuntime = "EvalJsRuntime", // 传递给前端消息
   getDeviceInfo = "GetDeviceInfo", // 获取设备信息 
   sendNotification = "SendNotification", // 创建消息通知

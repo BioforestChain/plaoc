@@ -1,4 +1,4 @@
-import { network } from "@bfsx/core";
+import { network, getDeviceInfo, EDeviceModule } from "@bfsx/core";
 import {
   NOTIFICATION_MESSAGE_QUEUE,
   CREATE_NOTIFICATION_MSG,
@@ -7,23 +7,43 @@ import {
 import {
   type IMessageInfoPush,
   MessagePriority,
+  MessageStatus,
 } from "../typings/message.type.ts";
 
 /** 消息推送 */
 export async function messagePush() {
-  // TODO(@kingsowrd09): 添加判断手机模式
-  while (NOTIFICATION_MESSAGE_QUEUE.length > 0) {
-    const item = NOTIFICATION_MESSAGE_QUEUE.shift()!;
-    const message: IMessageInfoPush = {
-      ...item,
-      priority:
-        item.priority < MessagePriority.IMPORTANT_MESSAGE
-          ? MessagePriority.DELAY_MESSAGE
-          : MessagePriority.IMPORTANT_MESSAGE,
-    };
+  /**
+   * 设备信息手机状态判断
+   * 如果消息大于等于20条，开始推送
+   */
+  const info = await getDeviceInfo();
+  if (
+    info.module === EDeviceModule.doNotDisturb &&
+    NOTIFICATION_MESSAGE_QUEUE.length < 20
+  ) {
+    return;
+  }
 
-    // 推送接口
-    await network.asyncCallDenoFunction(CREATE_NOTIFICATION_MSG, message);
+  /**
+   * @TODO 是否需要添加重试次数
+   */
+  for (const item of NOTIFICATION_MESSAGE_QUEUE) {
+    if (item.msg_status === MessageStatus.UNPROCESS) {
+      const message: IMessageInfoPush = {
+        ...item,
+        priority:
+          item.priority < MessagePriority.IMPORTANT_MESSAGE
+            ? MessagePriority.DELAY_MESSAGE
+            : MessagePriority.IMPORTANT_MESSAGE,
+      };
+
+      // 推送接口
+      await network.asyncCallDenoFunction(CREATE_NOTIFICATION_MSG, message);
+
+      // 更新消息为已完成
+      item.msg_status = MessageStatus.PROCESSED;
+      console.log(item);
+    }
   }
 
   return;

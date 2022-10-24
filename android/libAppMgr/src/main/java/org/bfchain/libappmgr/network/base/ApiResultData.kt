@@ -1,6 +1,10 @@
 package org.bfchain.libappmgr.network.base
 
+import android.util.Log
+import io.ktor.client.call.*
+import io.ktor.client.statement.*
 import java.io.File
+import java.io.IOException
 
 /*const val BASE_URL = "172.30.93.165"
 const val BASE_PORT = 8080
@@ -107,3 +111,10 @@ inline fun <R> runCatching(block: () -> R): ApiResultData<R> {
     ApiResultData.failure(e)
   }
 }
+
+suspend inline fun <reified T> HttpResponse.checkAndBody(): T =
+  if (this.status.value == 200) {
+    this.body() // body有做bodyNullable判断，导致会有exception打印，这边做过滤
+  } else {
+    BaseData(this.status.value, this.status.description, null) as T
+  }

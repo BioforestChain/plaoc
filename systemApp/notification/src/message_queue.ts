@@ -4,9 +4,10 @@
 
 import {
   type IMessageInfo,
-  type IMessageInfoExtension,
+  type IMessageSource,
   MessagePriority,
   MessageStatus,
+  MessageSource,
 } from "../typings/message.type.ts";
 
 import SnowFlake from "../utils/snowFlake.ts";
@@ -16,12 +17,16 @@ import { NOTIFICATION_MESSAGE_QUEUE, CODE_MAP } from "./constants.ts";
  * 消息入队列
  * @param messageInfo 消息体
  */
-export function messageToQueue(messageInfo: IMessageInfo) {
+export function messageToQueue(messageInfo: IMessageSource) {
   const msg_priority = messagePriorityInit(messageInfo.priority);
   const msg_id = genMessageIds(messageInfo.app_id);
 
-  const messageInfoItem: IMessageInfoExtension = {
-    ...messageInfo,
+  const messageInfoItem: IMessageInfo = {
+    app_id: messageInfo.app_id,
+    title: messageInfo.title,
+    msg_content: messageInfo.body,
+    msg_src: MessageSource.APP,
+    priority: messageInfo.priority,
     msg_id,
     msg_priority,
     entry_queue_time: Date.now(),

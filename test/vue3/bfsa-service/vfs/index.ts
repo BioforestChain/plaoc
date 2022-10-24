@@ -16,12 +16,19 @@ console.log("vfs测试：获取ls : ", lsFileList)
 
 try {
   for await (const entry of fs.list("./")) { // 也可以用异步迭代器来访问，避免列表过大
-    console.log(`vfs测试：获取${entry.type}的各项信息: `, entry.name, entry.extname, entry.basename,
-      entry.path, entry.relativePath)
+    console.log(`vfs测试：获取${entry.type}的各项信息name->${entry.name}
+    ,extname->${entry.extname},cwd->${entry.cwd},basename->${entry.basename},
+    path->${entry.path},relativePath->${entry.relativePath}`
+    )
     for await (const buff of entry.stream()) {
       console.log("vfs测试：entry.stream():", buff)
     }
     console.log("vfs测试：entry.binary():", await entry.binary())
+
+    console.log("vfs测试：entry.cd(book):", await entry.cd("book"))
+    if (entry.name === "gege.txt") {
+      console.log("vfs测试：重命名:", await entry.rename("嘎嘎.txt"))
+    }
   }
 } catch (e) {
   console.log(e)

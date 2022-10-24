@@ -2,11 +2,11 @@ package org.bfchain.rust.plaoc.system.device
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.media.AudioManager
 import android.os.Build
 import android.os.Build.MODEL
 import android.provider.Settings
 import android.telephony.TelephonyManager
-import com.google.gson.Gson
 import com.king.mlkit.vision.camera.util.LogUtils
 import org.bfchain.libappmgr.utils.AppContextUtil
 import org.bfchain.libappmgr.utils.JsonUtil
@@ -14,7 +14,6 @@ import org.bfchain.rust.plaoc.App
 import org.bfchain.rust.plaoc.ExportNative
 import org.bfchain.rust.plaoc.createBytesFactory
 import org.bfchain.rust.plaoc.system.device.model.*
-import org.bfchain.rust.plaoc.system.permission.PermissionManager
 
 
 data class DeviceData(
@@ -25,7 +24,6 @@ data class DeviceData(
   var memory: MemoryData? = null, // 运行内存
   var storage: StorageSize? = null, // 存储
   var screen: String = "", // 屏幕
-//  var phone: String = "", // 手机号码
   var module: String = "default", // 手机模式(silentMode,doNotDisturb,default)
   var isDeno: Boolean = true
 )
@@ -41,7 +39,7 @@ class DeviceInfo {
   }
 
   fun getDeviceInfo() {
-    createBytesFactory(ExportNative.GetDeviceInfo,  JsonUtil.toJson(deviceData))
+    createBytesFactory(ExportNative.GetDeviceInfo, JsonUtil.toJson(deviceData))
   }
 
   val deviceData: DeviceData
@@ -52,11 +50,10 @@ class DeviceInfo {
       deviceData.screen = deviceScreen
       deviceData.deviceVersion = deviceVersion
       deviceData.processor = deviceProcessor
-//      deviceData.phone = devicePhone
+      deviceData.module = module
       var memoryInfo = MemoryInfo()
       deviceData.memory = memoryInfo.memoryData
       deviceData.storage = memoryInfo.storageSize
-      LogUtils.d("xxxx$deviceData")
       return deviceData
     }
 
@@ -99,9 +96,45 @@ class DeviceInfo {
       return Build.HARDWARE
     }
 
-  val devicePhone: String
-    @SuppressLint("MissingPermission")
+  val module:String // silentMode,doNotDisturb,default
+  get() {
+    // 勿扰
+    if (enableZenMode) {
+      return "doNotDisturb"
+    }
+    // 静音
+    if (ringerMode == AudioManager.RINGER_MODE_SILENT) {
+      return "silentMode"
+    }
+    return  "default"
+  }
+
+//  val devicePhone: String
+//    @SuppressLint("MissingPermission")
+//    get() {
+//      return mTelephonyManager.line1Number
+//    }
+
+  /**
+   * 获取勿扰模式状态，true为开，false为关
+   */
+  val enableZenMode: Boolean
     get() {
-      return mTelephonyManager.line1Number
+      var zenMode = Settings.Global.getInt(App.appContext.contentResolver, "zen_mode", 0)
+      return zenMode == 1
+    }
+
+  /**
+   * 获取当前声音模式
+   * AudioManager.RINGER_MODE_NORMAL  响铃模式 2
+   * AudioManager.RINGER_MODE_SILENT  静音模式 0
+   * AudioManager.RINGER_MODE_VIBRATE 振动模式 1
+   */
+  val ringerMode: Int
+    get() {
+      AudioManager.RINGER_MODE_NORMAL
+      AudioManager.RINGER_MODE_NORMAL
+      var am = App.appContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+      return am.ringerMode
     }
 }

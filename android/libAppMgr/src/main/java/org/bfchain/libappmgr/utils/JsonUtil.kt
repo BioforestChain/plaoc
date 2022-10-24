@@ -12,11 +12,11 @@ object JsonUtil {
   /**
    * 通过 link.json 文件获取的字符串，解析成AppInfo
    */
-  fun getAppInfoFromLinkJson(content: String, type: FilesUtil.APP_DIR_TYPE): AppInfo? {
+  fun getAppInfoFromLinkJson(content: String, type: APP_DIR_TYPE): AppInfo? {
     try {
       var appInfo: AppInfo = Gson().fromJson(content, AppInfo::class.java)
       appInfo.isSystemApp = when (type) {
-        FilesUtil.APP_DIR_TYPE.SystemApp -> true
+        APP_DIR_TYPE.SystemApp -> true
         else -> false
       }
       appInfo.iconPath = FilesUtil.getAppIconPathName(
@@ -33,13 +33,13 @@ object JsonUtil {
   /**
    * 获取数组列表
    */
-  fun getAppInfoListFromLinkJson(content: String, type: FilesUtil.APP_DIR_TYPE): List<AppInfo>? {
+  fun getAppInfoListFromLinkJson(content: String, type: APP_DIR_TYPE): List<AppInfo>? {
     try {
       var appInfos: List<AppInfo> =
         Gson().fromJson(content, object : TypeToken<List<AppInfo>>() {}.type)
       appInfos.forEach {
         it.isSystemApp = when (type) {
-          FilesUtil.APP_DIR_TYPE.SystemApp -> true
+          APP_DIR_TYPE.SystemApp -> true
           else -> false
         }
       }
