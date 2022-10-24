@@ -25,12 +25,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
 //        notiManager.registerNotificationCategory()
 //        UNUserNotificationCenter.current().delegate = notiManager
-//        permissionManager.startPermissionAuthenticate(type: .bluetooth, isSet: true) { result in
-////            if result {
-////                notiManager.sendLocalNotification()
-////            }
+//        permissionManager.startPermissionAuthenticate(type: .notification, isSet: true) { result in
+//            if result {
+//                notiManager.sendLocalNotification()
+//            }
 //        }
-     
         return true
     }
     
