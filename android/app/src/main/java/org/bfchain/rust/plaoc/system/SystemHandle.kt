@@ -11,6 +11,9 @@ import org.bfchain.rust.plaoc.system.notification.NotificationMsgItem
 import org.bfchain.rust.plaoc.webView.network.initMetaData
 import org.bfchain.rust.plaoc.webView.sendToJavaScript
 import org.bfchain.rust.plaoc.system.notification.NotifyManager
+import org.bfchain.rust.plaoc.system.permission.EPermission
+import org.bfchain.rust.plaoc.system.permission.PermissionManager
+import org.bfchain.rust.plaoc.system.permission.PermissionUtil.getActualPermissions
 import org.bfchain.rust.plaoc.webView.network.dWebView_host
 
 
@@ -98,6 +101,12 @@ data class RORuntime(
    /**deviceInfo */
   callable_map[ExportNative.GetDeviceInfo] = {
     DeviceInfo().getDeviceInfo()
+  }
+  /**申请应用权限 */
+  callable_map[ExportNative.ApplyPermissions] = {
+    val per = getActualPermissions(it)
+    println("ApplyPermissions:$per")
+    PermissionManager(activity).requestPermissions(per)
   }
   /** Notification */
   callable_map[ExportNative.CreateNotificationMsg] = {

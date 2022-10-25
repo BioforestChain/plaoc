@@ -18,6 +18,7 @@ enum class ExportNative(val type: String) {
   FileSystemRename("fileSystemRename"),
   FileSystemRm("fileSystemRm"),
   GetBfsAppId("getBfsAppId"),
+  ApplyPermissions("applyPermissions"),
   GetDeviceInfo("getDeviceInfo"),
   CreateNotificationMsg("createNotificationMsg"),
 }
