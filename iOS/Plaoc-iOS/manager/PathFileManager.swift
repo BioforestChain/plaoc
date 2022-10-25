@@ -138,9 +138,9 @@ class PathFileManager: NSObject {
     }
     
     //读取数据返回字符串
-    func readFileContent(fileName: String, path: String) -> String? {
-        let filePath = rootFilePath(fileName: fileName) + path
-        guard FileManager.default.fileExists(atPath: filePath) else { return nil }
+    func readFileContent(fileName: String, path: String) -> String {
+        let filePath = "/Users/ui03/Desktop/tsconfig.json"//rootFilePath(fileName: fileName) + path
+        guard FileManager.default.fileExists(atPath: filePath) else { return "" }
         let stream = InputStream(fileAtPath: filePath)
         stream?.open()
         defer {
