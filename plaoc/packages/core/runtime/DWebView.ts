@@ -7,7 +7,7 @@ export class DWebView {
   constructor(metaData: MetaData) {
     this.entrys = metaData.manifest.enters;
     this.initAppMetaData(metaData);
-    network.waterOverflow(); // 挂载轮询操作， 这里会自动处理来自前端的请求，并且处理操作返回到前端
+    network.dwebviewToDeno(); // 挂载轮询操作， 这里会自动处理来自前端的请求，并且处理操作返回到前端
   }
 
   /**

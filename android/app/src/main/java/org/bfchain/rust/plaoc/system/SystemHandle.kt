@@ -1,8 +1,7 @@
 package org.bfchain.rust.plaoc.system
 
-import android.content.res.AssetManager
 import android.util.Log
-import com.king.mlkit.vision.camera.util.LogUtils
+import org.bfchain.libappmgr.utils.APP_DIR_TYPE
 import org.bfchain.libappmgr.utils.FilesUtil
 import org.bfchain.rust.plaoc.*
 import org.bfchain.rust.plaoc.system.device.DeviceInfo
@@ -11,6 +10,8 @@ import org.bfchain.rust.plaoc.system.notification.NotificationMsgItem
 import org.bfchain.rust.plaoc.webView.network.initMetaData
 import org.bfchain.rust.plaoc.webView.sendToJavaScript
 import org.bfchain.rust.plaoc.system.notification.NotifyManager
+import org.bfchain.rust.plaoc.system.permission.PermissionManager
+import org.bfchain.rust.plaoc.system.permission.PermissionUtil.getActualPermissions
 import org.bfchain.rust.plaoc.webView.network.dWebView_host
 
 
@@ -18,13 +19,13 @@ private val fileSystem = FileSystem()
 private val notifyManager = NotifyManager()
 
 /** 初始化系统后端app*/
-fun initServiceApp(assets: AssetManager) {
+fun initServiceApp() {
   val serviceId = arrayListOf("HE74YAAL")
   serviceId.forEach { id ->
    try {
-     val dApp  = FilesUtil.getDAppInfo(id)
+     val dApp  = FilesUtil.getDAppInfo(id, APP_DIR_TYPE.AssetsApp)
      dApp?.manifest?.bfsaEntry?.let {
-       createWorker(WorkerNative.valueOf("ReadOnlyRuntime"), RORuntime(it,assets).toString())
+       createWorker(WorkerNative.valueOf("ReadOnlyRuntime"), splicingPath(id,it))
      }
    } catch (e:Exception) {
      Log.i("initServiceApp: ", e.toString())
@@ -32,10 +33,16 @@ fun initServiceApp(assets: AssetManager) {
   }
 }
 
-data class RORuntime(
-  val url: String = "",
-  val assets: AssetManager = App.appContext.assets
-)
+/** 拼接入口*/
+fun splicingPath(bfsId:String, entry:String):String {
+  if (entry.startsWith("./")) {
+    return "/$bfsId${entry.replace("./","/")}"
+  }
+  if (entry.startsWith("/")) {
+    return  "/$bfsId$entry"
+  }
+  return "/$bfsId/$entry"
+}
 
 /** 初始化系统函数*/
  fun initSystemFn(activity: MainActivity) {
@@ -51,8 +58,8 @@ data class RORuntime(
     denoService.denoRuntime(it)
   }
   callable_map[ExportNative.ReadOnlyRuntime] = {
-    val handle = mapper.readValue(it, RORuntime::class.java)
-    denoService.onlyReadRuntime(handle.assets,handle.url)
+    println("ReadOnlyRuntime：$it")
+    denoService.onlyReadRuntime(App.appContext.assets,it)
   }
   callable_map[ExportNative.EvalJsRuntime] =
     { sendToJavaScript(it) }
@@ -98,6 +105,12 @@ data class RORuntime(
    /**deviceInfo */
   callable_map[ExportNative.GetDeviceInfo] = {
     DeviceInfo().getDeviceInfo()
+  }
+  /**申请应用权限 */
+  callable_map[ExportNative.ApplyPermissions] = {
+    val per = getActualPermissions(it)
+    println("ApplyPermissions:$per")
+    PermissionManager(activity).requestPermissions(per)
   }
   /** Notification */
   callable_map[ExportNative.CreateNotificationMsg] = {

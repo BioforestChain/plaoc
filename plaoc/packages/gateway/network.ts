@@ -20,6 +20,21 @@ export function registerServerWorker() {
 }
 
 /**
+ * 创建消息发送请求给 Kotlin 转发 dwebView-to-deno
+ * @param fun 操作函数
+ * @param data 数据
+ * @returns Promise<Ok>
+ */
+export function createMessage(fun: string, data: TNative = ""): Promise<string> {
+  if (data instanceof Object) {
+    data = JSON.stringify(data); // stringify 两次转义一下双引号
+  }
+  const message = `{"function":"${fun}","data":${JSON.stringify(data)}}`;
+  const buffer = new TextEncoder().encode(message);
+  return getConnectChannel(`/poll?data=${buffer}`);
+}
+
+/**
  *  发送请求到netive设置ui
  * @param url
  * @returns

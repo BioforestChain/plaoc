@@ -15,16 +15,16 @@ import org.bfchain.libappmgr.database.AppContract
 import org.bfchain.rust.plaoc.App
 
 object PermissionUtil {
-  const val PERMISSION_CALENDAR = "org.bfchain.rust.plaoc.CALENDAR"
-  const val PERMISSION_CAMERA = "org.bfchain.rust.plaoc.CAMERA"
-  const val PERMISSION_CONTACTS = "org.bfchain.rust.plaoc.CONTACTS"
-  const val PERMISSION_LOCATION = "org.bfchain.rust.plaoc.LOCATION"
-  const val PERMISSION_RECORD_AUDIO = "org.bfchain.rust.plaoc.RECORD_AUDIO"
-  const val PERMISSION_BODY_SENSORS = "org.bfchain.rust.plaoc.BODY_SENSORS"
-  const val PERMISSION_STORAGE = "org.bfchain.rust.plaoc.STORAGE"
-  const val PERMISSION_SMS = "org.bfchain.rust.plaoc.SMS"
-  const val PERMISSION_CALL = "org.bfchain.rust.plaoc.CALL"
-  const val PERMISSION_DEVICE = "org.bfchain.rust.plaoc.DEVICE"
+  const val PERMISSION_CALENDAR = "org.bfchain.rust.plaoc.CALENDAR" // 日历
+  const val PERMISSION_CAMERA = "org.bfchain.rust.plaoc.CAMERA" // 相机相册
+  const val PERMISSION_CONTACTS = "org.bfchain.rust.plaoc.CONTACTS" // 联系人
+  const val PERMISSION_LOCATION = "org.bfchain.rust.plaoc.LOCATION" // 位置
+  const val PERMISSION_RECORD_AUDIO = "org.bfchain.rust.plaoc.RECORD_AUDIO" // 录音
+  const val PERMISSION_BODY_SENSORS = "org.bfchain.rust.plaoc.BODY_SENSORS" // 传感器（重力，陀螺仪）
+  const val PERMISSION_STORAGE = "org.bfchain.rust.plaoc.STORAGE" // 存储
+  const val PERMISSION_SMS = "org.bfchain.rust.plaoc.SMS" // 短信
+  const val PERMISSION_CALL = "org.bfchain.rust.plaoc.CALL" // 电话
+  const val PERMISSION_DEVICE = "org.bfchain.rust.plaoc.DEVICE" // （手机状态）
 
   /**
    * 判断是否申请过系统权限

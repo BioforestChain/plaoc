@@ -1,5 +1,5 @@
 import { loop } from "../common/index.ts";
-import { getConnectChannel } from "@bfsx/gateway";
+import { createMessage } from "@bfsx/gateway";
 /**
  * 所有的dweb-plugin需要继承这个类
  */
@@ -9,7 +9,7 @@ export class DwebPlugin extends HTMLElement {
   /**反压高水位，暴露给开发者控制 */
   hightWaterMark = 10;
   /** 用来区分不同的Dweb-plugin建议使用英文单词，单元测试需要覆盖中文和特殊字符传输情况*/
-  channelId = "";
+  // channelId = "";
   constructor() {
     super();
   }
@@ -54,7 +54,7 @@ export class DwebPlugin extends HTMLElement {
     data = `"''"`,
     delay = 500,
   ): Promise<string> {
-    const ok = await this.createMessage(fun, data);
+    const ok = await createMessage(fun, data);
     let index = 1;
     // deno-lint-ignore no-async-promise-executor
     return new Promise(async (resolve, reject) => {
@@ -72,16 +72,5 @@ export class DwebPlugin extends HTMLElement {
       } while (index < 10);
     });
   }
-  /**
-   * 创建消息发送请求给 Kotlin 转发
-   * @param fun 操作函数
-   * @param data 数据
-   * @returns Promise<Ok>
-   */
-  createMessage(fun: string, data = `"''"`): Promise<string> {
-    const message =
-      `{"function":"${fun}","data":${data},"channelId":"${this.channelId}"}`;
-    const buffer = new TextEncoder().encode(message);
-    return getConnectChannel(`/poll?data=${buffer}`);
-  }
+
 }

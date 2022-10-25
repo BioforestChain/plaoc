@@ -9,6 +9,8 @@ export {
   sendNotification,
   isAndroid,
   getDeviceInfo,
-  EDeviceModule
+  EDeviceModule,
+  EPermissions,
+  applyPermissions,
 } from "./runtime/index.ts";
 export { network } from "./deno/network.ts"
