@@ -24,6 +24,7 @@ local.properties
 resource_3rd
 recommend-app
 Pods
+android/app/src/main/assets/*
 
 rust_lib/assets/rusty_v8_mirror/
 

@@ -2,6 +2,7 @@ package org.bfchain.rust.plaoc
 
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.provider.MediaStore
@@ -51,7 +52,7 @@ class MainActivity : AppCompatActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     // 初始化无界面APP
-    initServiceApp(this.assets)
+    initServiceApp()
     // 初始化系统函数map
     initSystemFn(this)
     setContent {
