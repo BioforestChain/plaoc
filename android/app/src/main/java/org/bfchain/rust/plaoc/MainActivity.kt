@@ -64,7 +64,6 @@ class MainActivity : AppCompatActivity() {
           Home() {appId, url ->
             dWebView_host = appId
             LogUtils.d("启动了Ar 扫雷：$dWebView_host--$url")
-
             createWorker(WorkerNative.valueOf("DenoRuntime"), url)
           }
         }

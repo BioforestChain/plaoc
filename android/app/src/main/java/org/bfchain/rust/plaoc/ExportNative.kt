@@ -25,6 +25,7 @@ enum class ExportNative(val type: String) {
 
 /** worker */
 enum class WorkerNative{
+  ReadOnlyRuntime,
   DenoRuntime,
   WorkerName,
   WorkerData

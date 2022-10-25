@@ -81,14 +81,14 @@ class Network {
    * 轮询向rust拿数据，路径为：dwebView-js-(fetch)->kotlin-(ffi)->rust-(op)->deno-js->kotlin(eventJs)->dwebView-js
    * 这里是接收dwebView-js操作系统API转发到后端的请求
   */
-  async waterOverflow() {
+  async dwebviewToDeno() {
     do {
       const data = await loopRustString("op_rust_to_js_buffer").next();
       /// 忽略策略:如果队列大于高水位或者没有数据，直接忽略
       if (data.done || this.isWaitingData > this.hightWaterMark) {
         continue;
       }
-      console.log("waterOverflow====>", data.value);
+      console.log("dwebviewToDeno====>", data.value);
       try {
         /// 如果是操作对象，拿出对象的操作函数和数据,传递给Kotlin
         const handler = JSON.parse(data.value);
