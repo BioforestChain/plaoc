@@ -10,7 +10,6 @@ import { loopRustString, loopRustBuffer } from "./rust.op.ts";
 const deno = new Deno();
 class Network {
   private isWaitingData = 0;
-  private pool: string[] = [];
   /**反压高水位，暴露给开发者控制 */
   hightWaterMark = 10;
 
@@ -89,20 +88,12 @@ class Network {
         continue;
       }
       console.log("dwebviewToDeno====>", data.value);
-      try {
-        /// 如果是操作对象，拿出对象的操作函数和数据,传递给Kotlin
-        const handler = JSON.parse(data.value);
-        // 保证存在操作函数中
-        if (Object.values(callDeno).includes(handler.function)) {
-          this.callKotlinFactory(handler);
-          continue;
-        }
-      } catch (_e) {
-        /// 如果是二进制数据的话，解析数据头和版本，拿到数据体传递给DwebView
-        if (this.isWaitingData !== 0) {
-          this.callDwebViewFactory(data.value);
-          continue;
-        }
+      /// 如果是操作对象，拿出对象的操作函数和数据,传递给Kotlin
+      const handler = JSON.parse(data.value);
+      // 保证存在操作函数中
+      if (Object.values(callDeno).includes(handler.function)) {
+        await this.callKotlinFactory(handler);
+        continue;
       }
       /// 这里是重点，使用 do-while ，替代 finally，可以避免堆栈溢出。
     } while (true);
@@ -113,23 +104,23 @@ class Network {
    * @param handler
    * @returns
    */
-  callKotlinFactory(handler: {
+  async callKotlinFactory(handler: {
     function: string;
     data: string;
-    channelId: string;
   }) {
-    deno.callFunction(handler.function, handler.data);
-    this.pool.push(handler.function);
-    if (this.isWaitingData >= Number.MAX_SAFE_INTEGER) return;
-    this.isWaitingData++; // 
+    // 等待数超过最高水位，操作全部丢弃
+    if (this.isWaitingData > this.hightWaterMark) return;
+    const result = await this.asyncCallDenoFunction(handler.function, handler.data)
+    this.callDwebViewFactory(handler.function, result)
+    this.isWaitingData++; // 增加一个等待数
   }
   /**
    * 数据传递到DwebView
    * @param data
    * @returns
    */
-  callDwebViewFactory(data: string) {
-    const handler = this.pool.shift() as keyof typeof callDVebView;
+  callDwebViewFactory(func: string, data: string) {
+    const handler = func as keyof typeof callDVebView;
     if (handler && callDVebView[handler]) {
       this.handlerEvalJs(callDVebView[handler], data);
     }
@@ -144,8 +135,6 @@ class Network {
   * @returns
   */
   handlerEvalJs(wb: string, data: string) {
-    // 等待数超过最高水位，操作全部丢弃
-    if (this.isWaitingData > this.hightWaterMark) return;
     console.log("handlerEvalJs:", this.isWaitingData, wb, data);
     deno.callEvalJsStringFunction(
       callDeno.evalJsRuntime,
