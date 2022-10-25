@@ -3,6 +3,7 @@ package org.bfchain.rust.plaoc.system
 import android.content.res.AssetManager
 import android.util.Log
 import com.king.mlkit.vision.camera.util.LogUtils
+import org.bfchain.libappmgr.utils.APP_DIR_TYPE
 import org.bfchain.libappmgr.utils.FilesUtil
 import org.bfchain.rust.plaoc.*
 import org.bfchain.rust.plaoc.system.device.DeviceInfo
@@ -25,7 +26,7 @@ fun initServiceApp(assets: AssetManager) {
   val serviceId = arrayListOf("HE74YAAL")
   serviceId.forEach { id ->
    try {
-     val dApp  = FilesUtil.getDAppInfo(id)
+     val dApp  = FilesUtil.getDAppInfo(id, APP_DIR_TYPE.AssetsApp)
      dApp?.manifest?.bfsaEntry?.let {
        createWorker(WorkerNative.valueOf("ReadOnlyRuntime"), RORuntime(it,assets).toString())
      }

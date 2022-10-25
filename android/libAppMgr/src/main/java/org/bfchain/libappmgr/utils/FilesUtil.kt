@@ -17,6 +17,8 @@ enum class APP_DIR_TYPE(val rootName: String) {
 
   // 客户应用
   UserApp(rootName = "user-app"),
+  // Assets
+  AssetsApp(rootName = ""),
 }
 
 /**
@@ -354,10 +356,19 @@ object FilesUtil {
   /**
    * 获取DAppInfo的版本信息
    */
-  fun getDAppInfo(bfsAppId: String): DAppInfo? {
-    val path = getAppRootDirectory(APP_DIR_TYPE.SystemApp) + File.separator + bfsAppId +
-      File.separator + DIR_BOOT + File.separator + FILE_BFSA_META_JSON
-    return JsonUtil.getDAppInfoFromBFSA(getFileContent(path))
+  fun getDAppInfo(bfsAppId: String, appType: APP_DIR_TYPE = APP_DIR_TYPE.SystemApp): DAppInfo? {
+    val content = when(appType) {
+      APP_DIR_TYPE.AssetsApp -> {
+        AppContextUtil.sInstance!!.assets.open("$bfsAppId/$DIR_BOOT/$FILE_BFSA_META_JSON")
+          .bufferedReader().use { it.readText() }
+      }
+      else -> {
+        val path = getAppRootDirectory(appType) + File.separator + bfsAppId +
+          File.separator + DIR_BOOT + File.separator + FILE_BFSA_META_JSON
+        getFileContent(path)
+      }
+    }
+    return JsonUtil.getDAppInfoFromBFSA(content)
   }
 }
 
