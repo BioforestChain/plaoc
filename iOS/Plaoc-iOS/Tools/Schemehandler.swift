@@ -26,7 +26,7 @@ class Schemehandler: NSObject, WKURLSchemeHandler {
     func webView(_ webView: WKWebView, start urlSchemeTask: WKURLSchemeTask) {
         guard var urlstring = urlSchemeTask.request.url?.absoluteString else { return }
         schemeTasksDict[urlSchemeTask.description] = true
- 
+        print(urlstring)
         if needIntercept(urlstring: urlstring) {
             analysisSetUiFunction(urlSchemeTask: urlSchemeTask, urlString: urlstring)
             return

@@ -9,7 +9,6 @@ import UIKit
 
 class BatchScanManager: BatchReadManager {
 
-    private var scanImageDict: [String: String] = [:]
     override func filePath() -> String {
         guard let filePath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first else { return "" }
         return filePath + "/scan-app"
@@ -21,7 +20,7 @@ class BatchScanManager: BatchReadManager {
     }
     
     func writeLinkJson(fileName: String, dict: [String:Any]) {
-        scanImageDict[fileName] = dict["icon"] as? String
+        
         let jsonString = ChangeTools.dicValueString(dict) ?? ""
         guard jsonString.count > 0 else { return }
         let path = filePath() + "/\(fileName)/boot/"
