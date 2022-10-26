@@ -4,11 +4,11 @@
 /**
  * 注册serverWorker方法
  */
-export function registerServerWorker() {
+export function registerServiceWorker() {
   addEventListener("load", () => {
     // 能力检测
     if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("serverWorker.mjs", { scope: "/" }).then(
+      navigator.serviceWorker.register("serviceWorker.js", { scope: "/" }).then(
         () => {
           console.log("Service Worker register success");
         },

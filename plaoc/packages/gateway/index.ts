@@ -8,4 +8,4 @@
 export * from './network.ts';
 export * from "./service.ts";
 export type { TNative } from './gateway.d.ts';
-export * from "./serverWorker.ts"
+export * from "./serviceWorker.ts"

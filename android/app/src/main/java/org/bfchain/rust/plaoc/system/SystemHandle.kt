@@ -25,7 +25,14 @@ fun initServiceApp() {
    try {
      val dApp  = FilesUtil.getDAppInfo(id, APP_DIR_TYPE.AssetsApp)
      dApp?.manifest?.bfsaEntry?.let {
-       createWorker(WorkerNative.valueOf("ReadOnlyRuntime"), splicingPath(id,it))
+       val path = splicingPath(id,it)
+       try {
+         App.appContext.assets.open(path) // 判断文件是否存在
+         createWorker(WorkerNative.valueOf("ReadOnlyRuntime"), path)
+       } catch (e: java.io.FileNotFoundException) {
+         Log.e("initServiceApp","not found ${e.message}")
+         null
+       }
      }
    } catch (e:Exception) {
      Log.i("initServiceApp: ", e.toString())
@@ -65,12 +72,10 @@ fun splicingPath(bfsId:String, entry:String):String {
     { sendToJavaScript(it) }
   /** fs System*/
   callable_map[ExportNative.FileSystemLs] = {
-//    Log.i("FileSystemLs:",it)
     val handle = mapper.readValue(it, FileLs::class.java)
     fileSystem.ls(handle.path,handle.option.filter, handle.option.recursive)
   }
   callable_map[ExportNative.FileSystemList] = {
-//    Log.i("FileSystemList:",it)
     val handle = mapper.readValue(it, FileLs::class.java)
     fileSystem.list(handle.path)
   }
