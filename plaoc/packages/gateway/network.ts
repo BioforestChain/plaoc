@@ -31,7 +31,7 @@ export function createMessage(fun: string, data: TNative = ""): Promise<string> 
   }
   const message = `{"function":"${fun}","data":${JSON.stringify(data)}}`;
   const buffer = new TextEncoder().encode(message);
-  return getConnectChannel(`/poll?data=${buffer}`);
+  return getConnectChannel(`/poll=${buffer}`);
 }
 
 /**
@@ -48,7 +48,7 @@ export function netCallNativeUi(
   }
   const message = `{"function":"${fun}","data":${JSON.stringify(data)}}`;
   const buffer = new TextEncoder().encode(message);
-  return getConnectChannel(`/setUi?data=${buffer}`);
+  return getConnectChannel(`/setUi=${buffer}`);
 }
 
 // deno-lint-ignore ban-types
@@ -79,7 +79,7 @@ export async function getConnectChannel(url: string) {
  * @returns 直接返回ok
  */
 
-export async function postConnectChannel(url: string) {
+export async function postConnectChannel(url: string, body: string) {
   const response = await fetch(url, {
     method: "POST", // dwebview 无法获取post的body,曲线救国，发送到serverWorker去处理成数据片。
     headers: {
@@ -87,6 +87,7 @@ export async function postConnectChannel(url: string) {
       "Content-Type": "application/json",
     },
     mode: "cors",
+    body: body
   });
   const data = await response.text();
   return data;

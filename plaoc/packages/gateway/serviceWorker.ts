@@ -1,45 +1,62 @@
 /// <reference lib="webworker" />
 
 const sw = self as unknown as ServiceWorkerGlobalScope;
-let channelId = ""
-sw.addEventListener("install", async function (event) {
-  channelId = await fetch(`/channel/registry`).then(res => res.text())
+let channelId = "";
+// 向native层申请channelId
+async function registerChnnel() {
+  return await fetch(`/channel/registry`).then(res => res.json());
+}
+
+sw.addEventListener("install", (event) => {
   event.waitUntil(sw.skipWaiting());
 });
 
-sw.addEventListener("activate", function (event) {
+sw.addEventListener("activate", (event) => {
   event.waitUntil(sw.clients.claim());
 });
 
-
-
-// deno-lint-ignore no-explicit-any
-const FETCH_EVENT_MAP = new Map<number, { event: FetchEvent, response?: Response, responseStream: ReadableStream, responseStreamController: ReadableStreamController<any> }>()
+const FETCH_EVENT_MAP = new Map<number,
+  {
+    event: FetchEvent, response?: Response, responseStream: ReadableStream,
+    responseStreamController: ReadableStreamController<ArrayBuffer> | null
+  }>()
 
 // remember event.respondWith must sync call🐰
 sw.addEventListener("fetch", async (event) => {
+  // 如果id为空需要申请id
+  if (channelId === "") {
+    channelId = await registerChnnel()
+  }
   const request = event.request;
+  // Build chunks
   const chunks = new HttpRequestBuilder(request, request.method, request.url, request.headers, request.body);
+
+  let responseStreamController: ReadableStreamController<ArrayBuffer> | null = null;
+  // 生成结构体
   const fetchTask = {
     event,
     response: new Response(),
     responseStream: new ReadableStream({
       start(controller) {
-        fetchTask.responseStreamController = controller
+        responseStreamController = controller
       }
     }),
-    responseStreamController: new ReadableStreamDefaultController,
+    responseStreamController,
   }
+  // 存起来
   FETCH_EVENT_MAP.set(chunks.reqId, fetchTask);
+  // 迭代发送
   for await (const chunk of chunks) {
     do {
-      const { success } = await fetch(`/channel/${channelId}/${chunk}`).then(res => res.json(), _ => ({ success: false }));
+      const { success } = await fetch(`/channel/${channelId}/chunk=${chunk}`)
+        .then(res => res.json(), _ => ({ success: false }));
       if (success) {
         break;
       }
       await sleep(10);
     } while (true)
   }
+
 });
 
 const encodeToHex = (reqId: number, data: string) => {
@@ -51,7 +68,7 @@ export class HttpRequestBuilder {
   static REQ_ID = new Uint16Array(1);
   static getReqId() {
     const reqId = HttpRequestBuilder.REQ_ID[0]
-    HttpRequestBuilder.REQ_ID[0] += 2;
+    HttpRequestBuilder.REQ_ID[0] += 1;
     return reqId;
   }
   readonly reqId = HttpRequestBuilder.getReqId()
@@ -67,9 +84,10 @@ export class HttpRequestBuilder {
 
   async *[Symbol.asyncIterator]() {
     const headerId = this.reqId;// 偶数为头
-    const bodyId = headerId + 1;// 奇数为body
-    yield encodeToHex(headerId, JSON.stringify([this.method, this.url, this.header]));
+    const bodyId = headerId.toString().padStart(4, '0');// 奇数为body
 
+    yield encodeToHex(headerId, JSON.stringify([this.method, this.url, this.header]));
+    // 如果body为空
     if (!this.body) {
       return
     }
@@ -79,8 +97,8 @@ export class HttpRequestBuilder {
       if (done) {
         break
       }
-      console.log("serviceWorker yield =>", `${bodyId.toString().padStart(4, '0')}${value}`)
-      yield `${bodyId.toString().padStart(4, '0')}${value}`
+
+      yield `${bodyId},${value}`
     }
   }
 }
