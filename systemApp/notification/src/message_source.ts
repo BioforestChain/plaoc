@@ -18,23 +18,14 @@ export async function asyncPollingCallDenoNotification(timeout = 3000) {
   const polling = async () => {
     do {
       const data = await loopRustNotification().next();
-      if (data.value) {
-        console.log("有消息");
-        console.log(data);
-      }
 
       if (data.done) {
         continue;
       }
 
-      console.log("typeof: ", typeof data.value);
-      console.log(JSON.parse(data.value));
-
       const messageInfo = data.value
         ? (JSON.parse(data.value) as IMessageSource)
         : undefined;
-
-      console.log("messageInfo", messageInfo);
 
       if (messageInfo) {
         messageToQueue(messageInfo);
@@ -42,7 +33,6 @@ export async function asyncPollingCallDenoNotification(timeout = 3000) {
 
       addEventListener(NOTIFICATION_MESSAGE_PUSH, async () => {
         isLocked = true;
-        console.log("addEventListener: ", isLocked);
         await messagePush();
         isLocked = false;
       });
@@ -50,7 +40,6 @@ export async function asyncPollingCallDenoNotification(timeout = 3000) {
     } while (true);
 
     if (!isLocked) {
-      console.log("dispatchEvent: ", isLocked);
       dispatchEvent(new Event(NOTIFICATION_MESSAGE_PUSH));
     }
 

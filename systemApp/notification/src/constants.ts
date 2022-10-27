@@ -11,7 +11,7 @@ export const NOTIFICATION_MESSAGE_QUEUE: IMessageInfo[] = [];
 export const NOTIFICATION_MESSAGE_PUSH = "notification_message_push";
 
 // native
-export const CREATE_NOTIFICATION_MSG = "createNotificationMsg";
+export const CREATE_NOTIFICATION_MSG = "CreateNotificationMsg";
 
 // ios getNotification
 export const GET_NOTIFICATION = "GetNotification";

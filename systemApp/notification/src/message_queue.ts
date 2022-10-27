@@ -32,14 +32,12 @@ export function messageToQueue(messageInfo: IMessageSource) {
     entry_queue_time: Date.now(),
     msg_status: MessageStatus.UNPROCESS,
   };
-  console.log("messageInfoItem", messageInfoItem);
 
   NOTIFICATION_MESSAGE_QUEUE.push(messageInfoItem);
   messagePriorityAscension();
 
   // 根据优先级排序
   NOTIFICATION_MESSAGE_QUEUE.sort((a, b) => b.msg_priority - a.msg_priority);
-  console.log("NOTIFICATION_MESSAGE_QUEUE", NOTIFICATION_MESSAGE_QUEUE);
 
   return;
 }
@@ -115,7 +113,7 @@ function messagePriorityInit(priority: MessagePriority): number {
  * @param bfsAppId 应用id
  * @returns
  */
-function genMessageIds(bfsAppId: string): bigint {
+function genMessageIds(bfsAppId: string): string {
   let tempWorkerId = 0;
   let tempDataCenterId = 0;
   for (const [index, item] of bfsAppId.split("").entries()) {
@@ -133,5 +131,5 @@ function genMessageIds(bfsAppId: string): bigint {
 
   // 雪花算法生成msg_id
   const snowFlake = new SnowFlake(workerId, dataCenterId);
-  return snowFlake.nextId();
+  return `${snowFlake.nextId()}`;
 }
