@@ -41,7 +41,6 @@
 		0443FCE928646E6A003425CD /* ConfirmConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0443FCE828646E6A003425CD /* ConfirmConfiguration.swift */; };
 		044C7DF0288E378F002D682A /* DocumentManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 044C7DEF288E378F002D682A /* DocumentManager.swift */; };
 		04560C872876E78E00638E2A /* CustomTabbarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04560C862876E78E00638E2A /* CustomTabbarViewController.swift */; };
-		045E369D286AF4B500A62263 /* resource_3rd in Resources */ = {isa = PBXBuildFile; fileRef = 045E369C286AF4B500A62263 /* resource_3rd */; };
 		04A664672898C43D006A11EB /* DiskManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04A664662898C43D006A11EB /* DiskManager.swift */; };
 		04B2B7D6287E5B8100172109 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04B2B7D5287E5B8100172109 /* NotificationManager.swift */; };
 		04B555E4287594C600314C9F /* ChangeTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04B555E3287594C600314C9F /* ChangeTools.swift */; };
@@ -92,6 +91,7 @@
 		F39A941328F79C8800E82EB2 /* NVHFile.m in Sources */ = {isa = PBXBuildFile; fileRef = F39A940D28F79C8800E82EB2 /* NVHFile.m */; };
 		F39A941428F79C8800E82EB2 /* NVHTarFile.m in Sources */ = {isa = PBXBuildFile; fileRef = F39A940E28F79C8800E82EB2 /* NVHTarFile.m */; };
 		F3B0946528F558150027CD06 /* NotificationName.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3B0946428F558150027CD06 /* NotificationName.swift */; };
+		F3B77B682909369A005A384D /* QueueManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3B77B672909369A005A384D /* QueueManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -148,7 +148,6 @@
 		0443FCE828646E6A003425CD /* ConfirmConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmConfiguration.swift; sourceTree = "<group>"; };
 		044C7DEF288E378F002D682A /* DocumentManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DocumentManager.swift; sourceTree = "<group>"; };
 		04560C862876E78E00638E2A /* CustomTabbarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTabbarViewController.swift; sourceTree = "<group>"; };
-		045E369C286AF4B500A62263 /* resource_3rd */ = {isa = PBXFileReference; lastKnownFileType = folder; path = resource_3rd; sourceTree = "<group>"; };
 		04A664662898C43D006A11EB /* DiskManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiskManager.swift; sourceTree = "<group>"; };
 		04B2B7D5287E5B8100172109 /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
 		04B555E3287594C600314C9F /* ChangeTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeTools.swift; sourceTree = "<group>"; };
@@ -215,6 +214,7 @@
 		F39A940D28F79C8800E82EB2 /* NVHFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NVHFile.m; sourceTree = "<group>"; };
 		F39A940E28F79C8800E82EB2 /* NVHTarFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NVHTarFile.m; sourceTree = "<group>"; };
 		F3B0946428F558150027CD06 /* NotificationName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationName.swift; sourceTree = "<group>"; };
+		F3B77B672909369A005A384D /* QueueManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueManager.swift; sourceTree = "<group>"; };
 		F406C3D95E45CC0D87A9E05A /* Pods_Plaoc_iOSTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Plaoc_iOSTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -344,7 +344,6 @@
 				F31B2B9228F80743008CDD5F /* controller */,
 				040E4D0028727DF4003569F1 /* Tools */,
 				04376B56286C36500007B444 /* jsFile */,
-				045E369C286AF4B500A62263 /* resource_3rd */,
 				041D100328630B4E00AEFE7D /* model */,
 				041D0FFB2862AEC300AEFE7D /* ocFile */,
 				0419F103286051D700EF8DC2 /* extension */,
@@ -444,6 +443,7 @@
 				04002FAC2897701900D03CB0 /* DatabaseManager.swift */,
 				04A664662898C43D006A11EB /* DiskManager.swift */,
 				F39930012900E9D50017D721 /* PathFileManager.swift */,
+				F3B77B672909369A005A384D /* QueueManager.swift */,
 			);
 			path = manager;
 			sourceTree = "<group>";
@@ -625,7 +625,6 @@
 				F31B2BAC28F80E74008CDD5F /* recommend-app in Resources */,
 				04BC49A628587590003FE6D9 /* LaunchScreen.storyboard in Resources */,
 				040E4D0C2872D9CF003569F1 /* coil_logo_colored.svg in Resources */,
-				045E369D286AF4B500A62263 /* resource_3rd in Resources */,
 				04BC49A328587590003FE6D9 /* Assets.xcassets in Resources */,
 				040E4D0D2872D9CF003569F1 /* angle_nft.png in Resources */,
 				04BC49A12858758E003FE6D9 /* Main.storyboard in Resources */,
@@ -792,6 +791,7 @@
 				0404B058287414F5000BABE8 /* XXWebView.swift in Sources */,
 				04B2B7D6287E5B8100172109 /* NotificationManager.swift in Sources */,
 				04BC499A2858758E003FE6D9 /* AppDelegate.swift in Sources */,
+				F3B77B682909369A005A384D /* QueueManager.swift in Sources */,
 				F3B0946528F558150027CD06 /* NotificationName.swift in Sources */,
 				04DCE25528869A5E001BE6B1 /* ThirdViewController.swift in Sources */,
 				F39A941328F79C8800E82EB2 /* NVHFile.m in Sources */,

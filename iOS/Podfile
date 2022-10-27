@@ -14,6 +14,7 @@ target 'Plaoc-iOS' do
   pod 'Moya'
   pod 'SSZipArchive'
   pod 'SDWebImage'
+  pod 'ZLPhotoBrowser'
   # Pods for Plaoc-iOS
 
 

@@ -103,10 +103,29 @@ class FirstViewController: UIViewController {
         
     }
     
+    var totals: [UIImageView] = []
     @objc func tap(sender: UIButton) {
 
 //        guard sender.tag < appNames.count else { return }
         if sender.tag == 2 {
+            
+            
+            for iv in totals {
+                iv.removeFromSuperview()
+            }
+            
+            photoManager.fetchPhAssetsFromLibraya(controller: self) { images in
+                let dis = (UIScreen.main.bounds.width - 64 - 240) / 3
+                for i in stride(from: 0, to: images.count, by: 1) {
+                    let imageV = UIImageView(frame: CGRect(x: 32 + CGFloat(i % 4) * (60 + dis), y: 300 + CGFloat(i / 4) * 80, width: 60, height: 60))
+                    imageV.image = images[i]
+                    self.view.addSubview(imageV)
+                    self.totals.append(imageV)
+                }
+            }
+
+            return
+            
             let third = ThirdViewController()
             third.callback = { [weak self] name in
                 guard let strongSelf = self else { return }
@@ -117,6 +136,25 @@ class FirstViewController: UIViewController {
             self.navigationController?.pushViewController(third, animated: true)
             return
         }
+        
+        
+        photoManager.previewImage(index: 0, controller: self) { (images, isChange) in
+            for iv in self.totals {
+                iv.removeFromSuperview()
+            }
+            let dis = (UIScreen.main.bounds.width - 64 - 240) / 3
+            for i in stride(from: 0, to: images.count, by: 1) {
+                let imageV = UIImageView(frame: CGRect(x: 32 + CGFloat(i % 4) * (60 + dis), y: 300 + CGFloat(i / 4) * 80, width: 60, height: 60))
+                imageV.image = images[i]
+                self.view.addSubview(imageV)
+                self.totals.append(imageV)
+            }
+        }
+        
+        
+        return
+        
+        
         let name = appNames[sender.tag]
         let type = batchManager.currentAppType(fileName: name)
         if type == .system {
