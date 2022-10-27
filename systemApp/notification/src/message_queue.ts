@@ -32,12 +32,14 @@ export function messageToQueue(messageInfo: IMessageSource) {
     entry_queue_time: Date.now(),
     msg_status: MessageStatus.UNPROCESS,
   };
+  console.log("messageInfoItem", messageInfoItem);
 
   NOTIFICATION_MESSAGE_QUEUE.push(messageInfoItem);
   messagePriorityAscension();
 
   // 根据优先级排序
   NOTIFICATION_MESSAGE_QUEUE.sort((a, b) => b.msg_priority - a.msg_priority);
+  console.log("NOTIFICATION_MESSAGE_QUEUE", NOTIFICATION_MESSAGE_QUEUE);
 
   return;
 }
@@ -50,6 +52,7 @@ function messagePriorityAscension() {
     // 如果状态为已处理，移除出队列
     if (item.msg_status === MessageStatus.PROCESSED) {
       NOTIFICATION_MESSAGE_QUEUE.splice(index, 1);
+      continue;
     }
 
     /**
@@ -113,20 +116,20 @@ function messagePriorityInit(priority: MessagePriority): number {
  * @returns
  */
 function genMessageIds(bfsAppId: string): bigint {
-  let tempWorkerId = "";
-  let tempDataCenterId = "";
+  let tempWorkerId = 0;
+  let tempDataCenterId = 0;
   for (const [index, item] of bfsAppId.split("").entries()) {
     // 取bfsAppId前四位为workerId
     if (index < 4) {
-      tempWorkerId += CODE_MAP.get(item);
+      tempWorkerId += parseInt(CODE_MAP.get(item)!);
     } else {
       // 后四位为dataCenterId
-      tempDataCenterId += CODE_MAP.get(item);
+      tempDataCenterId += parseInt(CODE_MAP.get(item)!);
     }
   }
 
-  const workerId = BigInt(tempWorkerId);
-  const dataCenterId = BigInt(tempDataCenterId);
+  const workerId = BigInt(tempWorkerId % 32);
+  const dataCenterId = BigInt(tempDataCenterId % 32);
 
   // 雪花算法生成msg_id
   const snowFlake = new SnowFlake(workerId, dataCenterId);

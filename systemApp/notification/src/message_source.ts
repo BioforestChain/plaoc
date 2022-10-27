@@ -1,10 +1,8 @@
-import { TextDecoder } from "node_util";
-import { EventEmitter } from "node_event";
-
 import { netCallNativeService } from "@bfsx/gateway";
 
-import { NOTIFICATION_MESSAGE_PUSH, GET_NOTIFICATION } from "./constants.ts";
+import { GET_NOTIFICATION, NOTIFICATION_MESSAGE_PUSH } from "./constants.ts";
 import { messageToQueue } from "./message_queue.ts";
+import { messagePush } from "./message_push.ts";
 
 import type * as types from "@bfsx/typings";
 import type { IMessageSource } from "../typings/message.type.ts";
@@ -15,29 +13,46 @@ import type { IMessageSource } from "../typings/message.type.ts";
  * @param ee      - 事件监听
  * @returns
  */
-export async function asyncPollingCallDenoNotification(
-  timeout = 3000,
-  ee: EventEmitter
-) {
+export async function asyncPollingCallDenoNotification(timeout = 3000) {
+  let isLocked = false;
   const polling = async () => {
     do {
       const data = await loopRustNotification().next();
+      if (data.value) {
+        console.log("有消息");
+        console.log(data);
+      }
 
       if (data.done) {
         continue;
       }
 
+      console.log("typeof: ", typeof data.value);
+      console.log(JSON.parse(data.value));
+
       const messageInfo = data.value
         ? (JSON.parse(data.value) as IMessageSource)
         : undefined;
+
+      console.log("messageInfo", messageInfo);
 
       if (messageInfo) {
         messageToQueue(messageInfo);
       }
 
-      ee.emit(NOTIFICATION_MESSAGE_PUSH);
+      addEventListener(NOTIFICATION_MESSAGE_PUSH, async () => {
+        isLocked = true;
+        console.log("addEventListener: ", isLocked);
+        await messagePush();
+        isLocked = false;
+      });
       break;
     } while (true);
+
+    if (!isLocked) {
+      console.log("dispatchEvent: ", isLocked);
+      dispatchEvent(new Event(NOTIFICATION_MESSAGE_PUSH));
+    }
 
     setTimeout(async () => {
       await polling();
@@ -86,10 +101,8 @@ export function loopRustNotification() {
  * @param ee      - 事件监听
  * @returns
  */
-export async function netCallNativeNotification(
-  timeout = 3000,
-  ee: EventEmitter
-) {
+export async function netCallNativeNotification(timeout = 3000) {
+  let isLocked = false;
   const polling = async () => {
     const messageString = await netCallNativeService(GET_NOTIFICATION);
 
@@ -100,9 +113,17 @@ export async function netCallNativeNotification(
         messages.forEach((message: IMessageSource) => {
           messageToQueue(message);
         });
-
-        ee.emit(NOTIFICATION_MESSAGE_PUSH);
       }
+
+      addEventListener(NOTIFICATION_MESSAGE_PUSH, async () => {
+        isLocked = true;
+        await messagePush();
+        isLocked = false;
+      });
+    }
+
+    if (!isLocked) {
+      dispatchEvent(new Event(NOTIFICATION_MESSAGE_PUSH));
     }
 
     setTimeout(async () => {

@@ -17,6 +17,7 @@ export async function messagePush() {
    * 如果消息大于等于20条，开始推送
    */
   const info = await getDeviceInfo();
+  console.log("DeviceInfo: ", info);
   if (
     info.module === EDeviceModule.doNotDisturb &&
     NOTIFICATION_MESSAGE_QUEUE.length < 20
@@ -36,13 +37,15 @@ export async function messagePush() {
             ? MessagePriority.DELAY_MESSAGE
             : MessagePriority.IMPORTANT_MESSAGE,
       };
+      console.log("message: ", message);
 
       // 推送接口
       await network.asyncCallDenoFunction(CREATE_NOTIFICATION_MSG, message);
+      console.log("asyncCallDenoFunction: 消息推送结束");
 
       // 更新消息为已完成
       item.msg_status = MessageStatus.PROCESSED;
-      console.log(item);
+      console.log("asyncItem: ", item);
     }
   }
 

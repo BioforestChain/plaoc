@@ -32,6 +32,7 @@ export const doBuild = async (npmFile: string) => {
       isolatedModules: true,
       experimentalDecorators: true,
       emitDecoratorMetadata: true,
+      lib: ["es2020"],
     },
     packageManager: "yarn",
     package: {
@@ -47,11 +48,11 @@ export const doBuild = async (npmFile: string) => {
       bugs: {
         url: "https://github.com/BioforestChain/plaoc/issues",
       },
-      dependencies: {
-        "@bfsx/core": "^0.0.7",
-        "@bfsx/metadata": "^0.0.7",
-        "@bfsx/gateway": "^0.0.7",
-      },
+      // dependencies: {
+      //   "@bfsx/core": "^0.0.7",
+      //   "@bfsx/metadata": "^0.0.7",
+      //   "@bfsx/gateway": "^0.0.7",
+      // },
       devDependencies: {
         "@bfsx/typings": "^0.0.7",
       },
