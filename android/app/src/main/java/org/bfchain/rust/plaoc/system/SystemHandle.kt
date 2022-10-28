@@ -1,8 +1,6 @@
 package org.bfchain.rust.plaoc.system
 
-import android.content.res.AssetManager
 import android.util.Log
-import com.king.mlkit.vision.camera.util.LogUtils
 import org.bfchain.libappmgr.utils.APP_DIR_TYPE
 import org.bfchain.libappmgr.utils.FilesUtil
 import org.bfchain.rust.plaoc.*
@@ -12,7 +10,6 @@ import org.bfchain.rust.plaoc.system.notification.NotificationMsgItem
 import org.bfchain.rust.plaoc.webView.network.initMetaData
 import org.bfchain.rust.plaoc.webView.sendToJavaScript
 import org.bfchain.rust.plaoc.system.notification.NotifyManager
-import org.bfchain.rust.plaoc.system.permission.EPermission
 import org.bfchain.rust.plaoc.system.permission.PermissionManager
 import org.bfchain.rust.plaoc.system.permission.PermissionUtil.getActualPermissions
 import org.bfchain.rust.plaoc.webView.network.dWebView_host
@@ -22,13 +19,20 @@ private val fileSystem = FileSystem()
 private val notifyManager = NotifyManager()
 
 /** 初始化系统后端app*/
-fun initServiceApp(assets: AssetManager) {
+fun initServiceApp() {
   val serviceId = arrayListOf("HE74YAAL")
   serviceId.forEach { id ->
    try {
      val dApp  = FilesUtil.getDAppInfo(id, APP_DIR_TYPE.AssetsApp)
      dApp?.manifest?.bfsaEntry?.let {
-       createWorker(WorkerNative.valueOf("ReadOnlyRuntime"), RORuntime(it,assets).toString())
+       val path = splicingPath(id,it)
+       try {
+         App.appContext.assets.open(path) // 判断文件是否存在
+         createWorker(WorkerNative.valueOf("ReadOnlyRuntime"), path)
+       } catch (e: java.io.FileNotFoundException) {
+         Log.e("initServiceApp","not found ${e.message}")
+         null
+       }
      }
    } catch (e:Exception) {
      Log.i("initServiceApp: ", e.toString())
@@ -36,10 +40,16 @@ fun initServiceApp(assets: AssetManager) {
   }
 }
 
-data class RORuntime(
-  val url: String = "",
-  val assets: AssetManager = App.appContext.assets
-)
+/** 拼接入口*/
+fun splicingPath(bfsId:String, entry:String):String {
+  if (entry.startsWith("./")) {
+    return "/$bfsId${entry.replace("./","/")}"
+  }
+  if (entry.startsWith("/")) {
+    return  "/$bfsId$entry"
+  }
+  return "/$bfsId/$entry"
+}
 
 /** 初始化系统函数*/
  fun initSystemFn(activity: MainActivity) {
@@ -55,19 +65,17 @@ data class RORuntime(
     denoService.denoRuntime(it)
   }
   callable_map[ExportNative.ReadOnlyRuntime] = {
-    val handle = mapper.readValue(it, RORuntime::class.java)
-    denoService.onlyReadRuntime(handle.assets,handle.url)
+    println("ReadOnlyRuntime：$it")
+    denoService.onlyReadRuntime(App.appContext.assets,it)
   }
   callable_map[ExportNative.EvalJsRuntime] =
     { sendToJavaScript(it) }
   /** fs System*/
   callable_map[ExportNative.FileSystemLs] = {
-//    Log.i("FileSystemLs:",it)
     val handle = mapper.readValue(it, FileLs::class.java)
     fileSystem.ls(handle.path,handle.option.filter, handle.option.recursive)
   }
   callable_map[ExportNative.FileSystemList] = {
-//    Log.i("FileSystemList:",it)
     val handle = mapper.readValue(it, FileLs::class.java)
     fileSystem.list(handle.path)
   }

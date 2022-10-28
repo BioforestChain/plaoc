@@ -5,7 +5,7 @@ import {
 } from "./constants.ts";
 
 import {
-  type IMessageInfoPush,
+  type IMessageInfo,
   MessagePriority,
   MessageStatus,
 } from "../typings/message.type.ts";
@@ -29,7 +29,7 @@ export async function messagePush() {
    */
   for (const item of NOTIFICATION_MESSAGE_QUEUE) {
     if (item.msg_status === MessageStatus.UNPROCESS) {
-      const message: IMessageInfoPush = {
+      const message: IMessageInfo = {
         ...item,
         priority:
           item.priority < MessagePriority.IMPORTANT_MESSAGE
@@ -42,7 +42,6 @@ export async function messagePush() {
 
       // 更新消息为已完成
       item.msg_status = MessageStatus.PROCESSED;
-      console.log(item);
     }
   }
 

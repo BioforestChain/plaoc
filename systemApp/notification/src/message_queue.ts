@@ -50,6 +50,7 @@ function messagePriorityAscension() {
     // 如果状态为已处理，移除出队列
     if (item.msg_status === MessageStatus.PROCESSED) {
       NOTIFICATION_MESSAGE_QUEUE.splice(index, 1);
+      continue;
     }
 
     /**
@@ -112,23 +113,23 @@ function messagePriorityInit(priority: MessagePriority): number {
  * @param bfsAppId 应用id
  * @returns
  */
-function genMessageIds(bfsAppId: string): bigint {
-  let tempWorkerId = "";
-  let tempDataCenterId = "";
+function genMessageIds(bfsAppId: string): string {
+  let tempWorkerId = 0;
+  let tempDataCenterId = 0;
   for (const [index, item] of bfsAppId.split("").entries()) {
     // 取bfsAppId前四位为workerId
     if (index < 4) {
-      tempWorkerId += CODE_MAP.get(item);
+      tempWorkerId += parseInt(CODE_MAP.get(item)!);
     } else {
       // 后四位为dataCenterId
-      tempDataCenterId += CODE_MAP.get(item);
+      tempDataCenterId += parseInt(CODE_MAP.get(item)!);
     }
   }
 
-  const workerId = BigInt(tempWorkerId);
-  const dataCenterId = BigInt(tempDataCenterId);
+  const workerId = BigInt(tempWorkerId % 32);
+  const dataCenterId = BigInt(tempDataCenterId % 32);
 
   // 雪花算法生成msg_id
   const snowFlake = new SnowFlake(workerId, dataCenterId);
-  return snowFlake.nextId();
+  return `${snowFlake.nextId()}`;
 }

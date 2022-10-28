@@ -45,7 +45,7 @@ export interface IMessageInfo {
   // 消息推送时间 YYYY-MM-DD hh:mm:ss
   // time?: string;
   // 消息id，类似：18100287420699802
-  msg_id: bigint;
+  msg_id: string;
   // 入队时间：timestamp，用于长时间未能处于优先级较高时，提升优先级，避免饿死
   entry_queue_time: number;
   // 当前消息处理状态
@@ -68,10 +68,4 @@ export enum PhoneStatus {
   SILENT_MODE,
   // 正常模式
   NORMAL_MODE,
-}
-
-/** 推送消息结构 */
-export interface IMessageInfoPush extends IMessageInfo {
-  // 消息id，类似：18100287420699802
-  msg_id: bigint;
 }

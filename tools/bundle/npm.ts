@@ -35,15 +35,15 @@ export const buildOptions: BuildOptions = {
       url: "https://github.com/BioforestChain/plaoc/issues",
     },
     dependencies: {
-      tar: "^6.1.11",
-      commander: "^9.4.0",
-      "@bfsx/gateway": "^0.0.4",
+      // 不能在import_map中依赖，否则会被tree shaking。如果引用，则会报错。
+      "@bfsx/gateway": "^0.0.8",
     },
     devDependencies: {
       "@types/node": "latest",
       "@types/tar": "^6.1.3",
-      "@bfsx/typings": "^0.0.3",
-      "@bfsx/metadata": "^0.0.4",
+      "@types/inquirer": "^9.0.2",
+      "@bfsx/typings": "^0.0.7",
+      "@bfsx/metadata": "^0.0.7",
     },
   },
 };

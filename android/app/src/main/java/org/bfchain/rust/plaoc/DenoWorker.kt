@@ -18,13 +18,13 @@ class DenoWorker(appContext: Context, workerParams: WorkerParameters) :
     Log.i(TAG, "WorkerName=$funName,WorkerData=$data")
     if (funName !== null) {
       val calFn = ExportNative.valueOf(funName)
-        thread {
-          callable_map[calFn]?.let { it ->
-            if (data != null) {
-              it(data)
-            }
+      thread {
+        callable_map[calFn]?.let { it ->
+          if (data != null) {
+            it(data)
           }
         }
+      }
     }
     return Result.success()
   }

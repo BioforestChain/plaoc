@@ -4,11 +4,11 @@
 /**
  * 注册serverWorker方法
  */
-export function registerServerWorker() {
+export function registerServiceWorker() {
   addEventListener("load", () => {
     // 能力检测
     if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("serverWorker.mjs", { scope: "/" }).then(
+      navigator.serviceWorker.register("serviceWorker.js", { scope: "/" }).then(
         () => {
           console.log("Service Worker register success");
         },
@@ -17,6 +17,21 @@ export function registerServerWorker() {
       });
     }
   });
+}
+
+/**
+ * 创建消息发送请求给 Kotlin 转发 dwebView-to-deno
+ * @param fun 操作函数
+ * @param data 数据
+ * @returns Promise<Ok>
+ */
+export function createMessage(fun: string, data: TNative = ""): Promise<string> {
+  if (data instanceof Object) {
+    data = JSON.stringify(data); // stringify 两次转义一下双引号
+  }
+  const message = `{"function":"${fun}","data":${JSON.stringify(data)}}`;
+  const buffer = new TextEncoder().encode(message);
+  return getConnectChannel(`/poll=${buffer}`);
 }
 
 /**
@@ -33,7 +48,7 @@ export function netCallNativeUi(
   }
   const message = `{"function":"${fun}","data":${JSON.stringify(data)}}`;
   const buffer = new TextEncoder().encode(message);
-  return getConnectChannel(`/setUi?data=${buffer}`);
+  return getConnectChannel(`/setUi=${buffer}`);
 }
 
 // deno-lint-ignore ban-types
@@ -64,7 +79,7 @@ export async function getConnectChannel(url: string) {
  * @returns 直接返回ok
  */
 
-export async function postConnectChannel(url: string) {
+export async function postConnectChannel(url: string, body: string) {
   const response = await fetch(url, {
     method: "POST", // dwebview 无法获取post的body,曲线救国，发送到serverWorker去处理成数据片。
     headers: {
@@ -72,6 +87,7 @@ export async function postConnectChannel(url: string) {
       "Content-Type": "application/json",
     },
     mode: "cors",
+    body: body
   });
   const data = await response.text();
   return data;

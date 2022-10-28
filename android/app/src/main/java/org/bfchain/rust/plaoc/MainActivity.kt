@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.ui.Modifier
+import com.github.yitter.contract.IdGeneratorOptions
+import com.github.yitter.idgen.YitIdHelper
 import com.google.mlkit.vision.barcode.Barcode
 import com.king.app.dialog.AppDialog
 import com.king.app.dialog.AppDialogConfig
@@ -26,6 +28,7 @@ import org.bfchain.libappmgr.ui.main.Home
 import org.bfchain.rust.plaoc.lib.drawRect
 import org.bfchain.rust.plaoc.system.barcode.BarcodeScanningActivity
 import org.bfchain.rust.plaoc.system.barcode.QRCodeScanningActivity
+import org.bfchain.rust.plaoc.system.device.DeviceInfo
 import org.bfchain.rust.plaoc.system.initServiceApp
 import org.bfchain.rust.plaoc.system.initSystemFn
 import org.bfchain.rust.plaoc.ui.theme.RustApplicationTheme
@@ -51,15 +54,17 @@ class MainActivity : AppCompatActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     // 初始化无界面APP
-    initServiceApp(this.assets)
+    initServiceApp()
     // 初始化系统函数map
     initSystemFn(this)
+    // 初始化id生成
+    initYitIdHelper()
     setContent {
       RustApplicationTheme {
         Box(
           modifier = Modifier
-              .fillMaxSize()
-              .background(MaterialTheme.colors.primary)
+            .fillMaxSize()
+            .background(MaterialTheme.colors.primary)
         ) {
           Home() {appId, url ->
             dWebView_host = appId
@@ -70,8 +75,11 @@ class MainActivity : AppCompatActivity() {
       }
     }
   }
-
-
+  /** 初始化唯一id*/
+  private fun initYitIdHelper() {
+    val options = IdGeneratorOptions()
+    YitIdHelper.setIdGenerator(options)
+  }
 
 
   // 选择图片后回调到这

@@ -20,5 +20,5 @@ export function netCallNativeService(
   }
   const message = `{"function":"${fun}","data":${JSON.stringify(data)}}`;
   const buffer = new TextEncoder().encode(message);
-  return getConnectChannel(`/setService?data=${buffer}`);
+  return getConnectChannel(`/setService=${buffer}`);
 }

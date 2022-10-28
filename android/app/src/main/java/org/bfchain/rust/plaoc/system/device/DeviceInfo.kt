@@ -34,6 +34,10 @@ class DeviceInfo {
     return AppInfo().getAppInfo()
   }
 
+  fun getDevice(): String {
+    return deviceData.deviceVersion
+  }
+
   fun getBatteryInfo(): String {
     return BatteryInfo().getBatteryInfo()
   }

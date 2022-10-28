@@ -3,6 +3,8 @@
 import * as process from "node_process";
 import { Command } from "commander";
 import { bundle } from "cmd_bundle";
+import { bundleProblemsFlow } from "problem";
+import { checkSign, genBfsAppId } from "check";
 import npmConfig from "../npm.json" assert { type: "json" };
 
 const program = new Command();
@@ -22,12 +24,38 @@ program
     "-i, --bfs-appid <string>",
     "bfsAppId: app unique identification，new app ignore."
   )
-  .action((options: any) => {
-    bundle({
-      bfsAppId: options.bfsAppid,
+  .action(async (options: any) => {
+    /**
+     * bfsAppId存在，则校验，否则生成
+     */
+    let bfsAppId = "";
+    if (options.bfsAppid) {
+      // 校验bfsAppId是否合法
+      const suc = await checkSign(options.bfsAppid);
+
+      if (!suc) {
+        throw new Error("bfsAppId不合法，请输入正确的bfsAppId");
+      }
+
+      bfsAppId = options.bfsAppid;
+    } else {
+      bfsAppId = await genBfsAppId();
+    }
+
+    await bundle({
+      bfsAppId: bfsAppId,
       frontPath: options.frontPath,
       backPath: options.backPath,
     });
+  });
+
+// 使用交互模式
+program
+  .command("interactive")
+  .description("bfsa bundle project to .bfsa by interactive command line")
+  .action(async () => {
+    const problemConfig = await bundleProblemsFlow();
+    await bundle(problemConfig);
   });
 
 program.parse(process.argv);

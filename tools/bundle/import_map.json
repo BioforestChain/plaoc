@@ -10,10 +10,17 @@
     "node_url": "https://deno.land/std@0.157.0/node/url.ts",
     "std_crypto": "https://deno.land/std@0.157.0/crypto/mod.ts",
     "std_path": "https://deno.land/std@0.157.0/path/mod.ts",
+    "rollup": "https://esm.sh/rollup@3.2.3",
+    "@rollup/plugin-node-resolve": "https://esm.sh/@rollup/plugin-node-resolve@15.0.1",
+    "commander": "https://esm.sh/commander@9.4.0",
+    "tar": "https://esm.sh/tar@6.1.11",
+    "inquirer": "https://esm.sh/inquirer@9.1.4",
     "crypto": "./utils/crypto.ts",
     "path": "./utils/path.ts",
     "check": "./utils/check.ts",
     "compress": "./utils/compress.ts",
+    "rollup-bundle": "./utils/rollup-bundle.ts",
+    "problem": "./utils/problem.ts",
     "cmd_bundle": "./cmd/bundle.ts"
   }
 }
