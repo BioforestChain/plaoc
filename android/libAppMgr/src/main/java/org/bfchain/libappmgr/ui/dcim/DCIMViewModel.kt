@@ -1,16 +1,83 @@
 package org.bfchain.libappmgr.ui.dcim
 
-import android.media.MediaMetadataRetriever
 import android.os.Environment
+import androidx.collection.ArrayMap
+import androidx.collection.arrayMapOf
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import org.bfchain.libappmgr.entity.DCIMInfo
+import org.bfchain.libappmgr.entity.DCIMSpinner
 import org.bfchain.libappmgr.entity.DCIMType
 import org.bfchain.libappmgr.entity.MediaFile
 import java.io.File
 
 class DCIMViewModel : ViewModel() {
+  val showViewer = mutableStateOf(false) // 用于大图状态
+  val showSpinner = mutableStateOf(false) // 用于大图状态
+  val totalSize = mutableStateOf(0)
+  val checkedSize = mutableStateOf(0)
+  val dcimInfoList = mutableStateListOf<DCIMInfo>() // 用于保存图片列表信息
+  val dcimInfo = mutableStateOf(DCIMInfo("")) // 用于保存当前选中的图片
+
+  val dcimSpinnerList = arrayListOf<DCIMSpinner>() // 用于保存选项列表
+  val checkedList = arrayListOf<DCIMInfo>() // 用于保存选中的图片信息
+
+  var dcimSpinner: DCIMSpinner = DCIMSpinner("", "图片和视频", 0) // 表示加载的是都有的图片和视频
+  val maps = arrayMapOf<String, ArrayList<DCIMInfo>>()
+
+  /**
+   * 用于接收回调
+   * send：有选择图片或者视频，返回具体路径
+   * cancel：取消
+   */
+  interface CallBack {
+    fun send(fileList: ArrayList<String>)
+    fun cancel()
+  }
+
+  var mCallBack: CallBack? = null
+  fun setCallback(callback: CallBack) {
+    mCallBack = callback
+  }
+
+  /**
+   * 修改选中列表的数据，由于需要刷新列表和状态，所以统一这边处理
+   */
+  fun updateCheckedList(dcimInfo: DCIMInfo) {
+    if (dcimInfo.checked.value) {
+      checkedList.remove(dcimInfo)
+    } else {
+      checkedList.add(dcimInfo)
+    }
+    dcimInfo.checked.value = !dcimInfo.checked.value
+    checkedSize.value = checkedList.size
+    var index = 1
+    checkedList.forEach {
+      it.index.value = index
+      index++
+    }
+  }
+
+  /**
+   * Spinner选择不同的类型的，列表进行重新加载
+   */
+  fun refreshDCIMInfoList(dcimSpinner: DCIMSpinner) {
+    this.dcimSpinner = dcimSpinner
+    this.showSpinner.value = false
+
+    dcimInfoList.clear()
+    //checkedList.clear()
+
+    maps.iterator().forEach {
+      if (it.key == dcimSpinner.name) {
+        dcimInfoList.addAll(it.value)
+      }
+    }
+  }
+
   // 加载图片内容
   fun loadDCIMInfo(
     result: (retMap: HashMap<String, ArrayList<DCIMInfo>>) -> Unit
@@ -28,7 +95,7 @@ class DCIMViewModel : ViewModel() {
   /**
    * 遍历当前目录所有文件
    */
-  private fun createDCIM(path: String, maps: HashMap<String, ArrayList<DCIMInfo>>) {
+  private fun createDCIM(path: String, maps: ArrayMap<String, ArrayList<DCIMInfo>>) {
     var defaultPicture = "Pictures"
     if (!maps.containsKey(defaultPicture)) maps[defaultPicture] =
       arrayListOf() // 默认先创建一个图片目录，用于保存根目录存在的图片
@@ -62,34 +129,30 @@ class DCIMViewModel : ViewModel() {
    */
   private fun traverseDCIM(path: String, maps: HashMap<String, ArrayList<DCIMInfo>>) {
     var defaultPicture = "Pictures"
-    if (!maps.containsKey(defaultPicture)) maps[defaultPicture] = arrayListOf() // 默认先创建一个图片目录，用于保存根目录存在的图片
+    if (!maps.containsKey(defaultPicture)) maps[defaultPicture] =
+      arrayListOf() // 默认先创建一个图片目录，用于保存根目录存在的图片
     var files = File(path).listFiles()
     files?.forEach inLoop@{ file ->
       var name = file.name
       if (name.startsWith(".")) return@inLoop // 判断第一个字符如果是. 不执行当前文件，直接continue
       if (file.isFile) {
-        var type = MediaFile.getDCIMType(file.absolutePath)
-        when (type) {
-          DCIMType.VIDEO -> maps[defaultPicture]!!.add(
-            DCIMInfo(file.absolutePath, type, duration = file.getVideoDuration())
-          )
-          DCIMType.IMAGE, DCIMType.GIF -> maps[defaultPicture]!!.add(
-            DCIMInfo(file.absolutePath, type)
-          )
+        var dcimInfo = MediaFile.createDCIMInfo(file.absolutePath)
+        when (dcimInfo.type) {
+          DCIMType.VIDEO, DCIMType.IMAGE, DCIMType.GIF -> {
+            maps[defaultPicture]!!.add(dcimInfo)
+          }
         }
       } else if (file.isDirectory) {
         var list = maps[name] ?: arrayListOf()
         file.walk().iterator().forEach subLoop@{ subFile ->
           if (subFile.name.startsWith(".")) return@subLoop
-          var type = MediaFile.getDCIMType(subFile.absolutePath)
-          if (subFile.isFile && type != DCIMType.OTHER) {
-            var di = when (type) {
-              DCIMType.VIDEO ->
-                DCIMInfo(subFile.absolutePath, type, duration = subFile.getVideoDuration())
-              else ->
-                DCIMInfo(subFile.absolutePath, type)
+          if (subFile.isFile) {
+            var dcimInfo = MediaFile.createDCIMInfo(subFile.absolutePath)
+            when (dcimInfo.type) {
+              DCIMType.VIDEO, DCIMType.IMAGE, DCIMType.GIF -> {
+                list.add(dcimInfo)
+              }
             }
-            list.add(di)
           }
         }
         if (list.isNotEmpty() && !maps.containsKey(name)) {
@@ -98,11 +161,4 @@ class DCIMViewModel : ViewModel() {
       }
     }
   }
-}
-
-//获取视频时长 单位秒
-fun File.getVideoDuration(): Int {
-  val mmr = MediaMetadataRetriever()
-  mmr.setDataSource(absolutePath)
-  return mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toInt()?.div(1000) ?: 0
 }
