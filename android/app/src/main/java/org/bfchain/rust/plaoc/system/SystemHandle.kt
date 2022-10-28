@@ -6,6 +6,7 @@ import org.bfchain.libappmgr.utils.FilesUtil
 import org.bfchain.rust.plaoc.*
 import org.bfchain.rust.plaoc.system.device.DeviceInfo
 import org.bfchain.rust.plaoc.system.file.*
+import org.bfchain.rust.plaoc.system.notification.MessageSource
 import org.bfchain.rust.plaoc.system.notification.NotificationMsgItem
 import org.bfchain.rust.plaoc.webView.network.initMetaData
 import org.bfchain.rust.plaoc.webView.sendToJavaScript
@@ -43,12 +44,12 @@ fun initServiceApp() {
 /** 拼接入口*/
 fun splicingPath(bfsId:String, entry:String):String {
   if (entry.startsWith("./")) {
-    return "/$bfsId${entry.replace("./","/")}"
+    return "$bfsId${entry.replace("./","/")}"
   }
   if (entry.startsWith("/")) {
-    return  "/$bfsId$entry"
+    return  "$bfsId$entry"
   }
-  return "/$bfsId/$entry"
+  return "$bfsId/$entry"
 }
 
 /** 初始化系统函数*/
@@ -120,12 +121,16 @@ fun splicingPath(bfsId:String, entry:String):String {
   /** Notification */
   callable_map[ExportNative.CreateNotificationMsg] = {
     val message = mapper.readValue(it, NotificationMsgItem::class.java)
-
+   val channelType =  when(message.msg_src) {
+     "app_message" -> NotifyManager.ChannelType.DEFAULT
+     "push_message"-> NotifyManager.ChannelType.IMPORTANT
+     else ->  NotifyManager.ChannelType.DEFAULT
+   }
     notifyManager.createNotification(
       title = message.title,
       text = message.msg_content,
       bigText = message.msg_content,
-      channelType = message.priority,
+      channelType = channelType,
     )
   }
 }

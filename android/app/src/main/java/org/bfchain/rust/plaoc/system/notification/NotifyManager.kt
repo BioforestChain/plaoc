@@ -120,13 +120,15 @@ enum class MessageSource(value: String) {
   APP("app_message"), PUSH("push_message")
 }
 
+
 /** 消息中心返回数据结构 */
 data class NotificationMsgItem (
-  val app_id: String,
-  val title: String,
-  val msg_content: String,
-  val msg_src: MessageSource,
-  val priority: NotifyManager.ChannelType,
-  val time: String,
-  val msg_id: Long,
+  val app_id: String = "",
+  val title: String = "",
+  val msg_content: String = "",
+  val msg_src: String = "app_message",
+  val msg_priority: Int  = 1,
+  val entry_queue_time: String = "",
+  val msg_status:String = "",
+  val msg_id:String="" ,
 )

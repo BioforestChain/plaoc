@@ -1,5 +1,5 @@
 /// <reference lib="dom" />
-import { netCallNativeUi } from "@bfsx/gateway";
+import { getCallNativeUi } from "@bfsx/gateway";
 import { DwebPlugin } from "./dweb-plugin.ts";
 import { NativeHandle, NativeUI } from "../common/nativeHandle.ts";
 
@@ -15,11 +15,11 @@ export class Navigation extends DwebPlugin {
   }
   /**隐藏系统导航栏 默认值false隐藏 */
   setNavigationBarVisible(isHide = false) {
-    return netCallNativeUi(NativeUI.SetNavigationBarVisible, isHide);
+    return getCallNativeUi(NativeUI.SetNavigationBarVisible, isHide);
   }
   /**获取系统导航栏颜色 */
   getNavigationBarVisible() {
-    return netCallNativeUi(NativeUI.GetNavigationBarVisible);
+    return getCallNativeUi(NativeUI.GetNavigationBarVisible);
   }
   /**
    * 设置导航栏颜色
@@ -33,7 +33,7 @@ export class Navigation extends DwebPlugin {
     darkIcons = false,
     isNavigationBarContrastEnforced = true,
   ) {
-    return netCallNativeUi(NativeUI.SetNavigationBarColor, {
+    return getCallNativeUi(NativeUI.SetNavigationBarColor, {
       colorHex,
       darkIcons,
       isNavigationBarContrastEnforced,
@@ -41,11 +41,11 @@ export class Navigation extends DwebPlugin {
   }
   /** 获取系统导航栏是否覆盖内容*/
   getNavigationBarOverlay() {
-    return netCallNativeUi(NativeUI.GetNavigationBarOverlay);
+    return getCallNativeUi(NativeUI.GetNavigationBarOverlay);
   }
   /**设置系统导航栏是否覆盖内容,默认值false为不覆盖 */
   setNavigationBarOverlay(isOverlay = false) {
-    return netCallNativeUi(NativeUI.SetNavigationBarOverlay, isOverlay);
+    return getCallNativeUi(NativeUI.SetNavigationBarOverlay, isOverlay);
   }
 }
 

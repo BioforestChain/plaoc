@@ -4,10 +4,12 @@ import android.util.Log
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import com.fasterxml.jackson.databind.DeserializationFeature
+import org.bfchain.libappmgr.utils.JsonUtil
 import org.bfchain.rust.plaoc.*
 import org.bfchain.rust.plaoc.webView.urlscheme.CustomUrlScheme
 import java.io.ByteArrayInputStream
 import java.net.URL
+import java.nio.ByteBuffer
 import java.util.*
 
 
@@ -20,12 +22,37 @@ var dWebView_host = ""
 // ð这里是路由的白名单
 var network_whitelist = "http://127.0.0.1"
 
+/** 分发解析的请求*/
+fun resolveNetworkRequest(
+  request: WebResourceRequest,
+  path: String,
+  header: String,
+  channelId: String,
+)
+  : WebResourceResponse {
+  // 拿到消息体，转换为结构体
+  val stringHex = path.substring(path.lastIndexOf("=") + 1);
 
-fun resolveNetworkRequest(): WebResourceResponse  {
+  //拦截转发到后端的事件
+  if (path.startsWith("/poll")) {
+    messageGateWay(stringHex)
+  } else if (path.startsWith("/setUi")) { //拦截设置ui的请求，代替JavascriptInterface
+    val stringData = String(hexStrToByteArray(stringHex))
+    println("resolveNetworkRequest: $stringData")
+    val result = uiGateWay(stringData)
+    networkResponse(channelId, header, result)
+  }
+
+  val suffixIndex = path.lastIndexOf(".")
+  // 只拦截数据文件,忽略资源文件
+  if (suffixIndex == -1) {
+    dataGateWay(request)
+  }
+
   return WebResourceResponse(
     "application/json",
     "utf-8",
-    ByteArrayInputStream("{}".toByteArray())
+    ByteArrayInputStream(JsonUtil.toJson(Response()).toByteArray())
   )
 }
 
@@ -37,49 +64,91 @@ fun interceptNetworkRequests(
   val url = request.url.toString()
   val path = request.url.path
   // 防止卡住请求为空而崩溃
-  if (!url.isNullOrEmpty()) {
+  if (!url.isNullOrEmpty() && !path.isNullOrEmpty()) {
     val temp = url.substring(url.lastIndexOf("/") + 1)
-
-    //拦截转发到后端的事件
-    if (temp.startsWith("poll")) {
-      return messageGateWay(request)
-    }
-    //拦截设置ui的请求，代替JavascriptInterface
-    if (temp.startsWith("setUi")) {
-      return uiGateWay(request)
-    }
-      // 注册channelId
+    // 注册channelId
     if (path == "/channel/registry") {
-      return  registerChannelId()
+      return registerChannelId()
     }
+    // 解析接收数据
     if (temp.startsWith("chunk")) {
-      return resolveNetworkRequest()
+      // 拿到channelID
+      val channelId = path.substring(path.lastIndexOf("/channel/") + 9, path.lastIndexOf("/chunk"))
+      parseChunkBinary(request, channelId, temp)
     }
-    val suffixIndex = temp.lastIndexOf(".")
-    // 只拦截数据文件,忽略资源文件
-    if (suffixIndex == -1) {
-      return dataGateWay(request)
-    }
+
     // 跳过白名单
     if (jumpWhitelist(url)) {
       // 拦截视图文件
-      if (url.endsWith(".html")) {
+      if (path.endsWith(".html")) {
         return viewGateWay(customUrlScheme, request)
       }
       // 映射本地文件的资源文件 https://bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj.dweb/index.mjs -> /plaoc/index.mjs
       if (Regex(dWebView_host.lowercase(Locale.ROOT)).containsMatchIn(url)) {
-        val path = URL(url).path
         return customUrlScheme.handleRequest(request, path)
       }
     }
   }
+
   return WebResourceResponse(
     "application/json",
     "utf-8",
-    ByteArrayInputStream("无权限，需要前往后端配置".toByteArray())
+    ByteArrayInputStream(JsonUtil.toJson(Response(false)).toByteArray())
   )
 }
 
+var header = ""
+var arrayBody = ""
+var stringPath = ""
+
+/**解析chunk 的数据*/
+fun parseChunkBinary(
+  request: WebResourceRequest,
+  channelId: String, path: String
+) {
+  if (path.lastIndexOf("=") == -1) {
+    return
+  }
+  // 拿到chunk的请求体
+  val strBits = path.substring(path.lastIndexOf("=") + 1);
+  // 拿到头部
+  val headerId = strBits.substring(0, strBits.indexOf(":")).toInt()
+  // 主体内容
+  val hexBody = strBits.substring(strBits.indexOf(":") + 1)
+  println("hexBody===>:${String(hexStrToByteArray(hexBody))}")
+  // headerId偶数为请求头
+  if (headerId.rem(2) == 0) {
+    val stringBody = String(hexStrToByteArray(hexBody));
+    // 解析出真正的请求
+    val stringArray = stringBody.split("|")
+    val stringData = stringArray[0]
+    header = stringArray[1]
+    // 拿到真正的请求消息
+    stringPath = stringData.substring(stringData.lastIndexOf("/"))
+    println("parseChunkBinary headerId:$headerId,${stringPath.lastIndexOf("=")}")
+    // 表示为get请求,携带了param参数
+    if (stringPath.lastIndexOf("=") != -1) {
+      // 分发请求
+      resolveNetworkRequest(request, stringPath, header, channelId)
+      return
+    }
+  } else {
+    // 如果发送的是奇数，表示发送了body消息
+    arrayBody += hexBody
+    // 如果消息结束了
+    if(String(hexStrToByteArray(hexBody))== "true") {
+      // 分发body请求
+      resolveNetworkRequest(request, "$stringPath=$arrayBody", header, channelId)
+      arrayBody = ""
+    }
+    return
+  }
+}
+
+data class Response(
+  val success: Boolean = true,
+  val message: String? = "无权限，需要前往后端配置"
+)
 
 
 /** 初始化app数据*/

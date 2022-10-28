@@ -132,7 +132,7 @@ fun requestHandlerFromAssets(assetManager: AssetManager, basePath: String): Requ
             val uri = URI(req.href)
             val warpWarp = "${App.appContext.dataDir}/system-app/$dWebView_host/sys/"
             val urlPath = Path(warpWarp, uri.path).toString()
-          Log.d(TAG, "onFileRequest url: ${urlPath},$uri")
+//          Log.d(TAG, "onFileRequest url: ${urlPath},$uri")
             val inputStream:FileInputStream
             try {
               inputStream = File(urlPath).inputStream()

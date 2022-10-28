@@ -53,12 +53,13 @@ class BottomBarFFI(
     return DataString_From(state.actions)//.map { action -> toDataString(action) }
   }
 
-  fun setActions(actionListJson: DataString<List<BottomBarAction>>) {
+  fun setActions(actionListJson: DataString<List<BottomBarAction>>): Boolean {
     state.actions.clear()
       Log.i(TAG, "actionListJson:${actionListJson}")
     val actionList = actionListJson.toData<List<BottomBarAction>>(object :
       TypeToken<List<BottomBarAction>>() {}.type)
     actionList.toCollection(state.actions)
+    return true
 //      actionList.forEach{
 //        Log.i(TAG, "actionList:${it.colors}")
 //      }

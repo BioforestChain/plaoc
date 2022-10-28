@@ -1,5 +1,5 @@
 import { NativeUI } from "../common/nativeHandle.ts";
-import { netCallNativeUi } from "@bfsx/gateway";
+import { getCallNativeUi } from "@bfsx/gateway";
 import { Color } from "../types/colorType.ts";
 import { StatusBar } from "./bfcsStatusBarType.ts";
 
@@ -11,7 +11,7 @@ export class StatusBarNet implements StatusBar.IStatusBarNet {
     let darkIcons: boolean;
 
     if (!colorHex) {
-      await netCallNativeUi(NativeUI.GetStatusBarColor).then(res => {
+      await getCallNativeUi(NativeUI.GetStatusBarColor).then(res => {
         colorHex = res
       }).catch(_err => {
         colorHex = "#fff" // 适配ios没有设置statsBar的情况
@@ -19,7 +19,7 @@ export class StatusBarNet implements StatusBar.IStatusBarNet {
     }
 
     if (!barStyle) {
-      const isDarkIcons = await netCallNativeUi(NativeUI.GetStatusBarIsDark);
+      const isDarkIcons = await getCallNativeUi(NativeUI.GetStatusBarIsDark);
       darkIcons = isDarkIcons;
     } else {
       switch (barStyle) {
@@ -33,22 +33,22 @@ export class StatusBarNet implements StatusBar.IStatusBarNet {
           darkIcons = false;
       }
     }
-    netCallNativeUi(NativeUI.SetStatusBarColor, { colorHex, darkIcons });
+    getCallNativeUi(NativeUI.SetStatusBarColor, { colorHex, darkIcons });
     return;
   }
 
   async getStatusBarColor(): Promise<Color.RGBAHex> {
-    const colorHex = await netCallNativeUi(NativeUI.GetStatusBarColor)
+    const colorHex = await getCallNativeUi(NativeUI.GetStatusBarColor)
     return colorHex;
   }
 
   async getStatusBarVisible(): Promise<boolean> {
-    const isVisible = await netCallNativeUi(NativeUI.GetStatusBarVisible);
+    const isVisible = await getCallNativeUi(NativeUI.GetStatusBarVisible);
     return Boolean(isVisible);
   }
 
   async setStatusBarVisible(isVer: boolean): Promise<boolean> {
-    const stringVisible = await netCallNativeUi(
+    const stringVisible = await getCallNativeUi(
       NativeUI.SetStatusBarVisible,
       isVer,
     );
@@ -64,12 +64,12 @@ export class StatusBarNet implements StatusBar.IStatusBarNet {
   }
 
   async getStatusBarOverlay(): Promise<boolean> {
-    const stringOverlay = await netCallNativeUi(NativeUI.GetStatusBarOverlay);
+    const stringOverlay = await getCallNativeUi(NativeUI.GetStatusBarOverlay);
     return Boolean(stringOverlay);
   }
 
   async setStatusBarOverlay(isOverlay: boolean): Promise<boolean> {
-    const isOver = await netCallNativeUi(NativeUI.SetStatusBarOverlay, isOverlay);
+    const isOver = await getCallNativeUi(NativeUI.SetStatusBarOverlay, isOverlay);
     return Boolean(isOver);
   }
 
@@ -78,7 +78,7 @@ export class StatusBarNet implements StatusBar.IStatusBarNet {
    * @returns 
    */
   async getStatusBarIsDark(): Promise<StatusBar.StatusBarStyle> {
-    const isDarkIcons = await netCallNativeUi(NativeUI.GetStatusBarIsDark);
+    const isDarkIcons = await getCallNativeUi(NativeUI.GetStatusBarIsDark);
     let barStyle: StatusBar.StatusBarStyle;
     if (isDarkIcons) {
       barStyle = "dark-content" as StatusBar.StatusBarStyle.DARK_CONTENT;
