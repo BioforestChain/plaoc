@@ -25,3 +25,10 @@ val ColorGrayLevel8 = Color(0xff2c2c2c)
 
 val TopBarBackground = ColorGrayLevel7
 val TopBarSpinnerBG = ColorGrayLevel5
+
+val ColorBackgroundBar = Color(0xFF333333) // 用于DCIM工具栏背景色
+val ColorBackgroundSearch = Color(0xFF4C4C4C) // 用于DCIM工具栏背景色
+val ColorBackgroundSpinner = Color(0xFFB2B2B2) // 用于DCIM工具栏背景色
+val ColorSendButtonGreen = Color(0xFF07C160) // 用于DCIM发送按键的绿色背景
+val ColorSendButtonGray = Color(0xFF434343) // 用于DCIM发送按键的灰色背景
+

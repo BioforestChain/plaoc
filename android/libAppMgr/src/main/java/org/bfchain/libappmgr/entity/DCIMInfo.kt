@@ -34,6 +34,11 @@ enum class DCIMType {
   IMAGE, GIF, VIDEO, OTHER
 }
 
+// 视频状态
+enum class PlayerState {
+  Play, Pause, END, Playing
+}
+
 object MediaFile {
   // comma separated list of all file extensions supported by the media scanner
   var sFileExtensions: String? = null

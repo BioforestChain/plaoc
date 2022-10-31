@@ -5,18 +5,19 @@ import androidx.collection.ArrayMap
 import androidx.collection.arrayMapOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.exoplayer2.SimpleExoPlayer
 import kotlinx.coroutines.launch
-import org.bfchain.libappmgr.entity.DCIMInfo
-import org.bfchain.libappmgr.entity.DCIMSpinner
-import org.bfchain.libappmgr.entity.DCIMType
-import org.bfchain.libappmgr.entity.MediaFile
+import org.bfchain.libappmgr.entity.*
+import org.bfchain.libappmgr.utils.AppContextUtil
 import java.io.File
 
 class DCIMViewModel : ViewModel() {
-  val showViewer = mutableStateOf(false) // 用于大图状态
-  val showSpinner = mutableStateOf(false) // 用于大图状态
+  val showSpinner = mutableStateOf(false) // 用于判断是否显示下拉
+  val showViewer = mutableStateOf(false) // 用于判断是否显示大图
+  val showViewerBar = mutableStateOf(false) // 用于判断大图界面是否显示工具栏和按钮
   val totalSize = mutableStateOf(0)
   val checkedSize = mutableStateOf(0)
   val dcimInfoList = mutableStateListOf<DCIMInfo>() // 用于保存图片列表信息
@@ -27,6 +28,13 @@ class DCIMViewModel : ViewModel() {
 
   var dcimSpinner: DCIMSpinner = DCIMSpinner("", "图片和视频", 0) // 表示加载的是都有的图片和视频
   val maps = arrayMapOf<String, ArrayList<DCIMInfo>>()
+
+  val playerState = mutableStateOf(PlayerState.Play)
+  val exoPlayer = SimpleExoPlayer.Builder(AppContextUtil.sInstance!!.applicationContext)
+    .build()
+    .apply {
+      playWhenReady = false
+    }
 
   /**
    * 用于接收回调

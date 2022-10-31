@@ -7,6 +7,7 @@ import android.content.Intent
 import android.os.Bundle
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.bfchain.libappmgr.di.repositoryModule
 import org.bfchain.libappmgr.di.viewModelModule
 import org.bfchain.libappmgr.utils.ClipboardUtil
 import org.bfchain.rust.plaoc.util.PlaocUtil
@@ -33,7 +34,7 @@ class App : Application() {
       androidContext(this@App)
       androidFileProperties()
       modules(
-        viewModelModule
+        viewModelModule, repositoryModule
       )
     }
     PlaocUtil.addShortcut(this) // 添加桌面快捷方式

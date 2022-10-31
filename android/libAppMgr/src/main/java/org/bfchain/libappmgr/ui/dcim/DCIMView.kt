@@ -1,7 +1,6 @@
 package org.bfchain.libappmgr.ui.dcim
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.animation.*
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
@@ -19,7 +18,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Alignment.Companion.CenterVertically
@@ -41,15 +42,11 @@ import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import coil.decode.GifDecoder
 import coil.decode.SvgDecoder
-import coil.decode.VideoFrameDecoder
 import coil.request.ImageRequest
 import org.bfchain.libappmgr.R
 import org.bfchain.libappmgr.entity.DCIMInfo
 import org.bfchain.libappmgr.entity.DCIMType
-import org.bfchain.libappmgr.ui.theme.ColorGrayLevel2
-import org.bfchain.libappmgr.ui.theme.ColorGrayLevel5
-import org.bfchain.libappmgr.ui.theme.TopBarBackground
-import org.bfchain.libappmgr.ui.theme.TopBarSpinnerBG
+import org.bfchain.libappmgr.ui.theme.*
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -120,6 +117,9 @@ fun DCIMItemView(
           )
         }
       }
+      else -> {
+        null
+      }
     }
   }
 }
@@ -128,9 +128,10 @@ fun DCIMItemView(
 fun DCIMGridView(dcimVM: DCIMViewModel = koinViewModel(), onClick: (DCIMInfo) -> Unit) {
   LazyVerticalGrid(
     columns = GridCells.Fixed(4),//GridCells.Adaptive(minSize = 60.dp), // 一行四个，或者指定大小
-    contentPadding = PaddingValues(4.dp),
+    //contentPadding = PaddingValues(4.dp, 0.dp, 4.dp, 0.dp),
     verticalArrangement = Arrangement.spacedBy(2.dp),
     horizontalArrangement = Arrangement.spacedBy(2.dp),
+    modifier = Modifier.background(ColorBackgroundBar)
   ) {
     items(dcimVM.dcimInfoList) {
       DCIMItemView(it, dcimVM) { info -> onClick(info) }
@@ -147,17 +148,16 @@ fun DCIMInfoViewer(
   onBack: () -> Unit
 ) {
   if (dcimVM.showViewer.value) {
-    val showTopbar = remember { mutableStateOf(true) } // 用于判断是否显示TopBar
     Box(
       modifier = Modifier
         .fillMaxSize()
-        .background(
-          when (showTopbar.value) { // 由于有些纯色的图片跟背景一样，导致看不清楚，这边点击做切换背景
+        .background(//Color.Black
+          when (dcimVM.dcimInfo.value.type != DCIMType.VIDEO && dcimVM.showViewerBar.value) { // 由于有些纯色的图片跟背景一样，导致看不清楚，这边点击做切换背景
             false -> Color.Black
             true -> Color.White
           }
         )
-        .clickable { showTopbar.value = !showTopbar.value }
+        .clickable { dcimVM.showViewerBar.value = !dcimVM.showViewerBar.value }
     ) {
       when (dcimVM.dcimInfo.value.type) {
         DCIMType.IMAGE -> {
@@ -194,26 +194,17 @@ fun DCIMInfoViewer(
           )
         }
         DCIMType.VIDEO -> {
-          AsyncImage(
-            modifier = Modifier.fillMaxSize(),
-            model = ImageRequest
-              .Builder(LocalContext.current)
-              .data(dcimVM.dcimInfo.value.path)
-              .decoderFactory(
-                VideoFrameDecoder.Factory()
-              )
-              .crossfade(true)
-              .build(),
-            contentDescription = null
-          )
-          //VideScreen()
+          VideScreen(dcimVM)
+        }
+        DCIMType.OTHER -> {
+          throw UnknownError()
         }
       }
-      DCIMViewerTopBar(show = showTopbar, dcimVM) {
+      DCIMViewerTopBar(dcimVM) {
         dcimVM.showViewer.value = false
         onBack()
       }
-      DCIMViewerBottomBar(show = showTopbar, dcimVM)
+      DCIMViewerBottomBar(dcimVM)
     }
   }
 }
@@ -225,7 +216,11 @@ fun DCIMView(
   onGridClick: () -> Unit,
   onViewerClick: () -> Unit
 ) {
-  Box(modifier = Modifier.fillMaxSize()) {
+  Box(
+    modifier = Modifier
+      .fillMaxSize()
+      .background(ColorBackgroundBar)
+  ) {
     Column(modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 40.dp)) {
       DCIMGridTopBar(dcimVM)
       Box {
@@ -251,7 +246,7 @@ fun DCIMGridTopBar(dcimVM: DCIMViewModel) {
     modifier = Modifier
       .fillMaxWidth()
       .height(50.dp)
-      .background(TopBarBackground)
+      .background(ColorBackgroundBar)
   ) {
     val rotationValue by animateFloatAsState(targetValue = if (dcimVM.showSpinner.value) -180f else 0f)
     Row {
@@ -269,7 +264,7 @@ fun DCIMGridTopBar(dcimVM: DCIMViewModel) {
           .padding(8.dp)
           .clip(RoundedCornerShape(16.dp))
           .clickable { dcimVM.showSpinner.value = !dcimVM.showSpinner.value }
-          .background(TopBarSpinnerBG)
+          .background(ColorBackgroundSearch)
       ) {
         Row(
           modifier = Modifier
@@ -298,7 +293,7 @@ fun DCIMGridTopBar(dcimVM: DCIMViewModel) {
         .align(Alignment.CenterEnd)
         .padding(8.dp)
         .clip(RoundedCornerShape(8.dp))
-        .background(if (dcimVM.checkedSize.value == 0) TopBarSpinnerBG else Color(0xff00ff00))
+        .background(if (dcimVM.checkedSize.value == 0) ColorSendButtonGray else ColorSendButtonGreen)
     ) {
       TextButton(onClick = {
         var list = arrayListOf<String>()
@@ -321,7 +316,7 @@ fun BoxScope.DCIMGridBottomBar(dcimVM: DCIMViewModel) {
       .fillMaxWidth()
       .height(40.dp)
       .align(Alignment.BottomStart)
-      .background(TopBarBackground)
+      .background(ColorBackgroundBar)
       .clickable(enabled = dcimVM.checkedSize.value > 0) {
         dcimVM.dcimInfo.value = dcimVM.checkedList[0] // 清空为了显示已选
         dcimVM.showViewer.value = true
@@ -391,13 +386,12 @@ fun CircleCheckBox(
  */
 @Composable
 fun BoxScope.DCIMViewerTopBar(
-  show: MutableState<Boolean> = mutableStateOf(false),
   dcimVM: DCIMViewModel,
   onBack: () -> Unit
 ) {
   val density = LocalDensity.current
   AnimatedVisibility(
-    visible = show.value,
+    visible = dcimVM.showViewerBar.value,
     enter = slideInVertically {
       // Slide in from 40 dp from the top.
       with(density) { -50.dp.roundToPx() }
@@ -411,7 +405,7 @@ fun BoxScope.DCIMViewerTopBar(
       modifier = Modifier
         .fillMaxWidth()
         .height(50.dp)
-        .background(TopBarBackground)
+        .background(ColorBackgroundBar)
     ) {
       Image(
         imageVector = ImageVector.vectorResource(id = R.drawable.ic_back),
@@ -431,7 +425,7 @@ fun BoxScope.DCIMViewerTopBar(
           .align(Alignment.CenterEnd)
           .padding(8.dp)
           .clip(RoundedCornerShape(8.dp))
-          .background(if (dcimVM.checkedSize.value == 0) TopBarSpinnerBG else Color(0xff00ff00))
+          .background(if (dcimVM.checkedSize.value == 0) ColorSendButtonGray else ColorSendButtonGreen)
       ) {
         TextButton(onClick = {
           var list = arrayListOf<String>()
@@ -453,12 +447,11 @@ fun BoxScope.DCIMViewerTopBar(
  */
 @Composable
 fun BoxScope.DCIMViewerBottomBar(
-  show: MutableState<Boolean> = mutableStateOf(false),
   dcimVM: DCIMViewModel,
 ) {
   val density = LocalDensity.current
   AnimatedVisibility(
-    visible = show.value,
+    visible = dcimVM.showViewerBar.value,
     modifier = Modifier.align(BottomCenter),
     enter = slideInVertically {
       // Slide in from 40 dp from the top.
@@ -472,7 +465,7 @@ fun BoxScope.DCIMViewerBottomBar(
     Box(
       modifier = Modifier
         .fillMaxWidth()
-        .background(TopBarBackground)
+        .background(ColorBackgroundBar)
     ) {
       Column {
         // 1. 上面显示LazyHori，，，下面显示
@@ -563,15 +556,13 @@ fun DCIMSpinnerView(dcimVM: DCIMViewModel) {
       modifier = Modifier
         .fillMaxWidth()
         .height(600.dp)
-        .background(TopBarBackground),
+        .background(ColorBackgroundBar),
       verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {
-      Log.d("lin.huang", "DCIMSpinnerView11  ->  $dcimVM")
       items(dcimVM.dcimSpinnerList) {
         Row(modifier = Modifier
           .fillMaxWidth()
           .clickable {
-            Log.d("lin.huang", "DCIMSpinnerView2222  ->  $dcimVM")
             dcimVM.refreshDCIMInfoList(it)
           }) {
           AsyncImage(

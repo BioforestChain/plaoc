@@ -141,6 +141,5 @@ fun DCIMGreeting(
       dcimVM.totalSize.value = dcimVM.dcimInfoList.size
     }
   }
-  Log.d("lin.huang", "DCIMGreeting  ->  $dcimVM")
   DCIMView(dcimVM, onGridClick, onViewerClick)
 }
