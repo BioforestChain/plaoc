@@ -139,8 +139,8 @@ fun openDWebWindow(activity: ComponentActivity, url: String) {
 fun sendToJavaScript(message: String) {
     Log.i("xxx", "sendToJavaScript->:$message")
     dWebView?.post(Runnable {
-        dWebView?.evaluateJavascript(message) { response ->
-            Log.d(TAG, "sendToJavaScript: $response")
+        dWebView?.evaluateJavascript(message) {
+//            Log.d(TAG, "sendToJavaScript: $response")
         }
     })
 

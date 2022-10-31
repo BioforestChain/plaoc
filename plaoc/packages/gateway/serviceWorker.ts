@@ -3,7 +3,7 @@
 const sw = self as unknown as ServiceWorkerGlobalScope;
 let channelId = "";
 // 向native层申请channelId
-async function registerChnnel() {
+async function registerChannel() {
   return await fetch(`/channel/registry`).then(res => res.json());
 }
 
@@ -15,7 +15,7 @@ sw.addEventListener("activate", (event) => {
   event.waitUntil(sw.clients.claim());
 });
 
-const FETCH_EVENT_MAP = new Map<number,
+const FETCH_EVENT_MAP = new Map<string,
   {
     event: FetchEvent, response?: Response, responseStream: ReadableStream,
     responseStreamController: ReadableStreamController<ArrayBuffer> | null
@@ -25,11 +25,13 @@ const FETCH_EVENT_MAP = new Map<number,
 sw.addEventListener("fetch", async (event) => {
   // 如果id为空需要申请id
   if (channelId === "") {
-    channelId = await registerChnnel()
+    channelId = await registerChannel()
   }
   const request = event.request;
+  console.log(`HttpRequestBuilder ${JSON.stringify(await request.text())},url: ${JSON.stringify(await request.arrayBuffer())}`)
+  console.log(`HttpRequestBuilder ${request.method},url: ${request.url},headers: ${JSON.stringify(request.headers)},body: ${request.body}`)
   // Build chunks
-  const chunks = new HttpRequestBuilder(request, request.method, request.url, request.headers, request.body);
+  const chunks = new HttpRequestBuilder(request, request.method, request.url, request.headers as unknown as Record<string, string>, request.body);
 
   let responseStreamController: ReadableStreamController<ArrayBuffer> | null = null;
   // 生成结构体
@@ -44,7 +46,7 @@ sw.addEventListener("fetch", async (event) => {
     responseStreamController,
   }
   // 存起来
-  FETCH_EVENT_MAP.set(chunks.reqId, fetchTask);
+  FETCH_EVENT_MAP.set(String(channelId), fetchTask);
   // 迭代发送
   for await (const chunk of chunks) {
     do {
@@ -60,33 +62,41 @@ sw.addEventListener("fetch", async (event) => {
 });
 
 const encodeToHex = (reqId: number, data: string) => {
-  return `${reqId.toString().padStart(4, '0')}${hexEncode(data)}`
+  return `${reqId.toString().padStart(4, '0')}:${hexEncode(data)}`
 }
 
 
 export class HttpRequestBuilder {
   static REQ_ID = new Uint16Array(1);
+  static BODY_ID = new Uint16Array(1);
   static getReqId() {
     const reqId = HttpRequestBuilder.REQ_ID[0]
-    HttpRequestBuilder.REQ_ID[0] += 1;
+    HttpRequestBuilder.REQ_ID[0] += 2; // 0, 2 ,4,6
     return reqId;
   }
+  static getBodyId(reqId: number) {
+    const bodyId = HttpRequestBuilder.BODY_ID[0];
+    HttpRequestBuilder.BODY_ID[0] = reqId + 1;// 1,3,5,7
+    return bodyId;
+  }
   readonly reqId = HttpRequestBuilder.getReqId()
+  readonly bodyId = HttpRequestBuilder.getBodyId(this.reqId)
 
   constructor(
     readonly request: Request,
     readonly method: string,
     readonly url: string,
-    readonly header: Headers,
+    readonly header: Record<string, string>,
     readonly body: ReadableStream<Uint8Array> | null
   ) { }
 
 
   async *[Symbol.asyncIterator]() {
     const headerId = this.reqId;// 偶数为头
-    const bodyId = headerId.toString().padStart(4, '0');// 奇数为body
-
-    yield encodeToHex(headerId, JSON.stringify([this.method, this.url, this.header]));
+    const bodyId = this.bodyId;// 奇数为body
+    console.log("headerId:", headerId, "bodyId:", bodyId)
+    // 只传递body
+    yield encodeToHex(headerId, `${this.url}|${JSON.stringify(this.header)}`);
     // 如果body为空
     if (!this.body) {
       return
@@ -95,35 +105,41 @@ export class HttpRequestBuilder {
     while (true) {
       const { done, value } = await reader.read()
       if (done) {
+        yield `${bodyId.toString().padStart(4, '0')}:${done}` // 消息结束
         break
       }
 
-      yield `${bodyId},${value}`
+      yield `${bodyId.toString().padStart(4, '0')}:${value}`
     }
   }
 }
 
 // return data 🐯
-sw.addEventListener('data', event => {
-  console.log("serviceWorker data =>", event)
-  // const [channelId, dataHex] = event.data.split(':');
-  // const reqId = parseInt(dataHex.slice(0, 4), 16);
-  // const chunk = hexDecode(dataHex.slice(4))
-  // const fetchTask = FETCH_EVENT_MAP.get(channelId);
-  // if (reqId | 1) {
-  //   // body
-  //   fetchTask.responseStreamController.enqueue(chunk)
-  // } else {
-  //   /**
-  //   headers?: HeadersInit;
-  //   status?: number;
-  //   statusText?: string;
-  //   */
-  //   const [headers, status, statusText] = JSON.parse(chunk)
-
-  //   fetchTask.event.responseWith(fetchTask.response = new Response(fetchTask.responseStream, { headers, status, statusText }))
-  // }
-
+sw.addEventListener('message', event => {
+  if (typeof event.data !== 'string') return
+  const [channelId, end, dataHex] = String(event.data).split(':');
+  const chunk = String(dataHex).split(",") as any;
+  console.log(`serviceWorker chunk=> ${chunk},end:${end}`);
+  const fetchTask = FETCH_EVENT_MAP.get(channelId);
+  // 如果存在
+  if (fetchTask) {
+    console.log("如果存在:", end, hexDecode(chunk))
+    // body reqId为偶数
+    if (end == "false" && fetchTask.responseStreamController !== null) {
+      console.log(`填入数据=> ${chunk}`);
+      fetchTask.responseStreamController.enqueue(chunk);
+      return
+    }
+    const data = hexDecode(chunk);
+    console.log(`请求结束返回数据=> ${data}`);
+    const [headers, status, statusText] = data.split(",");
+    console.log("解析headers", JSON.parse(headers), status, statusText)
+    fetchTask.response = new Response(fetchTask.responseStream, { headers: JSON.parse(headers), status: Number(status), statusText })
+    fetchTask.event.respondWith(async function () {
+      // event.request.headers["Range"] = "0-160"
+      return await Promise.resolve(fetchTask.response as Response);
+    }())
+  }
 })
 
 
@@ -132,7 +148,7 @@ function hexEncode(data: string) {
   return encoder.encode(data);
 }
 
-function hexDecode(buffer: Uint8Array) {
+function hexDecode(buffer: ArrayBuffer) {
   return new TextDecoder().decode(new Uint8Array(buffer));
 }
 

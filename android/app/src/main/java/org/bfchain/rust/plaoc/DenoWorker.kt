@@ -8,7 +8,6 @@ import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 
 private const val TAG = "DENO_WORKER"
-var ordData = "";
 
 class DenoWorker(appContext: Context, workerParams: WorkerParameters) :
   Worker(appContext, workerParams) {

@@ -15,7 +15,7 @@ registerServiceWorker();
 ### setUi
 
 ```typescript
-await netCallNativeUi(param);
+await getCallNativeUi(param);
 ```
 
 ### setVfs
