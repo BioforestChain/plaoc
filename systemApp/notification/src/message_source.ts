@@ -94,6 +94,11 @@ export function loopRustNotification() {
  */
 export async function netCallNativeNotification(timeout = 3000) {
   let isLocked = false;
+  const listener = async () => {
+    isLocked = true;
+    await messagePush();
+    isLocked = false;
+  };
   const polling = async () => {
     const messageString = await netCallNativeService(GET_NOTIFICATION);
 
@@ -106,15 +111,13 @@ export async function netCallNativeNotification(timeout = 3000) {
         });
       }
 
-      addEventListener(NOTIFICATION_MESSAGE_PUSH, async () => {
-        isLocked = true;
-        await messagePush();
-        isLocked = false;
-      });
+      addEventListener(NOTIFICATION_MESSAGE_PUSH, listener);
     }
 
     if (!isLocked) {
       dispatchEvent(new Event(NOTIFICATION_MESSAGE_PUSH));
+    } else {
+      removeEventListener(NOTIFICATION_MESSAGE_PUSH, listener);
     }
 
     setTimeout(async () => {
