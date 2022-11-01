@@ -1,17 +1,5 @@
 [
   {
-    "buildFromRootDir": "./packages/plugin",
-    "mainExports": ".",
-    "buildToRootDir": "./build/plugin",
-    "importMap": "./import_map.json",
-    "name": "@bfsx/plugin",
-    "version": "0.0.9",
-    "lib": [
-      "es2020",
-      "dom"
-    ]
-  },
-  {
     "buildFromRootDir": "./packages/gateway",
     "mainExports": ".",
     "buildToRootDir": "./build/gateway",

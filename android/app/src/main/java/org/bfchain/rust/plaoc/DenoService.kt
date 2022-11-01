@@ -141,7 +141,8 @@ fun createBytesFactory(callFun: ExportNative, message: String) {
     // 移除使用完的标记
     rust_call_map.remove(callFun)
     version_head_map.remove(headId)
-    thread {
+  println("ExportNative.CreateNotificationMsg,$message")
+  thread {
       denoService.backSystemDataToRust(result.array())
     }
 }

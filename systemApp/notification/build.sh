@@ -23,4 +23,5 @@ fi
 
 mv HE74YAAL.bfsa ./dist && mv appversion.json ./dist
 
+cp -R ./dist/HE74YAAL ../../android/app/src/main/assets/system-app/
 
