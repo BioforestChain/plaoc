@@ -20,7 +20,7 @@ export async function asyncPollingCallDenoNotification(timeout = 3000) {
       const data = await loopRustNotification().next();
 
       if (data.done) {
-        continue;
+        break;
       }
 
       const messageInfo = data.value
@@ -36,7 +36,6 @@ export async function asyncPollingCallDenoNotification(timeout = 3000) {
         await messagePush();
         isLocked = false;
       });
-      break;
     } while (true);
 
     if (!isLocked) {
