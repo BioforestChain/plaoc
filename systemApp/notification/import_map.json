@@ -1,7 +1,8 @@
 {
   "imports": {
     "dnt": "https://deno.land/x/gaubee_dnt@0.31.0-1/mod.ts",
-    "node_util": "https://deno.land/std@0.159.0/node/util.ts",
-    "node_event": "https://deno.land/std@0.159.0/node/events.ts"
+    "@bfsx/core": "https://esm.sh/@bfsx/core@0.0.9",
+    "@bfsx/metadata": "https://esm.sh/@bfsx/metadata@0.0.7",
+    "@bfsx/gateway": "https://esm.sh/@bfsx/gateway@0.0.9"
   }
 }

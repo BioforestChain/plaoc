@@ -16,6 +16,7 @@ import org.bfchain.libappmgr.entity.DAppInfo
 import org.bfchain.libappmgr.entity.DownLoadState
 import org.bfchain.libappmgr.network.base.IApiResult
 import org.bfchain.libappmgr.ui.main.MainViewModel
+import org.bfchain.libappmgr.ui.main.MainViewModel2
 import org.bfchain.libappmgr.ui.view.*
 import org.bfchain.libappmgr.utils.AppContextUtil
 import org.bfchain.libappmgr.utils.FilesUtil
@@ -104,11 +105,11 @@ fun DownloadAppInfoView(
     })
 
   CustomAlertDialog(state = dialogState, onConfirm = {
-    if (appVersion != null && appVersion!!.files.isNotEmpty()) {
+    if (appVersion != null && appVersion!!.files != null && appVersion!!.files!!.isNotEmpty()) {
       dialogState.updateState(customShow = false)
       maskProgressMode.updateState(DownLoadState.LOADING)
       vmDown.downloadAndSave(
-        appVersion!!.files[0].url,
+        appVersion!!.files!![0].url,
         FilesUtil.getAppDownloadPath(),
         object : IApiResult<Nothing> {
           override fun downloadProgress(current: Long, total: Long, progress: Float) {
@@ -227,12 +228,12 @@ fun DownloadDialogView(
         onOpenApp?.let { onOpenApp(appInfo.bfsAppId, url) }
       }
       appInfoMode.showBadge.value = false // 打开后，隐藏小红点
-    } else if (appVersion != null && appVersion!!.files.isNotEmpty()) {
+    } else if (appVersion != null && appVersion!!.files != null && appVersion!!.files!!.isNotEmpty()) {
       // 调用下载操作
       dialogState.updateState(progressShow = true)
       appInfoMode.downLoadState.value = DownLoadState.LOADING
       vmDown.downloadAndSave(
-        appVersion!!.files[0].url,
+        appVersion!!.files!![0].url,
         FilesUtil.getAppDownloadPath(),
         object : IApiResult<Nothing> {
           override fun downloadProgress(current: Long, total: Long, progress: Float) {

@@ -5,22 +5,27 @@ import {
 } from "./constants.ts";
 
 import {
-  type IMessageInfoPush,
+  type IMessageInfo,
   MessagePriority,
   MessageStatus,
 } from "../typings/message.type.ts";
 
 /** 消息推送 */
 export async function messagePush() {
+  // 如果没有消息，返回
+  const notifyLen = NOTIFICATION_MESSAGE_QUEUE.filter(
+    (item) => !item.msg_status
+  ).length;
+  if (notifyLen === 0) {
+    return;
+  }
+
   /**
    * 设备信息手机状态判断
    * 如果消息大于等于20条，开始推送
    */
   const info = await getDeviceInfo();
-  if (
-    info.module === EDeviceModule.doNotDisturb &&
-    NOTIFICATION_MESSAGE_QUEUE.length < 20
-  ) {
+  if (info.module === EDeviceModule.doNotDisturb && notifyLen < 20) {
     return;
   }
 
@@ -29,7 +34,7 @@ export async function messagePush() {
    */
   for (const item of NOTIFICATION_MESSAGE_QUEUE) {
     if (item.msg_status === MessageStatus.UNPROCESS) {
-      const message: IMessageInfoPush = {
+      const message: IMessageInfo = {
         ...item,
         priority:
           item.priority < MessagePriority.IMPORTANT_MESSAGE
@@ -42,7 +47,6 @@ export async function messagePush() {
 
       // 更新消息为已完成
       item.msg_status = MessageStatus.PROCESSED;
-      console.log(item);
     }
   }
 

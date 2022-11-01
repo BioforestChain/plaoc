@@ -4,7 +4,7 @@
 /////////////////////////////
 
 import { callDeno, callDVebView } from "./android.fn.ts";
-import { Deno } from "./Deno.ts"
+import { Deno } from "./deno.ts"
 import { loopRustString, loopRustBuffer } from "./rust.op.ts";
 
 const deno = new Deno();

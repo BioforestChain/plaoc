@@ -641,7 +641,6 @@ fun TestPopHistoryOrFavorite() {
 fun TestListItem(appInfo: TestAppInfo) {
   var check = mutableStateOf(appInfo.checked)
   var viewModel = viewModel() as TestViewModel
-  Log.d("lin.huang", "TestListItem -> $check")
   Row(
     modifier = Modifier
       .fillMaxWidth()

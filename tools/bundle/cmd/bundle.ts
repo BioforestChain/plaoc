@@ -4,11 +4,12 @@ import { fileURLToPath, pathToFileURL, URL } from "node_url";
 import { Files, LinkMetadata, MetaData } from "@bfsx/metadata";
 import { path, slash, appendForwardSlash } from "path";
 import { checksumFile } from "crypto";
-import { genBfsAppId, checkSign } from "check";
 import { compressToSuffixesBfsa } from "compress";
+import { build } from "rollup-bundle";
 
 import type * as types from "@bfsx/typings";
 import type { IAppversion } from "../types/appversion.type.ts";
+import type { IProblemConfig } from "../types/problem.type.ts";
 
 const { existsSync } = fs;
 const { mkdir, writeFile, copyFile, readdir, stat, rm, readFile } = fs.promises;
@@ -17,46 +18,28 @@ const { mkdir, writeFile, copyFile, readdir, stat, rm, readFile } = fs.promises;
  * 打包入口
  * @param options
  */
-export async function bundle(options: {
-  bfsAppId: string;
-  frontPath?: string;
-  backPath: string;
-}) {
-  let bfsAppId = options.bfsAppId;
+export async function bundle(options: IProblemConfig) {
+  const { bfsAppId } = options;
 
-  // 校验bfsAppId是否合法
-  if (bfsAppId) {
-    const suc = await checkSign(bfsAppId);
-
-    if (!suc) {
-      throw new Error("bfsAppId不合法，请输入正确的bfsAppId");
-    }
-  } else {
-    bfsAppId = await genBfsAppId();
-  }
-
-  // 目录以/结尾
-  // const { frontPath, backPath } = options;
-  const frontPath = options.frontPath
-    ? appendForwardSlash(options.frontPath)
-    : "";
-  const backPath = appendForwardSlash(options.backPath);
   const destPath = await createBfsaDir(bfsAppId);
 
   // 将前端项目移动到sys目录
   // 无界面应用不包含前端
+  const sysPath = path.join(destPath, "sys");
+  let frontPath = options.frontPath;
   if (frontPath) {
-    const sysPath = path.join(destPath, "sys");
+    frontPath = appendForwardSlash(path.resolve(process.cwd(), frontPath));
     await copyDir(frontPath, sysPath);
-    await writeServiceWorkder(sysPath);
+    await writeServiceWorker(sysPath);
   }
 
-  // 将后端项目移动到boot目录
+  // 将后端项目编译到sys目录
+  const backPath = appendForwardSlash(
+    path.resolve(process.cwd(), options.backPath)
+  );
+  const metadata = await getBfsaMetaDataJson(sysPath, backPath, bfsAppId);
+  // 配置文件写入boot目录
   const bootPath = path.join(destPath, "boot");
-  // copy时没有带上目录，因此加上项目目录
-  const backname = path.basename(backPath);
-  await copyDir(backPath, path.join(bootPath, backname));
-  const metadata = await getBfsaMetaDataJson(bootPath, backPath);
   await writeConfigJson(bootPath, bfsAppId, metadata);
 
   // 对文件进行压缩
@@ -134,8 +117,8 @@ async function copyDir(src: string, dest: string) {
  * @param destPath 目标目录
  * @returns
  */
-async function writeServiceWorkder(destPath: string): Promise<boolean> {
-  const file = path.join(destPath, "serverWorker.mjs");
+async function writeServiceWorker(destPath: string): Promise<boolean> {
+  const file = path.join(destPath, "serviceWorker.js");
 
   // TODO: 暂时没想到好的方法
   const url = new URL("./bundle.js", import.meta.url);
@@ -143,7 +126,7 @@ async function writeServiceWorkder(destPath: string): Promise<boolean> {
   let content = await readFile(
     path.resolve(
       filePath,
-      "../../node_modules/@bfsx/gateway/esm/serverWorker.js"
+      "../../node_modules/@bfsx/gateway/esm/serviceWorker.js"
     ),
     "utf-8"
   );
@@ -159,12 +142,19 @@ async function writeServiceWorkder(destPath: string): Promise<boolean> {
  * @returns
  */
 async function getBfsaMetaDataJson(
-  bootPath: string,
-  backPath: string
+  sysPath: string,
+  backPath: string,
+  bfsAppId: string
 ): Promise<MetaData> {
-  const packageJsonPath = await searchFile(bootPath, /package.json/);
-  const bfsaMetaDataFile = await searchFile(backPath, /bfsa-metadata\.m?js/);
+  // 使用rollup将后端项目打包成单文件，并返回入口文件地址
+  const backEntryFile = await findBackEntryFile(backPath);
+  const bfsaEntryFile = await build({
+    entryFile: slash(backEntryFile),
+    dest: sysPath,
+    bfsAppId,
+  });
 
+  const bfsaMetaDataFile = await searchFile(backPath, /bfsa-metadata\.m?js/);
   if (!bfsaMetaDataFile) {
     throw new Error("未找到bfsa-metadata配置文件");
   }
@@ -172,32 +162,10 @@ async function getBfsaMetaDataJson(
   const url = pathToFileURL(bfsaMetaDataFile);
   const metadata = await import(url.href);
 
-  const jsonPath = pathToFileURL(packageJsonPath);
-  const jsonConfig = (await import(jsonPath.href, { assert: { type: "json" } }))
-    .default;
-  const backDir = path.dirname(packageJsonPath);
-  const rootPath = path.resolve(bootPath, "../");
-  let bfsaEntry = "";
-
-  if (jsonConfig.main) {
-    bfsaEntry = path.relative(rootPath, path.resolve(backDir, jsonConfig.main));
-  } else if (jsonConfig.module) {
-    bfsaEntry = path.relative(
-      rootPath,
-      path.resolve(backDir, jsonConfig.module)
-    );
-  } else if (jsonConfig.exports?.["."]?.import) {
-    const entry =
-      typeof jsonConfig.exports["."].import === "string"
-        ? jsonConfig.exports["."].import
-        : jsonConfig.exports["."].import.default;
-    bfsaEntry = path.relative(rootPath, path.resolve(backDir, entry));
-  }
-
   const _metadata: MetaData = {
     manifest: {
       ...metadata.default.manifest,
-      bfsaEntry: bfsaEntry ? "./" + slash(bfsaEntry) : "",
+      bfsaEntry: bfsaEntryFile ? slash(bfsaEntryFile) : "",
     },
     dwebview: metadata.default.dwebview,
     whitelist: metadata.default.whitelist,
@@ -333,38 +301,6 @@ async function genAppVersionJson(
 }
 
 /**
- * 搜索文件获取地址
- * @param src     搜索文件路径
- * @param nameReg 搜索文件正则
- * @returns
- */
-
-async function searchFile(src: string, nameReg: RegExp): Promise<string> {
-  let searchPath = "";
-  await loopSearchFile(src, nameReg);
-
-  async function loopSearchFile(src: string, nameReg: RegExp) {
-    if (!searchPath) {
-      const entries = await readdir(src, { withFileTypes: true });
-
-      for (const entry of entries) {
-        const filePath = path.join(src, entry.name!);
-        if (nameReg.test(entry.name!) && entry.isFile()) {
-          searchPath = filePath;
-          break;
-        } else if (entry.isDirectory()) {
-          await loopSearchFile(filePath, nameReg);
-        }
-      }
-    }
-
-    return;
-  }
-
-  return searchPath;
-}
-
-/**
  * 为文件列表生成sha512校验码
  * @param dest        查找目录
  * @param bfsAppId    应用id
@@ -399,4 +335,70 @@ async function fileListHash(
   }
 
   return filesList;
+}
+
+/**
+ * 查找后端项目路口文件
+ * @param backPath 后端项目地址
+ * @returns
+ */
+async function findBackEntryFile(backPath: string) {
+  const packageJsonPath = await searchFile(backPath, /package.json/);
+  const jsonPath = pathToFileURL(packageJsonPath);
+  const jsonConfig = (await import(jsonPath.href, { assert: { type: "json" } }))
+    .default;
+  const backDir = path.dirname(packageJsonPath);
+  const rootPath = path.resolve(backPath, "../");
+  let entryFile = "";
+
+  if (jsonConfig.main) {
+    entryFile = path.resolve(rootPath, path.resolve(backDir, jsonConfig.main));
+  } else if (jsonConfig.module) {
+    entryFile = path.resolve(
+      rootPath,
+      path.resolve(backDir, jsonConfig.module)
+    );
+  } else if (jsonConfig.exports?.["."]?.import) {
+    const entry =
+      typeof jsonConfig.exports["."].import === "string"
+        ? jsonConfig.exports["."].import
+        : jsonConfig.exports["."].import.default;
+    entryFile = path.resolve(rootPath, path.resolve(backDir, entry));
+  }
+
+  return entryFile;
+}
+
+/**
+ * 搜索文件获取地址
+ * @param src     搜索文件路径
+ * @param nameReg 搜索文件正则
+ * @returns
+ */
+export async function searchFile(
+  src: string,
+  nameReg: RegExp
+): Promise<string> {
+  let searchPath = "";
+  await loopSearchFile(src, nameReg);
+
+  async function loopSearchFile(src: string, nameReg: RegExp) {
+    if (!searchPath) {
+      const entries = await readdir(src, { withFileTypes: true });
+
+      for (const entry of entries) {
+        const filePath = path.join(src, entry.name!);
+        if (nameReg.test(entry.name!) && entry.isFile()) {
+          searchPath = filePath;
+          break;
+        } else if (entry.isDirectory()) {
+          await loopSearchFile(filePath, nameReg);
+        }
+      }
+    }
+
+    return;
+  }
+
+  return searchPath;
 }

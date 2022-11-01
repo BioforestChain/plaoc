@@ -7,19 +7,19 @@ Here is the gateway of all DwebView-js responsible for sending messages to the m
 register serviceWorker for sys folder path
 
 ```typescript
-import { registerServerWorker } from "@bfsx/gateway";
-registerServerWorker();
+import { registerServiceWorker } from "@bfsx/gateway";
+registerServiceWorker();
 ```
 
 
 ### setUi
 
 ```typescript
-await netCallNativeUi(param);
+await getCallNativeUi(param);
 ```
 
 ### setVfs
 
 ```typescript
-await netCallNativeVfs(param);
+await asyncCallDenoFunction(param);
 ```

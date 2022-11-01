@@ -3,13 +3,13 @@ package org.bfchain.rust.plaoc.webView.network
 import android.util.Log
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
-import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.DeserializationFeature
+import org.bfchain.libappmgr.utils.JsonUtil
 import org.bfchain.rust.plaoc.*
 import org.bfchain.rust.plaoc.webView.urlscheme.CustomUrlScheme
 import java.io.ByteArrayInputStream
-import java.net.HttpURLConnection
 import java.net.URL
+import java.nio.ByteBuffer
 import java.util.*
 
 
@@ -22,159 +22,134 @@ var dWebView_host = ""
 // ð这里是路由的白名单
 var network_whitelist = "http://127.0.0.1"
 
+/** 分发解析的请求*/
+fun resolveNetworkRequest(
+  request: WebResourceRequest,
+  path: String,
+  header: String,
+  channelId: String,
+)
+  : WebResourceResponse {
+  // 拿到消息体，转换为结构体
+  val stringHex = path.substring(path.lastIndexOf("=") + 1);
+
+  //拦截转发到后端的事件
+  if (path.startsWith("/poll")) {
+    messageGateWay(stringHex)
+  } else if (path.startsWith("/setUi")) { //拦截设置ui的请求，代替JavascriptInterface
+    val stringData = String(hexStrToByteArray(stringHex))
+    println("resolveNetworkRequest: $stringData")
+    val result = uiGateWay(stringData)
+    networkResponse(channelId, header, result)
+  }
+
+  val suffixIndex = path.lastIndexOf(".")
+  // 只拦截数据文件,忽略资源文件
+  if (suffixIndex == -1) {
+    dataGateWay(request)
+  }
+
+  return WebResourceResponse(
+    "application/json",
+    "utf-8",
+    ByteArrayInputStream(JsonUtil.toJson(Response()).toByteArray())
+  )
+}
+
 /** 抽离拦截请求*/
 fun interceptNetworkRequests(
   request: WebResourceRequest,
   customUrlScheme: CustomUrlScheme
 ): WebResourceResponse {
   val url = request.url.toString()
+  val path = request.url.path
   // 防止卡住请求为空而崩溃
-  if (!url.isNullOrEmpty()) {
+  if (!url.isNullOrEmpty() && !path.isNullOrEmpty()) {
     val temp = url.substring(url.lastIndexOf("/") + 1)
-    //拦截转发到后端的事件
-    if (temp.startsWith("poll")) {
-      return messageGateWay(request)
+    // 注册channelId
+    if (path == "/channel/registry") {
+      return registerChannelId()
     }
-    //拦截设置ui的请求，代替JavascriptInterface
-    if (temp.startsWith("setUi")) {
-      return uiGateWay(request)
+    // 解析接收数据
+    if (temp.startsWith("chunk")) {
+      // 拿到channelID
+      val channelId = path.substring(path.lastIndexOf("/channel/") + 9, path.lastIndexOf("/chunk"))
+      parseChunkBinary(request, channelId, temp)
     }
-    val suffixIndex = temp.lastIndexOf(".")
-    // 只拦截数据文件,忽略资源文件
-    if (suffixIndex == -1) {
-      return dataGateWay(request)
-    }
+
     // 跳过白名单
     if (jumpWhitelist(url)) {
       // 拦截视图文件
-      if (url.endsWith(".html")) {
+      if (path.endsWith(".html")) {
         return viewGateWay(customUrlScheme, request)
       }
       // 映射本地文件的资源文件 https://bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj.dweb/index.mjs -> /plaoc/index.mjs
       if (Regex(dWebView_host.lowercase(Locale.ROOT)).containsMatchIn(url)) {
-        val path = URL(url).path
         return customUrlScheme.handleRequest(request, path)
       }
     }
   }
+
   return WebResourceResponse(
     "application/json",
     "utf-8",
-    ByteArrayInputStream("无权限，需要前往后端配置".toByteArray())
+    ByteArrayInputStream(JsonUtil.toJson(Response(false)).toByteArray())
   )
 }
 
-/**
- * 数据资源拦截
- */
-fun dataGateWay(
-  request: WebResourceRequest
-): WebResourceResponse {
-  val url = request.url.toString().lowercase(Locale.ROOT)
-  Log.i(TAG, " dataGateWay: $url")
-  if (front_to_rear_map.contains(url)) {
-    val trueUrl = front_to_rear_map[url]
-    Log.i(TAG, " dataGateWay front_to_rear_map.contains: $trueUrl")
-    try {
-      val connection = URL(trueUrl).openConnection() as HttpURLConnection
-      connection.requestMethod = request.method
-//        Log.i(TAG, " dataGateWay connection.inputStream: ${connection.inputStream}")
-      return WebResourceResponse(
-        "application/json",
-        "utf-8",
-        connection.inputStream
-      )
-    } catch (e: Exception) { // 处理用户在配置文件里写的资源或服务，但实际没有引发webview崩溃重载的情况
-      return WebResourceResponse(
-        "application/json",
-        "utf-8",
-        ByteArrayInputStream("This data service could not be found".toByteArray())
-      )
-    }
+var header = ""
+var arrayBody = ""
+var stringPath = ""
+
+/**解析chunk 的数据*/
+fun parseChunkBinary(
+  request: WebResourceRequest,
+  channelId: String, path: String
+) {
+  if (path.lastIndexOf("=") == -1) {
+    return
   }
-  return WebResourceResponse(
-    "application/json",
-    "utf-8",
-    ByteArrayInputStream("No permission, need to go to the backend configuration".toByteArray())
-  )
-}
-
-/**
- * 传递dwebView到deno的消息,单独对转发给deno-js 的请求进行处理
- * https://channelId.bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj.dweb/poll
- */
-fun messageGateWay(
-  request: WebResourceRequest
-): WebResourceResponse {
-  val url = request.url.toString().lowercase(Locale.ROOT)
-  Log.i(TAG, " messageGateWay: $url")
-  val byteData = url.substring(url.lastIndexOf("=") + 1)
-  DenoService().backDataToRust(hexStrToByteArray(byteData))// 通知
-  return WebResourceResponse(
-    "application/json",
-    "utf-8",
-    ByteArrayInputStream("ok".toByteArray())
-  )
-}
-
-/** 转发给ui*/
-fun uiGateWay(
-  request: WebResourceRequest
-): WebResourceResponse {
-  val url = request.url.toString().lowercase(Locale.ROOT)
-  val byteData = url.substring(url.lastIndexOf("=") + 1)
-  val stringData = String(hexStrToByteArray(byteData))
-//  Log.i(TAG, " uiGateWay: $stringData")
-  mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true) // 允许使用单引号包裹字符串
-  val handle = mapper.readValue(stringData, JsHandle::class.java)
-  val funName = ExportNativeUi.valueOf(handle.function);
-  // 执行函数
-  val result = call_ui_map[funName]?.let { it ->
-    it(handle.data)
-  } ?: return WebResourceResponse(
-    "application/json",
-    "utf-8",
-    ByteArrayInputStream("0".toByteArray())
-  )
-  return WebResourceResponse(
-    "application/json",
-    "utf-8",
-    ByteArrayInputStream(result.toString().toByteArray())
-  )
-}
-
-
-// 视图文件拦截
-fun viewGateWay(
-  customUrlScheme: CustomUrlScheme,
-  request: WebResourceRequest
-): WebResourceResponse {
-  val url = request.url.toString().lowercase(Locale.ROOT)
-  Log.i(TAG, " viewGateWay: $url,contains: ${front_to_rear_map.contains(url)}")
-  if (front_to_rear_map.contains(url)) {
-    val trueUrl = front_to_rear_map[url]
-    Log.i(TAG, " viewGateWay: $trueUrl")
-    if (trueUrl != null) {
-      // 远程文件处理
-      if (trueUrl.startsWith("https") || trueUrl.startsWith("http")) {
-        val connection = URL(trueUrl).openConnection() as HttpURLConnection
-        connection.requestMethod = request.method
-        return WebResourceResponse(
-          "text/html",
-          "utf-8",
-          connection.inputStream
-        )
-      }
-      // 本地文件处理
-      return customUrlScheme.handleRequest(request, trueUrl)
+  // 拿到chunk的请求体
+  val strBits = path.substring(path.lastIndexOf("=") + 1);
+  // 拿到头部
+  val headerId = strBits.substring(0, strBits.indexOf(":")).toInt()
+  // 主体内容
+  val hexBody = strBits.substring(strBits.indexOf(":") + 1)
+  println("hexBody===>:${String(hexStrToByteArray(hexBody))}")
+  // headerId偶数为请求头
+  if (headerId.rem(2) == 0) {
+    val stringBody = String(hexStrToByteArray(hexBody));
+    // 解析出真正的请求
+    val stringArray = stringBody.split("|")
+    val stringData = stringArray[0]
+    header = stringArray[1]
+    // 拿到真正的请求消息
+    stringPath = stringData.substring(stringData.lastIndexOf("/"))
+    println("parseChunkBinary headerId:$headerId,${stringPath.lastIndexOf("=")}")
+    // 表示为get请求,携带了param参数
+    if (stringPath.lastIndexOf("=") != -1) {
+      // 分发请求
+      resolveNetworkRequest(request, stringPath, header, channelId)
+      return
     }
+  } else {
+    // 如果发送的是奇数，表示发送了body消息
+    arrayBody += hexBody
+    // 如果消息结束了
+    if(String(hexStrToByteArray(hexBody))== "true") {
+      // 分发body请求
+      resolveNetworkRequest(request, "$stringPath=$arrayBody", header, channelId)
+      arrayBody = ""
+    }
+    return
   }
-  return WebResourceResponse(
-    "application/json",
-    "utf-8",
-    ByteArrayInputStream("无权限，需要前往后端配置".toByteArray())
-  )
 }
+
+data class Response(
+  val success: Boolean = true,
+  val message: String? = "无权限，需要前往后端配置"
+)
+
 
 /** 初始化app数据*/
 fun initMetaData(metaData: String) {
@@ -198,6 +173,15 @@ fun initMetaData(metaData: String) {
   Log.d(TAG, "this is metaData:${network_whitelist}")
 }
 
+// 跳过白名单（因为每次请求都会走这个方法，所以抛弃循环的方法，用contains进行模式匹配，保证了速度）
+fun jumpWhitelist(url: String): Boolean {
+  val currentUrl = URL(url)
+  if (network_whitelist.contains(currentUrl.host)) {
+    return false
+  }
+  return true
+}
+
 /** 返回应用的虚拟路径 "https://$dWebView_host.dweb$path"*/
 fun resolveUrl(path: String): String {
   return "https://${dWebView_host.lowercase(Locale.ROOT)}.dweb${shakeUrl(path)}"
@@ -211,15 +195,6 @@ fun shakeUrl(path: String): String {
     "/$path"
   }
   return pathname
-}
-
-// 跳过白名单（因为每次请求都会走这个方法，所以抛弃循环的方法，用contains进行模式匹配，保证了速度）
-fun jumpWhitelist(url: String): Boolean {
-  val currentUrl = URL(url)
-  if (network_whitelist.contains(currentUrl.host)) {
-    return false
-  }
-  return true
 }
 
 /**
@@ -284,29 +259,4 @@ data class DwebViewMap(
   val url: String = "",
   val response: String = ""
 )
-
-
-//fun test() {
-//    val b =
-//        RearRouter(
-//            "https://62b94efd41bf319d22797acd.mockapi.io/bfchain/v1/getBlockInfo",
-//            UserHeader("GET", "application/json", 200, "xxx hi  this is response")
-//        )
-//    val c1 =
-//        RearRouter(
-//            "hello_runtime.html",
-//            UserHeader("GET", "application/json", 200, "xxx hi  this is response")
-//        )
-//    val c2 =
-//        RearRouter(
-//            "app/bfchain.dev/index.html",
-//            UserHeader("GET", "application/json", 200, "xxx hi  this is response")
-//        )
-//    front_to_rear_map["https://bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj.dweb/hello_runtime.html"] = c1
-//    front_to_rear_map["https://bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj.dweb/app/bfchain.dev/index.html"] =
-//        c2
-//    front_to_rear_map["https://bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj.dweb/getblockinfo"] = b
-//    front_to_rear_map["https://bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj.dweb/getBlockHigh"] = b
-//
-//}
 

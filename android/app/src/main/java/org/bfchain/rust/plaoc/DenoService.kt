@@ -116,7 +116,7 @@ fun warpCallback(bytes: ByteArray, store: Boolean = true) {
 }
 
 // 解析二进制数据
-fun parseBytesFactory(bytes: ByteArray): ByteData {
+fun parseBytesFactory(bytes: ByteArray): Pair<ByteArray,String> {
     val versionId = bytes.sliceArray(0..0)
     val headId = bytes.sliceArray(1..2)
     val message = bytes.sliceArray(3 until bytes.size)
@@ -125,7 +125,7 @@ fun parseBytesFactory(bytes: ByteArray): ByteData {
     Log.d("bytesFactory", "now versionId :${versionId}")
     Log.d("bytesFactory", "now headId:${headId}")
     Log.d("bytesFactory", "now message says:$stringData")
-    return ByteData(headId, stringData)
+    return Pair(headId, stringData)
 }
 
 
@@ -141,7 +141,8 @@ fun createBytesFactory(callFun: ExportNative, message: String) {
     // 移除使用完的标记
     rust_call_map.remove(callFun)
     version_head_map.remove(headId)
-    thread {
+  println("ExportNative.CreateNotificationMsg,$message")
+  thread {
       denoService.backSystemDataToRust(result.array())
     }
 }
@@ -157,6 +158,3 @@ data class JsHandle(
     val data: String = "",
     val channelId: String? = ""
 )
-
-
-data class ByteData(var headId: ByteArray, var stringData: String)

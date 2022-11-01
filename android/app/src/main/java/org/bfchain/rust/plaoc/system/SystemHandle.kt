@@ -6,6 +6,7 @@ import org.bfchain.libappmgr.utils.FilesUtil
 import org.bfchain.rust.plaoc.*
 import org.bfchain.rust.plaoc.system.device.DeviceInfo
 import org.bfchain.rust.plaoc.system.file.*
+import org.bfchain.rust.plaoc.system.notification.MessageSource
 import org.bfchain.rust.plaoc.system.notification.NotificationMsgItem
 import org.bfchain.rust.plaoc.webView.network.initMetaData
 import org.bfchain.rust.plaoc.webView.sendToJavaScript
@@ -25,7 +26,14 @@ fun initServiceApp() {
    try {
      val dApp  = FilesUtil.getDAppInfo(id, APP_DIR_TYPE.AssetsApp)
      dApp?.manifest?.bfsaEntry?.let {
-       createWorker(WorkerNative.valueOf("ReadOnlyRuntime"), splicingPath(id,it))
+       val path = splicingPath(id,it)
+       try {
+         App.appContext.assets.open(path) // 判断文件是否存在
+         createWorker(WorkerNative.valueOf("ReadOnlyRuntime"), path)
+       } catch (e: java.io.FileNotFoundException) {
+         Log.e("initServiceApp","not found ${e.message}")
+         null
+       }
      }
    } catch (e:Exception) {
      Log.i("initServiceApp: ", e.toString())
@@ -36,12 +44,12 @@ fun initServiceApp() {
 /** 拼接入口*/
 fun splicingPath(bfsId:String, entry:String):String {
   if (entry.startsWith("./")) {
-    return "/$bfsId${entry.replace("./","/")}"
+    return "$bfsId${entry.replace("./","/")}"
   }
   if (entry.startsWith("/")) {
-    return  "/$bfsId$entry"
+    return  "$bfsId$entry"
   }
-  return "/$bfsId/$entry"
+  return "$bfsId/$entry"
 }
 
 /** 初始化系统函数*/
@@ -65,12 +73,10 @@ fun splicingPath(bfsId:String, entry:String):String {
     { sendToJavaScript(it) }
   /** fs System*/
   callable_map[ExportNative.FileSystemLs] = {
-//    Log.i("FileSystemLs:",it)
     val handle = mapper.readValue(it, FileLs::class.java)
     fileSystem.ls(handle.path,handle.option.filter, handle.option.recursive)
   }
   callable_map[ExportNative.FileSystemList] = {
-//    Log.i("FileSystemList:",it)
     val handle = mapper.readValue(it, FileLs::class.java)
     fileSystem.list(handle.path)
   }
@@ -114,13 +120,18 @@ fun splicingPath(bfsId:String, entry:String):String {
   }
   /** Notification */
   callable_map[ExportNative.CreateNotificationMsg] = {
+    createBytesFactory(ExportNative.CreateNotificationMsg, it)
     val message = mapper.readValue(it, NotificationMsgItem::class.java)
-
+   val channelType =  when(message.msg_src) {
+     "app_message" -> NotifyManager.ChannelType.DEFAULT
+     "push_message"-> NotifyManager.ChannelType.IMPORTANT
+     else ->  NotifyManager.ChannelType.DEFAULT
+   }
     notifyManager.createNotification(
       title = message.title,
       text = message.msg_content,
       bigText = message.msg_content,
-      channelType = message.priority,
+      channelType = channelType,
     )
   }
 }

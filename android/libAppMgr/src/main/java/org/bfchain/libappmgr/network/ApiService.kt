@@ -9,6 +9,7 @@ import java.io.File
 interface ApiService {
 
   suspend fun getAppVersion(path: String): ApiResultData<BaseData<AppVersion>>
+  suspend fun getAppVersion(): BaseData<AppVersion>
 
   suspend fun download(path: String, onDownload: (Long, Long) -> Unit): HttpResponse
   suspend fun downloadAndSave(path: String, file: File?, DLProgress: (Long, Long) -> Unit)

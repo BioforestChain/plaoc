@@ -1,25 +1,25 @@
-import { netCallNativeUi } from "@bfsx/gateway";
+import { getCallNativeUi } from "@bfsx/gateway";
 import { Keyboard } from "./bfcsKeyboardType.ts";
 import { NativeUI } from "../common/nativeHandle.ts";
 
 export class VirtualKeyboardNet implements Keyboard.IVirtualKeyboardNet {
   async getKeyboardSafeArea(): Promise<Keyboard.IKeyboardSafeArea> {
-    const safeArea = await netCallNativeUi(NativeUI.GetKeyBoardSafeArea);
+    const safeArea = await getCallNativeUi(NativeUI.GetKeyBoardSafeArea);
     return JSON.parse(safeArea);
   }
 
   async getKeyboardHeight(): Promise<number> {
-    const height = await netCallNativeUi(NativeUI.GetKeyBoardHeight);
+    const height = await getCallNativeUi(NativeUI.GetKeyBoardHeight);
     return parseFloat(height);
   }
 
   async getKeyboardOverlay(): Promise<boolean> {
-    const overlay = await netCallNativeUi(NativeUI.GetKeyBoardOverlay);
+    const overlay = await getCallNativeUi(NativeUI.GetKeyBoardOverlay);
     return overlay;
   }
 
   async setKeyboardOverlay(isOver = true): Promise<boolean> {
-    const overlay = await netCallNativeUi(NativeUI.SetKeyBoardOverlay, isOver);
+    const overlay = await getCallNativeUi(NativeUI.SetKeyBoardOverlay, isOver);
     return overlay;
   }
 
@@ -34,13 +34,13 @@ export class VirtualKeyboardNet implements Keyboard.IVirtualKeyboardNet {
   showKeyboard(): Promise<boolean> {
     return new Promise((resolve) => {
       setTimeout(async () => {
-        const isShow = await netCallNativeUi(NativeUI.ShowKeyBoard);
+        const isShow = await getCallNativeUi(NativeUI.ShowKeyBoard);
         resolve(isShow);
       }, 100);
     });
   }
 
   async hideKeyboard(): Promise<boolean> {
-    return await netCallNativeUi(NativeUI.HideKeyBoard);
+    return await getCallNativeUi(NativeUI.HideKeyBoard);
   }
 }

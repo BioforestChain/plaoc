@@ -35,7 +35,7 @@ interface IApiResult<T> {
   fun downloadSuccess(file: File) {} // 下载完成
 }
 
-data class BaseData<T>(val errorCode: Int, val errorMsg: String, val data: T?)
+//data class BaseData<T>(val errorCode: Int, val errorMsg: String, val data: T?)
 
 class ApiResultData<out T> constructor(val value: Any?) {
   val isSuccess: Boolean get() = value !is Failure && value !is Progress && value !is Prepare

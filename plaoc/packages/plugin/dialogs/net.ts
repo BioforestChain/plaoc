@@ -1,4 +1,4 @@
-import { netCallNativeUi } from "@bfsx/gateway";
+import { getCallNativeUi } from "@bfsx/gateway";
 import { Dialogs } from "./bfcsDialogsType.ts";
 import { NativeUI } from "../common/nativeHandle.ts";
 
@@ -10,7 +10,7 @@ export class DialogsNet implements Dialogs.IDialogsNet {
     const cb = `(()=>{
           ${confirmFunc}
       })`;
-    await netCallNativeUi(NativeUI.OpenDialogAlert, {
+    await getCallNativeUi(NativeUI.OpenDialogAlert, {
       config: JSON.stringify(config),
       cb,
     });
@@ -28,7 +28,7 @@ export class DialogsNet implements Dialogs.IDialogsNet {
           ${cancelFunc ?? ""}
         }
       })`;
-    await netCallNativeUi(NativeUI.OpenDialogPrompt, {
+    await getCallNativeUi(NativeUI.OpenDialogPrompt, {
       config: JSON.stringify(config),
       cb,
     });
@@ -46,7 +46,7 @@ export class DialogsNet implements Dialogs.IDialogsNet {
           ${cancelFunc ?? ""}
         }
       })`;
-    await netCallNativeUi(NativeUI.OpenDialogConfirm, {
+    await getCallNativeUi(NativeUI.OpenDialogConfirm, {
       config: JSON.stringify(config),
       cb,
     });
@@ -64,7 +64,7 @@ export class DialogsNet implements Dialogs.IDialogsNet {
           ${cancelFunc ?? ""}
         }
       })`;
-    await netCallNativeUi(NativeUI.OpenDialogWarning, {
+    await getCallNativeUi(NativeUI.OpenDialogWarning, {
       config: JSON.stringify(config),
       cb,
     });

@@ -1,5 +1,8 @@
 package org.bfchain.libappmgr.entity
 
+import android.graphics.Bitmap
+import android.media.MediaMetadataRetriever
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import java.util.*
@@ -7,12 +10,33 @@ import java.util.*
 data class DCIMInfo(
   val path: String,
   val type: DCIMType = DCIMType.IMAGE,
+  val name: String = "",
   val checked: MutableState<Boolean> = mutableStateOf(false),
-  val duration: Int = 0 // 如果是视频，需要加载时长
+  val index: MutableState<Int> = mutableStateOf(0),
+  //var title: String? = null, // 标题
+  //var album: String? = null, // 专辑
+  var mime: String? = null, // 类型
+  //var artist: String? = null, // 作者
+  var duration: Int = 0, // 如果是视频，需要加载时长
+  //var bitrate: String? = null, // bit/s api>=14
+  //var date: String? = null,
+  var bitmap: Bitmap? = null, // 如果是视频，用于显示某一帧的图片
+)
+
+data class DCIMSpinner(
+  val path: String,
+  val name: String,
+  val count: Int,
+  val checked: MutableState<Boolean> = mutableStateOf(false)
 )
 
 enum class DCIMType {
   IMAGE, GIF, VIDEO, OTHER
+}
+
+// 视频状态
+enum class PlayerState {
+  Play, Pause, END, Playing
 }
 
 object MediaFile {
@@ -42,9 +66,14 @@ object MediaFile {
   val FILE_TYPE_M4V = 22
   val FILE_TYPE_3GPP = 23
   val FILE_TYPE_3GPP2 = 24
-  val FILE_TYPE_WMV = 25
+
+  //val FILE_TYPE_WMV = 25
+  //val FILE_TYPE_RMVB = 26
+  //val FILE_TYPE_FLV = 27
+  //val FILE_TYPE_MKV = 28
+  //val FILE_TYPE_AVI = 29
   private val FIRST_VIDEO_FILE_TYPE = FILE_TYPE_MP4
-  private val LAST_VIDEO_FILE_TYPE = FILE_TYPE_WMV
+  private val LAST_VIDEO_FILE_TYPE = FILE_TYPE_3GPP2
 
   // Image file types
   val FILE_TYPE_JPEG = 31
@@ -93,7 +122,11 @@ object MediaFile {
     addFileType("3GPP", FILE_TYPE_3GPP, "video/3gpp")
     addFileType("3G2", FILE_TYPE_3GPP2, "video/3gpp2")
     addFileType("3GPP2", FILE_TYPE_3GPP2, "video/3gpp2")
-    addFileType("WMV", FILE_TYPE_WMV, "video/x-ms-wmv")
+    //addFileType("WMV", FILE_TYPE_WMV, "video/x-ms-wmv")
+    //addFileType("RMVB", FILE_TYPE_RMVB, "video/rmvb")
+    //addFileType("FLV", FILE_TYPE_FLV, "video/flv")
+    //addFileType("MKV", FILE_TYPE_MKV, "video/mkv")
+    //addFileType("AVI", FILE_TYPE_AVI, "video/avi")
 
     addFileType("JPG", FILE_TYPE_JPEG, "image/jpeg")
     addFileType("JPEG", FILE_TYPE_JPEG, "image/jpeg")
@@ -136,7 +169,6 @@ object MediaFile {
     return (fileType in FIRST_PLAYLIST_FILE_TYPE..LAST_PLAYLIST_FILE_TYPE)
   }
 
-
   private fun getFileType(path: String): MediaFileType? {
     val lastDot = path.lastIndexOf(".")
     return if (lastDot < 0) null
@@ -165,15 +197,42 @@ object MediaFile {
     return (value?.toInt() ?: 0)
   }
 
-  fun getDCIMType(path: String) : DCIMType {
+  fun getDCIMType(path: String): DCIMType {
     val type = getFileType(path)
     type?.let {
-      return when(it.fileType) {
+      return when (it.fileType) {
         FILE_TYPE_GIF -> DCIMType.GIF
         in FIRST_VIDEO_FILE_TYPE..LAST_VIDEO_FILE_TYPE -> DCIMType.VIDEO
         in FIRST_IMAGE_FILE_TYPE..LAST_IMAGE_FILE_TYPE -> DCIMType.IMAGE
-        else -> {DCIMType.OTHER}
+        else -> {
+          DCIMType.OTHER
+        }
       }
     } ?: return DCIMType.OTHER
+  }
+
+  fun createDCIMInfo(path: String): DCIMInfo {
+    var dcimInfo = DCIMInfo(path, getDCIMType(path), path.substring(path.lastIndexOf("/") + 1))
+    if (dcimInfo.type == DCIMType.VIDEO) {
+      var mmr: MediaMetadataRetriever? = null
+      try {
+        mmr = MediaMetadataRetriever()
+        mmr.setDataSource(path)
+        // dcimInfo.title = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE)
+        // dcimInfo.album = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM)
+        dcimInfo.mime = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE)
+        // dcimInfo.artist = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST)
+        dcimInfo.duration =
+          mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toInt()?.div(1000) ?: 0
+        // dcimInfo.bitrate = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE)
+        // dcimInfo.date = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DATE)
+        dcimInfo.bitmap = mmr.frameAtTime
+      } catch (e: Exception) {
+        Log.d("DCIMInfo", "fail->$e")
+      } finally {
+        mmr?.release()
+      }
+    }
+    return dcimInfo
   }
 }

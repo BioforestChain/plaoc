@@ -11,6 +11,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import org.bfchain.libappmgr.data.PreferencesHelper
 import org.bfchain.libappmgr.entity.AppInfo
 import org.bfchain.libappmgr.schedule.CoroutineUpdateTask
