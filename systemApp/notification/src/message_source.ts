@@ -15,6 +15,11 @@ import type { IMessageSource } from "../typings/message.type.ts";
  */
 export async function asyncPollingCallDenoNotification(timeout = 3000) {
   let isLocked = false;
+  const listener = async () => {
+    isLocked = true;
+    await messagePush();
+    isLocked = false;
+  };
   const polling = async () => {
     do {
       const data = await loopRustNotification().next();
@@ -31,15 +36,13 @@ export async function asyncPollingCallDenoNotification(timeout = 3000) {
         messageToQueue(messageInfo);
       }
 
-      addEventListener(NOTIFICATION_MESSAGE_PUSH, async () => {
-        isLocked = true;
-        await messagePush();
-        isLocked = false;
-      });
+      addEventListener(NOTIFICATION_MESSAGE_PUSH, listener);
     } while (true);
 
     if (!isLocked) {
       dispatchEvent(new Event(NOTIFICATION_MESSAGE_PUSH));
+    } else {
+      removeEventListener(NOTIFICATION_MESSAGE_PUSH, listener);
     }
 
     setTimeout(async () => {
