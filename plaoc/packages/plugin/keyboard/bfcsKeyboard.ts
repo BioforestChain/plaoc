@@ -1,4 +1,4 @@
-import { VirtualKeyboardNet } from "@keyboard/net";
+import { VirtualKeyboardNet } from "./net.ts";
 import { Keyboard } from "./bfcsKeyboardType.ts";
 import { DwebPlugin } from "../native/dweb-plugin.ts";
 
@@ -11,9 +11,9 @@ export class BfcsKeyboard extends DwebPlugin {
     this.net = new VirtualKeyboardNet();
   }
 
-  connectedCallback() { }
+  connectedCallback() {}
 
-  disconnectedCallback() { }
+  disconnectedCallback() {}
 
   /**获取键盘安全区域 */
   async getKeyboardSafeArea(): Promise<Keyboard.IKeyboardSafeArea> {

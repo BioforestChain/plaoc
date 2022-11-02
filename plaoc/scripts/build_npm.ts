@@ -4,6 +4,7 @@ import {
   emptyDir,
   EntryPoint,
   LibName,
+  type ShimOptions,
 } from "https://deno.land/x/gaubee_dnt@0.31.0-1/mod.ts";
 
 export const doBuid = async (config: {
@@ -14,6 +15,7 @@ export const doBuid = async (config: {
   buildToRootDir: string;
   importMap?: string;
   lib?: (LibName | string)[];
+  shims?: ShimOptions;
 }) => {
   const { version, buildFromRootDir, buildToRootDir, importMap, name, lib } =
     config;
@@ -47,10 +49,7 @@ export const doBuid = async (config: {
      * 1. TS2691
      */
     typeCheck: true,
-    shims: {
-      // see JS docs for overview and more options
-      deno: "dev",
-    },
+    shims: config.shims ?? { deno: "dev" },
     compilerOptions: {
       target: "ES2020",
       importHelpers: true,

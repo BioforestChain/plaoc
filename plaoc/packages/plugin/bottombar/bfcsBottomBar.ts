@@ -2,7 +2,7 @@
 
 import { convertToRGBAHex } from "../util/index.ts";
 import { DwebPlugin } from "../native/dweb-plugin.ts";
-import { BottomBarNet } from "@bottomBar/net";
+import { BottomBarNet } from "./net.ts";
 import { BottomBar } from "./bfcsBottomBarType.ts";
 import { Icon } from "../icon/bfspIconType.ts";
 import { Color } from "../types/colorType.ts";
@@ -124,7 +124,6 @@ export class BfcsBottomBar extends DwebPlugin {
   async setForegroundColor(color: string): Promise<boolean> {
     const colorHex = convertToRGBAHex(color);
     return await this.net.setForegroundColor(colorHex);
-
   }
 
   async getActions(): Promise<BottomBar.BottomBarItem[]> {
@@ -168,7 +167,7 @@ export class BfcsBottomBar extends DwebPlugin {
         }
         if ($.hasAttribute("selected-color")) {
           colors.iconColorSelected = convertToRGBAHex(
-            $.getAttribute("selected-color")!,
+            $.getAttribute("selected-color")!
           );
         }
       }
@@ -187,14 +186,13 @@ export class BfcsBottomBar extends DwebPlugin {
         }
         if ($.hasAttribute("selected-color")) {
           colors.textColorSelected = convertToRGBAHex(
-            $.getAttribute("selected-color")!,
+            $.getAttribute("selected-color")!
           );
         }
       }
 
       const bid = childNode.getAttribute("bid");
-      const onClickCode =
-        `document.querySelector('dweb-bottom-bar-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+      const onClickCode = `document.querySelector('dweb-bottom-bar-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
       // 禁止触发所有事件，包括无障碍事件
       const disabled = childNode.hasAttribute("disabled") ? true : false;
       const selected = childNode.hasAttribute("selected") ? true : false;
@@ -205,7 +203,7 @@ export class BfcsBottomBar extends DwebPlugin {
       // 指示器颜色，当前选中的背景颜色
       if (childNode.hasAttribute("indicator-color")) {
         colors.indicatorColor = convertToRGBAHex(
-          childNode.getAttribute("indicator-color")!,
+          childNode.getAttribute("indicator-color")!
         );
       }
       this._actionList.push({
@@ -236,7 +234,7 @@ export class BfcsBottomBar extends DwebPlugin {
   async attributeChangedCallback(
     attrName: string,
     oldVal: unknown,
-    newVal: unknown,
+    newVal: unknown
   ) {
     if (oldVal === newVal) {
       return;

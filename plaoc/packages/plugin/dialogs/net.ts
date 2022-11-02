@@ -1,11 +1,11 @@
-import { getCallNativeUi } from "@bfsx/gateway";
+// import { getCallNativeUi } from "@bfsx/gateway";
 import { Dialogs } from "./bfcsDialogsType.ts";
 import { NativeUI } from "../common/nativeHandle.ts";
 
 export class DialogsNet implements Dialogs.IDialogsNet {
   async openAlert(
     config: Dialogs.IAlertConfig,
-    confirmFunc: string,
+    confirmFunc: string
   ): Promise<void> {
     const cb = `(()=>{
           ${confirmFunc}
@@ -19,7 +19,7 @@ export class DialogsNet implements Dialogs.IDialogsNet {
   async openPrompt(
     config: Dialogs.IPromptConfig,
     confirmFunc: string,
-    cancelFunc?: string,
+    cancelFunc?: string
   ): Promise<void> {
     const cb = `((result)=>{
         if(result){
@@ -37,7 +37,7 @@ export class DialogsNet implements Dialogs.IDialogsNet {
   async openConfirm(
     config: Dialogs.IConfirmConfig,
     confirmFunc: string,
-    cancelFunc?: string,
+    cancelFunc?: string
   ): Promise<void> {
     const cb = `((result)=>{
         if(result){
@@ -55,7 +55,7 @@ export class DialogsNet implements Dialogs.IDialogsNet {
   async openWarning(
     config: Dialogs.IConfirmConfig,
     confirmFunc: string,
-    cancelFunc?: string,
+    cancelFunc?: string
   ): Promise<void> {
     const cb = `((result)=>{
         if(result){

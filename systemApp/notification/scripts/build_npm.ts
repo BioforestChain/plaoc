@@ -48,13 +48,8 @@ export const doBuild = async (npmFile: string) => {
       bugs: {
         url: "https://github.com/BioforestChain/plaoc/issues",
       },
-      // dependencies: {
-      //   "@bfsx/core": "^0.0.7",
-      //   "@bfsx/metadata": "^0.0.7",
-      //   "@bfsx/gateway": "^0.0.7",
-      // },
       devDependencies: {
-        "@bfsx/typings": "^0.0.7",
+        "@bfsx/typings": "^0.1.0",
       },
     },
   });

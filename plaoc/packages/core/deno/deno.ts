@@ -3,18 +3,16 @@
 /////////////////////////////
 
 import { eval_js, js_to_rust_buffer } from "./rust.op.ts";
-import { netCallNativeService } from '@bfsx/gateway';
+// import { netCallNativeService } from "@bfsx/gateway";
 import { isAndroid } from "../runtime/device.ts";
-
 
 const versionView = new Uint8Array(new ArrayBuffer(1));
 const headView = new Uint8Array(new ArrayBuffer(2)); // 初始化头部标记
 versionView[0] = 0x01; // 版本号都是1，表示消息
-export class Deno {
-
+class Deno {
   constructor() {
     // 创建头部消息
-    this.createHeader()
+    this.createHeader();
   }
 
   /**
@@ -43,11 +41,11 @@ export class Deno {
     const uint8Array = this.structureBinary(handleFn, data);
     let msg = "";
     if (isAndroid) {
-      js_to_rust_buffer(uint8Array) // android - denoOp
+      js_to_rust_buffer(uint8Array); // android - denoOp
     } else {
-      msg = await netCallNativeService(handleFn, data);  //  ios - javascriptCore
+      msg = await netCallNativeService(handleFn, data); //  ios - javascriptCore
     }
-    return { versionView, headView, msg }
+    return { versionView, headView, msg };
   }
   /**
    * 调用evaljs 执行js
@@ -57,9 +55,9 @@ export class Deno {
   callEvalJsStringFunction(handleFn: string, data = "''") {
     const uint8Array = this.structureBinary(handleFn, data);
     if (isAndroid) {
-      eval_js(uint8Array)// android - denoOp    
+      eval_js(uint8Array); // android - denoOp
     } else {
-      netCallNativeService(handleFn, data);  //  ios - javascriptCore
+      netCallNativeService(handleFn, data); //  ios - javascriptCore
     }
   }
 
@@ -109,4 +107,4 @@ export class Deno {
   }
 }
 
-
+export default new Deno();

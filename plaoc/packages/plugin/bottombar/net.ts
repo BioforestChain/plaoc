@@ -1,9 +1,8 @@
 import { NativeUI } from "../common/nativeHandle.ts";
-import { getCallNativeUi } from "@bfsx/gateway";
+// import { getCallNativeUi } from "@bfsx/gateway";
 import { Color } from "../types/colorType.ts";
 import { BottomBar } from "./bfcsBottomBarType.ts";
 export class BottomBarNet implements BottomBar.IBottomBarNet {
-
   async getHidden(): Promise<boolean> {
     return await getCallNativeUi(NativeUI.GetBottomBarEnabled);
   }
@@ -29,26 +28,36 @@ export class BottomBarNet implements BottomBar.IBottomBarNet {
   }
 
   async getBackgroundColor(): Promise<Color.RGBAHex> {
-    const colorHex = await getCallNativeUi(NativeUI.GetBottomBarBackgroundColor);
+    const colorHex = await getCallNativeUi(
+      NativeUI.GetBottomBarBackgroundColor
+    );
     return colorHex;
   }
 
   async setBackgroundColor(colorHex: Color.RGBAHex): Promise<boolean> {
-    return await getCallNativeUi(NativeUI.SetBottomBarBackgroundColor, colorHex);
+    return await getCallNativeUi(
+      NativeUI.SetBottomBarBackgroundColor,
+      colorHex
+    );
   }
 
   async getForegroundColor(): Promise<Color.RGBAHex> {
-    const colorHex = await getCallNativeUi(NativeUI.GetBottomBarForegroundColor);
+    const colorHex = await getCallNativeUi(
+      NativeUI.GetBottomBarForegroundColor
+    );
     return colorHex;
   }
 
   async setForegroundColor(colorHex: Color.RGBAHex): Promise<boolean> {
-    return await getCallNativeUi(NativeUI.SetBottomBarForegroundColor, colorHex);
+    return await getCallNativeUi(
+      NativeUI.SetBottomBarForegroundColor,
+      colorHex
+    );
   }
 
   async getActions(): Promise<BottomBar.BottomBarItem[]> {
     const actionList = JSON.parse(
-      await getCallNativeUi(NativeUI.GetBottomBarActions),
+      await getCallNativeUi(NativeUI.GetBottomBarActions)
     );
     return actionList;
   }

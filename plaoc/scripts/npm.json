@@ -1,13 +1,29 @@
 [
   {
-    "buildFromRootDir": "./packages/gateway",
+    "buildFromRootDir": "./packages/core",
     "mainExports": ".",
-    "buildToRootDir": "./build/gateway",
+    "buildToRootDir": "./build/core",
     "importMap": "./import_map.json",
-    "name": "@bfsx/gateway",
-    "version": "0.0.9",
-    "lib": [
-      "es2020"
-    ]
+    "name": "@bfsx/core",
+    "version": "0.1.0",
+    "lib": ["es2020"],
+    "shims": {
+      "custom": [
+        {
+          "package": {
+            "name": "@bfsx/gateway",
+            "version": "^0.1.0"
+          },
+          "globalNames": ["netCallNativeService"]
+        },
+        {
+          "package": {
+            "name": "@bfsx/metadata",
+            "version": "^0.1.0"
+          },
+          "globalNames": ["MetaData"]
+        }
+      ]
+    }
   }
 ]
