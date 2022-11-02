@@ -1,6 +1,0 @@
-{
-  "imports": {
-    "@bfsx/typings": "./packages/typings/index.ts",
-    "@bfsx/vfs/path": "./packages/vfs/path/index.ts"
-  }
-}
