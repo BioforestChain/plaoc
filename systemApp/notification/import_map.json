@@ -1,8 +1,8 @@
 {
   "imports": {
     "dnt": "https://deno.land/x/gaubee_dnt@0.31.0-1/mod.ts",
-    "@bfsx/core": "https://esm.sh/@bfsx/core@0.1.0",
-    "@bfsx/metadata": "https://esm.sh/@bfsx/metadata@0.1.0",
-    "@bfsx/gateway": "https://esm.sh/@bfsx/gateway@0.1.0"
+    "@bfsx/core": "https://deno.land/x/bfsx_std@0.0.1/packages/core/index.ts",
+    "@bfsx/metadata": "https://deno.land/x/bfsx_std@0.0.1/packages/metadata/index.ts",
+    "@bfsx/gateway": "https://deno.land/x/bfsx_std@0.0.1/packages/gateway/index.ts"
   }
 }
