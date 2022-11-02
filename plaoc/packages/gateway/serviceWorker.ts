@@ -17,26 +17,24 @@ sw.addEventListener("activate", (event) => {
 
 const FETCH_EVENT_MAP = new Map<string,
   {
-    event: FetchEvent, response?: Response, responseStream: ReadableStream,
+    event: FetchEvent, response: Response, responseStream: ReadableStream,
     responseStreamController: ReadableStreamController<ArrayBuffer> | null
   }>()
 
 // remember event.respondWith must sync call🐰
-sw.addEventListener("fetch", async (event) => {
-  // 如果id为空需要申请id
-  if (channelId === "") {
-    channelId = await registerChannel()
+sw.addEventListener("fetch", (event) => {
+  const request = event.request.clone();
+
+  const path = new URL(request.url).pathname
+  // 资源文件不处理
+  if (path.lastIndexOf(".") !== -1) {
+    return
   }
-  const request = event.request;
-  console.log(`HttpRequestBuilder ${JSON.stringify(await request.text())},url: ${JSON.stringify(await request.arrayBuffer())}`)
-  console.log(`HttpRequestBuilder ${request.method},url: ${request.url},headers: ${JSON.stringify(request.headers)},body: ${request.body}`)
-  // Build chunks
-  const chunks = new HttpRequestBuilder(request, request.method, request.url, request.headers as unknown as Record<string, string>, request.body);
 
   let responseStreamController: ReadableStreamController<ArrayBuffer> | null = null;
   // 生成结构体
   const fetchTask = {
-    event,
+    event: new FetchEvent("fetch", event),
     response: new Response(),
     responseStream: new ReadableStream({
       start(controller) {
@@ -47,6 +45,24 @@ sw.addEventListener("fetch", async (event) => {
   }
   // 存起来
   FETCH_EVENT_MAP.set(String(channelId), fetchTask);
+
+  handleRequest(request)
+
+});
+
+
+
+async function handleRequest(request: Request) {
+  // 如果id为空需要申请id
+  if (channelId === "") {
+    channelId = await registerChannel()
+  }
+  // console.log(`HttpRequestBuilder ${JSON.stringify(await request.text())},url: ${JSON.stringify(await request.arrayBuffer())}`)
+  console.log(`HttpRequestBuilder ${request.method},url: ${request.url},headers: ${request.headers},body: ${request.body}`)
+
+  // Build chunks
+  const chunks = new HttpRequestBuilder(request, request.method, request.url, request.headers as unknown as Record<string, string>, request.body);
+
   // 迭代发送
   for await (const chunk of chunks) {
     do {
@@ -58,8 +74,7 @@ sw.addEventListener("fetch", async (event) => {
       await sleep(10);
     } while (true)
   }
-
-});
+}
 
 const encodeToHex = (reqId: number, data: string) => {
   return `${reqId.toString().padStart(4, '0')}:${hexEncode(data)}`
@@ -133,12 +148,9 @@ sw.addEventListener('message', event => {
     const data = hexDecode(chunk);
     console.log(`请求结束返回数据=> ${data}`);
     const [headers, status, statusText] = data.split(",");
-    console.log("解析headers", JSON.parse(headers), status, statusText)
-    fetchTask.response = new Response(fetchTask.responseStream, { headers: JSON.parse(headers), status: Number(status), statusText })
-    fetchTask.event.respondWith(async function () {
-      // event.request.headers["Range"] = "0-160"
-      return await Promise.resolve(fetchTask.response as Response);
-    }())
+    console.log("解析headers", headers, status, statusText)
+    fetchTask.response = new Response(fetchTask.responseStream, { headers: {}, status: Number(status), statusText })
+    fetchTask.event.respondWith(fetchTask.response)
   }
 })
 
