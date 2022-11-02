@@ -120,6 +120,7 @@ fun splicingPath(bfsId:String, entry:String):String {
   }
   /** Notification */
   callable_map[ExportNative.CreateNotificationMsg] = {
+    createBytesFactory(ExportNative.CreateNotificationMsg, it)
     val message = mapper.readValue(it, NotificationMsgItem::class.java)
    val channelType =  when(message.msg_src) {
      "app_message" -> NotifyManager.ChannelType.DEFAULT

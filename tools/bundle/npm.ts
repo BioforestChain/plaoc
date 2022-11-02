@@ -36,7 +36,7 @@ export const buildOptions: BuildOptions = {
     },
     dependencies: {
       // 不能在import_map中依赖，否则会被tree shaking。如果引用，则会报错。
-      "@bfsx/gateway": "^0.0.8",
+      "@bfsx/gateway": "^0.0.9",
     },
     devDependencies: {
       "@types/node": "latest",

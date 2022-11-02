@@ -1,17 +1,21 @@
 package org.bfchain.rust.plaoc
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.util.Log
+import androidx.core.app.NotificationCompat
 import androidx.work.*
-import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 
 private const val TAG = "DENO_WORKER"
 
-class DenoWorker(appContext: Context, workerParams: WorkerParameters) :
-  Worker(appContext, workerParams) {
-  override fun doWork(): Result {
+class DenoWorker(val appContext: Context, workerParams: WorkerParameters) :
+  CoroutineWorker(appContext, workerParams) {
+  override suspend fun doWork(): Result {
     val funName = inputData.getString(WorkerNative.WorkerName.toString())
     val data = inputData.getString("WorkerData")
     Log.i(TAG, "WorkerName=$funName,WorkerData=$data")
@@ -26,6 +30,37 @@ class DenoWorker(appContext: Context, workerParams: WorkerParameters) :
       }
     }
     return Result.success()
+  }
+
+  // fix issue https://github.com/BioforestChain/plaoc/issues/44
+  override suspend fun getForegroundInfo(): ForegroundInfo {
+    val notificationManager =
+      appContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      val channel = NotificationChannel(
+        CHANNEL_ID,
+        NOTIFICATION_TITLE,
+        NotificationManager.IMPORTANCE_HIGH
+      )
+
+      notificationManager.createNotificationChannel(channel)
+    }
+
+    val PENDING_INTENT_FLAG_MUTABLE = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) PendingIntent.FLAG_MUTABLE else 0
+    val notification = NotificationCompat.Builder(appContext, CHANNEL_ID)
+      .setContentIntent(PendingIntent.getActivity(appContext, 0, Intent(appContext, MainActivity::class.java), PENDING_INTENT_FLAG_MUTABLE))
+      .setSmallIcon(R.drawable.ic_launcher)
+      .setOngoing(true)
+      .setAutoCancel(true)
+      .setOnlyAlertOnce(true)
+      .setPriority(NotificationCompat.PRIORITY_MIN)
+      .setContentTitle(appContext.getString(R.string.app_name))
+      .setLocalOnly(true)
+      .setVisibility(NotificationCompat.VISIBILITY_SECRET)
+      .build()
+
+    return ForegroundInfo(1337, notification)
   }
 }
 
