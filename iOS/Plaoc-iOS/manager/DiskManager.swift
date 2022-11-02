@@ -9,13 +9,20 @@ import UIKit
 
 class DiskManager: NSObject {
 
-    //保存数据
+    //保存数据 数组、字典 字符串
     func preserveData(data:AnyObject, key: AnyObject) {
         
         let filePath = filePath(forKey: key)
         guard filePath.count > 0 else { return }
-        try? data.write(toFile: filePath, atomically: true, encoding: String.Encoding.utf8.rawValue)
-        print("保存到硬盘中")
+        let url = URL(fileURLWithPath: filePath)
+        if data is Array<Any> || data is [String:Any] {
+            let info = try? JSONSerialization.data(withJSONObject: data, options: [])
+            try? info?.write(to: url)
+        }
+        if data is String {
+            let dataString = data as! String
+            try? dataString.write(to: url, atomically: true, encoding: .utf8)
+        }
     }
     
     //查询数据
@@ -23,13 +30,14 @@ class DiskManager: NSObject {
         let fileManager = FileManager.default
         let filePath = filePath(forKey: key)
         guard filePath.count > 0 else { return nil }
-        
         if fileManager.isReadableFile(atPath: filePath) {
             guard let dataInfo = fileManager.contents(atPath: filePath) else { return nil }
-            let content = String(data: dataInfo, encoding: .utf8)
+            var content = try? JSONSerialization.jsonObject(with: dataInfo, options: .mutableContainers)
+            if content == nil {
+                content = String(data: dataInfo, encoding: .utf8)
+            }
             return content as AnyObject
         }
-        print("从硬盘中查询")
         return nil
     }
     //更新数据
@@ -54,14 +62,13 @@ class DiskManager: NSObject {
         let fileManager = FileManager.default
         let filePath = filePath(forKey: key)
         guard filePath.count > 0 else { return }
-        if !fileManager.fileExists(atPath: filePath) {
-            do {
-                try fileManager.createDirectory(atPath: filePath, withIntermediateDirectories: true, attributes: nil)
-            } catch {
-                NSLog("Couldn't create document directory")
-            }
-            NSLog("Document directory is \(filePath)")
+        guard !fileManager.fileExists(atPath: filePath) else { return }
+        do {
+            try fileManager.createDirectory(atPath: filePath, withIntermediateDirectories: true, attributes: nil)
+        } catch {
+            NSLog("Couldn't create document directory")
         }
+        NSLog("Document directory is \(filePath)")
     }
     //MARK: - Delete selected folder in Cache
     ///delete selected_files folder

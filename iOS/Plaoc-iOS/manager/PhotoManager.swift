@@ -77,7 +77,6 @@ class PhotoManager: NSObject {
         config.cropVideoAfterSelectThumbnail = false
         config.allowEditVideo = false
         config.showSelectBtnWhenSingleSelect = true
-        
         if isScan {
             config.maxSelectCount = 1
             config.allowSelectVideo = false
