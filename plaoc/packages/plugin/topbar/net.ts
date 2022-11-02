@@ -1,5 +1,5 @@
 import { NativeUI } from "../common/nativeHandle.ts";
-import { getCallNativeUi, postCallNativeUi } from "@bfsx/gateway";
+// import { getCallNativeUi, postCallNativeUi } from "@bfsx/gateway";
 import { Color } from "../types/colorType.ts";
 import { TopBar } from "./bfcsTopBarType.ts";
 
@@ -35,7 +35,6 @@ export class TopBarNet implements TopBar.ITopBarNet {
     return await getCallNativeUi(NativeUI.SetTopBarOverlay, Number(alpha));
   }
 
-
   async getTopBarAlpha(): Promise<number> {
     const alpha = await getCallNativeUi(NativeUI.GetTopBarAlpha);
 
@@ -67,7 +66,7 @@ export class TopBarNet implements TopBar.ITopBarNet {
 
   async getTopBarActions(): Promise<TopBar.TopBarItem[]> {
     const actionList = (await getCallNativeUi(
-      NativeUI.GetTopBarActions,
+      NativeUI.GetTopBarActions
     )) as string;
 
     return JSON.parse(actionList);
@@ -78,9 +77,8 @@ export class TopBarNet implements TopBar.ITopBarNet {
     return;
   }
 
-
   async getTopBarBackgroundColor(): Promise<Color.RGBAHex> {
-    return await getCallNativeUi(NativeUI.GetTopBarBackgroundColor)
+    return await getCallNativeUi(NativeUI.GetTopBarBackgroundColor);
   }
 
   async setTopBarBackgroundColor(color: Color.RGBAHex): Promise<boolean> {
@@ -88,12 +86,10 @@ export class TopBarNet implements TopBar.ITopBarNet {
   }
 
   async getTopBarForegroundColor(): Promise<Color.RGBAHex> {
-    return await getCallNativeUi(NativeUI.GetTopBarForegroundColor)
+    return await getCallNativeUi(NativeUI.GetTopBarForegroundColor);
   }
 
   async setTopBarForegroundColor(color: Color.RGBAHex): Promise<boolean> {
     return await getCallNativeUi(NativeUI.SetTopBarForegroundColor, color);
   }
-
-
 }

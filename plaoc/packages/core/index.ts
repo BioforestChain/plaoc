@@ -13,4 +13,4 @@ export {
   EPermissions,
   applyPermissions,
 } from "./runtime/index.ts";
-export { network } from "./deno/network.ts"
+export { network, type Network } from "./deno/network.ts";

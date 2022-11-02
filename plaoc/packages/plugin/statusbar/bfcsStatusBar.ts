@@ -1,6 +1,6 @@
 import { convertToRGBAHex } from "../util/index.ts";
 import { DwebPlugin } from "../native/dweb-plugin.ts";
-import { StatusBarNet } from "@statusbar/net";
+import { StatusBarNet } from "./net.ts";
 import { StatusBar } from "./bfcsStatusBarType.ts";
 import { Color } from "../types/colorType.ts";
 
@@ -16,7 +16,7 @@ export class BfcsStatusBar extends DwebPlugin {
     this._init();
   }
   /**移除DOM添加的方法 */
-  disconnectedCallback() { }
+  disconnectedCallback() {}
 
   private async _init() {
     // this.setAttribute("background-color", colorHex);
@@ -31,7 +31,7 @@ export class BfcsStatusBar extends DwebPlugin {
    */
   async setStatusBarColor(
     color?: string,
-    barStyle?: StatusBar.StatusBarStyle,
+    barStyle?: StatusBar.StatusBarStyle
   ): Promise<void> {
     const colorHex = convertToRGBAHex(color ?? "");
     await this.net.setStatusBarColor(colorHex, barStyle);
@@ -72,7 +72,11 @@ export class BfcsStatusBar extends DwebPlugin {
   }
 
   /**当自定义元素增加、删除、自身属性修改时，被调用。 */
-  attributeChangedCallback(attrName: string, _oldVal: unknown, newVal: unknown) {
+  attributeChangedCallback(
+    attrName: string,
+    _oldVal: unknown,
+    newVal: unknown
+  ) {
     if (attrName === "overlay") {
       if (this.hasAttribute(attrName)) {
         this.net.setStatusBarOverlay(true);
@@ -85,7 +89,7 @@ export class BfcsStatusBar extends DwebPlugin {
       if (this.hasAttribute(attrName)) {
         this.setStatusBarColor(
           this.getAttribute("background-color") ?? "",
-          newVal ? (newVal as StatusBar.StatusBarStyle) : undefined,
+          newVal ? (newVal as StatusBar.StatusBarStyle) : undefined
         );
       }
     } else if (attrName === "background-color") {

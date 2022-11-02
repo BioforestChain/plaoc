@@ -1,9 +1,9 @@
-import { network } from "@bfsx/core"
+// import { network } from "@bfsx/core";
 import { EFilterType, IsOption } from "./vfsType.ts";
-import { vfsHandle } from '../vfsHandle.ts';
-import { FileEntry } from './vfsType.ts';
+import { vfsHandle } from "../vfsHandle.ts";
+import { FileEntry } from "./vfsType.ts";
 import { readBuff, read, rename } from "./read.ts";
-import { Path } from '@bfsx/vfs/path';
+import { Path } from "@bfsx/vfs/path";
 
 /// const list: string[] = await fs.ls("./", { // list
 // /   filter: [{ // 声明筛选方式
@@ -15,12 +15,15 @@ import { Path } from '@bfsx/vfs/path';
 
 /**
  * 获取目录下有哪些文件
- * @param path 
+ * @param path
  * @param option:{filter: [{type: "file", name: ["*.ts"]}],recursive: true // 是否要递归遍历目录，默认是 false}
  * @returns file string[]
  */
 export async function ls(path: string, option: IsOption) {
-  const fileList = await network.asyncCallDenoFunction(vfsHandle.FileSystemLs, { path, option })
+  const fileList = await network.asyncCallDenoFunction(vfsHandle.FileSystemLs, {
+    path,
+    option,
+  });
   return transStringToArray(fileList);
 }
 
@@ -46,44 +49,49 @@ export async function ls(path: string, option: IsOption) {
 
 /**
  * 迭代返回文件对象
- * @param path 
+ * @param path
  * @returns fileSystems
  */
 export async function* list(path: string): AsyncGenerator<FileEntry> {
-  const fileList = await network.asyncCallDenoFunction(vfsHandle.FileSystemList, { path })
+  const fileList = await network.asyncCallDenoFunction(
+    vfsHandle.FileSystemList,
+    { path }
+  );
   const list = transStringToJson(fileList);
   for (const fs of list) {
-    const files = createFileEntry(fs)
-    yield files
+    const files = createFileEntry(fs);
+    yield files;
   }
 }
 
 /**
  * 返回文件对象
- * @param path 
+ * @param path
  * @returns fileSystems
  */
 export async function getList(path: string): Promise<FileEntry[]> {
-  const fileList = await network.asyncCallDenoFunction(vfsHandle.FileSystemList, { path })
+  const fileList = await network.asyncCallDenoFunction(
+    vfsHandle.FileSystemList,
+    { path }
+  );
   const list = transStringToJson(fileList);
-  const fileEntrys: FileEntry[] = []
+  const fileEntrys: FileEntry[] = [];
   for (const fs of list) {
-    const files = createFileEntry(fs)
-    fileEntrys.push(files)
+    const files = createFileEntry(fs);
+    fileEntrys.push(files);
   }
-  return fileEntrys
+  return fileEntrys;
 }
-
 
 // ["/src/test/vue3/bfsa-service/vfs/index.ts","./src"]
 /**
  * 创建文件entry
- * @param filePath 
- * @param cwd 
- * @returns 
+ * @param filePath
+ * @param cwd
+ * @returns
  */
 function createFileEntry(file: FileEntry) {
-  console.log("createFileEntry:", file)
+  console.log("createFileEntry:", file);
   // 去掉两边的"
   const isFile = file.type === EFilterType.file ? true : false;
   // 文件基本名称，不带文件类型
@@ -93,43 +101,43 @@ function createFileEntry(file: FileEntry) {
 
   // 读取文件 以文本方式
   file.text = async function () {
-    const readText = await read(file.path)
-    return readText
-  }
+    const readText = await read(file.path);
+    return readText;
+  };
 
   // 读取文件 流方式
   file.stream = async function* () {
     // 如果是文件再读取内容
     if (isFile) {
-      const fileBuff = new Uint8Array(await readBuff(file.path))
+      const fileBuff = new Uint8Array(await readBuff(file.path));
       let index = 0;
       const oneM = 1024 * 512 * 1;
       // 如果数据不是很大，直接返回
       if (fileBuff.byteLength < oneM) {
-        yield fileBuff
+        yield fileBuff;
       } else {
         // 迭代返回
         do {
-          yield fileBuff.subarray(index, index + oneM)
+          yield fileBuff.subarray(index, index + oneM);
           index += oneM;
         } while (fileBuff.byteLength > index);
       }
     }
-  }
+  };
 
   // 读取文件 二进制流方式
   file.binary = async function () {
     let buff = new ArrayBuffer(1);
     if (isFile) {
-      buff = await readBuff(file.path)
+      buff = await readBuff(file.path);
     }
-    return buff
-  }
+    return buff;
+  };
 
   //重命名文件
   file.rename = async function (name: string) {
-    return await rename(file.path, name)
-  }
+    return await rename(file.path, name);
+  };
   // file.readAs = function () {
   //   return Promise.resolve(file)
   // }
@@ -138,17 +146,17 @@ function createFileEntry(file: FileEntry) {
   // }
   file.cd = async function (path: string) {
     const fs = await getList(Path.join(file.cwd, path));
-    return await fs
-  }
+    return await fs;
+  };
   file.relativeTo = async function (path?: string) {
     if (path) {
       const fs = await list(path).next();
-      return fs.value.relativePath
+      return fs.value.relativePath;
     }
-    return file.relativePath
-  }
+    return file.relativePath;
+  };
 
-  return file
+  return file;
 }
 
 /**
@@ -165,10 +173,10 @@ function transStringToArray(str: string) {
 
 /**
  * 字符串转换为json
- * @param str 
- * @returns 
+ * @param str
+ * @returns
  */
 function transStringToJson(str: string): FileEntry[] {
-  const fs = JSON.parse(str)
-  return fs
+  const fs = JSON.parse(str);
+  return fs;
 }

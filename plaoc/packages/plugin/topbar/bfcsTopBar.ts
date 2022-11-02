@@ -1,4 +1,4 @@
-import { TopBarNet } from "@topbar/net";
+import { TopBarNet } from "./net.ts";
 import { TopBar } from "./bfcsTopBarType.ts";
 import { Icon } from "../icon/bfspIconType.ts";
 import { Color } from "../types/colorType.ts";
@@ -163,8 +163,7 @@ export class BfcsTopBar extends DwebPlugin {
       }
 
       const bid = childNode.getAttribute("bid");
-      const onClickCode =
-        `document.querySelector('dweb-top-bar-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+      const onClickCode = `document.querySelector('dweb-top-bar-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
       const disabled = childNode.hasAttribute("disabled") ? true : false;
       this._actionList.push({ icon, onClickCode: onClickCode, disabled });
     });
@@ -184,7 +183,7 @@ export class BfcsTopBar extends DwebPlugin {
   async attributeChangedCallback(
     attrName: string,
     oldVal: unknown,
-    newVal: unknown,
+    newVal: unknown
   ) {
     if (oldVal === newVal) {
       return;

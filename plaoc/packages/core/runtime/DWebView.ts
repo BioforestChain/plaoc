@@ -1,6 +1,6 @@
 import { callDeno } from "../deno/android.fn.ts";
-import { MetaData } from "@bfsx/metadata";
-import { network } from '../deno/network.ts';
+// import { MetaData } from "@bfsx/metadata";
+import { network } from "../deno/network.ts";
 
 export class DWebView {
   entrys: string[];
@@ -17,7 +17,10 @@ export class DWebView {
    */
   initAppMetaData(metaData: MetaData) {
     if (Object.keys(metaData).length === 0) return;
-    network.syncCallDenoFunction(callDeno.initMetaData, `'${JSON.stringify(metaData)}'`);
+    network.syncCallDenoFunction(
+      callDeno.initMetaData,
+      `'${JSON.stringify(metaData)}'`
+    );
   }
   /**
    * 激活DwebView
@@ -26,13 +29,9 @@ export class DWebView {
   activity(entry: string) {
     // 判断在不在入口文件内
     if (this.entrys.toString().match(RegExp(`${entry}`))) {
-      network.syncCallDenoFunction(
-        callDeno.openDWebView,
-        `"${entry}"`,
-      );
+      network.syncCallDenoFunction(callDeno.openDWebView, `"${entry}"`);
       return;
     }
     throw new Error("您传递的入口不在配置的入口内，需要在配置文件里配置入口");
   }
-
 }

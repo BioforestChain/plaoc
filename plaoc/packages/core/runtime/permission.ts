@@ -1,14 +1,16 @@
-import { network } from '../deno/network.ts';
-import { callDeno } from '../deno/android.fn.ts';
+import { network } from "../deno/network.ts";
+import { callDeno } from "../deno/android.fn.ts";
 
 /**
  * 申请权限
- * @param permissions 
+ * @param permissions
  * @returns boolean
  */
 export async function applyPermissions(permissions: EPermissions) {
-  const per = await network.asyncCallDenoFunction(callDeno.ApplyPermissions, { permissions })
-  return per
+  const per = await network.asyncCallDenoFunction(callDeno.ApplyPermissions, {
+    permissions,
+  });
+  return per;
 }
 
 export enum EPermissions {
@@ -21,6 +23,5 @@ export enum EPermissions {
   PERMISSION_STORAGE = "PERMISSION_STORAGE", // 存储
   PERMISSION_SMS = "PERMISSION_SMS", // 短信
   PERMISSION_CALL = "PERMISSION_CALL", // 电话
-  PERMISSION_DEVICE = "PERMISSION_DEVICE" // （手机状态）
+  PERMISSION_DEVICE = "PERMISSION_DEVICE", // （手机状态）
 }
-

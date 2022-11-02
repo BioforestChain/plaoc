@@ -1,5 +1,5 @@
 /// <reference lib="dom" />
-import { getCallNativeUi } from "@bfsx/gateway";
+// import { getCallNativeUi } from "@bfsx/gateway";
 import { DwebPlugin } from "./dweb-plugin.ts";
 import { NativeHandle, NativeUI } from "../common/nativeHandle.ts";
 
@@ -31,7 +31,7 @@ export class Navigation extends DwebPlugin {
   setNavigationBarColor(
     colorHex: string,
     darkIcons = false,
-    isNavigationBarContrastEnforced = true,
+    isNavigationBarContrastEnforced = true
   ) {
     return getCallNativeUi(NativeUI.SetNavigationBarColor, {
       colorHex,

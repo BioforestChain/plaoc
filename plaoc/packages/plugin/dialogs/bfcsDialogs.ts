@@ -1,6 +1,6 @@
 /// <reference lib="dom" />
 
-import { DialogsNet } from "@dialogs/net";
+import { DialogsNet } from "./net.ts";
 import { DwebPlugin } from "../native/dweb-plugin.ts";
 import { Dialogs } from "./bfcsDialogsType.ts";
 
@@ -75,8 +75,7 @@ export class BfcsDialogAlert extends BfcsDialogs {
         bid = childNode.getAttribute("bid") ?? "";
       }
 
-      const cb =
-        `document.querySelector('dweb-dialog-alert[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+      const cb = `document.querySelector('dweb-dialog-alert[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
       this.net.openAlert(alertConfig, cb);
 
       resolve();
@@ -86,7 +85,7 @@ export class BfcsDialogAlert extends BfcsDialogs {
   attributeChangedCallback(
     attrName: string,
     _oldVal: unknown,
-    newVal: unknown,
+    newVal: unknown
   ) {
     if (attrName === "visible" && newVal === true) {
       if (this.hasAttribute("visible")) {
@@ -144,7 +143,7 @@ export class BfcsDialogPrompt extends BfcsDialogs {
         ? true
         : false;
       promptConfig.dismissOnClickOutside = this.hasAttribute(
-        "disOnClickOutside",
+        "disOnClickOutside"
       )
         ? true
         : false;
@@ -160,25 +159,21 @@ export class BfcsDialogPrompt extends BfcsDialogs {
           if (childNode.hasAttribute("aria-label")) {
             if (childNode.getAttribute("aria-label") === "confirm") {
               promptConfig.confirmText = childNode.getAttribute("label") ?? "";
-              confirmFunc =
-                `document.querySelector('dweb-dialog-prompt[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click',{detail: {result: result}}))`;
+              confirmFunc = `document.querySelector('dweb-dialog-prompt[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click',{detail: {result: result}}))`;
             } else {
               promptConfig.cancelText = childNode.getAttribute("label") ?? "";
-              cancelFunc =
-                `document.querySelector('dweb-dialog-prompt[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+              cancelFunc = `document.querySelector('dweb-dialog-prompt[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
             }
           } else {
             if (index === 0) {
               promptConfig.confirmText = childNode.getAttribute("label") ?? "";
-              confirmFunc =
-                `document.querySelector('dweb-dialog-prompt[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click',{detail: {result: result}}))`;
+              confirmFunc = `document.querySelector('dweb-dialog-prompt[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click',{detail: {result: result}}))`;
             } else {
               promptConfig.cancelText = childNode.getAttribute("label") ?? "";
-              cancelFunc =
-                `document.querySelector('dweb-dialog-prompt[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+              cancelFunc = `document.querySelector('dweb-dialog-prompt[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
             }
           }
-        },
+        }
       );
 
       this.net.openPrompt(promptConfig, confirmFunc, cancelFunc);
@@ -190,7 +185,7 @@ export class BfcsDialogPrompt extends BfcsDialogs {
   attributeChangedCallback(
     attrName: string,
     _oldVal: unknown,
-    newVal: unknown,
+    newVal: unknown
   ) {
     if (attrName === "visible" && newVal === true) {
       if (this.hasAttribute("visible")) {
@@ -246,7 +241,7 @@ export class BfcsDialogConfirm extends BfcsDialogs {
         ? true
         : false;
       confirmConfig.dismissOnClickOutside = this.hasAttribute(
-        "disOnClickOutside",
+        "disOnClickOutside"
       )
         ? true
         : false;
@@ -262,25 +257,21 @@ export class BfcsDialogConfirm extends BfcsDialogs {
           if (childNode.hasAttribute("aria-label")) {
             if (childNode.getAttribute("aria-label") === "confirm") {
               confirmConfig.confirmText = childNode.getAttribute("label") ?? "";
-              confirmFunc =
-                `document.querySelector('dweb-dialog-confirm[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+              confirmFunc = `document.querySelector('dweb-dialog-confirm[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
             } else {
               confirmConfig.cancelText = childNode.getAttribute("label") ?? "";
-              cancelFunc =
-                `document.querySelector('dweb-dialog-confirm[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+              cancelFunc = `document.querySelector('dweb-dialog-confirm[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
             }
           } else {
             if (index === 0) {
               confirmConfig.confirmText = childNode.getAttribute("label") ?? "";
-              confirmFunc =
-                `document.querySelector('dweb-dialog-confirm[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+              confirmFunc = `document.querySelector('dweb-dialog-confirm[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
             } else {
               confirmConfig.cancelText = childNode.getAttribute("label") ?? "";
-              cancelFunc =
-                `document.querySelector('dweb-dialog-confirm[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+              cancelFunc = `document.querySelector('dweb-dialog-confirm[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
             }
           }
-        },
+        }
       );
 
       this.net.openConfirm(confirmConfig, confirmFunc, cancelFunc);
@@ -292,7 +283,7 @@ export class BfcsDialogConfirm extends BfcsDialogs {
   attributeChangedCallback(
     attrName: string,
     _oldVal: unknown,
-    newVal: unknown,
+    newVal: unknown
   ) {
     if (attrName === "visible" && newVal === true) {
       if (this.hasAttribute("visible")) {
@@ -348,7 +339,7 @@ export class BfcsDialogWarning extends BfcsDialogs {
         ? true
         : false;
       confirmConfig.dismissOnClickOutside = this.hasAttribute(
-        "disOnClickOutside",
+        "disOnClickOutside"
       )
         ? true
         : false;
@@ -364,25 +355,21 @@ export class BfcsDialogWarning extends BfcsDialogs {
           if (childNode.hasAttribute("aria-label")) {
             if (childNode.getAttribute("aria-label") === "confirm") {
               confirmConfig.confirmText = childNode.getAttribute("label") ?? "";
-              confirmFunc =
-                `document.querySelector('dweb-dialog-warning[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+              confirmFunc = `document.querySelector('dweb-dialog-warning[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
             } else {
               confirmConfig.cancelText = childNode.getAttribute("label") ?? "";
-              cancelFunc =
-                `document.querySelector('dweb-dialog-warning[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+              cancelFunc = `document.querySelector('dweb-dialog-warning[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
             }
           } else {
             if (index === 0) {
               confirmConfig.confirmText = childNode.getAttribute("label") ?? "";
-              confirmFunc =
-                `document.querySelector('dweb-dialog-warning[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+              confirmFunc = `document.querySelector('dweb-dialog-warning[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
             } else {
               confirmConfig.cancelText = childNode.getAttribute("label") ?? "";
-              cancelFunc =
-                `document.querySelector('dweb-dialog-warning[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
+              cancelFunc = `document.querySelector('dweb-dialog-warning[did="${did}"] dweb-dialog-button[bid="${bid}"]').dispatchEvent(new CustomEvent('click'))`;
             }
           }
-        },
+        }
       );
 
       this.net.openWarning(confirmConfig, confirmFunc, cancelFunc);
@@ -394,7 +381,7 @@ export class BfcsDialogWarning extends BfcsDialogs {
   attributeChangedCallback(
     attrName: string,
     _oldVal: unknown,
-    newVal: unknown,
+    newVal: unknown
   ) {
     if (attrName === "visible" && newVal === true) {
       if (this.hasAttribute("visible")) {

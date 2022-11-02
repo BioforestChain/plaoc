@@ -12,5 +12,5 @@ export * from "./statusbar/index.ts";
 export * from "./topbar/index.ts";
 export * from "./types/index.ts";
 
-import { registerServiceWorker } from "@bfsx/gateway";
+// import { registerServiceWorker } from "@bfsx/gateway";
 registerServiceWorker();
