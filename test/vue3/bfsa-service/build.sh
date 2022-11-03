@@ -2,23 +2,17 @@
 
 bfs_id="KEJPMHLA"
 
-echo "start build app: $bfs_id"
+echo "start build bfsa_service: $bfs_id"
 
 echo "编译后端"
 
-cd bfsa-service && deno task build && cd ..
-
-echo "编译前端"
-
-yarn build
-
-mkdir -p ./dist
+deno task build
 
 check_results=`bfsa -V`
 
 if [[ $check_results =~ "0." ]]
 then
-    bfsa bundle -f ./build/  -b ./bfsa-service/build/ -i $bfs_id
+    bfsa bundle   -b ./build -i $bfs_id
     rm -rf ./dist/*
     tar -xvf KEJPMHLA.bfsa -C ./dist
 else

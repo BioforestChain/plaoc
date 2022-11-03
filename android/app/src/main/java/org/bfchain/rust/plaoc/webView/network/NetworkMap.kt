@@ -9,7 +9,6 @@ import org.bfchain.rust.plaoc.*
 import org.bfchain.rust.plaoc.webView.urlscheme.CustomUrlScheme
 import java.io.ByteArrayInputStream
 import java.net.URL
-import java.nio.ByteBuffer
 import java.util.*
 
 
@@ -33,15 +32,13 @@ fun resolveNetworkRequest(
   // 拿到消息体，转换为结构体
   val stringHex = path.substring(path.lastIndexOf("=") + 1);
 
-  //拦截转发到后端的事件
-  if (path.startsWith("/poll")) {
-    messageGateWay(stringHex)
-  } else if (path.startsWith("/setUi")) { //拦截设置ui的请求，代替JavascriptInterface
+  if (path.startsWith("/setUi")) { //拦截设置ui的请求，代替JavascriptInterface
     val stringData = String(hexStrToByteArray(stringHex))
     println("resolveNetworkRequest: $stringData")
     val result = uiGateWay(stringData)
     networkResponse(channelId, header, result)
   }
+
 
   val suffixIndex = path.lastIndexOf(".")
   // 只拦截数据文件,忽略资源文件
@@ -63,6 +60,9 @@ fun interceptNetworkRequests(
 ): WebResourceResponse {
   val url = request.url.toString()
   val path = request.url.path
+
+  println("interceptNetworkRequests:$url")
+  println("interceptNetworkRequests:${request.url.lastPathSegment}")
   // 防止卡住请求为空而崩溃
   if (!url.isNullOrEmpty() && !path.isNullOrEmpty()) {
     val temp = url.substring(url.lastIndexOf("/") + 1)
@@ -73,14 +73,14 @@ fun interceptNetworkRequests(
     // 解析接收数据
     if (temp.startsWith("chunk")) {
       // 拿到channelID
-      val channelId = path.substring(path.lastIndexOf("/channel/") + 9, path.lastIndexOf("/chunk"))
+      val channelId = path.substring(
+        path.lastIndexOf("/channel/") + 9, path.lastIndexOf("/chunk")
+      )
       parseChunkBinary(request, channelId, temp)
     }
-
-    // 跳过白名单
     if (jumpWhitelist(url)) {
       // 拦截视图文件
-      if (path.endsWith(".html")) {
+      if (request.url.lastPathSegment!!.endsWith(".html")) {
         return viewGateWay(customUrlScheme, request)
       }
       // 映射本地文件的资源文件 https://bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj.dweb/index.mjs -> /plaoc/index.mjs
@@ -104,45 +104,17 @@ var stringPath = ""
 /**解析chunk 的数据*/
 fun parseChunkBinary(
   request: WebResourceRequest,
-  channelId: String, path: String
+  channelId: String,
+  path: String
 ) {
   if (path.lastIndexOf("=") == -1) {
     return
   }
   // 拿到chunk的请求体
-  val strBits = path.substring(path.lastIndexOf("=") + 1);
-  // 拿到头部
-  val headerId = strBits.substring(0, strBits.indexOf(":")).toInt()
-  // 主体内容
-  val hexBody = strBits.substring(strBits.indexOf(":") + 1)
-  println("hexBody===>:${String(hexStrToByteArray(hexBody))}")
-  // headerId偶数为请求头
-  if (headerId.rem(2) == 0) {
-    val stringBody = String(hexStrToByteArray(hexBody));
-    // 解析出真正的请求
-    val stringArray = stringBody.split("|")
-    val stringData = stringArray[0]
-    header = stringArray[1]
-    // 拿到真正的请求消息
-    stringPath = stringData.substring(stringData.lastIndexOf("/"))
-    println("parseChunkBinary headerId:$headerId,${stringPath.lastIndexOf("=")}")
-    // 表示为get请求,携带了param参数
-    if (stringPath.lastIndexOf("=") != -1) {
-      // 分发请求
-      resolveNetworkRequest(request, stringPath, header, channelId)
-      return
-    }
-  } else {
-    // 如果发送的是奇数，表示发送了body消息
-    arrayBody += hexBody
-    // 如果消息结束了
-    if(String(hexStrToByteArray(hexBody))== "true") {
-      // 分发body请求
-      resolveNetworkRequest(request, "$stringPath=$arrayBody", header, channelId)
-      arrayBody = ""
-    }
-    return
-  }
+  val stringHex = path.substring(path.lastIndexOf("=") + 1);
+  //拦截转发到后端的事件
+  messageGateWay(stringHex)
+
 }
 
 data class Response(

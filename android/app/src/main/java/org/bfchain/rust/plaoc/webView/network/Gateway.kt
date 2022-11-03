@@ -30,11 +30,11 @@ fun networkResponse(
   println("networkResponse channelId:$channelId result: $result")
 
   val hexResult = result.encodeToByteArray().toHexString()
-  sendToJavaScript("navigator.serviceWorker.controller.postMessage('${channelId}:false:${hexResult}')")
+  sendToJavaScript("navigator.serviceWorker.controller.postMessage('${channelId}:true:${hexResult}')")
 
-  // 消息传递结束
-  val hexData = "${headers},${status},${statusText}".encodeToByteArray().toHexString()
-  sendToJavaScript("navigator.serviceWorker.controller.postMessage('${channelId}:true:${hexData}')")
+//  // 消息传递结束
+//  val hexData = "${headers}|${status}|${statusText}".encodeToByteArray().toHexString()
+//  sendToJavaScript("navigator.serviceWorker.controller.postMessage('${channelId}:true:${hexData}')")
 }
 
 
@@ -99,7 +99,10 @@ fun viewGateWay(
   customUrlScheme: CustomUrlScheme,
   request: WebResourceRequest
 ): WebResourceResponse {
-  val url = request.url.toString().lowercase(Locale.ROOT)
+  var url = request.url.toString().lowercase(Locale.ROOT)
+  if(url.contains("?")){
+    url = url.split("?", limit = 2)[0];
+  }
   Log.i(TAG, " viewGateWay: $url,contains: ${front_to_rear_map.contains(url)}")
   if (front_to_rear_map.contains(url)) {
     val trueUrl = front_to_rear_map[url]
