@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SwiftyJSON
 
 class RefreshManager: NSObject {
 
@@ -34,14 +35,26 @@ class RefreshManager: NSObject {
             guard data != nil else { return }
             guard let result = String(data: data!, encoding: .utf8) else { return }
             let dict = ChangeTools.stringValueDic(result)
-            let dataDict = dict?["data"] as? [String:Any]
+            guard let dataDict = dict?["data"] as? [String:Any] else { return }
             if fileName != nil {
+//                let versionType = self.analysisVersion(urlString: urlString!)
+//                guard let subDict = self.versionTypeJson(type: versionType, dict: dataDict) else {
+//                    DispatchQueue.main.async {
+//                        if isCompare {
+//                            self.openAlertAction()
+//                        }
+//                    }
+//                    return
+//                }
                 RefreshManager.saveLastUpdateTime(fileName: fileName!, time: Date().timeStamp)
                 batchManager.writeUpdateContent(fileName: fileName!, json: dataDict)
                 if isCompare {
                     //TODO 发送比较版本信息
                     operateMonitor.refreshCompleteMonitor.onNext(fileName!)
                 }
+            } else {  //扫码下载
+                guard let name = dataDict["name"] as? String else { return }
+                operateMonitor.scanMonitor.onNext((name,dataDict))
             }
         }
         
@@ -64,5 +77,34 @@ class RefreshManager: NSObject {
                          "size": 102984,
                          "sha512": "haha"]]
         return dict
+    }
+    
+    //获取当前下载的版本类型
+    private func analysisVersion(urlString: String) -> String {
+        //https://shop.plaoc.com/KEJPMHLA/appversion.json?type=Beta
+        guard urlString.contains("type=") else { return "Release" }
+        if let result = urlString.components(separatedBy: "type=").last {
+            return result
+        }
+        return "Release"
+    }
+    //获取当前下载版本的内容
+    private func versionTypeJson(type: String, dict: [String:Any]) -> [String:Any]? {
+        
+        guard let files = dict["files"] as? [[String:Any]] else { return nil }
+        for file in files {
+            if file["type"] as? String == type {
+                return file
+            }
+        }
+        return nil
+    }
+    //查找当前版本失败弹框
+    private func openAlertAction() {
+        let dict = ["message":"暂无当前可下载版本","confirmText":"取消"]
+        let alertModel = AlertConfiguration(dict: JSON(dict))
+        let alertView = CustomAlertPopView(frame: CGRect(x: 0, y: 0, width: screen_width, height: screen_height))
+        alertView.alertModel = alertModel
+        alertView.show()
     }
 }
