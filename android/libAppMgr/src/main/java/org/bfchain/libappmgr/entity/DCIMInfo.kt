@@ -5,28 +5,31 @@ import android.media.MediaMetadataRetriever
 import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import com.google.android.exoplayer2.SimpleExoPlayer
+import java.io.File
 import java.util.*
 
 data class DCIMInfo(
   val path: String,
   val type: DCIMType = DCIMType.IMAGE,
   val name: String = "",
+  val time: Long = 0L, // 用于表示文件时间
   val checked: MutableState<Boolean> = mutableStateOf(false),
   val index: MutableState<Int> = mutableStateOf(0),
+  var duration: MutableState<Int> = mutableStateOf(0), // 如果是视频，需要加载时长
+  var bitmap: Bitmap? = null, // 如果是视频，用于显示某一帧的图片
+  // var mime: String? = null, // 类型
   //var title: String? = null, // 标题
   //var album: String? = null, // 专辑
-  var mime: String? = null, // 类型
   //var artist: String? = null, // 作者
-  var duration: Int = 0, // 如果是视频，需要加载时长
   //var bitrate: String? = null, // bit/s api>=14
   //var date: String? = null,
-  var bitmap: Bitmap? = null, // 如果是视频，用于显示某一帧的图片
 )
 
 data class DCIMSpinner(
-  val path: String,
   val name: String,
   val count: Int,
+  var path: Any = "",
   val checked: MutableState<Boolean> = mutableStateOf(false)
 )
 
@@ -37,6 +40,38 @@ enum class DCIMType {
 // 视频状态
 enum class PlayerState {
   Play, Pause, END, Playing
+}
+
+data class ExoPlayerData(
+  var exoPlayer: SimpleExoPlayer,
+  var playerState: MutableState<PlayerState>
+)
+
+/**
+ * 更新视频的时间
+ */
+fun DCIMInfo.updateDuration() {
+  if (this.type == DCIMType.VIDEO) {
+    var mmr: MediaMetadataRetriever? = null
+    try {
+      mmr = MediaMetadataRetriever()
+      mmr.setDataSource(path)
+      bitmap = mmr.frameAtTime
+      duration.value =
+        mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toInt()?.div(1000)
+          ?: 0
+      // mime = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE)
+      // title = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE)
+      // album = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM)
+      // artist = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST)
+      // bitrate = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE)
+      // date = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DATE)
+    } catch (e: Exception) {
+      Log.d("DCIMInfo", "fail->$e")
+    } finally {
+      mmr?.release()
+    }
+  }
 }
 
 object MediaFile {
@@ -197,7 +232,7 @@ object MediaFile {
     return (value?.toInt() ?: 0)
   }
 
-  fun getDCIMType(path: String): DCIMType {
+  private fun getDCIMType(path: String): DCIMType {
     val type = getFileType(path)
     type?.let {
       return when (it.fileType) {
@@ -212,27 +247,12 @@ object MediaFile {
   }
 
   fun createDCIMInfo(path: String): DCIMInfo {
-    var dcimInfo = DCIMInfo(path, getDCIMType(path), path.substring(path.lastIndexOf("/") + 1))
-    if (dcimInfo.type == DCIMType.VIDEO) {
-      var mmr: MediaMetadataRetriever? = null
-      try {
-        mmr = MediaMetadataRetriever()
-        mmr.setDataSource(path)
-        // dcimInfo.title = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE)
-        // dcimInfo.album = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM)
-        dcimInfo.mime = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE)
-        // dcimInfo.artist = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST)
-        dcimInfo.duration =
-          mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toInt()?.div(1000) ?: 0
-        // dcimInfo.bitrate = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE)
-        // dcimInfo.date = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DATE)
-        dcimInfo.bitmap = mmr.frameAtTime
-      } catch (e: Exception) {
-        Log.d("DCIMInfo", "fail->$e")
-      } finally {
-        mmr?.release()
-      }
-    }
-    return dcimInfo
+    return DCIMInfo(
+      path = path,
+      type = getDCIMType(path),
+      name = path.substring(path.lastIndexOf("/") + 1),
+      time = File(path).lastModified()
+    )
   }
 }
+

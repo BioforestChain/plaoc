@@ -23,6 +23,8 @@ import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import coil.decode.SvgDecoder
 import coil.decode.VideoFrameDecoder
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.cancel
 import org.bfchain.libappmgr.R
 import org.bfchain.libappmgr.entity.DCIMSpinner
 import org.bfchain.libappmgr.ui.theme.AppMgrTheme
@@ -118,6 +120,11 @@ class DCIMActivity : ComponentActivity() {
       super.onBackPressed()
     }
   }
+
+  override fun onDestroy() {
+    dcimViewModel.clearExoPlayerList()
+    super.onDestroy()
+  }
 }
 
 @SuppressLint("UnrememberedMutableState")
@@ -130,15 +137,9 @@ fun DCIMGreeting(
   var model = viewModel() as DCIMViewModel
   LaunchedEffect(Unit) {
     model.loadDCIMInfo() { maps ->
-      dcimVM.maps.putAll(maps)
-      dcimVM.dcimInfoList.clear()
-      dcimVM.checkedList.clear()
-      dcimVM.dcimSpinnerList.clear()
-      maps.iterator().forEach { list ->
-        dcimVM.dcimInfoList.addAll(list.value)
-        dcimVM.dcimSpinnerList.add(DCIMSpinner(list.value[0].path, list.key, list.value.size))
-      }
-      dcimVM.totalSize.value = dcimVM.dcimInfoList.size
+      dcimVM.dcimMaps = maps
+      //dcimVM.maps.putAll(maps)
+      dcimVM.refreshDCIMInfoList(DCIMSpinner(name = DCIMViewModel.All, count = 0))
     }
   }
   DCIMView(dcimVM, onGridClick, onViewerClick)

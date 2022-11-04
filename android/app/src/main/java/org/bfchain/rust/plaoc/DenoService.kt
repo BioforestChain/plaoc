@@ -80,9 +80,9 @@ class DenoService : IntentService("DenoService") {
     /** 只读模式走这里*/
     external fun onlyReadRuntime(assets: AssetManager,target:String)
     /** 传递dwebView到deno-js的消息*/
-    external fun backDataToRust(byteData: ByteArray)
+    external fun backDataToRust(byteData: ByteArray) // op_rust_to_js_buffer
     /** 这里负责直接返回数据到deno-js*/
-    external fun backSystemDataToRust(byteData: ByteArray)
+    external fun backSystemDataToRust(byteData: ByteArray) // op_rust_to_js_system_buffer
     external fun denoRuntime(path: String)
 
     @RequiresApi(Build.VERSION_CODES.S)

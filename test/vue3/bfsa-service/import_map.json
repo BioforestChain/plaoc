@@ -1,10 +1,9 @@
 {
   "imports": {
-    "@bfsx/metadata": "../../../plaoc/packages/metadata/index.ts",
-    "@bfsx/typings": "../../../plaoc/packages/typings/index.ts",
-    "@bfsx/gateway": "../../../plaoc/packages/gateway/index.ts",
-    "@bfsx/core": "../../../plaoc/packages/core/index.ts",
-    "@bfsx/vfs": "../../../plaoc/packages/vfs/index.ts",
-    "@bfsx/vfs/path": "../../../plaoc/packages/vfs/path/index.ts"
+    "@bfsx/metadata": "../../../../bfsa-std/packages/metadata/index.ts",
+    "@bfsx/core": "../../../../bfsa-std/packages/core/index.ts",
+    "@bfsx/vfs": "../../../../bfsa-std/packages/vfs/index.ts",
+    "@bfsx/typings": "../../../../bfsa-std/packages/typings/index.ts",
+    "@bfsx/vfs/path": "../../../../bfsa-std/packages/vfs/path/index.ts"
   }
 }
