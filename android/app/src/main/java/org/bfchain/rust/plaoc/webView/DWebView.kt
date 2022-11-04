@@ -126,7 +126,7 @@ fun DWebView(
     res
   }.asPaddingValues()
 
-  Log.i(TAG, "overlayPadding:$overlayPadding")
+//  Log.i(TAG, "overlayPadding:$overlayPadding")
   val presseBack = remember {
     return@remember {
       activity.runOnUiThread {
@@ -388,7 +388,7 @@ fun DWebView(
           if ((top.value == 0F) and (bottom.value == 0F)) {
             start = 0.dp; end = 0.dp
           }
-          Log.i(TAG, "webview-padding $start, $top, $end, $bottom")
+//          Log.i(TAG, "webview-padding $start, $top, $end, $bottom")
           m.padding(start, top, end, bottom)
         },
       )

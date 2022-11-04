@@ -6,6 +6,7 @@ import android.webkit.WebResourceResponse
 import com.fasterxml.jackson.databind.DeserializationFeature
 import org.bfchain.libappmgr.utils.JsonUtil
 import org.bfchain.rust.plaoc.*
+import org.bfchain.rust.plaoc.webView.sendToJavaScript
 import org.bfchain.rust.plaoc.webView.urlscheme.CustomUrlScheme
 import java.io.ByteArrayInputStream
 import java.net.URL
@@ -29,17 +30,6 @@ fun resolveNetworkRequest(
   channelId: String,
 )
   : WebResourceResponse {
-  // 拿到消息体，转换为结构体
-  val stringHex = path.substring(path.lastIndexOf("=") + 1);
-
-  if (path.startsWith("/setUi")) { //拦截设置ui的请求，代替JavascriptInterface
-    val stringData = String(hexStrToByteArray(stringHex))
-    println("resolveNetworkRequest: $stringData")
-    val result = uiGateWay(stringData)
-    networkResponse(channelId, header, result)
-  }
-
-
   val suffixIndex = path.lastIndexOf(".")
   // 只拦截数据文件,忽略资源文件
   if (suffixIndex == -1) {
@@ -61,8 +51,7 @@ fun interceptNetworkRequests(
   val url = request.url.toString()
   val path = request.url.path
 
-  println("interceptNetworkRequests:$url")
-  println("interceptNetworkRequests:${request.url.lastPathSegment}")
+//  println("interceptNetworkRequests:${request.url.lastPathSegment}")
   // 防止卡住请求为空而崩溃
   if (!url.isNullOrEmpty() && !path.isNullOrEmpty()) {
     val temp = url.substring(url.lastIndexOf("/") + 1)
@@ -72,11 +61,8 @@ fun interceptNetworkRequests(
     }
     // 解析接收数据
     if (temp.startsWith("chunk")) {
-      // 拿到channelID
-      val channelId = path.substring(
-        path.lastIndexOf("/channel/") + 9, path.lastIndexOf("/chunk")
-      )
-      parseChunkBinary(request, channelId, temp)
+      //拦截转发到后端的事件
+      messageGateWay(path)
     }
     if (jumpWhitelist(url)) {
       // 拦截视图文件
@@ -97,25 +83,24 @@ fun interceptNetworkRequests(
   )
 }
 
-var header = ""
-var arrayBody = ""
-var stringPath = ""
-
-/**解析chunk 的数据*/
-fun parseChunkBinary(
-  request: WebResourceRequest,
+/** 发送真正的请求到serviceWorker*/
+fun networkResponse(
   channelId: String,
-  path: String
+  headers: String,
+  result: String = "",
+  status: Number = 200,
+  statusText: String = "success"
 ) {
-  if (path.lastIndexOf("=") == -1) {
-    return
-  }
-  // 拿到chunk的请求体
-  val stringHex = path.substring(path.lastIndexOf("=") + 1);
-  //拦截转发到后端的事件
-  messageGateWay(stringHex)
+  println("networkResponse channelId:$channelId result: $result")
 
+  val hexResult = result.encodeToByteArray().toHexString()
+//  sendToJavaScript("navigator.serviceWorker.controller.postMessage('${channelId}:false:${hexResult}')")
+
+//  // 消息传递结束
+//  val hexData = "${headers}|${status}|${statusText}".encodeToByteArray().toHexString()
+//  sendToJavaScript("navigator.serviceWorker.controller.postMessage('${channelId}:true:${hexData}')")
 }
+
 
 data class Response(
   val success: Boolean = true,

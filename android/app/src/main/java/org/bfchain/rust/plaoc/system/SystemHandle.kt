@@ -8,12 +8,11 @@ import org.bfchain.rust.plaoc.system.device.DeviceInfo
 import org.bfchain.rust.plaoc.system.file.*
 import org.bfchain.rust.plaoc.system.notification.MessageSource
 import org.bfchain.rust.plaoc.system.notification.NotificationMsgItem
-import org.bfchain.rust.plaoc.webView.network.initMetaData
 import org.bfchain.rust.plaoc.webView.sendToJavaScript
 import org.bfchain.rust.plaoc.system.notification.NotifyManager
 import org.bfchain.rust.plaoc.system.permission.PermissionManager
 import org.bfchain.rust.plaoc.system.permission.PermissionUtil.getActualPermissions
-import org.bfchain.rust.plaoc.webView.network.dWebView_host
+import org.bfchain.rust.plaoc.webView.network.*
 
 
 private val fileSystem = FileSystem()
@@ -61,6 +60,14 @@ fun splicingPath(bfsId:String, entry:String):String {
   }
   callable_map[ExportNative.InitMetaData] = {
     initMetaData(it)
+  }
+  callable_map[ExportNative.SetDWebViewUI] = {
+    uiGateWay(it)
+  }
+  callable_map[ExportNative.CallSWMessage] = {
+    val handle = mapper.readValue(it, RespondWith::class.java)
+    networkResponse(handle.channelId,handle.headers,
+      handle.result,handle.status,handle.statusText)
   }
   callable_map[ExportNative.DenoRuntime] = {
     denoService.denoRuntime(it)
