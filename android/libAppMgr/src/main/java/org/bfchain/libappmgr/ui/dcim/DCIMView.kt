@@ -1,6 +1,7 @@
 package org.bfchain.libappmgr.ui.dcim
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.animation.*
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
@@ -14,13 +15,13 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.BottomCenter
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -64,7 +65,9 @@ fun DCIMItemView(
   onClick: (DCIMInfo) -> Unit
 ) {
   Box(
-    modifier = Modifier.fillMaxWidth()
+    modifier = Modifier
+      .fillMaxWidth()
+      .height(getWindowWithDP() / 4)
   ) {
     AsyncImage(
       model = when (dcimInfo.type) {
@@ -74,9 +77,13 @@ fun DCIMItemView(
       contentDescription = "",
       contentScale = ContentScale.Crop,
       modifier = Modifier
-        .size(getWindowWithDP() / 4)
+        .fillMaxWidth()
         .clickable { onClick(dcimInfo) },
     )
+
+    if (dcimInfo.checked.value) { // 如果是被选中了，增加一个半透明遮罩
+      Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(0.2f)))
+    }
 
     // 在右上角显示是否选中
     CircleCheckBox(
@@ -95,7 +102,7 @@ fun DCIMItemView(
           modifier = Modifier
             .align(Alignment.BottomStart)
             .fillMaxWidth()
-            .width(20.dp)
+            .height(DimenVideoDurationHeight)
             .background(Color.Black.copy(0.2f))
         ) {
           Image(
@@ -146,7 +153,7 @@ fun DCIMGridView(dcimVM: DCIMViewModel = koinViewModel(), onClick: (DCIMInfo) ->
 @Composable
 fun DCIMInfoViewer(
   dcimVM: DCIMViewModel,
-  onBack: () -> Unit
+  onViewerClick: () -> Unit
 ) {
   if (dcimVM.showViewer.value) {
     Box(
@@ -159,7 +166,10 @@ fun DCIMInfoViewer(
           }
         )
         .clickable(
-          onClick = { dcimVM.showViewerBar.value = !dcimVM.showViewerBar.value },
+          onClick = {
+            dcimVM.showViewerBar.value = !dcimVM.showViewerBar.value
+            onViewerClick()
+          },
           // 去除水波纹效果
           indication = null,
           interactionSource = remember { MutableInteractionSource() }
@@ -168,12 +178,25 @@ fun DCIMInfoViewer(
       DCIMHorizontalPager(dcimVM = dcimVM)
       DCIMViewerTopBar(dcimVM) {
         dcimVM.showViewer.value = false
-        onBack()
       }
       DCIMViewerBottomBar(dcimVM)
     }
   } else {
-    dcimVM.showPreview.value = false
+    dcimVM.showViewerBar.value = true
+    if (dcimVM.showPreview.value) {
+      dcimVM.showPreview.value = false
+      // 为了将之前预览状态下移除的列表删掉
+      var tempList = arrayListOf<DCIMInfo>()
+      dcimVM.checkedList.forEach {
+        if (it.overlay.value) {
+          it.overlay.value = false
+          it.checked.value = false
+          tempList.add(it)
+        }
+      }
+      dcimVM.checkedList.removeAll(tempList)
+      dcimVM.updateCheckedList()
+    }
   }
 }
 
@@ -208,9 +231,10 @@ fun DCIMHorizontalPager(dcimVM: DCIMViewModel) {
       modifier = Modifier.fillMaxSize()
     ) { loadPage ->
       // 该区块有三个参数：currentPage表示当前显示的界面，currentPageOffset表示滑动偏移量，loadPage表示加载界面
-      DCIMPager(dcimVM = dcimVM, curDCIMInfo = curShowlist[loadPage])
+      if (loadPage >= 0 && loadPage < curShowlist.size) {
+        DCIMPager(dcimVM = dcimVM, curDCIMInfo = curShowlist[loadPage])
+      }
     }
-
   } else {
     DCIMPager(dcimVM = dcimVM, curDCIMInfo = dcimVM.dcimInfo.value)
   }
@@ -299,8 +323,9 @@ fun DCIMGridTopBar(dcimVM: DCIMViewModel) {
   Box(
     modifier = Modifier
       .fillMaxWidth()
-      .height(50.dp)
+      .height(DimenTopBarHeight)
       .background(ColorBackgroundBar)
+      .padding(DimenBarLeftPadding, 0.dp, DimenBarRightPadding, 0.dp)
   ) {
     val rotationValue by animateFloatAsState(targetValue = if (dcimVM.showSpinner.value) -180f else 0f)
     Row {
@@ -308,7 +333,6 @@ fun DCIMGridTopBar(dcimVM: DCIMViewModel) {
         imageVector = ImageVector.vectorResource(id = R.drawable.ic_back),
         contentDescription = null,
         modifier = Modifier
-          .padding(10.dp, 0.dp, 0.dp, 0.dp)
           .align(CenterVertically)
           .clickable { dcimVM.mCallBack?.cancel() }
       )
@@ -328,6 +352,7 @@ fun DCIMGridTopBar(dcimVM: DCIMViewModel) {
           Text(
             text = dcimVM.dcimSpinner.name,
             color = Color.White,
+            fontSize = 14.sp,
             modifier = Modifier.align(CenterVertically)
           )
           Spacer(modifier = Modifier.width(6.dp))
@@ -368,9 +393,10 @@ fun BoxScope.DCIMGridBottomBar(dcimVM: DCIMViewModel) {
   Box(
     modifier = Modifier
       .fillMaxWidth()
-      .height(40.dp)
+      .height(DimenBottomBarHeight)
       .align(Alignment.BottomStart)
       .background(ColorBackgroundBar)
+      .padding(DimenBarLeftPadding, 0.dp, DimenBarRightPadding, 0.dp)
       .clickable(enabled = dcimVM.checkedList.size > 0) {
         dcimVM.dcimInfo.value = dcimVM.checkedList[0] // 清空为了显示已选
         dcimVM.showViewer.value = true
@@ -414,13 +440,12 @@ fun CircleCheckBox(
       })
   ) {
     Image(
-      modifier = modifier
-        .fillMaxSize()
-        .background(Color.White, CircleShape),
+      modifier = modifier,
       painter = rememberAsyncImagePainter(
-        model = when (dcimInfo.checked.value) {
-          true -> R.drawable.ic_circle_checked //ic_circle_checked2
-          false -> R.drawable.ic_circle_unchecked
+        model = if (dcimInfo.checked.value) {
+          R.drawable.ic_circle_checked //ic_circle_checked2
+        } else {
+          R.drawable.ic_circle_uncheck
         }
       ),
       contentDescription = null
@@ -459,15 +484,15 @@ fun BoxScope.DCIMViewerTopBar(
     Box(
       modifier = Modifier
         .fillMaxWidth()
-        .height(50.dp)
+        .height(DimenTopBarHeight)
         .background(ColorBackgroundBar)
+        .padding(DimenBarLeftPadding, 0.dp, DimenBarRightPadding, 0.dp)
     ) {
       Image(
         imageVector = ImageVector.vectorResource(id = R.drawable.ic_back),
         contentDescription = null,
         modifier = Modifier
           .align(Alignment.CenterStart)
-          .padding(8.dp)
           .clickable { onBack() }
       )
       var title = if (dcimVM.showPreview.value) {
@@ -525,7 +550,7 @@ fun BoxScope.DCIMViewerBottomBar(
     Box(
       modifier = Modifier
         .fillMaxWidth()
-        .background(ColorBackgroundBar)
+        .background(ColorBackgroundBar.copy(0.8f))
     ) {
       Column {
         // 1. 上面显示LazyHorizontal，，，下面显示
@@ -533,19 +558,19 @@ fun BoxScope.DCIMViewerBottomBar(
           LazyRow(
             modifier = Modifier
               .fillMaxWidth()
-              .height(60.dp),
-            horizontalArrangement = Arrangement.spacedBy(2.dp),
-            contentPadding = PaddingValues(6.dp)
+              .height(DimenBarPreviewHeight),
+            horizontalArrangement = Arrangement.spacedBy(5.dp),
+            contentPadding = PaddingValues(5.dp, 10.dp, 5.dp, 10.dp)
           ) {
             items(dcimVM.checkedList) { dcimItem ->
               Box(modifier = Modifier
-                .background(
-                  if (dcimVM.dcimInfo.value.path == dcimItem.path) Color.Black else Color(
-                    0x00000000
-                  )
+                /*.background(
+                  if (dcimVM.dcimInfo.value.path == dcimItem.path) Color.Green
+                  else ColorBackgroundBar
                 )
                 .padding(1.dp)
-                .size(50.dp)
+                .background(ColorBackgroundBar)*/
+                .size(DimenBottomBarHeight)
                 .clickable {
                   if (dcimVM.showPreview.value) {
                     dcimVM.dcimInfo.value = dcimItem
@@ -558,6 +583,15 @@ fun BoxScope.DCIMViewerBottomBar(
                     }
                   }
                 }) { // 显示图片
+                if (dcimVM.dcimInfo.value.path == dcimItem.path) {
+                  AsyncImage(
+                    model = R.drawable.ic_rectangle,
+                    contentDescription = "",
+                    modifier = Modifier
+                      .width(DimenBottomBarHeight)
+                      .align(Center)
+                  )
+                }
                 AsyncImage(
                   model = when (dcimItem.type) {
                     DCIMType.VIDEO -> dcimItem.bitmap
@@ -565,14 +599,25 @@ fun BoxScope.DCIMViewerBottomBar(
                   },
                   contentDescription = null,
                   contentScale = ContentScale.Crop,
-                  modifier = Modifier.width(50.dp)
+                  modifier = Modifier
+                    .width(DimenBottomBarHeight)
+                    .align(Center)
+                    .padding(1.dp)
                 )
+                // 增加一层白色遮罩
+                if (dcimItem.overlay.value) {
+                  AsyncImage(
+                    model = "",
+                    contentDescription = "",
+                    modifier = Modifier.background(Color.White.copy(0.6f))
+                  )
+                }
                 if (dcimItem.type == DCIMType.VIDEO) { // 如果是video的话，需要显示
                   AsyncImage(
                     model = R.drawable.ic_video,
                     contentDescription = null,
                     modifier = Modifier
-                      .padding(3.dp)
+                      .padding(4.dp)
                       .size(15.dp)
                       .align(Alignment.BottomStart)
                   )
@@ -591,19 +636,25 @@ fun BoxScope.DCIMViewerBottomBar(
         Box(
           modifier = Modifier
             .fillMaxWidth()
-            .height(40.dp)
+            .height(DimenBottomBarHeight)
         ) {
           AsyncImage(
-            model = when (dcimVM.dcimInfo.value.checked.value) {
-              true -> R.drawable.ic_circle_checked2
-              false -> R.drawable.ic_circle_unchecked
+            model = if (dcimVM.dcimInfo.value.checked.value) {
+              R.drawable.ic_circle_checked2
+            } else {
+              R.drawable.ic_circle_uncheck
             }, contentDescription = null,
             modifier = Modifier
               .align(Alignment.CenterEnd)
               .padding(5.dp, 5.dp, 10.dp, 5.dp)
               .size(20.dp)
               .clickable {
-                dcimVM.updateCheckedList(dcimVM.dcimInfo.value)
+                if (dcimVM.showPreview.value) { // 如果是”预览“模式下，点击不直接删除，而是增加一个遮罩
+                  dcimVM.dcimInfo.value.checked.value = !dcimVM.dcimInfo.value.checked.value
+                  dcimVM.dcimInfo.value.overlay.value = !dcimVM.dcimInfo.value.checked.value
+                } else {
+                  dcimVM.updateCheckedList(dcimVM.dcimInfo.value)
+                }
               }
           )
         }
@@ -614,6 +665,8 @@ fun BoxScope.DCIMViewerBottomBar(
 
 @Composable
 fun DCIMSpinnerView(dcimVM: DCIMViewModel) {
+  Log.d("lin.huang", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa ${dcimVM.dcimSpinnerList.size}")
+  if (dcimVM.dcimSpinnerList.isEmpty()) return
   AnimatedVisibility(
     visible = dcimVM.showSpinner.value,
     modifier = Modifier
@@ -624,9 +677,9 @@ fun DCIMSpinnerView(dcimVM: DCIMViewModel) {
     LazyColumn(
       modifier = Modifier
         .fillMaxWidth()
-        .height(600.dp)
+        .height(DimenSpinnerViewHeight)
         .background(ColorBackgroundBar),
-      verticalArrangement = Arrangement.spacedBy(2.dp)
+      verticalArrangement = Arrangement.spacedBy(DimenGridArrangementSpace)
     ) {
       items(dcimVM.dcimSpinnerList) {
         Row(modifier = Modifier
@@ -635,11 +688,11 @@ fun DCIMSpinnerView(dcimVM: DCIMViewModel) {
             dcimVM.refreshDCIMInfoList(it)
           }) {
           AsyncImage(
-            model = it.path,
+            model = it.path.value,
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier
-              .size(50.dp)
+              .size(DimenTopBarHeight)
               .align(CenterVertically)
               .padding(10.dp, 4.dp, 10.dp, 4.dp)
           )
@@ -649,7 +702,7 @@ fun DCIMSpinnerView(dcimVM: DCIMViewModel) {
             color = Color.White
           )
           Text(
-            text = "(${it.count})",
+            text = "(${it.count.value})",
             modifier = Modifier.align(CenterVertically),
             color = ColorGrayLevel5
           )

@@ -15,7 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.Coil
@@ -23,11 +23,11 @@ import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import coil.decode.SvgDecoder
 import coil.decode.VideoFrameDecoder
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.*
+import okhttp3.internal.wait
 import org.bfchain.libappmgr.R
-import org.bfchain.libappmgr.entity.DCIMSpinner
 import org.bfchain.libappmgr.ui.theme.AppMgrTheme
+import org.bfchain.libappmgr.ui.theme.ColorBackgroundBar
 import org.koin.android.ext.android.inject
 import org.koin.androidx.compose.koinViewModel
 
@@ -81,7 +81,8 @@ class DCIMActivity : ComponentActivity() {
   }
 
   private fun contentLoad() {
-    window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+    // window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN) // 隐藏顶部状态栏
+    window.statusBarColor = ColorBackgroundBar.toArgb() // // 修改状态栏颜色
     dcimViewModel.setCallback(callback = object : DCIMViewModel.CallBack {
       override fun send(fileList: ArrayList<String>) {
         // 接收返回的文件列表地址
@@ -101,11 +102,13 @@ class DCIMActivity : ComponentActivity() {
         Box(
           modifier = Modifier
             .fillMaxSize()
-            .background(Color.Gray)
+            .background(ColorBackgroundBar)
         ) {
           DCIMGreeting(
             onGridClick = { /*window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN) */ },
-            onViewerClick = { /*window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)*/ },
+            onViewerClick = {
+              showWindowStatusBar(dcimViewModel.showViewerBar.value)
+            },
             dcimVM = dcimViewModel
           )
         }
@@ -116,6 +119,7 @@ class DCIMActivity : ComponentActivity() {
   override fun onBackPressed() {
     if (dcimViewModel.showViewer.value) {
       dcimViewModel.showViewer.value = false
+      showWindowStatusBar(true)
     } else {
       super.onBackPressed()
     }
@@ -124,6 +128,14 @@ class DCIMActivity : ComponentActivity() {
   override fun onDestroy() {
     dcimViewModel.clearExoPlayerList()
     super.onDestroy()
+  }
+
+  private fun showWindowStatusBar(show: Boolean) {
+    if (show) {
+      window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+    } else {
+      window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+    }
   }
 }
 
@@ -136,10 +148,9 @@ fun DCIMGreeting(
 ) {
   var model = viewModel() as DCIMViewModel
   LaunchedEffect(Unit) {
-    model.loadDCIMInfo() { maps ->
-      dcimVM.dcimMaps = maps
-      //dcimVM.maps.putAll(maps)
-      dcimVM.refreshDCIMInfoList(DCIMSpinner(name = DCIMViewModel.All, count = 0))
+    model.loadDCIMInfo { maps ->
+      dcimVM.dcimMaps.putAll(maps)
+      dcimVM.initDCIMInfoList()
     }
   }
   DCIMView(dcimVM, onGridClick, onViewerClick)

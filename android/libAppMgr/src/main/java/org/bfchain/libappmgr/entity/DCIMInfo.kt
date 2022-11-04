@@ -18,6 +18,7 @@ data class DCIMInfo(
   val index: MutableState<Int> = mutableStateOf(0),
   var duration: MutableState<Int> = mutableStateOf(0), // 如果是视频，需要加载时长
   var bitmap: Bitmap? = null, // 如果是视频，用于显示某一帧的图片
+  var overlay: MutableState<Boolean> = mutableStateOf(false), // 主要是为了在预览模式下，显示的图片不直接删除，而是改为白色覆盖
   // var mime: String? = null, // 类型
   //var title: String? = null, // 标题
   //var album: String? = null, // 专辑
@@ -28,8 +29,8 @@ data class DCIMInfo(
 
 data class DCIMSpinner(
   val name: String,
-  val count: Int,
-  var path: Any = "",
+  val count: MutableState<Int> = mutableStateOf(0),
+  var path: MutableState<Any> = mutableStateOf(""),
   val checked: MutableState<Boolean> = mutableStateOf(false)
 )
 
@@ -57,6 +58,7 @@ fun DCIMInfo.updateDuration() {
       mmr = MediaMetadataRetriever()
       mmr.setDataSource(path)
       bitmap = mmr.frameAtTime
+      Log.d("lin.huang", "updateDuration $path->$bitmap")
       duration.value =
         mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toInt()?.div(1000)
           ?: 0
