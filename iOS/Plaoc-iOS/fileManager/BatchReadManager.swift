@@ -75,7 +75,8 @@ class BatchReadManager: NSObject {
         var imageName = dict?["icon"] as? String ?? ""
         if imageName.hasPrefix("file://") {
             imageName = imageName.replacingOccurrences(of: "file://", with: "")
-        } 
+        }
+        
         let imagePath = iconImagePath(fileName: fileName) + imageName
         var image = UIImage(contentsOfFile: imagePath)
         if imagePath.hasSuffix(".svg") {
@@ -83,6 +84,18 @@ class BatchReadManager: NSObject {
         }
         return image
     }
+    
+    func appIconUrlString(fileName: String) -> String? {
+        var dict = linkDict[fileName] as? [String:Any]
+        if dict == nil {
+            readBFSAppLinkContent(fileName: fileName)
+            dict = linkDict[fileName] as? [String:Any]
+        }
+        
+        let imageName = dict?["icon"] as? String
+        return imageName
+    }
+    
     //appID
     func appID(fileName: String) -> String {
         var dict = linkDict[fileName] as? [String:Any]
@@ -123,7 +136,6 @@ class BatchReadManager: NSObject {
         if !FileManager.default.fileExists(atPath: updatePath) {
             FileManager.default.createFile(atPath: updatePath, contents: nil)
         }
-//        try? jsonString.write(toFile: updatePath, atomically: true, encoding: .utf8)
         
         do {
             try jsonString.write(toFile: updatePath, atomically: true, encoding: .utf8)
@@ -151,11 +163,6 @@ class BatchReadManager: NSObject {
             return true
         }
         return false
-        
-//        if firstVersion > secondVersion {
-//            return true
-//        }
-//        return false
     }
                                   
     private func versionInfo(name: String) -> String {

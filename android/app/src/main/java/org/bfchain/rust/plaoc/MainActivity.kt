@@ -211,7 +211,7 @@ class MainActivity : AppCompatActivity() {
     if (dWebView_host == "") {
       return
     }
-    val url = "https://${dWebView_host.lowercase(Locale.ROOT)}.dweb${shakeUrl(path)}"
+    val url = "https://${dWebView_host.lowercase(Locale.ROOT)}.dweb${shakeUrl(path)}?_=${Date().time}"
     LogUtils.d("启动了DWebView:$url")
     openDWebWindow(
       activity = getContext(),

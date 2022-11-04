@@ -5,38 +5,19 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import com.fasterxml.jackson.core.JsonParser
 import com.github.yitter.idgen.YitIdHelper
+import io.ktor.utils.io.core.*
 import org.bfchain.libappmgr.utils.JsonUtil
-import org.bfchain.rust.plaoc.DenoService
-import org.bfchain.rust.plaoc.ExportNativeUi
-import org.bfchain.rust.plaoc.JsHandle
-import org.bfchain.rust.plaoc.mapper
+import org.bfchain.rust.plaoc.*
 import org.bfchain.rust.plaoc.webView.sendToJavaScript
 import org.bfchain.rust.plaoc.webView.urlscheme.CustomUrlScheme
 import java.io.ByteArrayInputStream
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.*
+import kotlin.text.String
+import kotlin.text.toByteArray
 
 private const val TAG = "Gateway"
-
-
-fun networkResponse(
-  channelId: String,
-  headers: String,
-  result: String = "",
-  status: Number = 200,
-  statusText: String = "success"
-) {
-  println("networkResponse channelId:$channelId result: $result")
-
-  val hexResult = result.encodeToByteArray().toHexString()
-  sendToJavaScript("navigator.serviceWorker.controller.postMessage('${channelId}:false:${hexResult}')")
-
-  // 消息传递结束
-  val hexData = "${headers},${status},${statusText}".encodeToByteArray().toHexString()
-  sendToJavaScript("navigator.serviceWorker.controller.postMessage('${channelId}:true:${hexData}')")
-}
-
 
 fun ByteArray.toHexString(): String {
   return this.joinToString(",") {
@@ -75,14 +56,15 @@ fun messageGateWay(
   stringData: String
 ) {
   Log.i(TAG, " messageGateWay: $stringData")
-  DenoService().backDataToRust(hexStrToByteArray(stringData))// 通知
+  DenoService().backDataToRust(stringData.toByteArray())// 通知
 }
 
 /** 转发给ui*/
 fun uiGateWay(
-  stringData: String
+  stringHex: String
 ): String {
-//  Log.i(TAG, " uiGateWay: $stringData")
+  Log.i(TAG, " uiGateWay: $stringHex")
+  val stringData = String(hexStrToByteArray(stringHex))
   mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true) // 允许使用单引号包裹字符串
   val handle = mapper.readValue(stringData, JsHandle::class.java)
   val funName = ExportNativeUi.valueOf(handle.function);
@@ -90,6 +72,7 @@ fun uiGateWay(
   val result = call_ui_map[funName]?.let { it ->
     it(handle.data)
   }
+  createBytesFactory(ExportNative.SetDWebViewUI, result.toString())
   return result.toString()
 }
 
@@ -99,7 +82,10 @@ fun viewGateWay(
   customUrlScheme: CustomUrlScheme,
   request: WebResourceRequest
 ): WebResourceResponse {
-  val url = request.url.toString().lowercase(Locale.ROOT)
+  var url = request.url.toString().lowercase(Locale.ROOT)
+  if(url.contains("?")){
+    url = url.split("?", limit = 2)[0];
+  }
   Log.i(TAG, " viewGateWay: $url,contains: ${front_to_rear_map.contains(url)}")
   if (front_to_rear_map.contains(url)) {
     val trueUrl = front_to_rear_map[url]
@@ -141,3 +127,11 @@ fun registerChannelId(): WebResourceResponse {
     ByteArrayInputStream(newId.toString().toByteArray())
   )
 }
+
+data class RespondWith(
+  val result:String = "",
+  val channelId: String = "",
+  val headers: String = "",
+  val status: Number = 200,
+  val statusText:String = "success"
+)

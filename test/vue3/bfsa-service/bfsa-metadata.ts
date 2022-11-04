@@ -15,6 +15,7 @@ export default metaConfig({
     author: ["waterbang,water_bang@163.com"],
     // 应用搜索的描述
     description: "Awasome DWeb",
+    maxAge:1,
     // 应用搜索的关键字
     keywords: ["demo"],
     // 私钥文件，用于最终的应用签名
