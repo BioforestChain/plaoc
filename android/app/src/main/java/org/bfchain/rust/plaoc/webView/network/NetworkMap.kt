@@ -22,27 +22,6 @@ var dWebView_host = ""
 // ð这里是路由的白名单
 var network_whitelist = "http://127.0.0.1"
 
-/** 分发解析的请求*/
-fun resolveNetworkRequest(
-  request: WebResourceRequest,
-  path: String,
-  header: String,
-  channelId: String,
-)
-  : WebResourceResponse {
-  val suffixIndex = path.lastIndexOf(".")
-  // 只拦截数据文件,忽略资源文件
-  if (suffixIndex == -1) {
-    dataGateWay(request)
-  }
-
-  return WebResourceResponse(
-    "application/json",
-    "utf-8",
-    ByteArrayInputStream(JsonUtil.toJson(Response()).toByteArray())
-  )
-}
-
 /** 抽离拦截请求*/
 fun interceptNetworkRequests(
   request: WebResourceRequest,
@@ -51,7 +30,7 @@ fun interceptNetworkRequests(
   val url = request.url.toString()
   val path = request.url.path
 
-//  println("interceptNetworkRequests:${request.url.lastPathSegment}")
+  println("interceptNetworkRequests:$url")
   // 防止卡住请求为空而崩溃
   if (!url.isNullOrEmpty() && !path.isNullOrEmpty()) {
     val temp = url.substring(url.lastIndexOf("/") + 1)
@@ -75,7 +54,6 @@ fun interceptNetworkRequests(
       }
     }
   }
-
   return WebResourceResponse(
     "application/json",
     "utf-8",
@@ -94,11 +72,11 @@ fun networkResponse(
   println("networkResponse channelId:$channelId result: $result")
 
   val hexResult = result.encodeToByteArray().toHexString()
-//  sendToJavaScript("navigator.serviceWorker.controller.postMessage('${channelId}:false:${hexResult}')")
+  sendToJavaScript("navigator.serviceWorker.controller.postMessage('${channelId}:false:${hexResult}')")
 
-//  // 消息传递结束
-//  val hexData = "${headers}|${status}|${statusText}".encodeToByteArray().toHexString()
-//  sendToJavaScript("navigator.serviceWorker.controller.postMessage('${channelId}:true:${hexData}')")
+  // 消息传递结束
+  val hexData = "${headers}|${status}|${statusText}".encodeToByteArray().toHexString()
+  sendToJavaScript("navigator.serviceWorker.controller.postMessage('${channelId}:true:${hexData}')")
 }
 
 

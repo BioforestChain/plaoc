@@ -56,12 +56,15 @@ fun splicingPath(bfsId:String, entry:String):String {
   callable_map[ExportNative.OpenDWebView] = {
     activity.openDWebViewActivity(it)
   }
+  // 初始化用户配置
   callable_map[ExportNative.InitMetaData] = {
     initMetaData(it)
   }
+  // 执行ui函数
   callable_map[ExportNative.SetDWebViewUI] = {
     uiGateWay(it)
   }
+  // 返回数据给DWebView-js
   callable_map[ExportNative.CallSWMessage] = {
     val handle = mapper.readValue(it, RespondWith::class.java)
     networkResponse(handle.channelId,handle.headers,

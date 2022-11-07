@@ -63,8 +63,8 @@ fun messageGateWay(
 fun uiGateWay(
   stringHex: String
 ): String {
-  Log.i(TAG, " uiGateWay: $stringHex")
   val stringData = String(hexStrToByteArray(stringHex))
+  Log.i(TAG, " uiGateWay: $stringData")
   mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true) // 允许使用单引号包裹字符串
   val handle = mapper.readValue(stringData, JsHandle::class.java)
   val funName = ExportNativeUi.valueOf(handle.function);

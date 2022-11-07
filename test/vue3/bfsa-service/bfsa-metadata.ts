@@ -15,13 +15,12 @@ export default metaConfig({
     author: ["waterbang,water_bang@163.com"],
     // 应用搜索的描述
     description: "Awasome DWeb",
-    maxAge:1,
+    maxAge: 1,
     // 应用搜索的关键字
     keywords: ["demo"],
     // 私钥文件，用于最终的应用签名
     privateKey: "bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj",
     homepage: "docs.plaoc.com",
-    maxAge: 1,
     // 应用入口，可以配置多个，其中index为缺省名称。
     // 外部可以使用 DWEB_ID.bfchain (等价同于index.DWEB_ID.bfchain)、admin.DWEB_ID.bfchain 来启动其它页面
     enters: ["index.html"],

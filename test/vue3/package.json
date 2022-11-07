@@ -12,8 +12,7 @@
   "dependencies": {
     "@ionic/vue": "^6.2.5",
     "@ionic/vue-router": "^6.2.5",
-    "@bfsx/plugin": "file:../../../bfsa-std/build/plugin",
-    "@bfsx/gateway": "file:../../../bfsa-std/build/gateway",
+    "@bfsx/plugin": "link:../../../bfsa-std/build/plugin",
     "vue": "^3.2.37",
     "vue-router": "4"
   },

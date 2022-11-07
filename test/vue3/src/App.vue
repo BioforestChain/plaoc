@@ -65,7 +65,16 @@ function onBottomBar(serial: string) {
     bottomBarImg[serial] = "https://objectjson.waterbang.top/test-vue3/home.svg"
   }
 }
-
+getBlockInfo()
+async function getBlockInfo() {
+  fetch('/getBlockInfo', {
+    headers: { 'Content-type': 'application/json' },
+  }).then(res => res.json()).then((response) => {
+    console.log({ response })
+  }).catch((error) => {
+    console.log('Looks like there was a problem: \n', error);
+  });
+}
 </script>
 
 <template>
