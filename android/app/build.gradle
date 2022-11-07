@@ -8,7 +8,7 @@ android {
   compileSdkVersion = build_versions.compileSdk
   buildToolsVersion = build_versions.buildTools
   defaultConfig {
-    applicationId = "org.bfchain.rust.plaoc"
+    applicationId = "info.bagen.rust.plaoc"
     minSdkVersion 28
     targetSdkVersion 33
     versionCode = 1

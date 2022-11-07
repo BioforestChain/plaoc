@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-  package="org.bfchain.libappmgr">
+  package="info.bagen.libappmgr">
 
   <uses-permission android:name="android.permission.INTERNET" />
   <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -10,7 +10,7 @@
     android:requestLegacyExternalStorage="true">
     <provider
       android:name=".database.AppProvider"
-      android:authorities="org.bfchain.rust.plaoc"
+      android:authorities="info.bagen.rust.plaoc"
       android:exported="true" />
 
     <activity android:name=".ui.main.MainActivity" />
