@@ -102,6 +102,13 @@ class BatchFileManager: NSObject {
     func scanDownloadURLString(fileName: String) -> String {
         return refreshInfoFromCacheInfo(fileName: fileName) ?? ""
     }
+    //扫码下载app
+    func scanToDownloadApp(fileName: String, dict: [String:Any]) {
+        batchManager.addAPPFromScan(fileName: fileName, dict: dict)
+        batchManager.updateScanType(fileName: fileName)
+        RefreshManager.saveLastUpdateTime(fileName: fileName, time: Date().timeStamp)
+        batchManager.writeUpdateContent(fileName: fileName, json: dict)
+    }
 
     //定时刷新
     func fetchRegularUpdateTime() {

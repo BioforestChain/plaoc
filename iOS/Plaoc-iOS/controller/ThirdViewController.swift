@@ -45,10 +45,7 @@ class ThirdViewController: UIViewController {
         let alertVC = UIAlertController(title: "确认下载更新吗？", message: nil, preferredStyle: .alert)
         let sureAction = UIAlertAction(title: "确认", style: .default) { action in
             
-            batchManager.addAPPFromScan(fileName: fileName, dict: dataDict)
-            batchManager.updateScanType(fileName: fileName)
-            RefreshManager.saveLastUpdateTime(fileName: fileName, time: Date().timeStamp)
-            batchManager.writeUpdateContent(fileName: fileName, json: dataDict)
+            batchManager.scanToDownloadApp(fileName: fileName, dict: dataDict)
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 self.navigationController?.popViewController(animated: true)

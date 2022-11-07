@@ -91,6 +91,8 @@
 		F39A941228F79C8800E82EB2 /* NSFileManager+NVHFileSize.m in Sources */ = {isa = PBXBuildFile; fileRef = F39A940C28F79C8800E82EB2 /* NSFileManager+NVHFileSize.m */; };
 		F39A941328F79C8800E82EB2 /* NVHFile.m in Sources */ = {isa = PBXBuildFile; fileRef = F39A940D28F79C8800E82EB2 /* NVHFile.m */; };
 		F39A941428F79C8800E82EB2 /* NVHTarFile.m in Sources */ = {isa = PBXBuildFile; fileRef = F39A940E28F79C8800E82EB2 /* NVHTarFile.m */; };
+		F39C2982291513BE0038EEBB /* JSCoreEntities.swift in Sources */ = {isa = PBXBuildFile; fileRef = F39C2981291513BE0038EEBB /* JSCoreEntities.swift */; };
+		F39C2984291516650038EEBB /* JSCoreManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F39C2983291516650038EEBB /* JSCoreManager.swift */; };
 		F3B0946528F558150027CD06 /* NotificationName.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3B0946428F558150027CD06 /* NotificationName.swift */; };
 		F3B77B682909369A005A384D /* QueueManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3B77B672909369A005A384D /* QueueManager.swift */; };
 /* End PBXBuildFile section */
@@ -215,6 +217,8 @@
 		F39A940C28F79C8800E82EB2 /* NSFileManager+NVHFileSize.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSFileManager+NVHFileSize.m"; sourceTree = "<group>"; };
 		F39A940D28F79C8800E82EB2 /* NVHFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NVHFile.m; sourceTree = "<group>"; };
 		F39A940E28F79C8800E82EB2 /* NVHTarFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NVHTarFile.m; sourceTree = "<group>"; };
+		F39C2981291513BE0038EEBB /* JSCoreEntities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSCoreEntities.swift; sourceTree = "<group>"; };
+		F39C2983291516650038EEBB /* JSCoreManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSCoreManager.swift; sourceTree = "<group>"; };
 		F3B0946428F558150027CD06 /* NotificationName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationName.swift; sourceTree = "<group>"; };
 		F3B77B672909369A005A384D /* QueueManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueManager.swift; sourceTree = "<group>"; };
 		F406C3D95E45CC0D87A9E05A /* Pods_Plaoc_iOSTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Plaoc_iOSTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -340,11 +344,11 @@
 		04BC49982858758E003FE6D9 /* Plaoc-iOS */ = {
 			isa = PBXGroup;
 			children = (
+				F31B2B9228F80743008CDD5F /* controller */,
 				F31B2BAB28F80E74008CDD5F /* recommend-app */,
 				F31B2BA028F80D04008CDD5F /* fileManager */,
 				F31B2B9B28F80BD3008CDD5F /* network */,
 				F31B2B9528F808E9008CDD5F /* manager */,
-				F31B2B9228F80743008CDD5F /* controller */,
 				040E4D0028727DF4003569F1 /* Tools */,
 				04376B56286C36500007B444 /* jsFile */,
 				041D100328630B4E00AEFE7D /* model */,
@@ -447,6 +451,8 @@
 				04A664662898C43D006A11EB /* DiskManager.swift */,
 				F39930012900E9D50017D721 /* PathFileManager.swift */,
 				F3B77B672909369A005A384D /* QueueManager.swift */,
+				F39C2981291513BE0038EEBB /* JSCoreEntities.swift */,
+				F39C2983291516650038EEBB /* JSCoreManager.swift */,
 			);
 			path = manager;
 			sourceTree = "<group>";
@@ -810,6 +816,7 @@
 				F31B2B9728F80A1D008CDD5F /* ProgressAnimationView.swift in Sources */,
 				04C02432287FF3EA008E32C8 /* BluetoothManager.swift in Sources */,
 				0443FCE32864615D003425CD /* CustomBasePopView.swift in Sources */,
+				F39C2982291513BE0038EEBB /* JSCoreEntities.swift in Sources */,
 				0419F10F2861BFED00EF8DC2 /* CaptureViewController.swift in Sources */,
 				0435866728655794004A83BB /* CustomPromptPopView.swift in Sources */,
 				04BC49CE2858768E003FE6D9 /* LeadReplyHandle.swift in Sources */,
@@ -820,6 +827,7 @@
 				F39A940F28F79C8800E82EB2 /* NVHProgress.m in Sources */,
 				04BA30EC287D122C00F8F703 /* PermissionManager.swift in Sources */,
 				04D022672860514C0018716E /* BottomView.swift in Sources */,
+				F39C2984291516650038EEBB /* JSCoreManager.swift in Sources */,
 				042FCD20288A45D00017BA5B /* ScanPhotoViewController.swift in Sources */,
 				F39A941128F79C8800E82EB2 /* NVHTarGzip.m in Sources */,
 				F39A941228F79C8800E82EB2 /* NSFileManager+NVHFileSize.m in Sources */,

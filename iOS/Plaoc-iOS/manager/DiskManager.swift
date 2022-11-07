@@ -71,7 +71,6 @@ class DiskManager: NSObject {
         NSLog("Document directory is \(filePath)")
     }
     //MARK: - Delete selected folder in Cache
-    ///delete selected_files folder
     private func deleteFolderInCacheFolder(forKey key: AnyObject) {
         let fileManager = FileManager.default
         let filePath = filePath(forKey: key)
