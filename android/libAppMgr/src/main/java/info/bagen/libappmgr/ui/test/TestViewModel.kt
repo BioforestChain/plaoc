@@ -1,4 +1,4 @@
-package info.bagen.libappmgr.ui.view
+package info.bagen.libappmgr.ui.test
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf

@@ -1,4 +1,4 @@
-package info.bagen.libappmgr.ui.view
+package info.bagen.libappmgr.ui.test
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -37,14 +37,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import info.bagen.libappmgr.R
+import info.bagen.libappmgr.ui.view.TestWebView
+import info.bagen.libappmgr.utils.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import info.bagen.libappmgr.R
-import info.bagen.libappmgr.utils.*
 import org.jsoup.Jsoup
 import java.util.*
 
@@ -218,10 +218,9 @@ fun TestListFavorite(
 }
 
 @Composable
-fun TestBottomBar(onClick: ((NavController) -> Unit)?) {
+fun TestBottomBar(viewModel: TestViewModel, onClick: ((NavController) -> Unit)?) {
 
   var index = remember { mutableStateOf(0) }
-  var viewModel = viewModel() as TestViewModel
 
   BottomNavigation(
     backgroundColor = Color.White,
@@ -250,12 +249,14 @@ fun TestBottomBar(onClick: ((NavController) -> Unit)?) {
   "CoroutineCreationDuringComposition", "UnrememberedMutableState",
   "UnusedMaterialScaffoldPaddingParameter"
 )
+
 @Preview
 @Composable
-fun TestMainView(onClick: ((TestAppInfo) -> Unit)? = null) {
-
+fun TestMainView(
+  viewModel: TestViewModel = TestViewModel(),
+  onClick: ((TestAppInfo) -> Unit)? = null
+) {
   val scaffoldState = rememberScaffoldState()
-  val viewModel = viewModel() as TestViewModel
   val scope = rememberCoroutineScope()
 
   GlobalScope.launch {
@@ -286,9 +287,7 @@ fun TestMainView(onClick: ((TestAppInfo) -> Unit)? = null) {
     if (hl.isNotEmpty()) {
       var historyList: List<TestAppInfo> =
         Gson().fromJson(hl, object : TypeToken<List<TestAppInfo>>() {}.type)
-      historyList.forEach { item ->
-        viewModel.historyList.add(item)
-      }
+      if (historyList.isNotEmpty()) viewModel.historyList.addAll(historyList)
     }
   }
 
@@ -301,7 +300,7 @@ fun TestMainView(onClick: ((TestAppInfo) -> Unit)? = null) {
     bottomBar = {
       Column {
         if (viewModel.showFavPop.value) {
-          TestFavoritePop()
+          TestFavoritePop(viewModel)
         }
         if (viewModel.progress.value in 0 until 100) {
           LinearProgressIndicator(
@@ -309,7 +308,7 @@ fun TestMainView(onClick: ((TestAppInfo) -> Unit)? = null) {
             progress = viewModel.progress.value / 100f
           )
         }
-        TestBottomBar() {
+        TestBottomBar(viewModel) {
           when (it.type) {
             NavControllerType.Back -> {
               when (viewModel.navUIType.value) {
@@ -358,7 +357,8 @@ fun TestMainView(onClick: ((TestAppInfo) -> Unit)? = null) {
         Box(modifier = Modifier.fillMaxWidth()) {
           TestSearchView { path ->
             var uri = Uri.parse(path)
-            viewModel.curAppInfo = TestAppInfo(name = "${uri.getQueryParameter("q")} - 搜索", path = path)
+            viewModel.curAppInfo =
+              TestAppInfo(name = "${uri.getQueryParameter("q")} - 搜索", path = path)
             onClick?.let { it(viewModel.curAppInfo!!) }
           }
         }
@@ -394,6 +394,7 @@ fun TestMainView(onClick: ((TestAppInfo) -> Unit)? = null) {
           }
           NavUIType.WEBVIEW -> {
             TestWebView(
+              viewModel = viewModel,
               onBack = {
                 if (it != null && it!!.canGoBack()) {
                   it!!.goBack()
@@ -404,7 +405,7 @@ fun TestMainView(onClick: ((TestAppInfo) -> Unit)? = null) {
             )
           }
           NavUIType.LIST -> {
-            TestPopHistoryOrFavorite()
+            TestPopHistoryOrFavorite(viewModel)
           }
           else -> {
             Text(
@@ -452,9 +453,8 @@ fun BoxScope.TestSearchView(onClick: ((String) -> Unit)? = null) {
 }
 
 @Composable
-fun TestFavoritePop() {
+fun TestFavoritePop(viewModel: TestViewModel) {
   var index = remember { mutableStateOf(0) }
-  var viewModel = viewModel() as TestViewModel
   BottomNavigation(
     backgroundColor = Color.White,
     elevation = 3.dp
@@ -514,8 +514,7 @@ fun TestFavoritePop() {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun TestPopHistoryOrFavorite() {
-  var viewModel = viewModel() as TestViewModel
+fun TestPopHistoryOrFavorite(viewModel: TestViewModel) {
   if (viewModel.showFavOrHistory.value > 0) {
     viewModel.bottomNavController.forEach {
       if (it.type == NavControllerType.Home) it.clickable.value = true
@@ -625,7 +624,7 @@ fun TestPopHistoryOrFavorite() {
             )
           }
           items(value) { item ->
-            TestListItem(appInfo = item)
+            TestListItem(viewModel, appInfo = item)
           }
         }
       }
@@ -635,9 +634,8 @@ fun TestPopHistoryOrFavorite() {
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
-fun TestListItem(appInfo: TestAppInfo) {
+fun TestListItem(viewModel: TestViewModel, appInfo: TestAppInfo) {
   var check = mutableStateOf(appInfo.checked)
-  var viewModel = viewModel() as TestViewModel
   Row(
     modifier = Modifier
       .fillMaxWidth()

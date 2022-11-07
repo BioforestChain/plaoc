@@ -3,17 +3,19 @@ package info.bagen.libappmgr.ui.view
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
+import android.util.Log
 import android.webkit.*
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.lifecycle.viewmodel.compose.viewModel
+import info.bagen.libappmgr.ui.test.TestViewModel
 import kotlinx.coroutines.launch
 
 @Composable
 fun TestWebView(
+  viewModel: TestViewModel,
   //自己处理返回事件
   onBack: (webView: WebView?) -> Unit,
   //自己选择是否接收，网页地址加载进度回调
@@ -23,9 +25,8 @@ fun TestWebView(
   //自己选择是否处理onReceivedError回调事件
   onReceivedError: (error: WebResourceError?) -> Unit = {}
 ) {
-  var webView:WebView? = null
+  var webView: WebView? = null
   val coroutineScope = rememberCoroutineScope()
-  var viewModel = viewModel() as TestViewModel
   if (viewModel.showWebView.value) {
     AndroidView(
       modifier = Modifier.fillMaxSize(),
@@ -87,6 +88,12 @@ fun TestWebView(
           initSettings(this.settings)
           webView = this
           loadUrl(viewModel.url.value)
+        }
+      },
+      update = {
+        it.loadUrl(viewModel.url.value)
+        viewModel.bottomNavController.forEach { navController ->
+          navController.clickable.value = true
         }
       })
     BackHandler {
