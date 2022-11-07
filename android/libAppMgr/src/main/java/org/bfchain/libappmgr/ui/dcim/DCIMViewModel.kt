@@ -200,28 +200,6 @@ class DCIMViewModel : ViewModel() {
     }
   }
 
-  /*private fun addTopSpinnerToList(totalPhotos: Int, totalVideos: Int) {
-    var photoAdded = false
-    var videoAdded = false
-    dcimInfoList.forEachIndexed { index, dcimInfo ->
-      if (index == 0 && dcimInfo.type == DCIMType.VIDEO) {
-        videoAdded = true
-        addToSpinnerList(All, dcimInfoList.size, dcimInfo, 0) // 所有图片和视频
-        addToSpinnerList(AllVideo, totalVideos, dcimInfo, 1)  // 所有视频
-      } else if (index == 0) {
-        photoAdded = true
-        addToSpinnerList(All, dcimInfoList.size, dcimInfo, 0) // 所有图片和视频
-        addToSpinnerList(AllPhoto, totalPhotos, dcimInfo, 1)  // 所有图片
-      } else if (photoAdded && dcimInfo.type == DCIMType.VIDEO) {
-        addToSpinnerList(AllVideo, totalVideos, dcimInfo, 2)
-        return
-      } else if (videoAdded && dcimInfo.type != DCIMType.VIDEO) {
-        addToSpinnerList(AllPhoto, totalPhotos, dcimInfo, 1) // 所有图片
-        return
-      }
-    }
-  }*/
-
   private fun addToSpinnerList(name: String, count: Int = 0, dcimInfo: DCIMInfo? = null) {
     var dcimSpinner = DCIMSpinner(
       name = name,

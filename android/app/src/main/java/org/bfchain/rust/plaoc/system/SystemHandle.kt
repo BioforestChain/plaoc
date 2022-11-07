@@ -6,12 +6,10 @@ import org.bfchain.libappmgr.utils.FilesUtil
 import org.bfchain.rust.plaoc.*
 import org.bfchain.rust.plaoc.system.device.DeviceInfo
 import org.bfchain.rust.plaoc.system.file.*
-import org.bfchain.rust.plaoc.system.notification.MessageSource
 import org.bfchain.rust.plaoc.system.notification.NotificationMsgItem
 import org.bfchain.rust.plaoc.webView.sendToJavaScript
 import org.bfchain.rust.plaoc.system.notification.NotifyManager
 import org.bfchain.rust.plaoc.system.permission.PermissionManager
-import org.bfchain.rust.plaoc.system.permission.PermissionUtil.getActualPermissions
 import org.bfchain.rust.plaoc.webView.network.*
 
 
@@ -121,9 +119,7 @@ fun splicingPath(bfsId:String, entry:String):String {
   }
   /**申请应用权限 */
   callable_map[ExportNative.ApplyPermissions] = {
-    val per = getActualPermissions(it)
-    println("ApplyPermissions:$per")
-    PermissionManager(activity).requestPermissions(per)
+    PermissionManager.requestPermissions(activity, it)
   }
   /** Notification */
   callable_map[ExportNative.CreateNotificationMsg] = {

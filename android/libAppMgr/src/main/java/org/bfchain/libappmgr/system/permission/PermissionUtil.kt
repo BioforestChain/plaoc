@@ -1,4 +1,4 @@
-package org.bfchain.rust.plaoc.system.permission
+package org.bfchain.libappmgr.system.permission
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -10,9 +10,8 @@ import android.os.Build
 import android.provider.Settings
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.king.mlkit.vision.camera.util.LogUtils
 import org.bfchain.libappmgr.database.AppContract
-import org.bfchain.rust.plaoc.App
+import org.bfchain.libappmgr.utils.AppContextUtil
 
 object PermissionUtil {
   const val PERMISSION_CALENDAR = "org.bfchain.rust.plaoc.CALENDAR" // 日历
@@ -39,7 +38,7 @@ object PermissionUtil {
   }
 
   @Synchronized
-  fun isPermissionsGranted(permissions: ArrayList<String>): Boolean  {
+  fun isPermissionsGranted(permissions: ArrayList<String>): Boolean {
     var permissionList = getActualPermissions(permissions)
     permissionList.forEach { pm ->
       if (!isPermissionGranted(pm)) return false
@@ -54,18 +53,18 @@ object PermissionUtil {
     val i = Intent()
     i.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
     i.addCategory(Intent.CATEGORY_DEFAULT)
-    i.data = Uri.parse("package:" + App.appContext.packageName)
+    i.data = Uri.parse("package:" + AppContextUtil.sInstance!!.packageName)
     i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)
     i.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
-    App.appContext.startActivity(i)
+    AppContextUtil.sInstance!!.startActivity(i)
   }
 
   @Synchronized
   private fun isPermissionGranted(permission: String): Boolean {
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
-      return App.appContext.checkCallingOrSelfPermission(permission) == PackageManager.PERMISSION_GRANTED
-    val hasPermission = ContextCompat.checkSelfPermission(App.appContext, permission)
+      return AppContextUtil.sInstance!!.checkCallingOrSelfPermission(permission) == PackageManager.PERMISSION_GRANTED
+    val hasPermission = ContextCompat.checkSelfPermission(AppContextUtil.sInstance!!, permission)
     return hasPermission == PackageManager.PERMISSION_GRANTED
   }
 
@@ -77,14 +76,14 @@ object PermissionUtil {
   @Synchronized
   private fun isGrantedByApp(permission: String, appId: String): Boolean {
     var project = arrayOf(
-      AppContract.Permissions.COLUMN_APP_ID,
-      AppContract.Permissions.COLUMN_PERMISSION,
+      AppContract.Permissions.COLUMN_ID,
+      AppContract.Permissions.COLUMN_NAME,
       AppContract.Permissions.COLUMN_GRANT
     )
     var select =
-      "${AppContract.Permissions.COLUMN_APP_ID}=? AND ${AppContract.Permissions.COLUMN_PERMISSION}=?"
+      "${AppContract.Permissions.COLUMN_ID}=? AND ${AppContract.Permissions.COLUMN_NAME}=?"
     var selectArgs = arrayOf(appId, permission)
-    var cursor = App.appContext.contentResolver.query(
+    var cursor = AppContextUtil.sInstance!!.contentResolver.query(
       AppContract.Permissions.CONTENT_URI, project, select, selectArgs, null
     )
     cursor?.let {
@@ -97,7 +96,7 @@ object PermissionUtil {
     return false
   }
 
-  fun getActualPermissions(permission: String) : ArrayList<String> {
+  fun getActualPermissions(permission: String): ArrayList<String> {
     val actualPermissions = arrayListOf<String>()
     when (permission) {
       PERMISSION_CAMERA -> actualPermissions.add(Manifest.permission.CAMERA)
@@ -136,8 +135,8 @@ object PermissionUtil {
         actualPermissions.add(Manifest.permission.READ_CALL_LOG)
         actualPermissions.add(Manifest.permission.WRITE_CALL_LOG)
       }
+      else -> actualPermissions.add(permission) // 如果都不匹配，直接将请求的权限填充
     }
-    LogUtils.d("getActualPermissions -> ${actualPermissions.size}")
     return actualPermissions
   }
 
@@ -147,7 +146,6 @@ object PermissionUtil {
       var temp = getActualPermissions(permission)
       if (temp.size > 0) actualPermissions.addAll(temp)
     }
-    LogUtils.d("getActualPermissions -> ${actualPermissions.size}->${permissions.size}")
     return actualPermissions
   }
 
@@ -177,7 +175,8 @@ object PermissionUtil {
     permissions.add(Manifest.permission.RECEIVE_MMS)
     permissions.add(Manifest.permission.READ_EXTERNAL_STORAGE)
     permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-    ActivityCompat.requestPermissions(activity!!, permissions.toTypedArray(),
+    ActivityCompat.requestPermissions(
+      activity!!, permissions.toTypedArray(),
       PermissionManager.MY_PERMISSIONS
     )
   }
