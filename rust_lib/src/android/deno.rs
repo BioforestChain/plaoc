@@ -25,7 +25,7 @@ use std::{collections::HashMap, ptr::NonNull};
 
 #[no_mangle]
 #[tokio::main]
-pub async extern "system" fn Java_org_bfchain_rust_plaoc_DenoService_onlyReadRuntime(
+pub async extern "system" fn Java_info_bagen_rust_plaoc_DenoService_onlyReadRuntime(
     env: JNIEnv,
     _context: JObject,
     jasset_manager: JObject,
@@ -54,7 +54,7 @@ pub async extern "system" fn Java_org_bfchain_rust_plaoc_DenoService_onlyReadRun
 
 #[no_mangle]
 #[tokio::main]
-pub async extern "system" fn Java_org_bfchain_rust_plaoc_DenoService_denoRuntime(
+pub async extern "system" fn Java_info_bagen_rust_plaoc_DenoService_denoRuntime(
     env: JNIEnv,
     _context: JObject,
     path: JString,
@@ -73,7 +73,7 @@ pub async extern "system" fn Java_org_bfchain_rust_plaoc_DenoService_denoRuntime
 /// 接收返回的二进制数据
 #[no_mangle]
 #[tokio::main]
-pub async extern "system" fn Java_org_bfchain_rust_plaoc_DenoService_backDataToRust(
+pub async extern "system" fn Java_info_bagen_rust_plaoc_DenoService_backDataToRust(
     env: JNIEnv,
     _context: JObject,
     byteData: jbyteArray,
@@ -87,7 +87,7 @@ pub async extern "system" fn Java_org_bfchain_rust_plaoc_DenoService_backDataToR
 /// 接收返回的系统API二进制数据
 #[no_mangle]
 #[tokio::main]
-pub async extern "C" fn Java_org_bfchain_rust_plaoc_DenoService_backSystemDataToRust(
+pub async extern "C" fn Java_info_bagen_rust_plaoc_DenoService_backSystemDataToRust(
     env: JNIEnv,
     _context: JObject,
     byteData: jbyteArray){
