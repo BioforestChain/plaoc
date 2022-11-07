@@ -17,6 +17,9 @@ PODS:
     - CocoaLumberjack (~> 3.0)
   - SwiftyJSON (5.0.1)
   - UIColor_Hex_Swift (5.1.7)
+  - ZLPhotoBrowser (4.3.7):
+    - ZLPhotoBrowser/Core (= 4.3.7)
+  - ZLPhotoBrowser/Core (4.3.7)
 
 DEPENDENCIES:
   - Moya
@@ -27,6 +30,7 @@ DEPENDENCIES:
   - SVGKit
   - SwiftyJSON
   - UIColor_Hex_Swift
+  - ZLPhotoBrowser
 
 SPEC REPOS:
   trunk:
@@ -40,6 +44,7 @@ SPEC REPOS:
     - SVGKit
     - SwiftyJSON
     - UIColor_Hex_Swift
+    - ZLPhotoBrowser
 
 SPEC CHECKSUMS:
   Alamofire: d368e1ff8a298e6dde360e35a3e68e6c610e7204
@@ -52,7 +57,8 @@ SPEC CHECKSUMS:
   SVGKit: 1ad7513f8c74d9652f94ed64ddecda1a23864dea
   SwiftyJSON: 2f33a42c6fbc52764d96f13368585094bfd8aa5e
   UIColor_Hex_Swift: 31cd3e47440f07a20d2503a36bb0437a445b3c29
+  ZLPhotoBrowser: f571bdaec6d0b64ae94a29787e4c7cbd8900d10f
 
-PODFILE CHECKSUM: 6ff8e5f2191e36d7ab3bd6ae7f31f64d09766444
+PODFILE CHECKSUM: aeecfa8c24b37549815d833855498fbbc56b60c9
 
 COCOAPODS: 1.11.3

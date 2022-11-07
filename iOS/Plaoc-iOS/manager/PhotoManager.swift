@@ -6,13 +6,17 @@
 //
 
 import UIKit
+import ZLPhotoBrowser
+import Photos
 
 let photoManager = PhotoManager()
 
 class PhotoManager: NSObject {
-
+    
     private var isPermissioned: Bool = false
     private var isScan: Bool = false
+    private var assets: [PHAsset] = []
+    private var images: [UIImage] = []
     
     private func permissioned() {
         permissionManager.startPermissionAuthenticate(type: .photo, isSet: true) { [weak self] result in
@@ -62,34 +66,73 @@ class PhotoManager: NSObject {
             controller.present(picker, animated: true)
         }
     }
-    
-    //从相册中选取图片
-    func fetchPhotoFromPhotoLibrary(isScan: Bool, controller: UIViewController) {
+    //从相册中选取图片/视频
+    func fetchPhAssetsFromLibraya(isScan: Bool = false, controller: UIViewController, callback: @escaping (([UIImage]) -> Void)) {
         permissioned()
         guard isPermissioned else { return }
-        self.isScan = isScan
-        if UIImagePickerController.isSourceTypeAvailable(.photoLibrary) {
-            let picker = UIImagePickerController()
-            picker.delegate = self
-            picker.sourceType = .photoLibrary
-            picker.allowsEditing = true
-            controller.present(picker, animated: true)
+        
+        let config = ZLPhotoConfiguration.default()
+        config.allowSelectGif = false
+        config.allowSelectOriginal = false
+        config.cropVideoAfterSelectThumbnail = false
+        config.allowEditVideo = false
+        config.showSelectBtnWhenSingleSelect = true
+        if isScan {
+            config.maxSelectCount = 1
+            config.allowSelectVideo = false
+        }
+        
+        let photoPicker = ZLPhotoPreviewSheet(selectedAssets: assets)
+        
+        photoPicker.selectImageBlock = { [weak self] (photos, isSelectOriginal) in
+            guard let strongSelf = self else { return }
+            strongSelf.assets.removeAll()
+            strongSelf.images.removeAll()
+            for photo in photos {
+                strongSelf.assets.append(photo.asset)
+                strongSelf.images.append(photo.image)
+                if photo.asset.mediaType.rawValue == 2 {
+                    //获取视频地址
+                    ZLVideoManager.exportVideo(for: photo.asset) { url, error in
+                        
+                    }
+                }
+            }
+            callback(strongSelf.images)
+        }
+        photoPicker.showPhotoLibrary(sender: controller)
+    }
+    //获取本地视频截图
+    private func generatorLocalVedioImage(url: URL?) -> UIImage? {
+        guard url != nil else { return nil }
+        let avAsset = AVAsset(url: url!)
+        
+        let generator = AVAssetImageGenerator(asset: avAsset)
+        generator.appliesPreferredTrackTransform = true
+        let time = CMTimeMakeWithSeconds(0.0, preferredTimescale: 600)
+        var actualTime = CMTimeMake(value: 0, timescale: 0)
+        guard let imageRef = try? generator.copyCGImage(at: time, actualTime: &actualTime) else { return nil }
+        let image = UIImage(cgImage: imageRef)
+        return image
+    }
+    
+    //获取网络视频截图
+    private func generatorNetworkVedioImage(urlString: String) {
+        guard let url = URL(string: urlString) else { return }
+        DispatchQueue.global().async {
+            let avAsset = AVURLAsset(url: url)
+            let generator = AVAssetImageGenerator(asset: avAsset)
+            generator.appliesPreferredTrackTransform = true
+            let time = CMTimeMakeWithSeconds(0.0, preferredTimescale: 600)
+            var actualTime = CMTimeMake(value: 0, timescale: 0)
+            guard let imageRef = try? generator.copyCGImage(at: time, actualTime: &actualTime) else { return }
+            let image = UIImage(cgImage: imageRef)
+            DispatchQueue.main.async {
+                //TODO 获取截图后逻辑
+            }
         }
     }
     
-    //从相册中选取视频
-    func fetchVideoFromPhotoLibrary(controller: UIViewController) {
-        permissioned()
-        guard isPermissioned else { return }
-        if UIImagePickerController.isSourceTypeAvailable(.photoLibrary) {
-            let picker = UIImagePickerController()
-            picker.delegate = self
-            picker.sourceType = .photoLibrary
-            picker.mediaTypes = ["public.movie"]
-            picker.allowsEditing = false
-            controller.present(picker, animated: true)
-        }
-    }
     //保存图片到文件中
     func savePhotoToDocument(image: UIImage) {
         
@@ -106,6 +149,37 @@ class PhotoManager: NSObject {
         return filePath
     }
     
+    //预览图片
+    func previewImage(index: Int, controller: UIViewController, callback: @escaping (([UIImage], Bool) -> Void)) {
+        let previewVC = ZLImagePreviewController(datas: assets, index: index)
+        previewVC.doneBlock = { [weak self] res in  // res is [PHAsset]
+            guard let strongSelf = self else { return }
+            guard let photos = res as? [PHAsset] else { return }
+            var isChange: Bool = false
+            if res.isEmpty {
+                //TODO 清空选择的图片
+                strongSelf.assets.removeAll()
+                strongSelf.images.removeAll()
+                isChange = true
+                callback(strongSelf.images, isChange)
+                return
+            }
+            if strongSelf.assets.count != photos.count {  //预览时修改图片
+                isChange = true
+                let diffList = strongSelf.assets.filter{ !photos.contains($0) }
+                let deleteImages = diffList.map { asset -> UIImage in
+                    let index = strongSelf.assets.firstIndex(of: asset)
+                    let image = strongSelf.images[index!]
+                    return image
+                }
+                strongSelf.images = strongSelf.images.filter{ !deleteImages.contains($0) }
+            }
+            strongSelf.assets = photos
+            callback(strongSelf.images, isChange)
+        }
+        previewVC.modalPresentationStyle = .fullScreen
+        controller.showDetailViewController(previewVC, sender: nil)
+    }
 }
 
 extension PhotoManager {
@@ -216,12 +290,7 @@ extension PhotoManager: UIImagePickerControllerDelegate, UINavigationControllerD
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         picker.dismiss(animated: true)
         guard let image = info[UIImagePickerController.InfoKey.editedImage] as? UIImage else { return }
-        let aa = UIImage(named: "haah.png")
-        if isScan {
-            recognizeQRImage(image: aa!)
-        } else {
-            savePhotoToDocument(image: image)
-        }
+        savePhotoToDocument(image: image)
     }
 
     

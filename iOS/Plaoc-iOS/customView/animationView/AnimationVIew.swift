@@ -7,13 +7,11 @@
 
 import UIKit
 
-class AnimationVIew: UIImageView {
+class AnimationView: UIImageView {
 
     var borderLayer: CAShapeLayer!   //中间的圆透明，圆与边框之间的内容半透明的layer
     var clockCircleLayer: CAShapeLayer!  //中心动画的layer
     var isStart: Bool = false
-    
-    var testView: AnimationVIew!
     
     init(targetView: UIView) {
         super.init(frame: targetView.bounds)
@@ -36,47 +34,20 @@ class AnimationVIew: UIImageView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-//        borderLayer = CAShapeLayer()
-//        borderLayer.fillColor = UIColor.black.withAlphaComponent(0.5).cgColor
-//        borderLayer.path = self.maskPathWithDiameter(diameter: self.bounds.height - 20).cgPath
-//        borderLayer.fillRule = .evenOdd
-//
-//        clockCircleLayer = CAShapeLayer()
-//        clockCircleLayer.fillColor = UIColor.clear.cgColor
-//        clockCircleLayer.strokeColor = UIColor.black.withAlphaComponent(0.5).cgColor
-//        clockCircleLayer.lineWidth = (self.bounds.height - 30) * 0.5
-//        clockCircleLayer.path = self.pathWithDiameter(diameter: (self.bounds.height - 30) * 0.5).cgPath
-//        clockCircleLayer.strokeEnd = 1
-//
-//        self.layer.addSublayer(borderLayer)
-//        self.layer.addSublayer(clockCircleLayer)
-//        self.layer.masksToBounds = true
+
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func addTestView() {
-        
-        var haView = self.viewWithTag(100) as? AnimationVIew
-        if haView == nil {
-            haView = AnimationVIew(targetView: self)
-            haView?.layer.cornerRadius = self.layer.cornerRadius
-            haView?.layer.masksToBounds = self.layer.masksToBounds
-            haView?.tag = 100
-            self.addSubview(haView!)
-            self.bringSubviewToFront(haView!)
-        }
-    }
-    
     func reveal() {
-        let hahaView = self.viewWithTag(100) as? AnimationVIew
+        let hahaView = self.viewWithTag(100) as? AnimationView
         guard hahaView != nil else { return }
-        hahaView!.startHH()
+        hahaView!.startClockCircleAnimation()
     }
     
-    func startHH() {
+    func startClockCircleAnimation() {
         guard !isStart else { return }
         isStart = true
         
@@ -118,7 +89,7 @@ class AnimationVIew: UIImageView {
     }
 }
 
-extension AnimationVIew :CAAnimationDelegate {
+extension AnimationView :CAAnimationDelegate {
     // 移除mask
     func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
         

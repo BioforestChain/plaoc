@@ -102,6 +102,13 @@ class BatchFileManager: NSObject {
     func scanDownloadURLString(fileName: String) -> String {
         return refreshInfoFromCacheInfo(fileName: fileName) ?? ""
     }
+    //扫码下载app
+    func scanToDownloadApp(fileName: String, dict: [String:Any]) {
+        batchManager.addAPPFromScan(fileName: fileName, dict: dict)
+        batchManager.updateScanType(fileName: fileName)
+        RefreshManager.saveLastUpdateTime(fileName: fileName, time: Date().timeStamp)
+        batchManager.writeUpdateContent(fileName: fileName, json: dict)
+    }
 
     //定时刷新
     func fetchRegularUpdateTime() {
@@ -160,6 +167,11 @@ class BatchFileManager: NSObject {
     //扫码添加安装的app数据
     func addAPPFromScan(fileName: String, dict: [String:Any]) {
         scanManager.writeLinkJson(fileName: fileName, dict: dict)
+    }
+    
+    //获取system-app的entryPath
+    func systemAPPEntryPath(fileName: String) -> String? {
+        return sysManager.fetchEntryPath(fileName: fileName)
     }
     
     //更新信息下载完后，重新下载项目文件,  可能不需要判断system-app 看最后system-app升级时的需求
