@@ -6,7 +6,6 @@ import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import com.google.android.exoplayer2.SimpleExoPlayer
-import org.bfchain.libappmgr.utils.BitmapUtil
 import java.io.File
 import java.util.*
 
@@ -58,7 +57,7 @@ fun DCIMInfo.updateDuration() {
     try {
       mmr = MediaMetadataRetriever()
       mmr.setDataSource(path)
-      bitmap = BitmapUtil.getVideoThumbnail(path, 120)// mmr.frameAtTime
+      bitmap = mmr.frameAtTime
       //Log.d("lin.huang", "updateDuration $path->$bitmap")
       duration.value =
         mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toInt()?.div(1000)
