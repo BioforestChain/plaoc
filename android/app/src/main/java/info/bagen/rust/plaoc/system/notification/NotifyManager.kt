@@ -74,7 +74,7 @@ class NotifyManager() {
   fun createNotification(
     title: String,
     text: String,
-    smallIcon: Int = R.mipmap.ic_launcher_round,
+    smallIcon: Int = R.mipmap.ic_launcher,
     bigText: String = "",
     channelType: ChannelType = ChannelType.DEFAULT,
     intent: PendingIntent = getDefaultPendingIntent()
