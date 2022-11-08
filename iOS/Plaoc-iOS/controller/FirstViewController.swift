@@ -21,9 +21,9 @@ class FirstViewController: UIViewController {
 
         self.view.backgroundColor = .white
         
-        batchManager.initBatchFile()
+//        batchManager.initBatchFile()
         
-        appNames = batchManager.appFilePaths
+        appNames = BatchFileManager.shared.appFilePaths
         
         for i in stride(from: 0, to: appNames.count + 1, by: 1) {
             if i == appNames.count {
@@ -37,12 +37,12 @@ class FirstViewController: UIViewController {
                 let name = appNames[i]
                 let button = UIButton(frame: CGRect(x: 30 + i * 90, y: 200, width: 60, height: 60))
                 button.addTarget(self, action: #selector(tap(sender:)), for: .touchUpInside)
-                let type = batchManager.currentAppType(fileName: name)
+                let type = BatchFileManager.shared.currentAppType(fileName: name)
                 if type == .scan {
-                    let urlString = batchManager.scanImageURL(fileName: name)
+                    let urlString = BatchFileManager.shared.scanImageURL(fileName: name)
                     button.sd_setImage(with: URL(string: urlString), for: .normal)
                 } else {
-                    button.setImage(batchManager.currentAppImage(fileName: name), for: .normal)
+                    button.setImage(BatchFileManager.shared.currentAppImage(fileName: name), for: .normal)
                 }
                 button.tag = i
                 button.layer.cornerRadius = 10
@@ -53,7 +53,7 @@ class FirstViewController: UIViewController {
                 let label = UILabel(frame: CGRect(x: button.frame.minX, y: 280, width: 60, height: 20))
                 label.textAlignment = .center
                 label.textColor = .black
-                label.text = batchManager.currentAppName(fileName: name)
+                label.text = BatchFileManager.shared.currentAppName(fileName: name)
                 self.view.addSubview(label)
                 labels.append(label)
             }
@@ -79,10 +79,10 @@ class FirstViewController: UIViewController {
         DispatchQueue.main.async {
             if type == "complete" {
                 if fileName != nil {
-                    batchManager.updateFileType(fileName: fileName!)
+                    BatchFileManager.shared.updateFileType(fileName: fileName!)
                     if let index = self.appNames.firstIndex(of: fileName!) {
                         let button = self.buttons[index]
-                        button.setImage(batchManager.currentAppImage(fileName: fileName!), for: .normal)
+                        button.setImage(BatchFileManager.shared.currentAppImage(fileName: fileName!), for: .normal)
                         button.startExpandAnimation()
                     }
                 }
@@ -103,69 +103,19 @@ class FirstViewController: UIViewController {
         
     }
     
-    var totals: [UIImageView] = []
     @objc func tap(sender: UIButton) {
 
-//        guard sender.tag < appNames.count else { return }
-        if sender.tag == 2 {
-            
-            
-            for iv in totals {
-                iv.removeFromSuperview()
-            }
-            
-            photoManager.fetchPhAssetsFromLibraya(controller: self) { images in
-                let dis = (UIScreen.main.bounds.width - 64 - 240) / 3
-                for i in stride(from: 0, to: images.count, by: 1) {
-                    let imageV = UIImageView(frame: CGRect(x: 32 + CGFloat(i % 4) * (60 + dis), y: 300 + CGFloat(i / 4) * 80, width: 60, height: 60))
-                    imageV.image = images[i]
-                    self.view.addSubview(imageV)
-                    self.totals.append(imageV)
-                }
-            }
-
-            return
-            
-            let third = ThirdViewController()
-            third.callback = { [weak self] name in
-                guard let strongSelf = self else { return }
-                strongSelf.appNames.append(name)
-                strongSelf.addScanAppUI(name: name)
-                strongSelf.addScanAppAction(name: name)
-            }
-            self.navigationController?.pushViewController(third, animated: true)
-            return
-        }
-        
-        
-        photoManager.previewImage(index: 0, controller: self) { (images, isChange) in
-            for iv in self.totals {
-                iv.removeFromSuperview()
-            }
-            let dis = (UIScreen.main.bounds.width - 64 - 240) / 3
-            for i in stride(from: 0, to: images.count, by: 1) {
-                let imageV = UIImageView(frame: CGRect(x: 32 + CGFloat(i % 4) * (60 + dis), y: 300 + CGFloat(i / 4) * 80, width: 60, height: 60))
-                imageV.image = images[i]
-                self.view.addSubview(imageV)
-                self.totals.append(imageV)
-            }
-        }
-        
-        
-        return
-        
-        
         let name = appNames[sender.tag]
-        let type = batchManager.currentAppType(fileName: name)
+        let type = BatchFileManager.shared.currentAppType(fileName: name)
         if type == .system {
             let second = WebViewViewController()
             second.fileName = name
             second.urlString = "iosqmkkx:/index.html"
             self.navigationController?.pushViewController(second, animated: true)
         } else if type == .recommend {
-            batchManager.clickRecommendAppAction(fileName: name)
+            BatchFileManager.shared.clickRecommendAppAction(fileName: name)
         } else if type == .scan {
-            batchManager.clickRecommendAppAction(fileName: name)
+            BatchFileManager.shared.clickRecommendAppAction(fileName: name)
         }
     }
     
@@ -182,7 +132,7 @@ class FirstViewController: UIViewController {
     }
     
     func addScanAppAction(name: String) {
-        let scanURLString = batchManager.scanDownloadURLString(fileName: name)
+        let scanURLString = BatchFileManager.shared.scanDownloadURLString(fileName: name)
         guard scanURLString.count > 0 else { return }
         BFSNetworkManager.shared.loadAutoUpdateInfo(fileName: name, urlString: scanURLString)
         let button = self.view.viewWithTag(3) as? UIButton

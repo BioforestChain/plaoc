@@ -83,6 +83,7 @@
 		F31B2BAE28F80EC8008CDD5F /* FirstViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F31B2BAD28F80EC8008CDD5F /* FirstViewController.swift */; };
 		F380F6C628FE8C39001BC5C3 /* BatchScanManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F380F6C528FE8C39001BC5C3 /* BatchScanManager.swift */; };
 		F3872073290BB2C20018B8CC /* Snowflake.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3872072290BB2C20018B8CC /* Snowflake.swift */; };
+		F39535162919E4650071898A /* UIImage_extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F39535152919E4650071898A /* UIImage_extension.swift */; };
 		F39930022900E9D50017D721 /* PathFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F39930012900E9D50017D721 /* PathFileManager.swift */; };
 		F39930042900F4760017D721 /* FileModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F39930032900F4760017D721 /* FileModel.swift */; };
 		F39A940F28F79C8800E82EB2 /* NVHProgress.m in Sources */ = {isa = PBXBuildFile; fileRef = F39A940328F79C8700E82EB2 /* NVHProgress.m */; };
@@ -203,6 +204,7 @@
 		F37EA33E28F693B70068A66D /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
 		F380F6C528FE8C39001BC5C3 /* BatchScanManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatchScanManager.swift; sourceTree = "<group>"; };
 		F3872072290BB2C20018B8CC /* Snowflake.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Snowflake.swift; sourceTree = "<group>"; };
+		F39535152919E4650071898A /* UIImage_extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImage_extension.swift; sourceTree = "<group>"; };
 		F39930012900E9D50017D721 /* PathFileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PathFileManager.swift; sourceTree = "<group>"; };
 		F39930032900F4760017D721 /* FileModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileModel.swift; sourceTree = "<group>"; };
 		F39A940328F79C8700E82EB2 /* NVHProgress.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NVHProgress.m; sourceTree = "<group>"; };
@@ -279,6 +281,7 @@
 				04C02436288011C4008E32C8 /* Data_extension.swift */,
 				F31B2B9328F8088F008CDD5F /* Date_extension.swift */,
 				F3B0946428F558150027CD06 /* NotificationName.swift */,
+				F39535152919E4650071898A /* UIImage_extension.swift */,
 			);
 			path = extension;
 			sourceTree = "<group>";
@@ -810,6 +813,7 @@
 				041D100528630B7800AEFE7D /* ButtonModel.swift in Sources */,
 				04002FAD2897701900D03CB0 /* DatabaseManager.swift in Sources */,
 				F31B2B9428F8088F008CDD5F /* Date_extension.swift in Sources */,
+				F39535162919E4650071898A /* UIImage_extension.swift in Sources */,
 				0443FCDE28640B70003425CD /* BottomBarModel.swift in Sources */,
 				04002FA928976D0F00D03CB0 /* CacheManager.swift in Sources */,
 				0419F107286051F500EF8DC2 /* UIDevice_extension.swift in Sources */,

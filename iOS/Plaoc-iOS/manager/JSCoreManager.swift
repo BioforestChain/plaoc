@@ -16,7 +16,7 @@ class JSCoreManager: NSObject {
     init(fileName: String, controller: UIViewController?) {
         super.init()
         baseViewController = controller
-        guard let entryPath = batchManager.systemAPPEntryPath(fileName: fileName) else { return }
+        guard let entryPath = BatchFileManager.shared.systemAPPEntryPath(fileName: fileName) else { return }
         
         let plaoc = PlaocHandleModel()
         plaoc.controller = controller

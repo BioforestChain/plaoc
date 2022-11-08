@@ -47,7 +47,7 @@ class RefreshManager: NSObject {
 //                    return
 //                }
                 RefreshManager.saveLastUpdateTime(fileName: fileName!, time: Date().timeStamp)
-                batchManager.writeUpdateContent(fileName: fileName!, json: dataDict)
+                BatchFileManager.shared.writeUpdateContent(fileName: fileName!, json: dataDict)
                 if isCompare {
                     //TODO 发送比较版本信息
                     operateMonitor.refreshCompleteMonitor.onNext(fileName!)
