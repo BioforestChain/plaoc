@@ -126,7 +126,7 @@ class ScanPhotoViewController: UIViewController {
         let alertVC = UIAlertController(title: "确认下载更新吗？", message: nil, preferredStyle: .alert)
         let sureAction = UIAlertAction(title: "确认", style: .default) { action in
      
-            batchManager.scanToDownloadApp(fileName: fileName, dict: dataDict)
+            BatchFileManager.shared.scanToDownloadApp(fileName: fileName, dict: dataDict)
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 self.navigationController?.popViewController(animated: true)

@@ -46,42 +46,50 @@ extension String {
     }
     
     //版本号比较
-        func versionCompare(oldVersion: String) -> ComparisonResult {
-            
-            let delimiter = "."
-            var currentComponents = self.components(separatedBy: delimiter)
-            var oldComponents = oldVersion.components(separatedBy: delimiter)
-            
-            let diff = currentComponents.count - oldComponents.count
-            let zeros = Array(repeating: "0", count: abs(diff))
-            if diff > 0 {
-                oldComponents.append(contentsOf: zeros)
-            } else if diff < 0 {
-                currentComponents.append(contentsOf: zeros)
-            }
-            
-            for i in stride(from: 0, to: currentComponents.count, by: 1) {
-                let current = currentComponents[i]
-                let old = oldComponents[i]
-                if Int(current)! > Int(old)! {
-                    return .orderedAscending
-                } else if Int(current)! < Int(old)! {
-                    return .orderedDescending
-                }
-            }
-            return .orderedDescending
+    func versionCompare(oldVersion: String) -> ComparisonResult {
+        
+        let delimiter = "."
+        var currentComponents = self.components(separatedBy: delimiter)
+        var oldComponents = oldVersion.components(separatedBy: delimiter)
+        
+        let diff = currentComponents.count - oldComponents.count
+        let zeros = Array(repeating: "0", count: abs(diff))
+        if diff > 0 {
+            oldComponents.append(contentsOf: zeros)
+        } else if diff < 0 {
+            currentComponents.append(contentsOf: zeros)
         }
         
-        //正则替换
-        func regexReplacePattern(pattern: String) -> String {
-            
-            do {
-                let regex = try NSRegularExpression(pattern: pattern, options: .caseInsensitive)
-                let finalStr = regex.stringByReplacingMatches(in: self, options: NSRegularExpression.MatchingOptions(rawValue: 0), range: NSMakeRange(0, self.count), withTemplate: "")
-                return finalStr
-            } catch {
-                print(error)
+        for i in stride(from: 0, to: currentComponents.count, by: 1) {
+            let current = currentComponents[i]
+            let old = oldComponents[i]
+            let currentVersion = Int(current) ?? 0
+            let oldVersion = Int(old) ?? 0
+            if currentVersion > oldVersion {
+                return .orderedAscending
+            } else if currentVersion < oldVersion {
+                return .orderedDescending
             }
-            return ""
         }
+        return .orderedDescending
+    }
+    
+    //正则替换
+    func regexReplacePattern(pattern: String) -> String {
+        
+        do {
+            let regex = try NSRegularExpression(pattern: pattern, options: .caseInsensitive)
+            let finalStr = regex.stringByReplacingMatches(in: self, options: NSRegularExpression.MatchingOptions(rawValue: 0), range: NSMakeRange(0, self.count), withTemplate: "")
+            return finalStr
+        } catch {
+            print(error)
+        }
+        return ""
+    }
+    //base64转图片
+    func base64ToImage() -> UIImage? {
+        guard let data = Data(base64Encoded: self, options: .ignoreUnknownCharacters) else { return nil }
+        let image = UIImage(data: data)
+        return image
+    }
 }

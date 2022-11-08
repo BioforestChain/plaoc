@@ -42,6 +42,8 @@ import JavaScriptCore
             return executiveSendNotification(param: param)
         case "ApplyPermissions":
             return executiveApplyPermissions(param: param)
+        case "isDenoRuntime":
+            return executiveIsDenoRuntime(param: param)
         default:
             return ""
         }
@@ -93,5 +95,9 @@ extension PlaocHandleModel {
     //申请权限
     private func executiveApplyPermissions(param: String) -> String {
         return ""
+    }
+    //
+    private func executiveIsDenoRuntime(param: String) -> String {
+        return "true"
     }
 }

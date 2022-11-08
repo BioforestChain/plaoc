@@ -15,8 +15,6 @@ enum FilePathType {
     case none
 }
 
-let batchManager = BatchFileManager()
-
 class BatchFileManager: NSObject {
 
     private let disposeBag = DisposeBag()
@@ -30,7 +28,14 @@ class BatchFileManager: NSObject {
     
     private(set) var appFilePaths: [String] = []
     
-    func initBatchFile() {
+    static let shared = BatchFileManager()
+    
+    override init() {
+        super.init()
+        initBatchFile()
+    }
+    
+    private func initBatchFile() {
         
         let recommendFiles = recommendManager.readAppSubFile()
         let systemFiles = sysManager.readAppSubFile()
@@ -45,8 +50,8 @@ class BatchFileManager: NSObject {
             guard let strongSelf = self else { return }
             strongSelf.downloadNewFile(fileName: fileName)
         }).disposed(by: disposeBag)
-        
     }
+    
     //根据文件名获取app名称
     func currentAppName(fileName: String) -> String {
         return appNames[fileName] ?? ""
@@ -104,10 +109,10 @@ class BatchFileManager: NSObject {
     }
     //扫码下载app
     func scanToDownloadApp(fileName: String, dict: [String:Any]) {
-        batchManager.addAPPFromScan(fileName: fileName, dict: dict)
-        batchManager.updateScanType(fileName: fileName)
+        BatchFileManager.shared.addAPPFromScan(fileName: fileName, dict: dict)
+        BatchFileManager.shared.updateScanType(fileName: fileName)
         RefreshManager.saveLastUpdateTime(fileName: fileName, time: Date().timeStamp)
-        batchManager.writeUpdateContent(fileName: fileName, json: dict)
+        BatchFileManager.shared.writeUpdateContent(fileName: fileName, json: dict)
     }
 
     //定时刷新

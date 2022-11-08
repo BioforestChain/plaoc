@@ -9,8 +9,6 @@ import UIKit
 import ZLPhotoBrowser
 import Photos
 
-let photoManager = PhotoManager()
-
 class PhotoManager: NSObject {
     
     private var isPermissioned: Bool = false
@@ -18,32 +16,27 @@ class PhotoManager: NSObject {
     private var assets: [PHAsset] = []
     private var images: [UIImage] = []
     
-    private func permissioned() {
-        permissionManager.startPermissionAuthenticate(type: .photo, isSet: true) { [weak self] result in
-            guard let strongSelf = self else { return }
-            strongSelf.isPermissioned = result
+    private func permissioned(action: @escaping (() -> Void)) {
+        permissionManager.startPermissionAuthenticate(type: .photo, isSet: true) { result in
+            if result {
+                action()
+            }
         }
     }
     //通过图片路径保存到相册
     func savePhoto(urlString: String) {
-        permissioned()
-        guard isPermissioned else { return }
-        DispatchQueue.global().async {
-            guard let imgUrl = URL(string: urlString) else { return }
-            if let imageData = try? Data(contentsOf: imgUrl) {
-                let img = UIImage(data: imageData)
-                DispatchQueue.main.async {
-                    guard img != nil else { return }
-                    UIImageWriteToSavedPhotosAlbum(img!, self, #selector(self.saveImage(image:didFinishSavingWithError:contextInfo:)), nil)
+        permissioned {
+            DispatchQueue.global().async {
+                guard let imgUrl = URL(string: urlString) else { return }
+                if let imageData = try? Data(contentsOf: imgUrl) {
+                    let img = UIImage(data: imageData)
+                    DispatchQueue.main.async {
+                        guard img != nil else { return }
+                        UIImageWriteToSavedPhotosAlbum(img!, self, #selector(self.saveImage(image:didFinishSavingWithError:contextInfo:)), nil)
+                    }
                 }
             }
         }
-    }
-    //把图片保存到相册
-    func savePhtot(image: UIImage) {
-        permissioned()
-        guard isPermissioned else { return }
-        UIImageWriteToSavedPhotosAlbum(image, self, #selector(self.saveImage(image:didFinishSavingWithError:contextInfo:)), nil)
     }
     
     @objc private func saveImage(image: UIImage, didFinishSavingWithError error: NSError?, contextInfo: AnyObject) {
@@ -53,54 +46,87 @@ class PhotoManager: NSObject {
             print("保存成功")
         }
     }
+    //获取相册图片
+    func fetchTotalPhotos() -> [UIImage] {
+        
+        generateImagesFromPhoto()
+        return images
+    }
+    //获取相册图片转base64
+    func fetchBase64Photos() -> [String] {
+        generateImagesFromPhoto()
+        guard images.count > 0 else { return [] }
+        let results = images.map { $0.imageToBase64() }
+        return results
+    }
+    
+    private func generateImagesFromPhoto() {
+        permissioned {
+            let photosOptions = PHFetchOptions()
+            photosOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
+            photosOptions.predicate = NSPredicate(format: "mediaType = %d",
+                                                  PHAssetMediaType.image.rawValue)
+            let assets = PHAsset.fetchAssets(with: .image, options: photosOptions)
+            let imageManager = PHCachingImageManager()
+            imageManager.stopCachingImagesForAllAssets()
+            for i in 0..<assets.count {
+                let asset = assets[i]
+                imageManager.requestImage(for: asset, targetSize: CGSize(width: 36, height: 36), contentMode: .aspectFill, options: nil) { image, info in
+                    if image != nil {
+                        self.images.append(image!)
+                    }
+                }
+            }
+        }
+    }
     
     //拍照功能
     func startPrimordialCamera(controller: UIViewController) {
-        permissioned()
-        guard isPermissioned else { return }
-        if UIImagePickerController.isSourceTypeAvailable(.camera) {
-            let picker = UIImagePickerController()
-            picker.delegate = self
-            picker.sourceType = .camera
-            picker.allowsEditing = true
-            controller.present(picker, animated: true)
+        permissioned {
+            if UIImagePickerController.isSourceTypeAvailable(.camera) {
+                let picker = UIImagePickerController()
+                picker.delegate = self
+                picker.sourceType = .camera
+                picker.allowsEditing = true
+                controller.present(picker, animated: true)
+            }
         }
     }
     //从相册中选取图片/视频
     func fetchPhAssetsFromLibraya(isScan: Bool = false, controller: UIViewController, callback: @escaping (([UIImage]) -> Void)) {
-        permissioned()
-        guard isPermissioned else { return }
         
-        let config = ZLPhotoConfiguration.default()
-        config.allowSelectGif = false
-        config.allowSelectOriginal = false
-        config.cropVideoAfterSelectThumbnail = false
-        config.allowEditVideo = false
-        config.showSelectBtnWhenSingleSelect = true
-        if isScan {
-            config.maxSelectCount = 1
-            config.allowSelectVideo = false
-        }
-        
-        let photoPicker = ZLPhotoPreviewSheet(selectedAssets: assets)
-        
-        photoPicker.selectImageBlock = { [weak self] (photos, isSelectOriginal) in
-            guard let strongSelf = self else { return }
-            strongSelf.assets.removeAll()
-            strongSelf.images.removeAll()
-            for photo in photos {
-                strongSelf.assets.append(photo.asset)
-                strongSelf.images.append(photo.image)
-                if photo.asset.mediaType.rawValue == 2 {
-                    //获取视频地址
-                    ZLVideoManager.exportVideo(for: photo.asset) { url, error in
-                        
+        permissioned {
+            let config = ZLPhotoConfiguration.default()
+            config.allowSelectGif = false
+            config.allowSelectOriginal = false
+            config.cropVideoAfterSelectThumbnail = false
+            config.allowEditVideo = false
+            config.showSelectBtnWhenSingleSelect = true
+            if isScan {
+                config.maxSelectCount = 1
+                config.allowSelectVideo = false
+            }
+            
+            let photoPicker = ZLPhotoPreviewSheet(selectedAssets: self.assets)
+            
+            photoPicker.selectImageBlock = { [weak self] (photos, isSelectOriginal) in
+                guard let strongSelf = self else { return }
+                strongSelf.assets.removeAll()
+                strongSelf.images.removeAll()
+                for photo in photos {
+                    strongSelf.assets.append(photo.asset)
+                    strongSelf.images.append(photo.image)
+                    if photo.asset.mediaType.rawValue == 2 {
+                        //获取视频地址
+                        ZLVideoManager.exportVideo(for: photo.asset) { url, error in
+                            
+                        }
                     }
                 }
+                callback(strongSelf.images)
             }
-            callback(strongSelf.images)
+            photoPicker.showPhotoLibrary(sender: controller)
         }
-        photoPicker.showPhotoLibrary(sender: controller)
     }
     //获取本地视频截图
     private func generatorLocalVedioImage(url: URL?) -> UIImage? {
