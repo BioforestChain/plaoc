@@ -21,8 +21,6 @@ class FirstViewController: UIViewController {
 
         self.view.backgroundColor = .white
         
-//        batchManager.initBatchFile()
-        
         appNames = BatchFileManager.shared.appFilePaths
         
         for i in stride(from: 0, to: appNames.count + 1, by: 1) {
@@ -117,6 +115,7 @@ class FirstViewController: UIViewController {
         } else if type == .scan {
             BatchFileManager.shared.clickRecommendAppAction(fileName: name)
         }
+ 
     }
     
     func addScanAppUI(name: String) {

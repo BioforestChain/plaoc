@@ -40,6 +40,8 @@ import JavaScriptCore
             return executiveGetDeviceInfo(param: param)
         case "SendNotification":
             return executiveSendNotification(param: param)
+        case "GetNotification":
+            return executiveGetNotification(param: param)
         case "ApplyPermissions":
             return executiveApplyPermissions(param: param)
         case "isDenoRuntime":
@@ -90,6 +92,10 @@ extension PlaocHandleModel {
     }
     //发送消息
     private func executiveSendNotification(param: String) -> String {
+        return ""
+    }
+    //获取推送消息列表
+    private func executiveGetNotification(param: String) -> String {
         return ""
     }
     //申请权限

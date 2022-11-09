@@ -109,10 +109,10 @@ class BatchFileManager: NSObject {
     }
     //扫码下载app
     func scanToDownloadApp(fileName: String, dict: [String:Any]) {
-        BatchFileManager.shared.addAPPFromScan(fileName: fileName, dict: dict)
-        BatchFileManager.shared.updateScanType(fileName: fileName)
+        self.addAPPFromScan(fileName: fileName, dict: dict)
+        self.updateScanType(fileName: fileName)
         RefreshManager.saveLastUpdateTime(fileName: fileName, time: Date().timeStamp)
-        BatchFileManager.shared.writeUpdateContent(fileName: fileName, json: dict)
+        self.writeUpdateContent(fileName: fileName, json: dict)
     }
 
     //定时刷新
