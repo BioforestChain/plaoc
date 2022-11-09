@@ -1,5 +1,3 @@
-import { netCallNativeService } from "@bfsx/gateway";
-
 import { GET_NOTIFICATION, NOTIFICATION_MESSAGE_PUSH } from "./constants.ts";
 import { messageToQueue } from "./message_queue.ts";
 import { messagePush } from "./message_push.ts";
@@ -93,6 +91,9 @@ export function loopRustNotification() {
  * @returns
  */
 export async function netCallNativeNotification(timeout = 3000) {
+  // dnt-shim-ignore
+  const jscore = (window as any)
+    .PlaocJavascriptBridge as types.PlaocJavascriptBridge;
   let isLocked = false;
   const listener = async () => {
     isLocked = true;
@@ -100,7 +101,7 @@ export async function netCallNativeNotification(timeout = 3000) {
     isLocked = false;
   };
   const polling = async () => {
-    const messageString = await netCallNativeService(GET_NOTIFICATION);
+    const messageString = await jscore.callJavaScriptWith(GET_NOTIFICATION);
 
     if (messageString) {
       const messages = JSON.parse(messageString);
