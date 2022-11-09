@@ -24,29 +24,6 @@ fun ByteArray.toHexString(): String {
 }
 
 /**
- * 数据资源拦截
- */
-fun dataGateWay(
-  request: WebResourceRequest
-): Response {
-  val url = request.url.toString().lowercase(Locale.ROOT)
-//  Log.i(TAG, " dataGateWay: $url")
-  if (front_to_rear_map.contains(url)) {
-    val trueUrl = front_to_rear_map[url]
-    Log.i(TAG, " dataGateWay front_to_rear_map.contains: $trueUrl")
-    return try {
-      val connection = URL(trueUrl).openConnection() as HttpURLConnection
-      connection.requestMethod = request.method
-      Log.i(TAG, " dataGateWay connection.inputStream: ${connection.inputStream}")
-      Response(true, connection.inputStream.toString())
-    } catch (e: Exception) { // 处理用户在配置文件里写的资源或服务，但实际没有引发webview崩溃重载的情况
-      Response(false, "This data service could not be found")
-    }
-  }
-  return Response(false, "No permission, need to go to the backend configuration")
-}
-
-/**
  * 传递dwebView到deno的消息,单独对转发给deno-js 的请求进行处理
  * https://channelId.bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj.dweb/poll
  */
@@ -63,6 +40,7 @@ fun uiGateWay(
 ): String {
   val stringData = String(hexStrToByteArray(stringHex))
   Log.i(TAG, " uiGateWay: $stringData")
+  if (stringData.isEmpty()) return ""
   mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true) // 允许使用单引号包裹字符串
   val handle = mapper.readValue(stringData, JsHandle::class.java)
   val funName = ExportNativeUi.valueOf(handle.function);
@@ -125,11 +103,3 @@ fun registerChannelId(): WebResourceResponse {
     ByteArrayInputStream(newId.toString().toByteArray())
   )
 }
-
-data class RespondWith(
-  val result:String = "",
-  val channelId: String = "",
-  val headers: String = "",
-  val status: Number = 200,
-  val statusText:String = "success"
-)

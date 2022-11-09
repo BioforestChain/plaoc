@@ -4,6 +4,8 @@
     "@bfsx/core": "../../../../bfsa-std/packages/core/index.ts",
     "@bfsx/vfs": "../../../../bfsa-std/packages/vfs/index.ts",
     "@bfsx/typings": "../../../../bfsa-std/packages/typings/index.ts",
-    "@bfsx/vfs/path": "../../../../bfsa-std/packages/vfs/path/index.ts"
+    "@bfsx/vfs/path": "../../../../bfsa-std/packages/vfs/path/index.ts",
+    "!event-base/message": "https://deno.land/x/bnqkl_util@1.1.2/packages/event-base/message@node.ts",
+    "!platform/diff": "https://deno.land/x/bnqkl_util@1.1.2/packages/platform/diff@node.ts"
   }
 }

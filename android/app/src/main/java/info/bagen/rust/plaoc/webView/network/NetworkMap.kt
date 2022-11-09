@@ -42,6 +42,11 @@ fun interceptNetworkRequests(
     if (temp.startsWith("chunk")) {
       //拦截转发到后端的事件
       messageGateWay(path)
+      return WebResourceResponse(
+        "application/json",
+        "utf-8",
+        ByteArrayInputStream(JsonUtil.toJson(Response(true,"请求成功！")).toByteArray())
+      )
     }
     if (jumpWhitelist(url)) {
       // 拦截视图文件
@@ -50,6 +55,7 @@ fun interceptNetworkRequests(
       }
       // 映射本地文件的资源文件 https://bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj.dweb/index.mjs -> /plaoc/index.mjs
       if (Regex(dWebView_host.lowercase(Locale.ROOT)).containsMatchIn(url)) {
+        println("本地文件url==>$url")
         return customUrlScheme.handleRequest(request, path)
       }
     }
@@ -59,24 +65,6 @@ fun interceptNetworkRequests(
     "utf-8",
     ByteArrayInputStream(JsonUtil.toJson(Response(false)).toByteArray())
   )
-}
-
-/** 发送真正的请求到serviceWorker*/
-fun networkResponse(
-  channelId: String,
-  headers: String,
-  result: String = "",
-  status: Number = 200,
-  statusText: String = "success"
-) {
-  println("networkResponse channelId:$channelId result: $result")
-
-  val hexResult = result.encodeToByteArray().toHexString()
-  sendToJavaScript("navigator.serviceWorker.controller.postMessage('${channelId}:false:${hexResult}')")
-
-  // 消息传递结束
-  val hexData = "${headers}|${status}|${statusText}".encodeToByteArray().toHexString()
-  sendToJavaScript("navigator.serviceWorker.controller.postMessage('${channelId}:true:${hexData}')")
 }
 
 

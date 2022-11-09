@@ -69,8 +69,8 @@ getBlockInfo()
 async function getBlockInfo() {
   fetch('/getBlockInfo', {
     headers: { 'Content-type': 'application/json' },
-  }).then(res => res.json()).then((response) => {
-    console.log({ response })
+  }).then(res => res.json()).then(async (response) => {
+    console.log("我是getBlockInfo：", await response.text())
   }).catch((error) => {
     console.log('Looks like there was a problem: \n', error);
   });

@@ -64,12 +64,6 @@ fun splicingPath(bfsId:String, entry:String):String {
   callable_map[ExportNative.SetDWebViewUI] = {
     uiGateWay(it)
   }
-  // 返回数据给DWebView-js
-  callable_map[ExportNative.CallSWMessage] = {
-    val handle = mapper.readValue(it, RespondWith::class.java)
-    networkResponse(handle.channelId,handle.headers,
-      handle.result,handle.status,handle.statusText)
-  }
   callable_map[ExportNative.DenoRuntime] = {
     denoService.denoRuntime(it)
   }
@@ -77,6 +71,7 @@ fun splicingPath(bfsId:String, entry:String):String {
     println("ReadOnlyRuntime：$it")
     denoService.onlyReadRuntime(App.appContext.assets,it)
   }
+  // 返回数据给DWebView-js
   callable_map[ExportNative.EvalJsRuntime] =
     { sendToJavaScript(it) }
   /** fs System*/
