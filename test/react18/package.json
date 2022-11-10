@@ -11,8 +11,8 @@
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "@bfsx/plugin": "file:../../../bfsa-std/build/plugin",
-    "@bfsx/plugin-typed-react": "file:../../../bfsa-plugin-typed/build/react"
+    "@bfsx/plugin": "^0.1.6",
+    "@bfsx/plugin-typed-react": "^0.0.3"
   },
   "devDependencies": {
     "@types/react": "^18.0.24",
