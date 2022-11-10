@@ -5,7 +5,6 @@ import HelloWorld from './components/HelloWorld.vue'
 import System_api from './view/system_api.vue';
 import Dialogs from './view/dialogs.vue';
 import { ref, defineComponent, reactive, onMounted } from 'vue';
-import { BfcsTopBar, OpenScanner } from '@bfsx/plugin';
 import { IonFab, IonFabButton, IonFabList, IonIcon } from '@ionic/vue';
 import {
   cartOutline,
@@ -13,6 +12,16 @@ import {
   logoTwitter,
   logoVimeo,
 } from 'ionicons/icons';
+import { BfcsTopBar, OpenScanner } from "@bfsx/plugin";
+import {
+  DwebTopBar,
+  DwebTopBarButton,
+  DwebBottomBar,
+  DwebBottomBarButton,
+  DwebBottomBarIcon,
+  DwebBottomBarText,
+  DwebIcon,
+} from "@bfsx/plugin-typed-vue";
 
 defineComponent({
   components: { IonFab, IonFabButton, IonFabList, IonIcon }
@@ -98,7 +107,7 @@ async function getBlockInfo() {
 
   <dweb-top-bar id="topbar" title="Ar 扫雷" background-color="#eee" foreground-color="#000" overlay="0.4">
 
-    <dweb-top-bar-button id="aaa" @click="openBarScanner">
+    <dweb-top-bar-button id="aaa" disabled @click="openBarScanner">
       <dweb-icon source="Filled.AddCircle"></dweb-icon>
     </dweb-top-bar-button>
     <dweb-top-bar-button id="ccc">
