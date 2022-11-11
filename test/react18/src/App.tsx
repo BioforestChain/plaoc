@@ -6,7 +6,7 @@ import "@bfsx/plugin-typed-react";
 
 function App() {
   const [count, setCount] = useState(0);
-  const [scannerData] = useState({
+  const [scannerData, setScannerData] = useState({
     value: "DwebView-js ♻️ Deno-js",
   });
 
@@ -17,7 +17,10 @@ function App() {
       "scannerData.value = await scanner.openQrCodeScanner() -->",
       JSON.stringify(iter)
     );
-    scannerData.value = iter;
+    // scannerData.value = iter;
+    setScannerData(({ value }) => {
+      return { value: iter };
+    });
   }
 
   async function openBarScanner() {
@@ -27,7 +30,9 @@ function App() {
       "scannerData.value = await scanner.openBarCodeScanner() -->",
       JSON.stringify(iter)
     );
-    scannerData.value = iter;
+    setScannerData(({ value }) => {
+      return { value: iter };
+    });
   }
 
   async function init() {
@@ -91,9 +96,6 @@ function App() {
   return (
     <div className="App">
       <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
         <a href="https://reactjs.org" target="_blank">
           <img src={reactLogo} className="logo react" alt="React logo" />
         </a>
