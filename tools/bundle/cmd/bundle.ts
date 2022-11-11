@@ -5,7 +5,7 @@ import { Files, LinkMetadata, MetaData } from "@bfsx/metadata";
 import { path, slash, appendForwardSlash } from "path";
 import { checksumFile } from "crypto";
 import { compressToSuffixesBfsa } from "compress";
-import { build } from "rollup-bundle";
+import { build, buildSw } from "rollup-bundle";
 
 import type * as types from "@bfsx/typings";
 import type { IAppversion } from "../types/appversion.type.ts";
@@ -118,20 +118,11 @@ async function copyDir(src: string, dest: string) {
  * @returns
  */
 async function writeServiceWorker(destPath: string): Promise<boolean> {
-  const file = path.join(destPath, "serviceWorker.js");
-
-  // TODO: 暂时没想到好的方法
+  // // TODO: 暂时没想到好的方法
   const url = new URL("./bundle.js", import.meta.url);
   const filePath = path.dirname(fileURLToPath(url.href));
-  let content = await readFile(
-    path.resolve(
-      filePath,
-      "../../node_modules/@bfsx/gateway/esm/serviceWorker.js"
-    ),
-    "utf-8"
-  );
-  content = content.replace(/export/g, "");
-  await writeFile(file, content, "utf-8");
+
+  await buildSw(filePath, destPath);
 
   return true;
 }

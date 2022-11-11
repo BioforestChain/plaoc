@@ -32,7 +32,8 @@ object ClipboardUtil {
     var clipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
     // 获取剪贴板的剪贴数据集
     var clipData = clipboardManager.primaryClip;
-    if (clipData != null && clipData!!.itemCount > 0) {
+
+    if (clipData != null && clipData!!.itemCount > 0 && clipData!!.getItemAt(0).text != null) {
       return clipData!!.getItemAt(0).text.toString()
     }
     return null

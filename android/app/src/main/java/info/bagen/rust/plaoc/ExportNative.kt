@@ -7,7 +7,6 @@ enum class ExportNative(val type: String) {
   OpenDWebView("openDWebView"),
   InitMetaData("initMetaData"),
   SetDWebViewUI("setDWebViewUI"),
-  CallSWMessage("callSWMessage"),
   DenoRuntime("denoRuntime"),
   ReadOnlyRuntime("readOnlyRuntime"),
   EvalJsRuntime("evalJsRuntime"),
