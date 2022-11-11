@@ -42,6 +42,7 @@ class BottomBarFFI(
   }
 
   fun getHeight(): Float {
+    println("state.height.value${state.height.value}",)
     return state.height.value ?: 0F
   }
 

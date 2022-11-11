@@ -48,6 +48,7 @@ fun uiGateWay(
   val result = call_ui_map[funName]?.let { it ->
     it(handle.data)
   }
+  println("uiGateWayFunction:$funName = $result")
   createBytesFactory(ExportNative.SetDWebViewUI, result.toString())
   return result.toString()
 }
