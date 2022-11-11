@@ -2,6 +2,7 @@ package info.bagen.libappmgr.ui.dcim
 
 import android.annotation.SuppressLint
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -27,17 +28,16 @@ import java.io.File
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
-fun VideScreen(dcimVM: DCIMViewModel, path: String) {
-  var exoPlayerData: ExoPlayerData? = null
-  dcimVM.resetExoPlayerList() // 重置所有的视频
-  if (dcimVM.exoMaps.containsKey(path)) {
-    exoPlayerData = dcimVM.exoMaps[path]
-  } else {
+fun VideoScreen(dcimVM: DCIMViewModel, path: String, page: Int) {
+  dcimVM.resetExoPlayerList(page) // 重置所有的视频
+  var exoPlayerData = dcimVM.exoMaps[page]
+  if (exoPlayerData == null) {
     exoPlayerData = ExoPlayerData(
       exoPlayer = SimpleExoPlayer.Builder(LocalContext.current).build()
         .apply { playWhenReady = false },
       playerState = mutableStateOf(PlayerState.Play)
     )
+    Log.d("lin.huang", "PlayerControlView -> ${exoPlayerData.exoPlayer}:$page:$path")
     exoPlayerData.exoPlayer.setMediaItem(MediaItem.fromUri(Uri.fromFile(File(path))))
     exoPlayerData.exoPlayer.addAnalyticsListener(object : AnalyticsListener {
       override fun onPlayWhenReadyChanged(
@@ -63,7 +63,7 @@ fun VideScreen(dcimVM: DCIMViewModel, path: String) {
         }
       }
     })
-    dcimVM.exoMaps[path] = exoPlayerData
+    dcimVM.exoMaps[page] = exoPlayerData
   }
   Box(modifier = Modifier.fillMaxSize()) {
     AndroidView(
@@ -91,6 +91,7 @@ fun VideScreen(dcimVM: DCIMViewModel, path: String) {
 
 @Composable
 fun BoxScope.PlayerControlView(exoPlayerData: ExoPlayerData) {
+  Log.d("lin.huang", "PlayerControlView -> ${exoPlayerData.exoPlayer}")
   Box(
     modifier = Modifier
       .fillMaxWidth()

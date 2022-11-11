@@ -1,30 +1,27 @@
 package info.bagen.libappmgr.entity
 
-import android.graphics.Bitmap
 import android.media.MediaMetadataRetriever
 import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import com.google.android.exoplayer2.SimpleExoPlayer
+import info.bagen.libappmgr.system.media.MediaInfo
+import info.bagen.libappmgr.system.media.getDurationOfMinute
+import info.bagen.libappmgr.system.media.toByteArray
 import java.io.File
 import java.util.*
 
 data class DCIMInfo(
   val path: String,
+  val id: Int = 0,
   val type: DCIMType = DCIMType.IMAGE,
   val name: String = "",
-  val time: Long = 0L, // 用于表示文件时间
+  val time: Int = 0, // 用于表示文件时间
   val checked: MutableState<Boolean> = mutableStateOf(false),
   val index: MutableState<Int> = mutableStateOf(0),
   var duration: MutableState<Int> = mutableStateOf(0), // 如果是视频，需要加载时长
-  var bitmap: Bitmap? = null, // 如果是视频，用于显示某一帧的图片
+  var bitmap: ByteArray? = null, // 如果是视频，用于显示某一帧的图片
   var overlay: MutableState<Boolean> = mutableStateOf(false), // 主要是为了在预览模式下，显示的图片不直接删除，而是改为白色覆盖
-  // var mime: String? = null, // 类型
-  //var title: String? = null, // 标题
-  //var album: String? = null, // 专辑
-  //var artist: String? = null, // 作者
-  //var bitrate: String? = null, // bit/s api>=14
-  //var date: String? = null,
 )
 
 data class DCIMSpinner(
@@ -35,7 +32,7 @@ data class DCIMSpinner(
 )
 
 enum class DCIMType {
-  IMAGE, GIF, VIDEO, OTHER
+  IMAGE, SVG, GIF, VIDEO, OTHER
 }
 
 // 视频状态
@@ -48,6 +45,10 @@ data class ExoPlayerData(
   var playerState: MutableState<PlayerState>
 )
 
+fun MediaInfo.createDCIMInfo() : DCIMInfo {
+  return DCIMInfo(path = this.path)
+}
+
 /**
  * 更新视频的时间
  */
@@ -57,11 +58,8 @@ fun DCIMInfo.updateDuration() {
     try {
       mmr = MediaMetadataRetriever()
       mmr.setDataSource(path)
-      bitmap = mmr.frameAtTime
-      //Log.d("lin.huang", "updateDuration $path->$bitmap")
-      duration.value =
-        mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toInt()?.div(1000)
-          ?: 0
+      bitmap = mmr.frameAtTime?.toByteArray()
+      duration.value = mmr.getDurationOfMinute()
       // mime = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE)
       // title = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE)
       // album = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM)
@@ -121,6 +119,8 @@ object MediaFile {
   private val FIRST_IMAGE_FILE_TYPE = FILE_TYPE_JPEG
   private val LAST_IMAGE_FILE_TYPE = FILE_TYPE_WBMP
 
+  val FILE_TYPE_SVG = 41
+
   // Playlist file types
   val FILE_TYPE_M3U = 51
   val FILE_TYPE_PLS = 52
@@ -171,6 +171,8 @@ object MediaFile {
     addFileType("PNG", FILE_TYPE_PNG, "image/png")
     addFileType("BMP", FILE_TYPE_BMP, "image/x-ms-bmp")
     addFileType("WBMP", FILE_TYPE_WBMP, "image/vnd.wap.wbmp")
+
+    addFileType("SVG", FILE_TYPE_SVG, "image/svg+xml")
 
     addFileType("M3U", FILE_TYPE_M3U, "audio/x-mpegurl")
     addFileType("PLS", FILE_TYPE_PLS, "audio/x-scpls")
@@ -241,6 +243,7 @@ object MediaFile {
         FILE_TYPE_GIF -> DCIMType.GIF
         in FIRST_VIDEO_FILE_TYPE..LAST_VIDEO_FILE_TYPE -> DCIMType.VIDEO
         in FIRST_IMAGE_FILE_TYPE..LAST_IMAGE_FILE_TYPE -> DCIMType.IMAGE
+        FILE_TYPE_SVG -> DCIMType.SVG
         else -> {
           DCIMType.OTHER
         }
@@ -253,7 +256,7 @@ object MediaFile {
       path = path,
       type = getDCIMType(path),
       name = path.substring(path.lastIndexOf("/") + 1),
-      time = File(path).lastModified()
+      time = (File(path).lastModified() / 1000).toInt()
     )
   }
 }

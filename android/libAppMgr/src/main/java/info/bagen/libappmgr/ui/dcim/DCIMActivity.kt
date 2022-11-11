@@ -125,6 +125,7 @@ class DCIMActivity : ComponentActivity() {
 
   override fun onDestroy() {
     dcimViewModel.clearExoPlayerList()
+    dcimViewModel.clearJobList()
     super.onDestroy()
   }
 

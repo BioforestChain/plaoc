@@ -3,6 +3,9 @@ package info.bagen.libappmgr.utils
 import android.os.Build
 import info.bagen.libappmgr.entity.AppInfo
 import info.bagen.libappmgr.entity.DAppInfo
+import info.bagen.libappmgr.system.media.MediaInfo
+import info.bagen.libappmgr.system.media.MediaType
+import info.bagen.libappmgr.system.media.loadThumbnail
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
@@ -17,6 +20,7 @@ enum class APP_DIR_TYPE(val rootName: String) {
 
   // 客户应用
   UserApp(rootName = "user-app"),
+
   // Assets
   AssetsApp(rootName = ""),
 }
@@ -353,11 +357,12 @@ object FilesUtil {
   fun getDAppInfo(appInfo: AppInfo): DAppInfo? {
     return getDAppInfo(appInfo.bfsAppId)
   }
+
   /**
    * 获取DAppInfo的版本信息
    */
   fun getDAppInfo(bfsAppId: String, appType: APP_DIR_TYPE = APP_DIR_TYPE.SystemApp): DAppInfo? {
-    val content = when(appType) {
+    val content = when (appType) {
       APP_DIR_TYPE.AssetsApp -> {
         AppContextUtil.sInstance!!.assets.open("$bfsAppId/$DIR_BOOT/$FILE_BFSA_META_JSON")
           .bufferedReader().use { it.readText() }
@@ -370,6 +375,46 @@ object FilesUtil {
     }
     return JsonUtil.getDAppInfoFromBFSA(content)
   }
+
+  /**
+   * 获取 DCIM和Picture下面的相册信息
+   */
+  fun getMediaInfoList(arrayList: ArrayList<File>): HashMap<String, ArrayList<MediaInfo>> {
+    val maps = hashMapOf<String, ArrayList<MediaInfo>>()
+    arrayList.forEach { path ->
+      traverseDCIM(path.absolutePath, maps)
+    }
+    return maps
+  }
+
+  /**
+   * 遍历当前目录及其子目录所有文件
+   */
+  private fun traverseDCIM(path: String, maps: HashMap<String, ArrayList<MediaInfo>>) {
+    var defaultPicture = "Pictures"
+    if (!maps.containsKey(defaultPicture)) maps[defaultPicture] =
+      arrayListOf() // 默认先创建一个图片目录，用于保存根目录存在的图片
+    File(path).listFiles()?.forEach inLoop@{ file ->
+      var name = file.name
+      if (name.startsWith(".")) return@inLoop // 判断第一个字符如果是. 不执行当前文件，直接continue
+      if (file.isFile) {
+        // 判断文件是否符合要求，如果符合，添加到maps
+        file.createMediaInfo()?.let { maps[defaultPicture]!!.add(it) }
+      } else if (file.isDirectory) {
+        var list = maps[name] ?: arrayListOf()
+        file.walk().iterator().forEach subLoop@{ subFile ->
+          if (subFile.name.startsWith(".")) return@subLoop
+          if (subFile.isFile) {
+            // 判断文件是否符合要求，如果符合，添加到list
+            subFile.createMediaInfo()?.let { list.add(it) }
+          }
+        }
+        if (list.isNotEmpty() && !maps.containsKey(name)) {
+          maps[name] = list // 判断list不为空，并且不在map中，进行添加
+        }
+      }
+    }
+  }
 }
 
 fun String.parseFilePath(): String {
@@ -381,3 +426,40 @@ fun String.parseFilePath(): String {
   }
   return this
 }
+
+fun File.createMediaInfo(): MediaInfo? {
+  var mediaInfo: MediaInfo? = null
+  val lastDot = this.absolutePath.lastIndexOf(".")
+  var suffix = if (lastDot < 0) "null"
+  else this.absolutePath.substring(lastDot + 1).uppercase(Locale.getDefault())
+  getFileType(suffix)?.let {
+    mediaInfo = MediaInfo(type = it, path = absolutePath)
+    mediaInfo?.time = (lastModified()/1000).toInt() // 获取文件的最后修改时间
+    mediaInfo?.loadThumbnail()
+  }
+  return mediaInfo
+}
+
+private fun getFileType(suffix: String): String? {
+  var first: String? = null
+  when (suffix) {
+    "MP4", "M4V", "3GP", "3GPP", "3G2", "3GPP2" -> {
+      first = MediaType.Video.name
+    }
+    "JPG", "JPEG", "PNG", "BMP", "WBMP" -> {
+      first = MediaType.Image.name
+    }
+    "SVG" -> {
+      first = MediaType.Svg.name
+    }
+    "GIF" -> {
+      first = MediaType.Gif.name
+    }
+    else -> {
+      first = null
+    }
+  }
+  return first
+}
+
+
