@@ -18,9 +18,7 @@ function App() {
       JSON.stringify(iter)
     );
     // scannerData.value = iter;
-    setScannerData(({ value }) => {
-      return { value: iter };
-    });
+    setScannerData({ value: iter });
   }
 
   async function openBarScanner() {
@@ -30,9 +28,7 @@ function App() {
       "scannerData.value = await scanner.openBarCodeScanner() -->",
       JSON.stringify(iter)
     );
-    setScannerData(({ value }) => {
-      return { value: iter };
-    });
+    setScannerData({ value: iter });
   }
 
   async function init() {
