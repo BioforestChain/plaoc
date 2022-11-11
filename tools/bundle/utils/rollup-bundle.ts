@@ -26,3 +26,27 @@ export async function build(options: {
 
   return `sys/backend-${bfsAppId}/index.js`;
 }
+
+/**
+ * 编译serviceWorker
+ * @returns
+ */
+export async function buildSw(cwd: string, dest: string) {
+  const entryFile = path.resolve(
+    cwd,
+    "../../node_modules/@bfsx/sw/esm/serviceWorker.js"
+  );
+
+  const bundle = await rollup({
+    input: entryFile,
+    plugins: [nodeResolve()],
+  });
+
+  const outputFile = path.join(dest, "./serviceWorker.js");
+
+  await bundle.write({
+    file: outputFile,
+  });
+
+  return;
+}

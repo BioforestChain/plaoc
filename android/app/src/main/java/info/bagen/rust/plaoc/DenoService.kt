@@ -122,8 +122,8 @@ fun parseBytesFactory(bytes: ByteArray): Pair<ByteArray,String> {
     val message = bytes.sliceArray(3 until bytes.size)
     version_head_map[headId] = versionId // 存版本号
     val stringData = String(message)
-    Log.d("bytesFactory", "now versionId :${versionId}")
-    Log.d("bytesFactory", "now headId:${headId}")
+    Log.d("bytesFactory", "now versionId :${versionId[0]}")
+    Log.d("bytesFactory", "now headId:${headId[0]}")
     Log.d("bytesFactory", "now message says:$stringData")
     return Pair(headId, stringData)
 }
@@ -141,7 +141,7 @@ fun createBytesFactory(callFun: ExportNative, message: String) {
     // 移除使用完的标记
     rust_call_map.remove(callFun)
     version_head_map.remove(headId)
-  println("ExportNative.CreateNotificationMsg,$message")
+  println("ExportNative.CreateNotificationMsg:${callFun}:${headId[0]},$message")
   thread {
       denoService.backSystemDataToRust(result.array())
     }

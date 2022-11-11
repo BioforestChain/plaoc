@@ -48,6 +48,7 @@ fun uiGateWay(
   val result = call_ui_map[funName]?.let { it ->
     it(handle.data)
   }
+  println("uiGateWayFunction:$funName = $result")
   createBytesFactory(ExportNative.SetDWebViewUI, result.toString())
   return result.toString()
 }
@@ -55,11 +56,11 @@ fun uiGateWay(
 
 // 视图文件拦截
 fun viewGateWay(
-    customUrlScheme: CustomUrlScheme,
-    request: WebResourceRequest
+  customUrlScheme: CustomUrlScheme,
+  request: WebResourceRequest
 ): WebResourceResponse {
   var url = request.url.toString().lowercase(Locale.ROOT)
-  if(url.contains("?")){
+  if (url.contains("?")) {
     url = url.split("?", limit = 2)[0];
   }
   Log.i(TAG, " viewGateWay: $url,contains: ${front_to_rear_map.contains(url)}")

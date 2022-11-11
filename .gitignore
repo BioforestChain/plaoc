@@ -22,7 +22,7 @@ local.properties
 **build
 /plaoc/yarn-error.log
 resource_3rd
-recommend-app
+# recommend-app
 Pods
 android/app/src/main/assets/*
 

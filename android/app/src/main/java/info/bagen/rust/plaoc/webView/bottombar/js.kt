@@ -42,12 +42,18 @@ class BottomBarFFI(
   }
 
   fun getHeight(): Float {
+    println("state.height.value${state.height.value}",)
     return state.height.value ?: 0F
   }
 
-  fun setHeight(heightDp: String): Float {
-    state.height.value = heightDp.toFloat()
-    return heightDp.toFloat()
+  fun setHeight(heightDp: String): String {
+    try {
+      state.height.value = heightDp.toFloat()
+    } catch (e:Exception) {
+      println(e.message)
+      return "请不要乱传递:${e.message}"
+    }
+    return heightDp
   }
 
   fun getActions(): DataString<List<BottomBarAction>> {

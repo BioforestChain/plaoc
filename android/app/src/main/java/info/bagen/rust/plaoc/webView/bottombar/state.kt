@@ -46,7 +46,7 @@ class BottomBarState(
                 BottomBarState(
                     enabled = mutableStateOf(null),
                     overlay = mutableStateOf(1.0F),
-                    height = mutableStateOf(null),
+                    height = mutableStateOf(0F),
                     actions = mutableStateListOf(),
                     backgroundColor = bottomBarBackgroundColor,
                     foregroundColor = bottomBarForegroundColor,
