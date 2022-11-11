@@ -13,15 +13,6 @@ import {
   logoVimeo,
 } from 'ionicons/icons';
 import { BfcsTopBar, OpenScanner } from "@bfsx/plugin";
-import {
-  DwebTopBar,
-  DwebTopBarButton,
-  DwebBottomBar,
-  DwebBottomBarButton,
-  DwebBottomBarIcon,
-  DwebBottomBarText,
-  DwebIcon,
-} from "@bfsx/plugin-typed-vue";
 
 defineComponent({
   components: { IonFab, IonFabButton, IonFabList, IonIcon }
