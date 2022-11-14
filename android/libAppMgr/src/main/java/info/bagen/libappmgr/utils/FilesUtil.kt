@@ -1,6 +1,7 @@
 package info.bagen.libappmgr.utils
 
 import android.os.Build
+import android.util.Log
 import info.bagen.libappmgr.entity.AppInfo
 import info.bagen.libappmgr.entity.DAppInfo
 import info.bagen.libappmgr.system.media.MediaInfo
@@ -409,8 +410,8 @@ object FilesUtil {
             subFile.createMediaInfo()?.let { list.add(it) }
           }
         }
-        if (list.isNotEmpty() && !maps.containsKey(name)) {
-          maps[name] = list // 判断list不为空，并且不在map中，进行添加
+        if (list.isNotEmpty()) { // 如果name已存在，添加所有，如果list不存在直接添加到节点
+          maps[name]?.addAll(list) ?: run { maps[name] = list }
         }
       }
     }

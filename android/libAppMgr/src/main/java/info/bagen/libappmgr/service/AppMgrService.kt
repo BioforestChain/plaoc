@@ -7,21 +7,16 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import info.bagen.libappmgr.data.PreferencesHelper
 import info.bagen.libappmgr.database.MediaDBManager
-import info.bagen.libappmgr.ui.dcim.DCIMViewModel
 import info.bagen.libappmgr.utils.FilesUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.launch
-import org.koin.android.ext.android.inject
 import java.io.File
 import java.util.*
-import kotlin.collections.ArrayList
-
 
 class AppMgrService : Service() {
   private val TAG: String = AppMgrService::class.java.simpleName
-  val vm: DCIMViewModel by inject()
   private var mMediaFileObserver: MediaFileObserver? = null
 
   override fun onBind(intent: Intent?): IBinder? {
@@ -50,10 +45,13 @@ class AppMgrService : Service() {
       arrayList.add(Environment.getExternalStoragePublicDirectory("DCIM"))
       arrayList.add(Environment.getExternalStoragePublicDirectory("Pictures"))
       // 将图片数据保存到数据库
+      Log.d(TAG, "initMediaInfo 获取文件列表信息")
       val start = Calendar.getInstance().timeInMillis
-      MediaDBManager.saveMediaInfoList(FilesUtil.getMediaInfoList(arrayList))
+      val maps = FilesUtil.getMediaInfoList(arrayList)
+      Log.d(TAG, "initMediaInfo 将文件转存到数据库")
+      MediaDBManager.saveMediaInfoList(maps)
       val end = Calendar.getInstance().timeInMillis
-      Log.d(TAG, "initMediaInfo countTime=${end - start}")
+      Log.d(TAG, "initMediaInfo 转存耗时=${end - start}ms")
       // 打开文件目录监听
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
         mMediaFileObserver = MediaFileObserver(arrayList)
@@ -71,8 +69,8 @@ class AppMgrService : Service() {
     var mMask = 0
 
     var mThreadName: String = MediaFileObserver::class.java.simpleName
-    var mThread: HandlerThread? = null
-    var mThreadHandler: Handler? = null
+    var mHandlerThread: HandlerThread? = null
+    var mHandler: Handler? = null
 
     companion object {
       private val CREATE_DIRECTORY = 1073742080
@@ -94,25 +92,25 @@ class AppMgrService : Service() {
     }
 
     override fun startWatching() {
-      if (mThread == null || !mThread!!.isAlive) {
-        mThread = HandlerThread(mThreadName)
-        mThread!!.start()
-        mThreadHandler = Handler(mThread!!.looper)
-        mThreadHandler!!.post(Runnable { startRunnable() })
+      if (mHandlerThread == null || !mHandlerThread!!.isAlive) {
+        mHandlerThread = HandlerThread(mThreadName)
+        mHandlerThread!!.start()
+        mHandler = Handler(mHandlerThread!!.looper)
+        mHandler!!.post(Runnable { startRunnable() })
       }
     }
 
     override fun stopWatching() {
-      if (null != mThreadHandler && null != mThread && mThread!!.isAlive) {
-        mThreadHandler!!.post(Runnable { stopRunnable() })
+      if (null != mHandler && null != mHandlerThread && mHandlerThread!!.isAlive) {
+        mHandler!!.post(Runnable { stopRunnable() })
       }
-      mThreadHandler = null
-      mThread!!.quit()
-      mThread = null
+      mHandler = null
+      mHandlerThread!!.quit()
+      mHandlerThread = null
     }
 
     override fun onEvent(event: Int, path: String?) {
-      mThreadHandler?.post(Runnable {
+      mHandler?.post(Runnable {
         when (event) {
           CREATE, CREATE_DIRECTORY -> {
             doCreate(path)

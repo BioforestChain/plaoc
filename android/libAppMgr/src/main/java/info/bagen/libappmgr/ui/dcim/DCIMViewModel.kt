@@ -3,6 +3,7 @@ package info.bagen.libappmgr.ui.dcim
 import android.os.Environment
 import android.util.Log
 import androidx.collection.arrayMapOf
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -25,7 +26,7 @@ class DCIMViewModel : ViewModel() {
 
   var dcimSpinner: DCIMSpinner = DCIMSpinner(name = All) // 表示加载的是都有的图片和视频
   var dcimMaps: HashMap<String, ArrayList<DCIMInfo>> = hashMapOf()
-  val exoMaps = hashMapOf<Int, ExoPlayerData>()
+  val exoPlayerList = arrayListOf<ExoPlayerData>()
 
   private var jobList: ArrayList<Job> = arrayListOf() // 用于保存当前的GlobalScope
 
@@ -53,41 +54,6 @@ class DCIMViewModel : ViewModel() {
   fun clearJobList() {
     jobList.forEach { it.cancel() } // 停止后台继续执行的协程
     dcimMaps.clear()
-  }
-
-  fun clearExoPlayerList() {
-    exoMaps.iterator().forEach {
-      it.value.exoPlayer.release()
-    }
-    exoMaps.clear()
-  }
-
-  fun resetExoPlayerList(page: Int) {
-    synchronized(exoMaps) {
-      exoMaps[page - 4]?.exoPlayer?.release()
-      exoMaps[page + 4]?.exoPlayer?.release()
-      exoMaps.remove(page - 4)
-      exoMaps.remove(page + 4)
-      exoMaps.iterator().forEach {
-        it.value.exoPlayer.seekTo(0)
-        it.value.exoPlayer.pause()
-        it.value.playerState.value = PlayerState.Play
-      }
-    }
-    /*var iterator = exoMaps.entries.iterator()
-    while (iterator.hasNext()) {
-      var entry = iterator.next()
-      if (entry.key >= page - 3 && entry.key <= page + 3) {
-        entry.value.exoPlayer.seekTo(0)
-        entry.value.exoPlayer.pause()
-        entry.value.playerState.value = PlayerState.Play
-      } else {
-        Log.d("lin.huang", "resetExoPlayerList1111 page->$page, size=${exoMaps.size}, delete_key=${entry.key}")
-        entry.value.exoPlayer.release()
-        iterator.remove()
-      }
-    }*/
-    //Log.d("lin.huang", "resetExoPlayerList2222 page->$page, size=${exoMaps.size}")
   }
 
   /**
@@ -266,7 +232,8 @@ class DCIMViewModel : ViewModel() {
           }
           maps[name] = list
         }
-      } else { // 如果后台没有加载完成，先自行加载
+      }
+      if (maps.isEmpty()){ // 如果后台没有加载完成，先自行加载
         val pathDCIM = Environment.getExternalStoragePublicDirectory("DCIM")
         traverseDCIM(pathDCIM.absolutePath, maps)
         val pathPicture = Environment.getExternalStoragePublicDirectory("Pictures")

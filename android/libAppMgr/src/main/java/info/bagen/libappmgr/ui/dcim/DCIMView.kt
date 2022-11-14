@@ -223,7 +223,7 @@ fun DCIMInfoViewer(
       dcimVM.updateCheckedList()
     }
     // 修复在播放时返回后，视频播放没有暂停问题
-    dcimVM.clearExoPlayerList()
+    //dcimVM.clearExoPlayerList()
   }
 }
 
@@ -307,6 +307,7 @@ fun DCIMPager(dcimVM: DCIMViewModel, curDCIMInfo: DCIMInfo, page: Int) {
       }
       DCIMType.VIDEO -> {
         VideoScreen(dcimVM, curDCIMInfo.path, page)
+        //ExoPlayerView(path = curDCIMInfo.path, page)
       }
       DCIMType.OTHER -> {
         throw UnknownError()

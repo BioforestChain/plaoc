@@ -35,7 +35,7 @@ class DCIMActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     // Setup Coil
-    val imageLoader = Coil.imageLoader(applicationContext)
+    /*val imageLoader = Coil.imageLoader(applicationContext)
     imageLoader.newBuilder()
       .components {
         if (Build.VERSION.SDK_INT >= 28) {
@@ -51,7 +51,7 @@ class DCIMActivity : ComponentActivity() {
       ) // 占位图片
       //.error(ActivityCompat.getDrawable(this@DCIMActivity, R.drawable.)) // 加载失败图片
       .build()
-    Coil.setImageLoader(imageLoader)
+    Coil.setImageLoader(imageLoader)*/
 
     if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
       checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
@@ -103,7 +103,9 @@ class DCIMActivity : ComponentActivity() {
             .background(ColorBackgroundBar)
         ) {
           DCIMGreeting(
-            onGridClick = { /*window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN) */ },
+            onGridClick = {
+              window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            },
             onViewerClick = {
               showWindowStatusBar(dcimViewModel.showViewerBar.value)
             },
@@ -118,14 +120,16 @@ class DCIMActivity : ComponentActivity() {
     if (dcimViewModel.showViewer.value) {
       dcimViewModel.showViewer.value = false
       showWindowStatusBar(true)
+      window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     } else {
       super.onBackPressed()
     }
   }
 
   override fun onDestroy() {
-    dcimViewModel.clearExoPlayerList()
+    //dcimViewModel.clearExoPlayerList()
     dcimViewModel.clearJobList()
+    window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     super.onDestroy()
   }
 

@@ -167,6 +167,7 @@ object MediaDBManager {
             .withValue(AppContract.Medias.COLUMN_PATH, mediaInfo.path)
             .withValue(AppContract.Medias.COLUMN_FILTER, filter)
             .withValue(AppContract.Medias.COLUMN_TYPE, mediaInfo.type)
+            .withValue(AppContract.Medias.COLUMN_DURATION, mediaInfo.duration)
             .withValue(AppContract.Medias.COLUMN_TIME, mediaInfo.time)
           mediaInfo.thumbnail?.let { b -> cpo.withValue(AppContract.Medias.COLUMN_THUMBNAIL, b) }
           mediaInfo.bitmap?.let { b -> cpo.withValue(AppContract.Medias.COLUMN_BITMAP, b) }
@@ -177,6 +178,7 @@ object MediaDBManager {
             .withValue(AppContract.Medias.COLUMN_PATH, mediaInfo.path)
             .withValue(AppContract.Medias.COLUMN_FILTER, filter)
             .withValue(AppContract.Medias.COLUMN_TYPE, mediaInfo.type)
+            .withValue(AppContract.Medias.COLUMN_DURATION, mediaInfo.duration)
             .withValue(AppContract.Medias.COLUMN_TIME, mediaInfo.time)
             .withSelection("${AppContract.Medias.COLUMN_PATH}=?", arrayOf(mediaInfo.path))
           mediaInfo.thumbnail?.let { array ->

@@ -29,7 +29,7 @@ data class MediaInfo(
 fun MediaInfo.loadThumbnail() {
   try {
     if (type == MediaType.Video.name) {
-      var mmr = MediaMetadataRetriever()
+      val mmr = MediaMetadataRetriever()
       mmr.setDataSource(path)
       thumbnail = mmr.frameAtTime?.toByteArray()
       duration = mmr.getDurationOfMinute()
@@ -49,8 +49,13 @@ fun Bitmap.toByteArray(): ByteArray? {
 }
 
 fun MediaMetadataRetriever.getDurationOfMinute(): Int {
-  return extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLong()?.div(1000)?.toInt()
-    ?: 0
+  return try {
+    extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.let {
+      Integer.parseInt(it) / 1000
+    } ?: 0
+  } catch (e: Exception) {
+    0
+  }
 }
 
 class MediaManager {
