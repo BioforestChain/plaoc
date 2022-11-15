@@ -52,6 +52,7 @@ import info.bagen.libappmgr.data.PreferencesHelper
 import info.bagen.libappmgr.database.MediaDBManager
 import info.bagen.libappmgr.entity.DCIMInfo
 import info.bagen.libappmgr.entity.DCIMType
+import info.bagen.libappmgr.system.media.MediaInfo
 import info.bagen.libappmgr.ui.theme.*
 import org.koin.androidx.compose.koinViewModel
 

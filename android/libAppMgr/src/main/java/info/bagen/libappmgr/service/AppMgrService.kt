@@ -110,15 +110,16 @@ class AppMgrService : Service() {
     }
 
     override fun onEvent(event: Int, path: String?) {
+      if (path == null) return
       mHandler?.post(Runnable {
         when (event) {
           CREATE, CREATE_DIRECTORY -> {
             doCreate(path)
-            insertDatabase(path)
+            if (event == CREATE) insertDatabase(path)
           }
           DELETE, DELETE_DIRECTORY -> {
             doDelete(path)
-            deleteDatabase(path)
+            if (event == DELETE) deleteDatabase(path)
           }
           MODIFY -> {
             updateDatabase(path)
@@ -159,7 +160,7 @@ class AppMgrService : Service() {
       }
     }
 
-    private fun doCreate(path: String?) {
+    private fun doCreate(path: String) {
       synchronized(this@MediaFileObserver) {
         var file = File(path)
         if (file.isDirectory && !file.startsWith(".")) {
@@ -171,7 +172,7 @@ class AppMgrService : Service() {
       }
     }
 
-    private fun doDelete(path: String?) {
+    private fun doDelete(path: String) {
       synchronized(this@MediaFileObserver) {
         mObservers.forEach { sfo ->
           if (sfo.mFile.absolutePath == path) {
@@ -183,28 +184,27 @@ class AppMgrService : Service() {
       }
     }
 
-    private fun updateDatabase(path: String?) {
-      var file = path?.let { File(path) } ?: null
-      if (file != null && file.exists() && file.isFile) {
+    private fun updateDatabase(path: String) {
+      val file = File(path)
+      if (file.exists() && file.isFile) {
         // 更新当前文件
         Log.d("lin.huang", "updateDatabase 更新当前文件")
+        MediaDBManager.updateMediaInfoByPath(path)
       }
     }
 
-    private fun insertDatabase(path: String?) {
-      var file = path?.let { File(path) } ?: null
-      if (file != null && file.exists() && file.isFile) {
+    private fun insertDatabase(path: String) {
+      val file = File(path)
+      if (file.exists() && file.isFile) {
         // 保存当前文件
         Log.d("lin.huang", "insertDatabase 保存当前文件")
+        MediaDBManager.insertMediaInfoByPath(path)
       }
     }
 
-    private fun deleteDatabase(path: String?) {
-      var file = path?.let { File(path) } ?: null
-      if (file != null && file.exists() && file.isFile) {
-        // 直接删除数据库
-        Log.d("lin.huang", "deleteDatabase 直接删除数据库")
-      }
+    private fun deleteDatabase(path: String) {
+      Log.d("lin.huang", "deleteDatabase 直接删除数据库")
+      MediaDBManager.deleteMediaInfoByPath(path)
     }
 
     class SingleFileObserver : FileObserver {

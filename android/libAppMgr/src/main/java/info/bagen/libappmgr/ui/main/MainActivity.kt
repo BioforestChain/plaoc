@@ -12,9 +12,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import info.bagen.libappmgr.data.PreferencesHelper
-import info.bagen.libappmgr.database.MediaDBManager
 import info.bagen.libappmgr.schedule.CoroutineUpdateTask
-import info.bagen.libappmgr.system.media.MediaManager
 import info.bagen.libappmgr.ui.theme.AppMgrTheme
 import info.bagen.libappmgr.ui.view.AppInfoGridView
 import info.bagen.libappmgr.utils.AppContextUtil

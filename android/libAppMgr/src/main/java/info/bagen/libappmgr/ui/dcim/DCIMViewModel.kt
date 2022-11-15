@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModel
 import info.bagen.libappmgr.data.PreferencesHelper
 import info.bagen.libappmgr.database.MediaDBManager
 import info.bagen.libappmgr.entity.*
+import info.bagen.libappmgr.system.media.MediaInfo
 import info.bagen.libappmgr.system.media.MediaType
 import kotlinx.coroutines.*
 import java.io.File
@@ -216,7 +217,7 @@ class DCIMViewModel : ViewModel() {
       if (PreferencesHelper.isMediaLoading()) { // 如果后台加载完毕，使用后台的数据
         MediaDBManager.getMediaFilter().forEach { name ->
           val list = arrayListOf<DCIMInfo>()
-          MediaDBManager.queryMediaData(filter = name).forEach { mediaInfo ->
+          MediaDBManager.queryMediaData(filter = name, loadPath = true).forEach { mediaInfo ->
             val dcimInfo = DCIMInfo(
               path = mediaInfo.path,
               id = mediaInfo.id,

@@ -2,16 +2,23 @@ package info.bagen.libappmgr.database
 
 import android.annotation.SuppressLint
 import android.content.ContentProviderOperation
+import android.content.ContentValues
 import android.database.Cursor
 import android.util.Log
 import info.bagen.libappmgr.system.media.MediaInfo
 import info.bagen.libappmgr.system.media.MediaType
+import info.bagen.libappmgr.system.media.createContentValues
 import info.bagen.libappmgr.utils.AppContextUtil
+import info.bagen.libappmgr.utils.createMediaInfo
+import java.io.File
 
 object MediaDBManager {
   private val PROJECTION = arrayOf(
-    AppContract.Medias.COLUMN_ID, AppContract.Medias.COLUMN_PATH, AppContract.Medias.COLUMN_TYPE,
-    AppContract.Medias.COLUMN_DURATION, AppContract.Medias.COLUMN_TIME,
+    AppContract.Medias.COLUMN_ID,
+    AppContract.Medias.COLUMN_PATH,
+    AppContract.Medias.COLUMN_TYPE,
+    AppContract.Medias.COLUMN_DURATION,
+    AppContract.Medias.COLUMN_TIME,
     AppContract.Medias.COLUMN_THUMBNAIL//, AppContract.Medias.COLUMN_BITMAP
   )
 
@@ -22,7 +29,9 @@ object MediaDBManager {
    * @return 返回查找结果
    */
   @SuppressLint("Range")
-  fun queryMediaData(id: Int, type: MediaType = MediaType.All): MediaInfo? {
+  fun queryMediaData(
+    id: Int, type: MediaType = MediaType.All, isOrigin: Boolean = false
+  ): MediaInfo? {
     // 查询数据库，然后获取path，转为base64
     val selection = when (type) {
       MediaType.All -> "${AppContract.Medias.COLUMN_ID} = ?"
@@ -36,15 +45,11 @@ object MediaDBManager {
 
     var mediaInfo: MediaInfo? = null
     val cursor = AppContextUtil.sInstance!!.contentResolver.query(
-      AppContract.Medias.CONTENT_URI,
-      PROJECTION,
-      selection,
-      selectionArgs,
-      sortOrder
+      AppContract.Medias.CONTENT_URI, PROJECTION, selection, selectionArgs, sortOrder
     )
     cursor?.let { c ->
       if (c.moveToFirst()) {
-        mediaInfo = getMediaInfo(c)
+        mediaInfo = getMediaInfo(c, isOrigin)
       }
       c.close()
     }
@@ -61,7 +66,9 @@ object MediaDBManager {
     type: MediaType = MediaType.All,
     filter: String? = null,
     from: Int = -1,
-    to: Int = -1
+    to: Int = -1,
+    isOrigin: Boolean = false,
+    loadPath: Boolean = false
   ): ArrayList<MediaInfo> {
     // 查询数据库，然后获取path，转为base64
     var selection: String? = null
@@ -84,16 +91,12 @@ object MediaDBManager {
     }
     val list = arrayListOf<MediaInfo>()
     val cursor = AppContextUtil.sInstance!!.contentResolver.query(
-      AppContract.Medias.CONTENT_URI,
-      PROJECTION,
-      selection,
-      selectionArgs,
-      sortOrder
+      AppContract.Medias.CONTENT_URI, PROJECTION, selection, selectionArgs, sortOrder
     )
     cursor?.let { c ->
       c.moveToPrevious()
       while (c.moveToNext()) {
-        getMediaInfo(c)?.let { list.add(it) }
+        getMediaInfo(c, isOrigin, loadPath)?.let { list.add(it) }
       }
       c.close()
     }
@@ -101,16 +104,26 @@ object MediaDBManager {
   }
 
   @SuppressLint("Range")
-  private fun getMediaInfo(cursor: Cursor): MediaInfo? {
+  private fun getMediaInfo(
+    cursor: Cursor, isOrigin: Boolean, loadPath: Boolean = false
+  ): MediaInfo? {
     return try {
       val id = cursor.getInt(cursor.getColumnIndex(AppContract.Medias.COLUMN_ID))
-      val path = cursor.getString(cursor.getColumnIndex(AppContract.Medias.COLUMN_PATH))
+      val path = if (loadPath) {
+        cursor.getString(cursor.getColumnIndex(AppContract.Medias.COLUMN_PATH))
+      } else {
+        ""
+      }
       val type = cursor.getString(cursor.getColumnIndex(AppContract.Medias.COLUMN_TYPE))
       val duration = cursor.getInt(cursor.getColumnIndex(AppContract.Medias.COLUMN_DURATION))
       val time = cursor.getInt(cursor.getColumnIndex(AppContract.Medias.COLUMN_TIME))
       val thumbnail = cursor.getBlob(cursor.getColumnIndex(AppContract.Medias.COLUMN_THUMBNAIL))
-      //val bitmap = cursor.getBlob(cursor.getColumnIndex(AppContract.Medias.COLUMN_BITMAP))
-      MediaInfo(id, path, type, duration, time, thumbnail)
+      val bitmap = if (isOrigin) {
+        cursor.getBlob(cursor.getColumnIndex(AppContract.Medias.COLUMN_BITMAP))
+      } else {
+        null
+      }
+      MediaInfo(id, path, type, duration, time, thumbnail, bitmap)
     } catch (e: Exception) {
       null
     }
@@ -183,8 +196,7 @@ object MediaDBManager {
             .withSelection("${AppContract.Medias.COLUMN_PATH}=?", arrayOf(mediaInfo.path))
           mediaInfo.thumbnail?.let { array ->
             cpo.withValue(
-              AppContract.Medias.COLUMN_THUMBNAIL,
-              array
+              AppContract.Medias.COLUMN_THUMBNAIL, array
             )
           }
           mediaInfo.bitmap?.let { array -> cpo.withValue(AppContract.Medias.COLUMN_BITMAP, array) }
@@ -213,11 +225,7 @@ object MediaDBManager {
     val maps = hashMapOf<String, MediaInfo>()
     maps.clear()
     val cursor = AppContextUtil.sInstance!!.contentResolver.query(
-      AppContract.Medias.CONTENT_URI,
-      PROJECTION,
-      selection,
-      selectionArgs,
-      sortOrder
+      AppContract.Medias.CONTENT_URI, PROJECTION, selection, selectionArgs, sortOrder
     )
     cursor?.let { c ->
       if (c.moveToFirst()) {
@@ -236,5 +244,36 @@ object MediaDBManager {
   private fun MediaInfo.equal(mediaInfo: MediaInfo): Boolean {
     if (this.path == mediaInfo.path && this.time == mediaInfo.time) return true
     return false
+  }
+
+  fun insertMediaInfoByPath(path: String) {
+    val mediaInfo = File(path).createMediaInfo()
+    mediaInfo?.let { mi ->
+      val uri = AppContextUtil.sInstance!!.contentResolver.insert(
+        AppContract.Medias.CONTENT_URI, mi.createContentValues()
+      )
+      Log.d("lin.huang", "insertMediaInfoByPath->$path,$uri")
+    }
+  }
+
+  fun updateMediaInfoByPath(path: String) {
+    val mediaInfo = File(path).createMediaInfo()
+    mediaInfo?.let { mi ->
+      val selection = "${AppContract.Medias.COLUMN_PATH} = ?"
+      val selectionArgs = arrayOf("$path")
+      val count = AppContextUtil.sInstance!!.contentResolver.update(
+        AppContract.Medias.CONTENT_URI, mi.createContentValues(), selection, selectionArgs
+      )
+      Log.d("lin.huang", "updateMediaInfoByPath->$path,$count")
+    }
+  }
+
+  fun deleteMediaInfoByPath(path: String) {
+    val selection = "${AppContract.Medias.COLUMN_PATH} = ?"
+    val selectionArgs = arrayOf("$path")
+    val count = AppContextUtil.sInstance!!.contentResolver.delete(
+      AppContract.Medias.CONTENT_URI, selection, selectionArgs
+    )
+    Log.d("lin.huang", "deleteMediaInfoByPath->$path,$count")
   }
 }
