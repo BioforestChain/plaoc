@@ -1,32 +1,62 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import reactLogo from "./assets/react.svg";
 import "./App.css";
-import { BfcsTopBar, OpenScanner } from "@bfsx/plugin";
+import {
+  BfcsTopBar,
+  BfcsBottomBarButton,
+  OpenScanner,
+  BfcsDialogButton,
+  BfcsTopBarButton,
+} from "@bfsx/plugin";
 import "@bfsx/plugin-typed-react";
 
 function App() {
   const [count, setCount] = useState(0);
+  const [visible, setVisible] = useState(false);
   const [scannerData, setScannerData] = useState({
     value: "DwebView-js ♻️ Deno-js",
   });
 
-  async function openQrScanner() {
+  useEffect(() => {
+    const eee = document.querySelector<BfcsBottomBarButton>("#eee")!;
+    eee.addEventListener("click", async () => {
+      await openQrScanner();
+    });
+
+    const ddb = document.querySelector<BfcsDialogButton>("#ddb")!;
+    ddb.addEventListener("click", () => {
+      console.log("弹窗关闭");
+    });
+
+    const aaa = document.querySelector<BfcsTopBarButton>("#aaa")!;
+    aaa.addEventListener("click", async () => {
+      await openBarScanner();
+    });
+
+    const ddd = document.querySelector<BfcsBottomBarButton>("#ddd")!;
+    ddd.addEventListener("click", () => {
+      onBottomBar("one");
+    });
+  });
+
+  const openQrScanner = async () => {
     const scanner = document.querySelector<OpenScanner>("dweb-scanner")!;
     const iter = await scanner.openQrCodeScanner();
+
     console.log(
       "scannerData.value = await scanner.openQrCodeScanner() -->",
-      JSON.stringify(iter)
+      iter
     );
     // scannerData.value = iter;
     setScannerData({ value: iter });
-  }
+  };
 
   async function openBarScanner() {
     const scanner = document.querySelector<OpenScanner>("dweb-scanner")!;
     const iter = await scanner.openBarCodeScanner();
     console.log(
       "scannerData.value = await scanner.openBarCodeScanner() -->",
-      JSON.stringify(iter)
+      iter
     );
     setScannerData({ value: iter });
   }
@@ -105,9 +135,18 @@ function App() {
           Edit <code>src/App.tsx</code> and save to test HMR
         </p>
       </div>
-      <p className="read-the-docs">
+      <p className="read-the-docs" onClick={() => setVisible(!visible)}>
         Click on the Vite and React logos to learn more
       </p>
+      <dweb-dialog-alert
+        visible={visible}
+        title="810975"
+        content="密码忘了怎么办？"
+        disOnClickOutside
+        disOnBackPress
+      >
+        <dweb-dialog-button id="ddb">确定</dweb-dialog-button>
+      </dweb-dialog-alert>
       <dweb-top-bar
         id="topbar"
         title="Ar react 扫雷"
@@ -115,7 +154,7 @@ function App() {
         foreground-color="#000"
         overlay="0.4"
       >
-        <dweb-top-bar-button id="aaa" disabled onClick={() => openBarScanner()}>
+        <dweb-top-bar-button id="aaa" disabled>
           <dweb-icon source="Filled.AddCircle"></dweb-icon>
         </dweb-top-bar-button>
         <dweb-top-bar-button id="ccc">
@@ -132,11 +171,7 @@ function App() {
         height="70"
         overlay="0.2"
       >
-        <dweb-bottom-bar-button
-          id="ddd"
-          selected
-          onClick={() => onBottomBar("one")}
-        >
+        <dweb-bottom-bar-button id="ddd" selected>
           <dweb-bottom-bar-icon
             source={bottomBarImg.one}
             type="AssetIcon"
@@ -147,11 +182,7 @@ function App() {
             value="土地"
           ></dweb-bottom-bar-text>
         </dweb-bottom-bar-button>
-        <dweb-bottom-bar-button
-          id="eee"
-          diSelectable
-          onClick={() => openQrScanner()}
-        >
+        <dweb-bottom-bar-button id="eee" diSelectable>
           <dweb-bottom-bar-icon
             source={bottomBarImg.two}
             type="AssetIcon"
