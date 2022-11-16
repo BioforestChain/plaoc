@@ -39,18 +39,23 @@ fun uiGateWay(
   stringHex: String
 ): String {
   val stringData = String(hexStrToByteArray(stringHex))
-  Log.i(TAG, " uiGateWay: $stringData")
+  Log.i(TAG, " uiGateWay2: $stringData")
   if (stringData.isEmpty()) return ""
-  mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true) // 允许使用单引号包裹字符串
-  val handle = mapper.readValue(stringData, JsHandle::class.java)
-  val funName = ExportNativeUi.valueOf(handle.function);
-  // 执行函数
-  val result = call_ui_map[funName]?.let { it ->
-    it(handle.data)
+  try {
+    mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true) // 允许使用单引号包裹字符串
+    val handle = mapper.readValue(stringData, JsHandle::class.java)
+    val funName = ExportNativeUi.valueOf(handle.function);
+    // 执行函数
+    val result = call_ui_map[funName]?.let { it ->
+      it(handle.data)
+    }
+    println("uiGateWayFunction:$funName = $result")
+    createBytesFactory(ExportNative.SetDWebViewUI, result.toString())
+    return result.toString()
+  } catch (e:Exception) {
+    e.message?.let { Log.e("uiGateWay：", it) }
   }
-  println("uiGateWayFunction:$funName = $result")
-  createBytesFactory(ExportNative.SetDWebViewUI, result.toString())
-  return result.toString()
+  return ""
 }
 
 

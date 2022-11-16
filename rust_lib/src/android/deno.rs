@@ -1,4 +1,4 @@
-#![cfg(target_os = "android")]
+// #![cfg(target_os = "android")]
 use android_logger::Config;
 use log::Level;
 use ndk_sys::AAssetManager;
@@ -9,7 +9,7 @@ use std::{borrow::Borrow, fmt, sync::RwLock};
 use crate::js_bridge::call_js_function::BUFFER_RESOLVE;
 use crate::js_bridge::call_js_function::BUFFER_SYSTEM;
 use crate::module_loader::AssetsModuleLoader;
-use crate::my_deno_runtime::{bootstrap_deno_runtime,bootstrap_deno_fs_runtime};
+use crate::my_deno_runtime::{bootstrap_deno_fs_runtime, bootstrap_deno_runtime};
 use jni::{
     objects::{JObject, JString, JValue},
     JNIEnv,
@@ -29,7 +29,7 @@ pub async extern "system" fn Java_info_bagen_rust_plaoc_DenoService_onlyReadRunt
     env: JNIEnv,
     _context: JObject,
     jasset_manager: JObject,
-    terget:JString
+    terget: JString,
 ) {
     android_logger::init_once(
         Config::default()
@@ -65,8 +65,8 @@ pub async extern "system" fn Java_info_bagen_rust_plaoc_DenoService_denoRuntime(
             .with_tag("myrust::BFS"),
     );
     let asset_path = String::from(env.get_string(path).unwrap());
-    log::info!(" denoRuntime :启动BFS后端 !! => {}",asset_path);
-    bootstrap_deno_fs_runtime( asset_path.as_str())
+    log::info!(" denoRuntime :启动BFS后端 !! => {}", asset_path);
+    bootstrap_deno_fs_runtime(asset_path.as_str())
         .await
         .unwrap();
 }
@@ -90,13 +90,13 @@ pub async extern "system" fn Java_info_bagen_rust_plaoc_DenoService_backDataToRu
 pub async extern "C" fn Java_info_bagen_rust_plaoc_DenoService_backSystemDataToRust(
     env: JNIEnv,
     _context: JObject,
-    byteData: jbyteArray){
+    byteData: jbyteArray,
+) {
     let scanner_data = env.convert_byte_array(byteData).unwrap();
     let data_string = std::str::from_utf8(&scanner_data).unwrap();
     log::info!(" backSystemDataToRust:{:?}", data_string);
     BUFFER_SYSTEM.lock().push(scanner_data.to_vec());
 }
-
 
 #[derive(Deserialize, Debug)]
 struct JsBackData {

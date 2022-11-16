@@ -104,28 +104,26 @@ class DenoService : IntentService("DenoService") {
 }
 
 fun warpCallback(bytes: ByteArray, store: Boolean = true) {
-    val (headId, stringData) = parseBytesFactory(bytes) // 处理二进制
+    val (versionId,headId, stringData) = parseBytesFactory(bytes) // 处理二进制
     mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true) //允许出现特殊字符和转义符
     mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true) //允许使用单引号
     val handle = mapper.readValue(stringData, RustHandle::class.java)
-    val funName = ExportNative.valueOf((handle.function))
-    if (store) {
-        rust_call_map[funName] = headId     // 存一下头部标记，返回数据的时候才知道给谁,存储的调用的函数名跟头部标记一一对应
+    val funName = ExportNative.valueOf(handle.function)
+  println("warpCallback 🤩headId:${headId[0]},${headId[1]},funName:$funName")
+  if (store) {
+      version_head_map[headId] = versionId // 存版本号
+      rust_call_map[funName] = headId     // 存一下头部标记，返回数据的时候才知道给谁,存储的调用的函数名跟头部标记一一对应
     }
     callable_map[funName]?.let { it -> it(handle.data) } // 执行函数
 }
 
 // 解析二进制数据
-fun parseBytesFactory(bytes: ByteArray): Pair<ByteArray,String> {
+fun parseBytesFactory(bytes: ByteArray): Triple<ByteArray,ByteArray,String> {
     val versionId = bytes.sliceArray(0..0)
     val headId = bytes.sliceArray(1..2)
     val message = bytes.sliceArray(3 until bytes.size)
-    version_head_map[headId] = versionId // 存版本号
     val stringData = String(message)
-    Log.d("bytesFactory", "now versionId :${versionId[0]}")
-    Log.d("bytesFactory", "now headId:${headId[0]}")
-    Log.d("bytesFactory", "now message says:$stringData")
-    return Pair(headId, stringData)
+    return Triple(versionId,headId, stringData)
 }
 
 
@@ -141,7 +139,7 @@ fun createBytesFactory(callFun: ExportNative, message: String) {
     // 移除使用完的标记
     rust_call_map.remove(callFun)
     version_head_map.remove(headId)
-  println("ExportNative.CreateNotificationMsg:${callFun}:${headId[0]},$message")
+  println("安卓返回数据:---headId=> ${headId[0]},${headId[1]},message=> $message")
   thread {
       denoService.backSystemDataToRust(result.array())
     }

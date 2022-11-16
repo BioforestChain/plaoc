@@ -1,4 +1,4 @@
-#![cfg(target_os = "android")]
+// #![cfg(target_os = "android")]
 
 use deno_core::anyhow::Error;
 // use assets_manager::{loader, Asset, AssetCache};
@@ -30,7 +30,7 @@ impl AssetsModuleLoader {
         let env = vm.attach_current_thread().unwrap();
 
         let asset_manager_ptr = unsafe {
-            log::info!("init AssetsModuleLoader2");
+            // log::info!("init AssetsModuleLoader2");
             let jasset_manager = env
                 .call_method(
                     ctx.context().cast(),
@@ -41,11 +41,11 @@ impl AssetsModuleLoader {
                 .unwrap()
                 .l()
                 .unwrap();
-            log::info!("init AssetsModuleLoader3");
+            // log::info!("init AssetsModuleLoader3");
 
             let asset_manager_ptr =
                 ndk_sys::AAssetManager_fromJava(env.get_native_interface(), jasset_manager.cast());
-            log::info!("init AssetsModuleLoader4");
+            // log::info!("init AssetsModuleLoader4");
 
             NonNull::new(asset_manager_ptr).unwrap()
         };
@@ -119,14 +119,6 @@ impl ModuleLoader for AssetsModuleLoader {
         } else {
             ModuleType::JavaScript
         };
-        // let asset_id = &str::replace(&path.to_string_lossy(), "/", ".")[1..];
-        // log::info!("read asset:{}", asset_id);
-        // let code: String = self
-        //     .cache
-        //     .load::<String>(asset_id)
-        //     .unwrap()
-        //     .read()
-        //     .to_string();
 
         let code = {
             let mut asset_path = path.to_str().unwrap();
@@ -158,35 +150,5 @@ impl ModuleLoader for AssetsModuleLoader {
             // Err(generic_error("Module loading is not supported"))
         }
         .boxed_local();
-        // async move {
-        //     let path = module_specifier.to_file_path().map_err(|_| {
-        //         generic_error(format!(
-        //             "Provided module specifier \"{}\" is not a file URL.",
-        //             module_specifier
-        //         ))
-        //     })?;
-        //     let module_type = if let Some(extension) = path.extension() {
-        //         let ext = extension.to_string_lossy().to_lowercase();
-        //         if ext == "json" {
-        //             ModuleType::Json
-        //         } else {
-        //             ModuleType::JavaScript
-        //         }
-        //     } else {
-        //         ModuleType::JavaScript
-        //     };
-
-        //     let asset_id = &str::replace(&path.to_string_lossy(), "/", ".")[1..];
-        //     log::info!("read asset:{}", asset_id);
-        //     let code: String = *self.cache.load::<String>(asset_id)?.read();
-        //     let module = ModuleSource {
-        //         code,
-        //         module_type,
-        //         module_url_specified: module_specifier.to_string(),
-        //         module_url_found: module_specifier.to_string(),
-        //     };
-        //     Ok(module)
-        // }
-        // .boxed_local()
     }
 }
