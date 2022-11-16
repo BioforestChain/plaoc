@@ -18,6 +18,7 @@ lazy_static! {
     pub(crate) static ref BUFFER_RESOLVE: Mutex<Vec<Vec<u8>>> = Mutex::new(vec![]);
     // 系统操作通道
     pub(crate) static ref BUFFER_SYSTEM: Mutex<Vec<Vec<u8>>> = Mutex::new(vec![]);
+    pub(crate) static ref BUFFER_SYSTEM_ARC: Mutex<Vec<Vec<u8>>> = Mutex::new(vec![]);
 }
 
 /// deno-js消息从这里走到移动端

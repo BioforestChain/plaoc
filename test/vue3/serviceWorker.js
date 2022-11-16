@@ -48,37 +48,29 @@ import { EasyWeakMap } from "./deps/deno.land/x/bnqkl_util@1.1.1/packages/extend
     });
     // remember event.respondWith must sync call🐰
     self.addEventListener("fetch", (event) => {
-        const request = event.request.clone();
+        const request = event.request;
         const path = new URL(request.url).pathname;
         // 资源文件不处理
         if (path.lastIndexOf(".") !== -1) {
             return;
         }
+        /// 开始向外发送数据，切片发送
+        console.log(`HttpRequestBuilder ${request.method},url: ${request.url}`);
         event.respondWith((async () => {
             const client = await self.clients.get(event.clientId);
             if (client === undefined) {
                 return fetch(event.request);
             }
             const channelId = await CLIENT_FETCH_CHANNEL_ID_WM.forceGet(client);
-            console.log("FETCH_EVENT_TASK_MAP:", channelId);
             const task = FETCH_EVENT_TASK_MAP.forceGet({ event, channelId });
-            /// 开始向外发送数据，切片发送
-            console.log(`HttpRequestBuilder ${request.method},url: ${request.url}`);
-            const headers = {};
-            request.headers.forEach((value, key) => {
-                if (key === "user-agent") { // user-agent 太长了先不要
-                    return;
-                }
-                Object.assign(headers, { [key]: value });
-            });
             // Build chunks
             const chunks = new HttpRequestBuilder(task.reqHeadersId, task.reqBodyId, request);
             // 迭代发送
             for await (const chunk of chunks) {
-                await fetch(`/channel/${channelId}/chunk=${chunk}`)
+                fetch(`/channel/${channelId}/chunk=${chunk}`)
                     .then(res => res.text(), _ => ({ success: false }));
             }
-            return task.po.promise;
+            return await task.po.promise;
         })());
     });
     class HttpRequestBuilder {
@@ -105,16 +97,25 @@ import { EasyWeakMap } from "./deps/deno.land/x/bnqkl_util@1.1.1/packages/extend
         async *[Symbol.asyncIterator]() {
             const { request, headersId, bodyId } = this;
             console.log("headerId:", headersId, "bodyId:", bodyId);
+            const headers = {};
+            request.headers.forEach((value, key) => {
+                if (key === "user-agent") { // user-agent 太长了先不要
+                    return;
+                }
+                Object.assign(headers, { [key]: value });
+            });
             // 传递headers
-            yield contactToHex(uint16_to_binary(headersId), encoder.encode(JSON.stringify({ url: request.url, headers: request.headers, method: request.method.toUpperCase() })), uint8_to_binary(0));
+            yield contactToHex(uint16_to_binary(headersId), encoder.encode(JSON.stringify({ url: request.url, headers, method: request.method.toUpperCase() })), uint8_to_binary(0));
+            console.log("有body数据传递1", request.method, request.body !== null);
             // 如果body为空
-            if (request.body) {
+            if (request.body !== null) {
                 const reader = request.body.getReader();
                 do {
                     const { done, value } = await reader.read();
                     if (done) {
                         break;
                     }
+                    console.log("有body数据传递2：", value);
                     yield binaryToHex(contact(uint16_to_binary(bodyId), value, uint8_to_binary(0)));
                 } while (true);
             }
@@ -123,7 +124,6 @@ import { EasyWeakMap } from "./deps/deno.land/x/bnqkl_util@1.1.1/packages/extend
     }
     // return data 🐯
     self.addEventListener('message', event => {
-        console.log('addEventListenermessage', event.data);
         if (typeof event.data !== 'string')
             return;
         const data = JSON.parse(event.data);
@@ -134,30 +134,14 @@ import { EasyWeakMap } from "./deps/deno.land/x/bnqkl_util@1.1.1/packages/extend
         const bodyId = returnId | 1;
         const headersId = bodyId - 1;
         console.log(`serviceWorker chunk=> ${chunk},end:${end}`);
-        console.log("FETCH_EVENT_TASK_MAP message:", headersId, channelId);
         const fetchTask = FETCH_EVENT_TASK_MAP.get(`${channelId}-${headersId}`);
         // 如果存在
         if (fetchTask === undefined) {
             throw new Error("no found fetch task:" + returnId);
-            // console.log("如果存在:", end, decoder.decode(chunk))
-            // // body reqId为偶数
-            // console.log(`填入数据=> ${chunk}`);
-            // if (end == "false") {
-            //   fetchTask.responseStreamController.enqueue(chunk);
-            // } else {
-            //   console.log(`请求结束返回数据`);
-            //   fetchTask.responseStreamController.close();
-            //   const data = hexDecode(chunk);
-            //   console.log(`请求结束返回数据=> ${data}`);
-            //   const [headers, status, statusText] = data.split("|");
-            //   console.log("解析headers", headers, status, statusText)
-            //   fetchTask.response = new Response(fetchTask.responseStream, { headers: {}, status: Number(status), statusText })
-            //   fetchTask.done = false
-            // }
-            // fetchTask.event.respondWith(new Response(fetchTask.responseStream, { headers: {}, status: Number(status), statusText }))
         }
         const responseContent = chunk.slice(0, -1);
-        if (returnId === headersId) {
+        if (returnId === headersId) { // parse headers
+            console.log("responseContent:", decoder.decode(responseContent));
             const { statusCode, headers } = JSON.parse(decoder.decode(responseContent));
             fetchTask.responseHeaders = headers;
             fetchTask.responseStatusCode = statusCode;
@@ -166,13 +150,15 @@ import { EasyWeakMap } from "./deps/deno.land/x/bnqkl_util@1.1.1/packages/extend
                 headers,
             }));
         }
-        else if (returnId === bodyId) {
-            fetchTask.responseBody.controller.enqueue(responseContent.buffer);
+        else if (returnId === bodyId) { // parse body
+            console.log("文件流推入", channelId, headersId, bodyId, responseContent.byteLength);
+            fetchTask.responseBody.controller.enqueue(responseContent);
         }
         else {
             throw new Error("should not happen!! NAN? " + returnId);
         }
         if (end) {
+            console.log("文件流关闭", channelId, headersId, bodyId);
             fetchTask.responseBody.controller.close();
         }
     });

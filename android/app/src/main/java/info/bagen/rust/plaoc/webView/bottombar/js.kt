@@ -51,7 +51,7 @@ class BottomBarFFI(
       state.height.value = heightDp.toFloat()
     } catch (e:Exception) {
       println(e.message)
-      return "请不要乱传递:${e.message}"
+      return "setHeight:${e.message}"
     }
     return heightDp
   }

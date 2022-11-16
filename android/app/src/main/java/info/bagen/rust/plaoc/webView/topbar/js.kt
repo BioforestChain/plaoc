@@ -63,7 +63,7 @@ class TopBarFFI(
         return DataString_From(state.actions)//.map { action -> toDataString(action) }
     }
 
-    fun setTopBarActions(actionListJson: DataString<List<TopBarAction>>) {
+    fun setTopBarActions(actionListJson: DataString<List<TopBarAction>>): Boolean {
         state.actions.clear()
 //      Log.i(TAG,"actionListJson:${actionListJson}")
         val actionList = actionListJson.toData<List<TopBarAction>>(object :
@@ -72,6 +72,7 @@ class TopBarFFI(
 //      actionList.forEach{
 //        Log.i(TAG,"哈哈：${it}")
 //      }
+      return true
     }
 
     fun getTopBarBackgroundColor(): String {
