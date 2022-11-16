@@ -6,7 +6,11 @@ import info.bagen.libappmgr.entity.DAppInfo
 import info.bagen.libappmgr.system.media.MediaInfo
 import info.bagen.libappmgr.system.media.MediaType
 import info.bagen.libappmgr.system.media.loadThumbnail
-import java.io.*
+import info.bagen.libappmgr.utils.FilesUtil.getFileType
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -405,6 +409,30 @@ object FilesUtil {
     }
   }
 
+  fun getFileType(path: String): String? {
+    val lastDot = path.lastIndexOf(".")
+    val suffix = if (lastDot < 0) "" else path.substring(lastDot + 1).uppercase(Locale.getDefault())
+    var first: String? = null
+    when (suffix) {
+      "MP4", "M4V", "3GP", "3GPP", "3G2", "3GPP2" -> {
+        first = MediaType.Video.name
+      }
+      "JPG", "JPEG", "PNG", "BMP", "WBMP" -> {
+        first = MediaType.Image.name
+      }
+      "SVG" -> {
+        first = MediaType.Svg.name
+      }
+      "GIF" -> {
+        first = MediaType.Gif.name
+      }
+      else -> {
+        first = null
+      }
+    }
+    return first
+  }
+
   fun fileToBase64(path: String): String? {
     var fis: FileInputStream? = null
     try {
@@ -438,37 +466,12 @@ fun String.parseFilePath(): String {
 
 fun File.createMediaInfo(): MediaInfo? {
   var mediaInfo: MediaInfo? = null
-  val lastDot = this.absolutePath.lastIndexOf(".")
-  var suffix = if (lastDot < 0) "null"
-  else this.absolutePath.substring(lastDot + 1).uppercase(Locale.getDefault())
-  getFileType(suffix)?.let {
+  getFileType(this.absolutePath)?.let {
     mediaInfo = MediaInfo(type = it, path = absolutePath)
     mediaInfo?.time = (lastModified() / 1000).toInt() // 获取文件的最后修改时间
     mediaInfo?.loadThumbnail()
   }
   return mediaInfo
-}
-
-private fun getFileType(suffix: String): String? {
-  var first: String? = null
-  when (suffix) {
-    "MP4", "M4V", "3GP", "3GPP", "3G2", "3GPP2" -> {
-      first = MediaType.Video.name
-    }
-    "JPG", "JPEG", "PNG", "BMP", "WBMP" -> {
-      first = MediaType.Image.name
-    }
-    "SVG" -> {
-      first = MediaType.Svg.name
-    }
-    "GIF" -> {
-      first = MediaType.Gif.name
-    }
-    else -> {
-      first = null
-    }
-  }
-  return first
 }
 
 

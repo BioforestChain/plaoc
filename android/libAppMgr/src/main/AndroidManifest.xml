@@ -42,6 +42,7 @@
   <application android:requestLegacyExternalStorage="true">
     <activity android:name=".ui.main.MainActivity" />
     <activity android:name=".ui.dcim.DCIMActivity" />
+    <activity android:name=".ui.splash.SplashActivity" />
 
     <provider
       android:name=".database.AppProvider"
