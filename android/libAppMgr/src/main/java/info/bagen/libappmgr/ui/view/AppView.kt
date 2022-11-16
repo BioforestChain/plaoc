@@ -93,6 +93,7 @@ fun BoxScope.AppIcon(appInfoMode: AppInfoMode) {
       modifier = Modifier
         .clip(CircleShape)
         .size(12.dp)
+        .background(Color.Red)
         .align(Alignment.TopEnd)
     )
   }
@@ -130,7 +131,6 @@ fun AppInfoView(
       .width(66.dp)
       .height(66.dp)
       .align(Alignment.TopCenter)
-      .background(Color.Red)
       .clickable { onClick?.let { onClick() } }) {
       AppIcon(appInfoMode)
       MaskProgressView(maskProgressMode, onMaskProgressClick)
