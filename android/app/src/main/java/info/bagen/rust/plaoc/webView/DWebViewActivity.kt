@@ -27,6 +27,8 @@ import androidx.navigation.navDeepLink
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
 import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
+import info.bagen.rust.plaoc.ExportNative
+import info.bagen.rust.plaoc.createBytesFactory
 import info.bagen.rust.plaoc.ui.theme.RustApplicationTheme
 import info.bagen.rust.plaoc.webView.urlscheme.CustomUrlScheme
 import info.bagen.rust.plaoc.webView.urlscheme.requestHandlerFromAssets
@@ -134,7 +136,10 @@ fun sendToJavaScript(message: String) {
     Log.i("xxx", "sendToJavaScript->:$message")
     dWebView?.post(Runnable {
         dWebView?.evaluateJavascript(message) {
-//            Log.d(TAG, "sendToJavaScript: $response")
+            Log.d(TAG, "sendToJavaScript 返回数据: $message")
+//          if (message.isNotEmpty()) {
+//            createBytesFactory(ExportNative.EvalJsRuntime, message)// 返回数据给后端
+//          }
         }
     })
 
