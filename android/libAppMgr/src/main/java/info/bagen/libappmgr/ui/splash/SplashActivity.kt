@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.ui.graphics.Color
 import info.bagen.libappmgr.ui.theme.AppMgrTheme
 
 class SplashActivity : ComponentActivity() {
@@ -22,7 +23,9 @@ class SplashActivity : ComponentActivity() {
     }
     setContent {
       AppMgrTheme {
-        SplashView(paths = list)
+        SplashView(
+          paths = list, activeColor = Color.White, inactiveColor = Color.White.copy(0.5f)
+        )
       }
     }
   }

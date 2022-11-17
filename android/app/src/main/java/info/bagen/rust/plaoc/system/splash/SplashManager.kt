@@ -1,6 +1,7 @@
 package info.bagen.rust.plaoc.system.splash
 
 import android.content.Intent
+import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
@@ -22,6 +23,7 @@ object SplashManager {
   fun openSplashActivity(list: ArrayList<String>) {
     val intent = Intent(App.appContext, SplashActivity::class.java).apply {
       putExtra(SPLASH_LIST, list)
+      flags = FLAG_ACTIVITY_NEW_TASK
     }
     App.appContext.startActivity(intent)
   }
