@@ -3,8 +3,14 @@ package info.bagen.libappmgr.utils
 import android.os.Build
 import info.bagen.libappmgr.entity.AppInfo
 import info.bagen.libappmgr.entity.DAppInfo
+import info.bagen.libappmgr.system.media.MediaInfo
+import info.bagen.libappmgr.system.media.MediaType
+import info.bagen.libappmgr.system.media.loadThumbnail
+import info.bagen.libappmgr.utils.FilesUtil.getFileType
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -17,6 +23,7 @@ enum class APP_DIR_TYPE(val rootName: String) {
 
   // 客户应用
   UserApp(rootName = "user-app"),
+
   // Assets
   AssetsApp(rootName = ""),
 }
@@ -85,8 +92,7 @@ object FilesUtil {
    * 获取程序运行路径
    */
   fun getAppLauncherPath(appName: String): String {
-    return getAppRootDirectory(APP_DIR_TYPE.SystemApp) + File.separator + appName +
-      File.separator + DIR_SYS
+    return getAppRootDirectory(APP_DIR_TYPE.SystemApp) + File.separator + appName + File.separator + DIR_SYS
   }
 
   /**
@@ -100,8 +106,7 @@ object FilesUtil {
    * 获取程序运行路径
    */
   fun getAppDenoUrl(bfsAppId: String, bfsaEntry: String): String {
-    return getAppRootDirectory(APP_DIR_TYPE.SystemApp) + File.separator + bfsAppId +
-      File.separator + bfsaEntry
+    return getAppRootDirectory(APP_DIR_TYPE.SystemApp) + File.separator + bfsAppId + File.separator + bfsaEntry
   }
 
   /**
@@ -115,8 +120,7 @@ object FilesUtil {
    * 获取应用更新路径
    */
   private fun getAppUpdateDirectory(appInfo: AppInfo): String {
-    return getAppRootDirectory(getAppType(appInfo)) + File.separator + appInfo.bfsAppId +
-      File.separator + DIR_AUTO_UPDATE
+    return getAppRootDirectory(getAppType(appInfo)) + File.separator + appInfo.bfsAppId + File.separator + DIR_AUTO_UPDATE
   }
 
   private fun getAppType(appInfo: AppInfo): APP_DIR_TYPE {
@@ -178,8 +182,7 @@ object FilesUtil {
    * 获取相应应用的图标, link.json中的icon路径进行修改，直接默认要求默认在sys目录
    */
   fun getAppIconPathName(appName: String, iconName: String, type: APP_DIR_TYPE): String {
-    return getAppRootDirectory(type) + File.separator + appName + File.separator +
-      DIR_SYS + File.separator + iconName
+    return getAppRootDirectory(type) + File.separator + appName + File.separator + DIR_SYS + File.separator + iconName
   }
 
   /**
@@ -254,8 +257,7 @@ object FilesUtil {
     var file = File(rootPath)
     file.delete() // 第一次运行程序时，recommend-app
     copyFilesFassets(
-      APP_DIR_TYPE.RecommendApp.rootName,
-      getAppRootDirectory(APP_DIR_TYPE.RecommendApp)
+      APP_DIR_TYPE.RecommendApp.rootName, getAppRootDirectory(APP_DIR_TYPE.RecommendApp)
     )
   }
 
@@ -274,8 +276,7 @@ object FilesUtil {
           file.mkdirs();//如果文件夹不存在，则递归
           fileNames.forEach {
             copyFilesFassets(
-              oldPath + File.separator + it,
-              newPath + File.separator + it
+              oldPath + File.separator + it, newPath + File.separator + it
             )
           }
         } else {// 文件
@@ -303,20 +304,17 @@ object FilesUtil {
     // 1.从system-app/boot/bfs-app-id/boot/link.json取值，将获取到内容保存到appInfo中
     // 2.将system-app中到bfs-app-id信息保存到map里面，用于后续交验
     // 3.从remember-app/boot/bfs-app-id/boot/link.json取值，补充到列表中
-    val systemAppMap =
-      getChildrenDirectoryList(getAppRootDirectory(APP_DIR_TYPE.SystemApp))
-    val recommendAppMap =
-      getChildrenDirectoryList(getAppRootDirectory(APP_DIR_TYPE.RecommendApp))
+    val systemAppMap = getChildrenDirectoryList(getAppRootDirectory(APP_DIR_TYPE.SystemApp))
+    val recommendAppMap = getChildrenDirectoryList(getAppRootDirectory(APP_DIR_TYPE.RecommendApp))
     val appInfoList = ArrayList<AppInfo>()
     val systemAppExist = HashMap<String, String>()
     // Log.d(TAG, "$systemAppMap , $recommendAppMap")
     systemAppMap?.forEach {
-      val appInfo =
-        getFileContent(
-          it.value + File.separator + DIR_BOOT + File.separator + FILE_LINK_JSON
-        )?.let { it1 ->
-          JsonUtil.getAppInfoFromLinkJson(it1, APP_DIR_TYPE.SystemApp)
-        }
+      val appInfo = getFileContent(
+        it.value + File.separator + DIR_BOOT + File.separator + FILE_LINK_JSON
+      )?.let { it1 ->
+        JsonUtil.getAppInfoFromLinkJson(it1, APP_DIR_TYPE.SystemApp)
+      }
       // Log.d(TAG, "getAppInfoList system-app $appInfo")
       if (appInfo != null) {
         appInfoList.add(appInfo)
@@ -325,12 +323,11 @@ object FilesUtil {
     }
     recommendAppMap?.forEach {
       if (!systemAppExist.containsKey(it.key)) {
-        val appInfo =
-          getFileContent(
-            it.value + File.separator + DIR_BOOT + File.separator + FILE_LINK_JSON
-          )?.let { it1 ->
-            JsonUtil.getAppInfoFromLinkJson(it1, APP_DIR_TYPE.RecommendApp)
-          }
+        val appInfo = getFileContent(
+          it.value + File.separator + DIR_BOOT + File.separator + FILE_LINK_JSON
+        )?.let { it1 ->
+          JsonUtil.getAppInfoFromLinkJson(it1, APP_DIR_TYPE.RecommendApp)
+        }
         // Log.d(TAG, "getAppInfoList recommend-app appInfo=$appInfo")
         if (appInfo != null) {
           appInfoList.add(appInfo)
@@ -353,22 +350,107 @@ object FilesUtil {
   fun getDAppInfo(appInfo: AppInfo): DAppInfo? {
     return getDAppInfo(appInfo.bfsAppId)
   }
+
   /**
    * 获取DAppInfo的版本信息
    */
   fun getDAppInfo(bfsAppId: String, appType: APP_DIR_TYPE = APP_DIR_TYPE.SystemApp): DAppInfo? {
-    val content = when(appType) {
+    val content = when (appType) {
       APP_DIR_TYPE.AssetsApp -> {
         AppContextUtil.sInstance!!.assets.open("$bfsAppId/$DIR_BOOT/$FILE_BFSA_META_JSON")
           .bufferedReader().use { it.readText() }
       }
       else -> {
-        val path = getAppRootDirectory(appType) + File.separator + bfsAppId +
-          File.separator + DIR_BOOT + File.separator + FILE_BFSA_META_JSON
+        val path =
+          getAppRootDirectory(appType) + File.separator + bfsAppId + File.separator + DIR_BOOT + File.separator + FILE_BFSA_META_JSON
         getFileContent(path)
       }
     }
     return JsonUtil.getDAppInfoFromBFSA(content)
+  }
+
+  /**
+   * 获取 DCIM和Picture下面的相册信息
+   */
+  fun getMediaInfoList(arrayList: ArrayList<File>): HashMap<String, ArrayList<MediaInfo>> {
+    val maps = hashMapOf<String, ArrayList<MediaInfo>>()
+    arrayList.forEach { path ->
+      traverseDCIM(path.absolutePath, maps)
+    }
+    return maps
+  }
+
+  /**
+   * 遍历当前目录及其子目录所有文件
+   */
+  private fun traverseDCIM(path: String, maps: HashMap<String, ArrayList<MediaInfo>>) {
+    var defaultPicture = "Pictures"
+    if (!maps.containsKey(defaultPicture)) maps[defaultPicture] =
+      arrayListOf() // 默认先创建一个图片目录，用于保存根目录存在的图片
+    File(path).listFiles()?.forEach inLoop@{ file ->
+      var name = file.name
+      if (name.startsWith(".")) return@inLoop // 判断第一个字符如果是. 不执行当前文件，直接continue
+      if (file.isFile) {
+        // 判断文件是否符合要求，如果符合，添加到maps
+        file.createMediaInfo()?.let { maps[defaultPicture]!!.add(it) }
+      } else if (file.isDirectory) {
+        var list = maps[name] ?: arrayListOf()
+        file.walk().iterator().forEach subLoop@{ subFile ->
+          if (subFile.name.startsWith(".")) return@subLoop
+          if (subFile.isFile) {
+            // 判断文件是否符合要求，如果符合，添加到list
+            subFile.createMediaInfo()?.let { list.add(it) }
+          }
+        }
+        if (list.isNotEmpty()) { // 如果name已存在，添加所有，如果list不存在直接添加到节点
+          maps[name]?.addAll(list) ?: run { maps[name] = list }
+        }
+      }
+    }
+  }
+
+  fun getFileType(path: String): String? {
+    val lastDot = path.lastIndexOf(".")
+    val suffix = if (lastDot < 0) "" else path.substring(lastDot + 1).uppercase(Locale.getDefault())
+    var first: String? = null
+    when (suffix) {
+      "MP4", "M4V", "3GP", "3GPP", "3G2", "3GPP2" -> {
+        first = MediaType.Video.name
+      }
+      "JPG", "JPEG", "PNG", "BMP", "WBMP" -> {
+        first = MediaType.Image.name
+      }
+      "SVG" -> {
+        first = MediaType.Svg.name
+      }
+      "GIF" -> {
+        first = MediaType.Gif.name
+      }
+      else -> {
+        first = null
+      }
+    }
+    return first
+  }
+
+  fun fileToBase64(path: String): String? {
+    var fis: FileInputStream? = null
+    try {
+      fis = File(path).inputStream()
+
+      val byte = ByteArray(fis.available())
+      fis.read(byte)
+
+      return android.util.Base64.encodeToString(byte, android.util.Base64.DEFAULT)
+    } catch (e: Exception) {
+    } finally {
+      try {
+        fis?.close()
+      } catch (e: IOException) {
+        //e.printStackTrace()
+      }
+      return null
+    }
   }
 }
 
@@ -381,3 +463,15 @@ fun String.parseFilePath(): String {
   }
   return this
 }
+
+fun File.createMediaInfo(): MediaInfo? {
+  var mediaInfo: MediaInfo? = null
+  getFileType(this.absolutePath)?.let {
+    mediaInfo = MediaInfo(type = it, path = absolutePath)
+    mediaInfo?.time = (lastModified() / 1000).toInt() // 获取文件的最后修改时间
+    mediaInfo?.loadThumbnail()
+  }
+  return mediaInfo
+}
+
+

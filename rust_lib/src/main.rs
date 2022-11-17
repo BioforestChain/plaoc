@@ -7,7 +7,7 @@ mod my_deno_runtime;
 mod ops;
 mod web_socket;
 
-#[cfg(target_os = "android")]
+// #[cfg(target_os = "android")]
 mod android;
 
 use crate::my_deno_runtime::bootstrap_deno_runtime;
@@ -37,27 +37,8 @@ impl log::Log for SimpleLogger {
 
 // static LOGGER: SimpleLogger = SimpleLogger;
 
-#[cfg(target_os = "android")]
+// #[cfg(target_os = "android")]
 #[tokio::main]
 async fn main() -> Result<(), AnyError> {
-    Ok(())
-}
-
-#[cfg(not(target_os = "android"))]
-#[tokio::main]
-async fn main() -> Result<(), AnyError> {
-    // log::set_logger(&LOGGER)
-    //     .map(|()| log::set_max_level(log::LevelFilter::Info))
-    //     .unwrap();
-
-    // initialization op
-    // handle_function::new();
-
-    // test 1
-    // my_deno_core::bootstrap_deno_core();
-
-    // test 2
-    let js_path = Path::new(env!("CARGO_MANIFEST_DIR")).join("assets/hello_runtime.js");
-    bootstrap_deno_runtime(|| Rc::new(FsModuleLoader {}), &js_path.to_string_lossy()).await?;
     Ok(())
 }

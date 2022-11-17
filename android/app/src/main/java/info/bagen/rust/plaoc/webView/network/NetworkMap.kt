@@ -30,7 +30,7 @@ fun interceptNetworkRequests(
   val url = request.url.toString()
   val path = request.url.path
 
-  println("interceptNetworkRequests:$url")
+//  println("interceptNetworkRequests:$url")
   // 防止卡住请求为空而崩溃
   if (!url.isNullOrEmpty() && !path.isNullOrEmpty()) {
     val temp = url.substring(url.lastIndexOf("/") + 1)
@@ -55,7 +55,7 @@ fun interceptNetworkRequests(
       }
       // 映射本地文件的资源文件 https://bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj.dweb/index.mjs -> /plaoc/index.mjs
       if (Regex(dWebView_host.lowercase(Locale.ROOT)).containsMatchIn(url)) {
-        println("本地文件url==>$url")
+//        println("本地文件url==>$url")
         return customUrlScheme.handleRequest(request, path)
       }
     }

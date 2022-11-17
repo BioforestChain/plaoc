@@ -18,14 +18,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.graphics.vector.addPathNodes
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.ImageLoader
@@ -35,6 +34,7 @@ import info.bagen.libappmgr.entity.AppInfo
 import info.bagen.libappmgr.entity.DownLoadState
 import info.bagen.libappmgr.ui.download.DownloadAppInfoView
 import info.bagen.libappmgr.ui.download.DownloadDialogView
+import info.bagen.libappmgr.R
 
 data class AppInfoMode(
   val iconPath: MutableState<String> = mutableStateOf(""),
@@ -73,36 +73,19 @@ fun AppInfoMode.updateDLState(state: DownLoadState): AppInfoMode {
 
 @Composable
 fun BoxScope.AppIcon(appInfoMode: AppInfoMode) {
-  /*Image(
-    bitmap = BitmapFactory.decodeFile(appInfoMode.iconPath.value)?.asImageBitmap()
-      ?: ImageBitmap.imageResource(id = R.drawable.ic_launcher),
-    contentDescription = "icon",
-    contentScale = ContentScale.Fit,
-    modifier = Modifier
-      .padding(3.dp)
-      .clip(RoundedCornerShape(12.dp))
-      .align(Alignment.Center)
-  )*/
   AsyncImage(
     model = appInfoMode.iconPath.value,
     contentDescription = null,
-    imageLoader = ImageLoader.Builder(LocalContext.current)
-      .components {
+    imageLoader = ImageLoader.Builder(LocalContext.current).components {
         add(SvgDecoder.Factory()) // 为了支持 SVG 图片加载
       }.build(),
-    onError = {
-      // appInfoMode.iconPath.value = 默认地址
-    },
-    contentScale = ContentScale.Fit,
     modifier = Modifier
-      .padding(3.dp)
+      .fillMaxWidth()
       .clip(RoundedCornerShape(12.dp))
-      /*.border( //描边功能
-        width = 0.5.dp,
-        color = MaterialTheme.colors.onBackground.copy(0.1f),
-        shape = RoundedCornerShape(12.dp)
-      )*/
-      .align(Alignment.Center)
+      .align(Alignment.Center),
+    contentScale = ContentScale.FillWidth,
+    placeholder = BitmapPainter(image = ImageBitmap.imageResource(id = R.drawable.ic_launcher)),
+    error = BitmapPainter(image = ImageBitmap.imageResource(id = R.drawable.ic_launcher))
   )
 
   if (appInfoMode.showBadge.value) {
@@ -113,33 +96,6 @@ fun BoxScope.AppIcon(appInfoMode: AppInfoMode) {
         .background(Color.Red)
         .align(Alignment.TopEnd)
     )
-  }
-}
-
-fun makeIconFromXMLPath(
-  pathStr: String,
-  viewportWidth: Float = 24f,
-  viewportHeight: Float = 24f,
-  defaultWidth: Dp = 24.dp,
-  defaultHeight: Dp = 24.dp,
-  fillColor: Color = Color.White,
-): ImageVector {
-  val fillBrush = SolidColor(fillColor)
-  val strokeBrush = SolidColor(fillColor)
-
-  return ImageVector.Builder(
-    defaultWidth = defaultWidth,
-    defaultHeight = defaultHeight,
-    viewportWidth = viewportWidth,
-    viewportHeight = viewportHeight,
-  ).run {
-    addPath(
-      pathData = addPathNodes(pathStr),
-      name = "",
-      fill = fillBrush,
-      stroke = strokeBrush,
-    )
-    build()
   }
 }
 
@@ -175,10 +131,7 @@ fun AppInfoView(
       .width(66.dp)
       .height(66.dp)
       .align(Alignment.TopCenter)
-      .clickable {
-        onClick?.let { onClick() }
-      }
-    ) {
+      .clickable { onClick?.let { onClick() } }) {
       AppIcon(appInfoMode)
       MaskProgressView(maskProgressMode, onMaskProgressClick)
     }

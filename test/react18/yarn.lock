@@ -240,17 +240,17 @@
     "@babel/helper-validator-identifier" "^7.19.1"
     to-fast-properties "^2.0.0"
 
-"@bfsx/plugin-typed-react@^0.0.3":
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/@bfsx/plugin-typed-react/-/plugin-typed-react-0.0.3.tgz#fbca1c53687088daa908f35e7ef9598f450b1bac"
-  integrity sha512-bziEneiTKjKsC0viY/I1BPTxAkNbOUVnXX3jp109EC9QYTgEfqskRbx4RXWssnRF8ewbWNfUW0BwFQbNU6KRqA==
+"@bfsx/plugin-typed-react@^0.0.4":
+  version "0.0.4"
+  resolved "https://registry.npmmirror.com/@bfsx/plugin-typed-react/-/plugin-typed-react-0.0.4.tgz#115a3ab61e53e5f951aa6b29fb494d35649380b2"
+  integrity sha512-xlnDASxqPFPSDM1u8tx+0j7a4qH7l32liUgj6yojPiVRzYfsCXmkoldox53AD1JtYj9JsPYKoX11W0FK0lCA6w==
   dependencies:
     tslib "2.3.1"
 
-"@bfsx/plugin@^0.1.6":
-  version "0.1.6"
-  resolved "https://registry.yarnpkg.com/@bfsx/plugin/-/plugin-0.1.6.tgz#548894aa347f3f6a0113b3b06d95f292995b34aa"
-  integrity sha512-if87JDrj4GcD/0bTTWWQqzXaqrykO17skV61PPVp0uPcRlhV1n4W6YMbzA4+1c82vrJksh5vECks09RDC0Pygw==
+"@bfsx/plugin@^0.1.9":
+  version "0.1.9"
+  resolved "https://registry.npmmirror.com/@bfsx/plugin/-/plugin-0.1.9.tgz#2ee2ac4346af874329dae1c555ab6f4af82924ac"
+  integrity sha512-CA23OGQMToFW80Oiz3QScatIgYxVBsw8HzYa1llqZdh3sqZ/OyFKP2k4fW3GFtddAQkGLIxjKjYqIxl3jnZyTA==
   dependencies:
     tslib "2.3.1"
 

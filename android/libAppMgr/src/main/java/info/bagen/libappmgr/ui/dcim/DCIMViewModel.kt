@@ -1,11 +1,18 @@
 package info.bagen.libappmgr.ui.dcim
 
 import android.os.Environment
+import android.util.Log
+import androidx.collection.arrayMapOf
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.*
+import info.bagen.libappmgr.data.PreferencesHelper
+import info.bagen.libappmgr.database.MediaDBManager
 import info.bagen.libappmgr.entity.*
+import info.bagen.libappmgr.system.media.MediaInfo
+import info.bagen.libappmgr.system.media.MediaType
+import kotlinx.coroutines.*
 import java.io.File
 
 class DCIMViewModel : ViewModel() {
@@ -20,7 +27,7 @@ class DCIMViewModel : ViewModel() {
 
   var dcimSpinner: DCIMSpinner = DCIMSpinner(name = All) // 表示加载的是都有的图片和视频
   var dcimMaps: HashMap<String, ArrayList<DCIMInfo>> = hashMapOf()
-  val exoMaps = hashMapOf<String, ExoPlayerData>()
+  val exoPlayerList = arrayListOf<ExoPlayerData>()
 
   private var jobList: ArrayList<Job> = arrayListOf() // 用于保存当前的GlobalScope
 
@@ -45,21 +52,9 @@ class DCIMViewModel : ViewModel() {
     mCallBack = callback
   }
 
-  fun clearExoPlayerList() {
-    exoMaps.iterator().forEach {
-      it.value.exoPlayer.release()
-    }
-    exoMaps.clear()
+  fun clearJobList() {
     jobList.forEach { it.cancel() } // 停止后台继续执行的协程
     dcimMaps.clear()
-  }
-
-  fun resetExoPlayerList() {
-    exoMaps.iterator().forEach {
-      it.value.exoPlayer.seekTo(0)
-      it.value.exoPlayer.pause()
-      it.value.playerState.value = PlayerState.Play
-    }
   }
 
   /**
@@ -95,18 +90,20 @@ class DCIMViewModel : ViewModel() {
       addToSpinnerList(name = list.key, count = list.value.size, dcimInfo = list.value[0])
     }
     // 进行排序操作
-    dcimInfoList.sortWith(Comparator { o1, o2 -> o2.time.compareTo(o1.time) }) // Collections.sort变种
+    dcimInfoList.sortWith { o1, o2 -> o2.time.compareTo(o1.time) } // Collections.sort变种
     // 初始化Spinner
     initSpinnerList()
-    // 开始刷新时间
-    var list = arrayListOf<DCIMInfo>()
-    list.addAll(dcimInfoList)
-    list.forEach {
-      if (it.type == DCIMType.VIDEO && it.bitmap == null) {
-        var job = GlobalScope.launch(Dispatchers.Default) {
-          it.updateDuration()
+    if (!PreferencesHelper.isMediaLoading()) {
+      // 开始刷新时间
+      val list = arrayListOf<DCIMInfo>()
+      list.addAll(dcimInfoList)
+      list.forEach {
+        if (it.type == DCIMType.VIDEO && it.bitmap == null) {
+          val job = GlobalScope.launch(Dispatchers.Default) {
+            it.updateDuration()
+          }
+          jobList.add(job)
         }
-        jobList.add(job)
       }
     }
   }
@@ -161,7 +158,7 @@ class DCIMViewModel : ViewModel() {
           dcimInfoList.addAll(list.value)
         }
         // 进行排序操作
-        dcimInfoList.sortWith(Comparator { o1, o2 -> o2.time.compareTo(o1.time) }) // Collections.sort变种
+        dcimInfoList.sortWith { o1, o2 -> o2.time.compareTo(o1.time) } // Collections.sort变种
       }
       AllPhoto -> {
         dcimMaps.iterator().forEach { list ->
@@ -172,7 +169,7 @@ class DCIMViewModel : ViewModel() {
           }
         }
         // 进行排序操作
-        dcimInfoList.sortWith(Comparator { o1, o2 -> o2.time.compareTo(o1.time) }) // Collections.sort变种
+        dcimInfoList.sortWith { o1, o2 -> o2.time.compareTo(o1.time) } // Collections.sort变种
       }
       AllVideo -> {
         dcimMaps.iterator().forEach { list ->
@@ -183,14 +180,14 @@ class DCIMViewModel : ViewModel() {
           }
         }
         // 进行排序操作
-        dcimInfoList.sortWith(Comparator { o1, o2 -> o2.time.compareTo(o1.time) }) // Collections.sort变种
+        dcimInfoList.sortWith { o1, o2 -> o2.time.compareTo(o1.time) } // Collections.sort变种
       }
       else -> {
         dcimMaps.iterator().forEach {
           if (it.key == dcimSpinner.name) {
             dcimInfoList.addAll(it.value)
             // 进行排序操作
-            dcimInfoList.sortWith(Comparator { o1, o2 -> o2.time.compareTo(o1.time) }) // Collections.sort变种
+            dcimInfoList.sortWith { o1, o2 -> o2.time.compareTo(o1.time) } // Collections.sort变种
             return
           }
         }
@@ -214,19 +211,37 @@ class DCIMViewModel : ViewModel() {
   }
 
   // 加载图片内容
-  suspend fun loadDCIMInfo(
-    result: (retMap: HashMap<String, ArrayList<DCIMInfo>>) -> Unit
-  ) {
-    //viewModelScope.launch {
-      withContext(Dispatchers.IO) {
-        val maps = hashMapOf<String, ArrayList<DCIMInfo>>()
+  suspend fun loadDCIMInfo(result: (retMap: HashMap<String, ArrayList<DCIMInfo>>) -> Unit) {
+    withContext(Dispatchers.IO) {
+      val maps = hashMapOf<String, ArrayList<DCIMInfo>>()
+      if (PreferencesHelper.isMediaLoading()) { // 如果后台加载完毕，使用后台的数据
+        MediaDBManager.getMediaFilter().forEach { name ->
+          val list = arrayListOf<DCIMInfo>()
+          MediaDBManager.queryMediaData(filter = name, loadPath = true).forEach { mediaInfo ->
+            val dcimInfo = DCIMInfo(
+              path = mediaInfo.path,
+              id = mediaInfo.id,
+              type = when (mediaInfo.type) {
+                MediaType.Video.name -> DCIMType.VIDEO
+                else -> DCIMType.IMAGE
+              },
+              time = mediaInfo.time,
+              duration = mutableStateOf(mediaInfo.duration),
+              bitmap = mediaInfo.thumbnail
+            )
+            list.add(dcimInfo)
+          }
+          maps[name] = list
+        }
+      }
+      if (maps.isEmpty()){ // 如果后台没有加载完成，先自行加载
         val pathDCIM = Environment.getExternalStoragePublicDirectory("DCIM")
         traverseDCIM(pathDCIM.absolutePath, maps)
         val pathPicture = Environment.getExternalStoragePublicDirectory("Pictures")
         traverseDCIM(pathPicture.absolutePath, maps)
-        result(maps)
       }
-    //}
+      result(maps)
+    }
   }
 
   /**

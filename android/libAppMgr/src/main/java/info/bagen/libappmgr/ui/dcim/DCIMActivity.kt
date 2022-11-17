@@ -2,8 +2,8 @@ package info.bagen.libappmgr.ui.dcim
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.WindowManager
@@ -16,26 +16,27 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
-import androidx.core.app.ActivityCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
-import coil.Coil
-import coil.decode.GifDecoder
-import coil.decode.ImageDecoderDecoder
-import coil.decode.SvgDecoder
-import coil.decode.VideoFrameDecoder
-import info.bagen.libappmgr.R
+import info.bagen.libappmgr.system.media.MediaInfo
 import info.bagen.libappmgr.ui.theme.AppMgrTheme
 import info.bagen.libappmgr.ui.theme.ColorBackgroundBar
+import info.bagen.libappmgr.utils.createMediaInfo
 import org.koin.android.ext.android.inject
 import org.koin.androidx.compose.koinViewModel
+import java.io.File
 
 class DCIMActivity : ComponentActivity() {
   val dcimViewModel: DCIMViewModel by inject()
 
+  companion object {
+    const val REQUEST_DCIM_CODE = 168
+    const val RESPONSE_DCIM_VALUE = "result"
+  }
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     // Setup Coil
-    val imageLoader = Coil.imageLoader(applicationContext)
+    /*val imageLoader = Coil.imageLoader(applicationContext)
     imageLoader.newBuilder()
       .components {
         if (Build.VERSION.SDK_INT >= 28) {
@@ -51,15 +52,15 @@ class DCIMActivity : ComponentActivity() {
       ) // 占位图片
       //.error(ActivityCompat.getDrawable(this@DCIMActivity, R.drawable.)) // 加载失败图片
       .build()
-    Coil.setImageLoader(imageLoader)
+    Coil.setImageLoader(imageLoader)*/
 
-    if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
-      checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+    if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED || checkSelfPermission(
+        Manifest.permission.WRITE_EXTERNAL_STORAGE
+      ) != PackageManager.PERMISSION_GRANTED
     ) {
       requestPermissions(
         arrayOf(
-          Manifest.permission.READ_EXTERNAL_STORAGE,
-          Manifest.permission.WRITE_EXTERNAL_STORAGE
+          Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE
         ), 666
       )
     } else {
@@ -68,9 +69,7 @@ class DCIMActivity : ComponentActivity() {
   }
 
   override fun onRequestPermissionsResult(
-    requestCode: Int,
-    permissions: Array<out String>,
-    grantResults: IntArray
+    requestCode: Int, permissions: Array<out String>, grantResults: IntArray
   ) {
     super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     when (requestCode) {
@@ -84,9 +83,13 @@ class DCIMActivity : ComponentActivity() {
     dcimViewModel.setCallback(callback = object : DCIMViewModel.CallBack {
       override fun send(fileList: ArrayList<String>) {
         // 接收返回的文件列表地址
-        fileList.forEach {
-          Log.d("lin.huang", "send -> $it")
+        val mediaInfos = arrayListOf<MediaInfo>()
+        fileList.forEach { path ->
+          File(path).createMediaInfo()?.let { mediaInfos.add(it) }
         }
+        val bundle = Bundle()
+        bundle.putSerializable(RESPONSE_DCIM_VALUE, mediaInfos)
+        setResult(REQUEST_DCIM_CODE, Intent().putExtras(bundle))
         this@DCIMActivity.finish()
       }
 
@@ -102,12 +105,11 @@ class DCIMActivity : ComponentActivity() {
             .fillMaxSize()
             .background(ColorBackgroundBar)
         ) {
-          DCIMGreeting(
-            onGridClick = { /*window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN) */ },
-            onViewerClick = {
-              showWindowStatusBar(dcimViewModel.showViewerBar.value)
-            },
-            dcimVM = dcimViewModel
+          DCIMGreeting(onGridClick = {
+            window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+          }, onViewerClick = {
+            showWindowStatusBar(dcimViewModel.showViewerBar.value)
+          }, dcimVM = dcimViewModel
           )
         }
       }
@@ -118,13 +120,16 @@ class DCIMActivity : ComponentActivity() {
     if (dcimViewModel.showViewer.value) {
       dcimViewModel.showViewer.value = false
       showWindowStatusBar(true)
+      window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     } else {
       super.onBackPressed()
     }
   }
 
   override fun onDestroy() {
-    dcimViewModel.clearExoPlayerList()
+    //dcimViewModel.clearExoPlayerList()
+    dcimViewModel.clearJobList()
+    window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     super.onDestroy()
   }
 
@@ -140,9 +145,7 @@ class DCIMActivity : ComponentActivity() {
 @SuppressLint("UnrememberedMutableState")
 @Composable
 fun DCIMGreeting(
-  onGridClick: () -> Unit,
-  onViewerClick: () -> Unit,
-  dcimVM: DCIMViewModel = koinViewModel()
+  onGridClick: () -> Unit, onViewerClick: () -> Unit, dcimVM: DCIMViewModel = koinViewModel()
 ) {
   var model = viewModel() as DCIMViewModel
   LaunchedEffect(Unit) {

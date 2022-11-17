@@ -37,17 +37,22 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import coil.decode.GifDecoder
 import coil.decode.SvgDecoder
+import coil.decode.VideoFrameDecoder
 import coil.request.ImageRequest
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
 import info.bagen.libappmgr.R
+import info.bagen.libappmgr.data.PreferencesHelper
+import info.bagen.libappmgr.database.MediaDBManager
 import info.bagen.libappmgr.entity.DCIMInfo
 import info.bagen.libappmgr.entity.DCIMType
+import info.bagen.libappmgr.system.media.MediaInfo
 import info.bagen.libappmgr.ui.theme.*
 import org.koin.androidx.compose.koinViewModel
 
@@ -70,9 +75,10 @@ fun DCIMItemView(
       .height(getWindowWithDP() / 4)
   ) {
     AsyncImage(
-      model = when (dcimInfo.type) {
-        DCIMType.VIDEO -> dcimInfo.bitmap
-        else -> dcimInfo.path
+      model = dcimInfo.bitmap ?: if (PreferencesHelper.isMediaLoading()) {
+        MediaDBManager.getThumbnail(dcimInfo.id)
+      } else {
+        dcimInfo.path
       },
       contentDescription = "",
       contentScale = ContentScale.Crop,
@@ -81,8 +87,28 @@ fun DCIMItemView(
         .clickable { onClick(dcimInfo) },
     )
 
+    /*AsyncImage(
+      model = dcimInfo.path,
+      contentDescription = "",
+      imageLoader = ImageLoader(LocalContext.current).newBuilder().components {
+        when (dcimInfo.type) {
+          DCIMType.VIDEO -> add(VideoFrameDecoder.Factory())
+          DCIMType.GIF -> add(GifDecoder.Factory())
+          DCIMType.SVG -> add(SvgDecoder.Factory())
+        }
+      }.build(),
+      contentScale = ContentScale.Crop,
+      modifier = Modifier
+        .fillMaxWidth()
+        .clickable { onClick(dcimInfo) },
+    )*/
+
     if (dcimInfo.checked.value) { // 如果是被选中了，增加一个半透明遮罩
-      Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(0.2f)))
+      Box(
+        modifier = Modifier
+          .fillMaxSize()
+          .background(Color.Black.copy(0.2f))
+      )
     }
 
     // 在右上角显示是否选中
@@ -197,6 +223,8 @@ fun DCIMInfoViewer(
       dcimVM.checkedList.removeAll(tempList)
       dcimVM.updateCheckedList()
     }
+    // 修复在播放时返回后，视频播放没有暂停问题
+    //dcimVM.clearExoPlayerList()
   }
 }
 
@@ -232,20 +260,36 @@ fun DCIMHorizontalPager(dcimVM: DCIMViewModel) {
     ) { loadPage ->
       // 该区块有三个参数：currentPage表示当前显示的界面，currentPageOffset表示滑动偏移量，loadPage表示加载界面
       if (loadPage >= 0 && loadPage < curShowlist.size) {
-        DCIMPager(dcimVM = dcimVM, curDCIMInfo = curShowlist[loadPage])
+        DCIMPager(dcimVM = dcimVM, curDCIMInfo = curShowlist[loadPage], loadPage)
       }
     }
   } else {
-    DCIMPager(dcimVM = dcimVM, curDCIMInfo = dcimVM.dcimInfo.value)
+    DCIMPager(dcimVM = dcimVM, curDCIMInfo = dcimVM.dcimInfo.value, 0)
   }
 }
 
 @Composable
-fun DCIMPager(dcimVM: DCIMViewModel, curDCIMInfo: DCIMInfo) {
+fun DCIMPager(dcimVM: DCIMViewModel, curDCIMInfo: DCIMInfo, page: Int) {
   Box(modifier = Modifier.fillMaxSize()) {
     when (curDCIMInfo.type) {
-      DCIMType.IMAGE -> {
+      DCIMType.IMAGE, DCIMType.GIF, DCIMType.SVG -> {
         AsyncImage(
+          model = curDCIMInfo.path,
+          contentDescription = "",
+          imageLoader = ImageLoader(LocalContext.current).newBuilder().components {
+            when (curDCIMInfo.type) {
+              DCIMType.VIDEO -> add(VideoFrameDecoder.Factory())
+              DCIMType.GIF -> add(GifDecoder.Factory())
+              DCIMType.SVG -> add(SvgDecoder.Factory())
+            }
+          }.build(),
+          contentScale = ContentScale.FillWidth,
+          modifier = Modifier
+            .fillMaxWidth()
+            .align(Center),
+          alignment = Alignment.TopStart
+        )
+        /*AsyncImage(
           modifier = Modifier
             .fillMaxWidth()
             .align(Alignment.Center),
@@ -260,25 +304,11 @@ fun DCIMPager(dcimVM: DCIMViewModel, curDCIMInfo: DCIMInfo) {
           contentDescription = null,
           contentScale = ContentScale.FillWidth, // 需要增加modifier才能宽度填充
           alignment = Alignment.TopStart, // 这边表示图片显示开始的位置，默认是center
-        )
-      }
-      DCIMType.GIF -> {
-        AsyncImage(
-          modifier = Modifier
-            .fillMaxSize(),
-          model = ImageRequest
-            .Builder(LocalContext.current)
-            .data(curDCIMInfo.path)
-            .decoderFactory(
-              GifDecoder.Factory()
-            )
-            .crossfade(true)
-            .build(),
-          contentDescription = null
-        )
+        )*/
       }
       DCIMType.VIDEO -> {
-        VideScreen(dcimVM, curDCIMInfo.path)
+        VideoScreen(dcimVM, curDCIMInfo.path, page)
+        //ExoPlayerView(path = curDCIMInfo.path, page)
       }
       DCIMType.OTHER -> {
         throw UnknownError()
@@ -665,7 +695,6 @@ fun BoxScope.DCIMViewerBottomBar(
 
 @Composable
 fun DCIMSpinnerView(dcimVM: DCIMViewModel) {
-  Log.d("lin.huang", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa ${dcimVM.dcimSpinnerList.size}")
   if (dcimVM.dcimSpinnerList.isEmpty()) return
   AnimatedVisibility(
     visible = dcimVM.showSpinner.value,

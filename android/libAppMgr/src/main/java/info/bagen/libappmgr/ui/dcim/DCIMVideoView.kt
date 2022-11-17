@@ -2,12 +2,11 @@ package info.bagen.libappmgr.ui.dcim
 
 import android.annotation.SuppressLint
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -27,70 +26,78 @@ import java.io.File
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
-fun VideScreen(dcimVM: DCIMViewModel, path: String) {
-  var exoPlayerData: ExoPlayerData? = null
-  dcimVM.resetExoPlayerList() // 重置所有的视频
-  if (dcimVM.exoMaps.containsKey(path)) {
-    exoPlayerData = dcimVM.exoMaps[path]
-  } else {
-    exoPlayerData = ExoPlayerData(
-      exoPlayer = SimpleExoPlayer.Builder(LocalContext.current).build()
-        .apply { playWhenReady = false },
+fun VideoScreen(dcimVM: DCIMViewModel, path: String, page: Int) {
+  val context = LocalContext.current
+  val exoPlayerData = remember {
+    ExoPlayerData(
+      exoPlayer = SimpleExoPlayer.Builder(context).build().apply {
+        playWhenReady = false
+        setMediaItem(MediaItem.fromUri(Uri.fromFile(File(path))))
+      },
       playerState = mutableStateOf(PlayerState.Play)
     )
-    exoPlayerData.exoPlayer.setMediaItem(MediaItem.fromUri(Uri.fromFile(File(path))))
-    exoPlayerData.exoPlayer.addAnalyticsListener(object : AnalyticsListener {
-      override fun onPlayWhenReadyChanged(
-        eventTime: AnalyticsListener.EventTime,
-        playWhenReady: Boolean,
-        reason: Int
-      ) {
-        //super.onPlayWhenReadyChanged(eventTime, playWhenReady, reason)
-        when (playWhenReady) {
-          true -> exoPlayerData.playerState.value = PlayerState.Playing
-          false -> exoPlayerData.playerState.value = PlayerState.Pause
-        }
-      }
-
-      override fun onPlaybackStateChanged(
-        eventTime: AnalyticsListener.EventTime,
-        state: Int
-      ) {
-        //super.onPlaybackStateChanged(eventTime, state)
-        when (state) {
-          Player.STATE_ENDED -> exoPlayerData.playerState.value = PlayerState.END
-          else -> null
-        }
-      }
-    })
-    dcimVM.exoMaps[path] = exoPlayerData
   }
-  Box(modifier = Modifier.fillMaxSize()) {
-    AndroidView(
-      factory = { context ->
-        PlayerView(context).apply {
-          useController = false // 是否显示控制视图
-          resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIT
-          this.player = exoPlayerData!!.exoPlayer
-        }
-      },
-      modifier = Modifier
-        .fillMaxWidth()
-        .align(Alignment.Center)
-    ) { playerView ->
-      playerView.player?.apply {
-        this.prepare()
-        this.pause()  // 为了保证每次点击视频后不主动播放
-        //dcimVM.exoPlayerList.add(this as SimpleExoPlayer)
+
+  exoPlayerData.exoPlayer.addAnalyticsListener(object : AnalyticsListener {
+    override fun onPlayWhenReadyChanged(
+      eventTime: AnalyticsListener.EventTime,
+      playWhenReady: Boolean,
+      reason: Int
+    ) {
+      when (playWhenReady) {
+        true -> exoPlayerData.playerState.value = PlayerState.Playing
+        false -> exoPlayerData.playerState.value = PlayerState.Pause
       }
     }
-    PlayerControlView(exoPlayerData!!)
+
+    override fun onPlaybackStateChanged(eventTime: AnalyticsListener.EventTime, state: Int) {
+      when (state) {
+        Player.STATE_ENDED -> exoPlayerData.playerState.value = PlayerState.END
+        else -> null
+      }
+    }
+  })
+
+  DisposableEffect(
+    Box(modifier = Modifier.fillMaxSize()) {
+      AndroidView(
+        modifier = Modifier
+          .fillMaxWidth()
+          .align(Alignment.Center),
+        factory = { context ->
+          dcimVM.exoPlayerList.add(exoPlayerData)
+          PlayerView(context).apply {
+            useController = false // 是否显示控制视图
+            resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIT
+            this.player = exoPlayerData.exoPlayer
+          }
+        },
+        update = { playerView ->
+          playerView.player?.apply {
+            this.prepare()
+            this.pause()  // 为了保证每次点击视频后不主动播放
+            //dcimVM.exoPlayerList.add(this as SimpleExoPlayer)
+          }
+        }
+      )
+      PlayerControlView(exoPlayerData)
+    }
+  ) {
+    onDispose {
+      dcimVM.exoPlayerList.forEach {
+        it.exoPlayer.pause()
+        it.exoPlayer.seekTo(0)
+        it.playerState.value = PlayerState.Play
+      } // 为了把其他在播放的进行暂停
+      exoPlayerData.exoPlayer.release()
+      dcimVM.exoPlayerList.remove(exoPlayerData)
+    }
   }
 }
 
 
 @Composable
-fun BoxScope.PlayerControlView(exoPlayerData: ExoPlayerData) {
+fun BoxScope.PlayerControlView(epd: ExoPlayerData) {
   Box(
     modifier = Modifier
       .fillMaxWidth()
@@ -98,14 +105,14 @@ fun BoxScope.PlayerControlView(exoPlayerData: ExoPlayerData) {
       .align(Alignment.Center)
       .clickable(
         onClick = {
-          when (exoPlayerData.playerState.value) {
-            PlayerState.Play -> exoPlayerData.exoPlayer.play()
-            PlayerState.Playing -> exoPlayerData.exoPlayer.pause()
-            PlayerState.Pause -> exoPlayerData.exoPlayer.play()
+          when (epd.playerState.value) {
+            PlayerState.Play -> epd.exoPlayer.play()
+            PlayerState.Playing -> epd.exoPlayer.pause()
+            PlayerState.Pause -> epd.exoPlayer.play()
             PlayerState.END -> {
-              exoPlayerData.exoPlayer.seekTo(0)
-              exoPlayerData.exoPlayer.play()
-              exoPlayerData.playerState.value = PlayerState.Playing
+              epd.exoPlayer.seekTo(0)
+              epd.exoPlayer.play()
+              epd.playerState.value = PlayerState.Playing
             }
           }
         },
@@ -114,7 +121,7 @@ fun BoxScope.PlayerControlView(exoPlayerData: ExoPlayerData) {
         interactionSource = remember { MutableInteractionSource() })
   ) {
     AsyncImage(
-      model = when (exoPlayerData.playerState.value) {
+      model = when (epd.playerState.value) {
         PlayerState.Play -> R.drawable.ic_player_play
         PlayerState.Pause -> R.drawable.ic_player_pause
         PlayerState.END -> R.drawable.ic_player_replay

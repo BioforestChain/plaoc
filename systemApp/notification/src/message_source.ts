@@ -101,7 +101,10 @@ export async function netCallNativeNotification(timeout = 3000) {
     isLocked = false;
   };
   const polling = async () => {
-    const messageString = await jscore.callJavaScriptWith(GET_NOTIFICATION);
+    const messageString = await jscore.callJavaScriptWithFunctionNameParam(
+      GET_NOTIFICATION,
+      ""
+    );
 
     if (messageString) {
       const messages = JSON.parse(messageString);

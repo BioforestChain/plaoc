@@ -1,4 +1,4 @@
-#![cfg(target_os = "android")]
+// #![cfg(target_os = "android")]
 use android_logger::Config;
 use lazy_static::*;
 use log::{debug, error, info, Level};
@@ -98,7 +98,7 @@ macro_rules! jni_method {
 //     );
 // }
 
-/// 动态库被 java 加载时 会触发此函数, 在此动态注册本地方法 
+/// 动态库被 java 加载时 会触发此函数, 在此动态注册本地方法
 #[no_mangle]
 #[allow(non_snake_case)]
 unsafe fn JNI_OnLoad(jvm: JavaVM, _reserved: *mut c_void) -> jint {

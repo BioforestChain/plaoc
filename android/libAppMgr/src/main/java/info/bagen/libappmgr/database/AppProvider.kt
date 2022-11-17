@@ -1,16 +1,16 @@
 package info.bagen.libappmgr.database
 
-import android.content.ContentProvider
-import android.content.ContentValues
-import android.content.Context
-import android.content.UriMatcher
+import android.content.*
 import android.database.Cursor
+import android.database.CursorWindow
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.net.Uri
+import android.util.Log
 import info.bagen.libappmgr.database.AppContract.Companion.PATH_MEDIA
 import info.bagen.libappmgr.database.AppContract.Companion.PATH_PERMISSION
 import info.bagen.libappmgr.utils.AppContextUtil
+import java.lang.reflect.Field
 
 
 class AppProvider : ContentProvider() {
@@ -52,12 +52,21 @@ class AppProvider : ContentProvider() {
       PERMISSIONS_TABLE + "." + AppContract.Medias.COLUMN_PATH
     sProjectionMap[AppContract.Medias.COLUMN_TYPE] =
       PERMISSIONS_TABLE + "." + AppContract.Medias.COLUMN_TYPE
+    sProjectionMap[AppContract.Medias.COLUMN_DURATION] =
+      PERMISSIONS_TABLE + "." + AppContract.Medias.COLUMN_DURATION
     sProjectionMap[AppContract.Medias.COLUMN_TIME] =
       PERMISSIONS_TABLE + "." + AppContract.Medias.COLUMN_TIME
   }
 
 
   override fun onCreate(): Boolean {
+      try {
+        val field: Field = CursorWindow::class.java.getDeclaredField("sCursorWindowSize")
+        field.isAccessible = true
+        val mb = 2
+        field.set(null, mb * 1024 * 1024)
+      } catch (e: Exception) {
+      }
     return true
   }
 
@@ -71,6 +80,9 @@ class AppProvider : ContentProvider() {
     when (sUriMatcher.match(uri)) {
       MATCH_PERMISSION -> return mOpenHelper.writableDatabase.query(
         PERMISSIONS_TABLE, projection, selection, selectionArgs, null, null, sortOrder
+      )
+      MATCH_MDEIA -> return mOpenHelper.writableDatabase.query(
+        MEDIAS_TABLE, projection, selection, selectionArgs, null, null, sortOrder
       )
       else -> null
     }
@@ -90,25 +102,37 @@ class AppProvider : ContentProvider() {
   }
 
   override fun insert(uri: Uri, values: ContentValues?): Uri? {
-    when (sUriMatcher.match(uri)) {
-      MATCH_PERMISSION -> mOpenHelper.writableDatabase.insert(PERMISSIONS_TABLE, null, values)
-      MATCH_MDEIA -> mOpenHelper.writableDatabase.insert(MEDIAS_TABLE, null, values)
+    return when (sUriMatcher.match(uri)) {
+      MATCH_PERMISSION -> {
+        var id = mOpenHelper.writableDatabase.insert(PERMISSIONS_TABLE, null, values)
+        if (id > 0) {
+          Uri.parse("content://${AppContract.AUTHORITY}/$PATH_PERMISSION/$id")
+        } else {
+          null
+        }
+      }
+      MATCH_MDEIA -> {
+        var id = mOpenHelper.writableDatabase.insert(MEDIAS_TABLE, null, values)
+        if (id > 0) {
+          Uri.parse("content://${AppContract.AUTHORITY}/$PATH_MEDIA/$id")
+        } else {
+          null
+        }
+      }
       else -> null
     }
-    return null
   }
 
   override fun delete(uri: Uri, selection: String?, selectionArgs: Array<out String>?): Int {
-    when (sUriMatcher.match(uri)) {
+    return when (sUriMatcher.match(uri)) {
       MATCH_PERMISSION -> return mOpenHelper.writableDatabase.delete(
         PERMISSIONS_TABLE, selection, selectionArgs
       )
       MATCH_MDEIA -> return mOpenHelper.writableDatabase.delete(
         MEDIAS_TABLE, selection, selectionArgs
       )
-      else -> null
+      else -> 0
     }
-    return 0
   }
 
   override fun update(
@@ -117,25 +141,40 @@ class AppProvider : ContentProvider() {
     selection: String?,
     selectionArgs: Array<out String>?
   ): Int {
-    when (sUriMatcher.match(uri)) {
+    return when (sUriMatcher.match(uri)) {
       MATCH_PERMISSION -> return mOpenHelper.writableDatabase.update(
         PERMISSIONS_TABLE, values, selection, selectionArgs
       )
-      else -> null
+      else -> 0
     }
-    return 0
+  }
+
+  override fun applyBatch(
+    authority: String,
+    operations: java.util.ArrayList<ContentProviderOperation>
+  ): Array<ContentProviderResult> {
+    var db = mOpenHelper.writableDatabase
+    db.beginTransaction();
+    try {
+      var results = super.applyBatch(operations);
+      db.setTransactionSuccessful();
+      return results;
+    } finally {
+      db.endTransaction()
+    }
+    return super.applyBatch(authority, operations)
   }
 
   class AppHelper(context: Context, db_name: String, db_version: Int) :
     SQLiteOpenHelper(context, db_name, null, db_version) {
     override fun onCreate(db: SQLiteDatabase?) {
       db?.execSQL(createPermissionTable())
-      db?.execSQL(createMediaTable())
+      createMediaTable().forEach { sql -> db?.execSQL(sql) }
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
       if (oldVersion == 1 && newVersion == 2) {
-        db?.execSQL(createMediaTable())
+        createMediaTable().forEach { sql -> db?.execSQL(sql) }
       }
     }
 
@@ -144,16 +183,26 @@ class AppProvider : ContentProvider() {
         AppContract.Permissions.COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
         AppContract.Permissions.COLUMN_APP_ID + " TEXT NOT NULL," +
         AppContract.Permissions.COLUMN_NAME + " TEXT NOT NULL," +
-        AppContract.Permissions.COLUMN_GRANT + " INTEGER NOT NULL DEFAULT -1" + ");"
+        AppContract.Permissions.COLUMN_GRANT + " INT NOT NULL DEFAULT -1" + ");"
     }
 
-    private fun createMediaTable(): String {
-      return "CREATE TABLE IF NOT EXISTS " + MEDIAS_TABLE + "(" +
-        AppContract.Medias.COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-        AppContract.Medias.COLUMN_PATH + " TEXT NOT NULL," +
-        AppContract.Medias.COLUMN_TYPE + " TEXT NOT NULL," +
-        AppContract.Medias.COLUMN_TIME + " INTEGER NOT NULL DEFAULT 0" + ")" +
-        "ADD INDEX ind_path(${AppContract.Medias.COLUMN_PATH}, ind_type(${AppContract.Medias.COLUMN_TYPE});"
+    private fun createMediaTable(): ArrayList<String> {
+      var list = arrayListOf<String>()
+      list.add(
+        "CREATE TABLE IF NOT EXISTS " + MEDIAS_TABLE + "(" +
+          AppContract.Medias.COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+          AppContract.Medias.COLUMN_PATH + " TEXT NOT NULL," +
+          AppContract.Medias.COLUMN_FILTER + " TEXT NOT NULL," +
+          AppContract.Medias.COLUMN_TYPE + " TEXT NOT NULL," +
+          AppContract.Medias.COLUMN_DURATION + " INT NOT NULL DEFAULT 0," +
+          AppContract.Medias.COLUMN_TIME + " INT NOT NULL DEFAULT 0," +
+          AppContract.Medias.COLUMN_THUMBNAIL + " BLOB," +
+          AppContract.Medias.COLUMN_BITMAP + " BLOB" + ");"
+      )
+      list.add("CREATE INDEX IND_PATH ON " + MEDIAS_TABLE + "(${AppContract.Medias.COLUMN_PATH});")
+      list.add("CREATE INDEX IND_FILTER ON " + MEDIAS_TABLE + "(${AppContract.Medias.COLUMN_FILTER});")
+      list.add("CREATE INDEX IND_TYPE ON " + MEDIAS_TABLE + "(${AppContract.Medias.COLUMN_TYPE});")
+      return list
     }
   }
 }

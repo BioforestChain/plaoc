@@ -1,4 +1,4 @@
-#[cfg(target_os = "android")]
+// #[cfg(target_os = "android")]
 use crate::android::android_inter;
 use crate::web_socket::ws::TopicsRequest;
 use std::sync::mpsc::{Receiver, Sender};
@@ -14,7 +14,7 @@ pub fn call_android(bit: Vec<u8>) {
     // let data = &handle.data;
     // 转换为static str
     let callback = Box::leak(bit.into_boxed_slice());
-    #[cfg(target_os = "android")]
+    // #[cfg(target_os = "android")]
     android_inter::call_java_callback(callback);
 }
 
@@ -25,7 +25,7 @@ pub fn call_android_evaljs(bit: Vec<u8>) {
     // let data = &handle.data;
     // 转换为static str
     let callback = Box::leak(bit.into_boxed_slice());
-    #[cfg(target_os = "android")]
+    // #[cfg(target_os = "android")]
     android_inter::deno_evaljs_callback(callback);
 }
 

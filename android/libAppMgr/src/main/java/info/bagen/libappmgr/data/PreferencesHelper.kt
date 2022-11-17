@@ -3,7 +3,8 @@ package info.bagen.libappmgr.data
 import info.bagen.libappmgr.utils.*
 
 object PreferencesHelper {
-  private const val STATE_FIRST_LOADING = "plaoc.state.first.in"
+  private const val STATE_FIRST_LOADING = "plaoc.state.first.in" // 判断是否第一次运行程序
+  private const val STATE_MEDIA_LOADING = "plaoc.state.media.loading" // 判断media数据是否已经加载过了
   /*private const val STATE_KEY_FIRST_INT = "wan.state.first.in"
   private const val USER_KEY_ID = "wan.user.id"
   private const val USER_KEY_NAME = "wan.user.name"
@@ -14,6 +15,11 @@ object PreferencesHelper {
     AppContextUtil.sInstance!!.saveBoolean(STATE_FIRST_LOADING, isFirst)
 
   fun isFirstIn() = AppContextUtil.sInstance!!.getBoolean(STATE_FIRST_LOADING, true)
+
+  fun saveMediaLoading(loading: Boolean) =
+    AppContextUtil.sInstance!!.saveBoolean(STATE_MEDIA_LOADING, loading)
+
+  fun isMediaLoading() = AppContextUtil.sInstance!!.getBoolean(STATE_MEDIA_LOADING, false)
 
   /*fun saveUserId(context: Context, id: Int) = context.saveInteger(USER_KEY_ID, id)
 
