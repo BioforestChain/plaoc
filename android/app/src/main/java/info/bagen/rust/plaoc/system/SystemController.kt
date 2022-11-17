@@ -1,4 +1,4 @@
-package info.bagen.libappmgr.system
+package info.bagen.rust.plaoc.system
 
 import android.content.Context
 import android.os.Vibrator
