@@ -3,6 +3,7 @@
   package="info.bagen.libappmgr">
 
   <uses-permission android:name="android.permission.INTERNET" />
+  <uses-permission android:name="android.permission.VIBRATE" /> <!-- 振动，蜂鸣 -->
   <!-- 存储卡 -->
   <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
   <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
