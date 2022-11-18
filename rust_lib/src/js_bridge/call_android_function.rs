@@ -2,10 +2,7 @@
 use crate::android::android_inter;
 use crate::web_socket::ws::TopicsRequest;
 use std::sync::mpsc::{Receiver, Sender};
-use std::{
-    collections::HashMap,
-    sync::{mpsc, Arc},
-};
+use std::sync::{mpsc, Arc};
 
 /// 调用android方法
 pub fn call_android(bit: Vec<u8>) {
