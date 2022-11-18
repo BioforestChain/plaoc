@@ -6,7 +6,7 @@ use serde::Deserialize;
 use serde_json::from_str;
 use std::{borrow::Borrow, fmt, sync::RwLock};
 // 引用 jni 库的一些内容，就是上面添加的 jni 依赖
-use crate::js_bridge::call_js_function::BUFFER_RESOLVE;
+// use crate::js_bridge::call_js_function::BUFFER_RESOLVE;
 use crate::js_bridge::call_js_function::BUFFER_SYSTEM;
 use crate::module_loader::AssetsModuleLoader;
 use crate::my_deno_runtime::{bootstrap_deno_fs_runtime, bootstrap_deno_runtime};
@@ -83,14 +83,14 @@ pub async extern "system" fn Java_info_bagen_rust_plaoc_DenoService_backDataToRu
     let data_string = std::str::from_utf8(&scanner_data).unwrap();
     log::info!(" backDataToRust:{:?}", data_string);
     let buffer = BUFFER_INSTANCES_MAP.lock().get(token);
-    if (buffer::waitter) {
+    if buffer::waitter {
         buffer::waitter.resolve();
         buffer::waitter = null;
         return 0; // 0 代表没有阻塞
     }
 
-    if (buffer.currentHeight >= buffer.waterThrotth) {
-        throw
+    if buffer.currentHeight >= buffer.waterThrotth {
+        println!()
     }
     buffer::cache.push(&scanner_data.to_vec());
     buffer::currentHeight += scanner_data.len();

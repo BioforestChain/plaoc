@@ -14,8 +14,8 @@ pub struct Promise {
     value: PromiseImpl<T>,
     reason: null,
     status: PromiseType::PENDING,
-    onResolvedCallbacks: vec![&self],
-    onRejectedCallbacks: vec![&self],
+    onResolvedCallbacks: Vec<&self>,
+    onRejectedCallbacks: Vec<&self>,
 }
 
 impl Promise {
@@ -46,7 +46,7 @@ pub enum PromiseImpl<T: Send + 'static> {
     Ready(T),
 }
 
-pub impl<T: Send + 'static> PromiseImpl<T> {
+ impl<T: Send + 'static> PromiseImpl<T> {
     /// 查看是否准备完
     #[allow(unused_variables)]
     fn poll_mut(&mut self, task_type: TaskType) -> std::task::Poll<&mut T> {
