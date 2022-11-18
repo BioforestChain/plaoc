@@ -1,4 +1,6 @@
 // #![cfg(target_os = "android")]
+use super::promise::PromiseImpl;
+use super::promsieOut::PromiseOut;
 use crate::android::android_inter;
 use crate::js_bridge::call_android_function;
 use android_logger::Config;
@@ -8,7 +10,7 @@ use deno_core::{op, ZeroCopyBuf};
 use lazy_static::*;
 use log::{debug, error, info, Level};
 use std::result::Result::Ok;
-use std::str;
+use std::{collections::HashMap, str};
 
 // 添加一个全局变量来缓存信息，让js每次来拿，防止js内存爆炸,这里应该用channelId来定位每条消息，而不是用现在的队列
 lazy_static! {
@@ -17,8 +19,18 @@ lazy_static! {
     pub(crate) static ref BUFFER_RESOLVE: Mutex<Vec<Vec<u8>>> = Mutex::new(vec![]);
     // 系统操作通道
     pub(crate) static ref BUFFER_SYSTEM: Mutex<Vec<Vec<u8>>> = Mutex::new(vec![]);
-    pub(crate) static ref BUFFER_SYSTEM_ARC: Mutex<Vec<Vec<u8>>> = Mutex::new(vec![]);
 }
+
+type channelId = String;
+struct BufferInstance<T: Send + 'static> {
+    cache: Vec<u8>,
+    waitter: PromiseImpl<T>,
+    currentHeight: i32,
+    waterThrotth: i32, // 8MB
+}
+
+pub const BUFFER_INSTANCES_MAP: Mutex<HashMap<channelId, BufferInstance>> =
+    Mutex::new(HashMap::new());
 
 /// deno-js消息从这里走到移动端
 #[op]
@@ -40,8 +52,24 @@ pub fn op_eval_js(buffer: ZeroCopyBuf) {
 
 ///  deno-js 轮询访问这个方法，以达到把rust数据传递到deno-js的过程，这里负责的是移动端系统API的数据
 #[op]
-pub fn op_rust_to_js_system_buffer() -> Result<Vec<u8>, AnyError> {
-    let box_data = BUFFER_SYSTEM.lock().pop();
+pub fn op_rust_to_js_system_buffer(channelId: String) -> Result<Vec<u8>, AnyError> {
+    let buffer = BUFFER_INSTANCES_MAP.lock().get(&channelId);
+    if (buffer::cache.len() > 0) {
+        let result = buffer::cache::shift();
+        buffer::currentHeight -= result.len();
+        // TODO: 背压放水策略： buffer.currentHeight < buffer.waterThrotth/2
+        if (buffer::currentHeight < buffer::waterThrotth) {
+            Java_open_back_pressure(token)
+        }
+        return result;
+    }
+    if (buffer::waitter) {
+        Err(custom_error("op_rust_to_js_system_buffer", "超过"))
+    }
+    let waitter = PromiseImpl::new();
+    buffer::waitter = waitter;
+    buffer::waitter::poll_mut.await?;
+    let box_data = buffer::cache;
     match box_data {
         Some(r) => Ok(r),
         None => Err(custom_error("op_rust_to_js_system_buffer", "未找到数据")),
@@ -220,4 +248,3 @@ class Channels{
     }
 }
  */
-const Z: i32 = 1;

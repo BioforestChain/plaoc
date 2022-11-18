@@ -70,21 +70,38 @@ pub async extern "system" fn Java_info_bagen_rust_plaoc_DenoService_denoRuntime(
         .await
         .unwrap();
 }
-/// 接收返回的二进制数据
+/// 接收返回的二进制数据 dwebview 的所有数据通过这个通道传输到deno-js
 #[no_mangle]
 #[tokio::main]
 pub async extern "system" fn Java_info_bagen_rust_plaoc_DenoService_backDataToRust(
     env: JNIEnv,
     _context: JObject,
+    token: JString,
     byteData: jbyteArray,
 ) {
     let scanner_data = env.convert_byte_array(byteData).unwrap();
     let data_string = std::str::from_utf8(&scanner_data).unwrap();
     log::info!(" backDataToRust:{:?}", data_string);
-    BUFFER_RESOLVE.lock().push(scanner_data.to_vec());
+    let buffer = BUFFER_INSTANCES_MAP.lock().get(token);
+    if (buffer::waitter) {
+        buffer::waitter.resolve();
+        buffer::waitter = null;
+        return 0; // 0 代表没有阻塞
+    }
+
+    if (buffer.currentHeight >= buffer.waterThrotth) {
+        throw
+    }
+    buffer::cache.push(&scanner_data.to_vec());
+    buffer::currentHeight += scanner_data.len();
+    // 1 代表已经被阻塞
+    if buffer.currentHeight >= buffer.waterThrotth {
+        1
+    }
+    0
 }
 
-/// 接收返回的系统API二进制数据
+/// 接收返回的系统API二进制数据 deno-js请求kotlin(系统函数)返回值走这里
 #[no_mangle]
 #[tokio::main]
 pub async extern "C" fn Java_info_bagen_rust_plaoc_DenoService_backSystemDataToRust(
