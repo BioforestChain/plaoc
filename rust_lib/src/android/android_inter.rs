@@ -1,16 +1,15 @@
 // #![cfg(target_os = "android")]
 use lazy_static::*;
 use log::{debug, error, info};
-// 引用标准库的一些内容
-#[cfg(target_os = "android")]
-use crate::module_loader::AssetsModuleLoader;
 use jni::{
-    objects::{GlobalRef, JObject, JValue},
-    sys::{jint, JNI_ERR, JNI_VERSION_1_4},
+    objects::{GlobalRef, JByteBuffer, JObject, JString, JValue},
+    sys::{jint, jstring, JNI_ERR, JNI_VERSION_1_4},
     JNIEnv, JavaVM, NativeMethod,
 };
 use jni_sys::jbyteArray;
 use std::{ffi::c_void, sync::Mutex};
+use std::ptr::NonNull;
+use std::sync::Arc;
 
 // 添加一个全局变量来缓存回调对象
 lazy_static! {

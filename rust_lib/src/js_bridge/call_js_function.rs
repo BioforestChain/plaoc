@@ -1,4 +1,4 @@
-// #[cfg(target_os = "android")]
+// #![cfg(target_os = "android")]
 use crate::android::android_inter;
 use crate::js_bridge::call_android_function;
 use android_logger::Config;
@@ -24,9 +24,8 @@ lazy_static! {
 }
 
 type ChannelId = String;
-
-pub const BUFFER_INSTANCES_MAP: Mutex<HashMap<ChannelId, BufferInstance>> =
-    Mutex::new(HashMap::new());
+const  buff_map :HashMap<ChannelId, BufferInstance> = HashMap::new();
+pub const BUFFER_INSTANCES_MAP: Mutex<HashMap<ChannelId, BufferInstance>> = Mutex::new(buff_map);
 
 /// deno-js消息从这里走到移动端
 #[op]

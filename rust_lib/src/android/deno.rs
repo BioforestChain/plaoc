@@ -42,7 +42,7 @@ pub async extern "system" fn Java_info_bagen_rust_plaoc_DenoService_onlyReadRunt
     let entrance: String = env.get_string(terget).unwrap().into();
     #[cfg(target_os = "android")]
     bootstrap_deno_runtime(
-        *Arc::new(AssetsModuleLoader::from_ptr(
+        Arc::new(AssetsModuleLoader::from_ptr(
             NonNull::new(asset_manager_ptr).unwrap(),
         )),
         &entrance,
@@ -84,7 +84,7 @@ pub async extern "system" fn Java_info_bagen_rust_plaoc_DenoService_backDataToRu
     // JString tramsfrom String
     let token_string: String = env.get_string(token).unwrap().into();
     log::info!(" backDataToRust:{:?}", data_string);
-    let buffer = BUFFER_INSTANCES_MAP.lock().get(&token_string).unwrap();
+    let buffer =  BUFFER_INSTANCES_MAP.lock().get(&token_string).unwrap();
 
     if buffer.currentHeight >= buffer.waterThrotth {
         println!()

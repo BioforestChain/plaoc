@@ -56,7 +56,7 @@ impl Future for BufferInstance {
     type Output = Result<Vec<u8>, &'static str>;
 
     fn poll(
-        self: std::pin::Pin<&mut Self>,
+         self: std::pin::Pin<&mut Self>,
         cx: &mut std::task::Context<'_>,
     ) -> std::task::Poll<Self::Output> {
         let mut shared_state = self.waitter.lock().unwrap();
@@ -66,7 +66,7 @@ impl Future for BufferInstance {
                 Poll::Pending
             }
             PromiseType::FULFILLED => {
-                let res = self.cache.remove(0);
+                let res = self.cache.remove(0).clone();
                 Poll::Ready(Ok(res))
             }
             PromiseType::REJECTED => Poll::Ready(Err("promise Error")),

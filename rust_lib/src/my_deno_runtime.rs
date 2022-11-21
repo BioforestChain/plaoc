@@ -93,7 +93,7 @@ fn create_web_worker_callback(
             compiled_wasm_module_store: Some(CompiledWasmModuleStore::default()),
             // maybe_exit_code: args.maybe_exit_code,
             stdio: stdio.clone(),
-            unsafely_ignore_certificate_errors: todo!(),
+            unsafely_ignore_certificate_errors: None,
         };
         // log::info!("bootstrap_from_options: {:?}", args.name);
 
