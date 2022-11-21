@@ -1,5 +1,4 @@
-// #![cfg(target_os = "android")]
-
+#![cfg(target_os = "android")]
 use deno_core::anyhow::Error;
 // use assets_manager::{loader, Asset, AssetCache};
 use deno_core::error::generic_error;

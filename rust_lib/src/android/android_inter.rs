@@ -1,24 +1,16 @@
 // #![cfg(target_os = "android")]
-use android_logger::Config;
 use lazy_static::*;
-use log::{debug, error, info, Level};
-use tokio;
+use log::{debug, error, info};
 // 引用标准库的一些内容
-use std::{
-    ffi::{c_void, CStr, CString},
-    sync::{mpsc, Mutex},
-    thread,
-};
-// 引用 jni 库的一些内容，就是上面添加的 jni 依赖
+#[cfg(target_os = "android")]
 use crate::module_loader::AssetsModuleLoader;
 use jni::{
-    objects::{GlobalRef, JByteBuffer, JObject, JString, JValue},
-    sys::{jint, jstring, JNI_ERR, JNI_VERSION_1_4},
+    objects::{GlobalRef, JObject, JValue},
+    sys::{jint, JNI_ERR, JNI_VERSION_1_4},
     JNIEnv, JavaVM, NativeMethod,
 };
 use jni_sys::jbyteArray;
-use std::ptr::NonNull;
-use std::sync::Arc;
+use std::{ffi::c_void, sync::Mutex};
 
 // 添加一个全局变量来缓存回调对象
 lazy_static! {
@@ -57,33 +49,6 @@ macro_rules! jni_method {
         }
     }};
 }
-
-// #[no_mangle]
-// pub extern "system" fn Java_info_bagen_rust_plaoc_DenoService_initialiseLogging(
-//     env: JNIEnv,
-//     _context: JObject,
-// ) {
-//     android_logger::init_once(
-//         Config::default()
-//             .with_min_level(Level::Trace)
-//             .with_tag("Rust"),
-//     );
-//     log_panics::init();
-
-//     log::info!("Logging initialised from Rust");
-
-//     std::env::set_var("NO_COLOR", "true");
-// }
-
-// #[no_mangle]
-// pub extern "system" fn Java_info_bagen_rust_plaoc_DenoService_hello(
-//     env: JNIEnv,
-//     context: JObject,
-// ) {
-//     log::info!("hello!!!hello!!!hello!!!hello!!!hello!!!");
-//     let global_context = env.new_global_ref(context).unwrap();
-//     rust_lib_ndk_context_initialize(env.get_java_vm().unwrap(), global_context.as_obj());
-// }
 
 // #[no_mangle]
 // pub extern "C" fn rust_lib_ndk_context_initialize(vm: JavaVM, context: JObject) {

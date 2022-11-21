@@ -22,7 +22,7 @@ use deno_runtime::BootstrapOptions;
 use std::rc::Rc;
 use std::sync::Arc;
 
-// #[cfg(target_os = "android")]
+#[cfg(target_os = "android")]
 use crate::module_loader::AssetsModuleLoader;
 
 fn create_web_worker_preload_module_callback() -> Arc<PreloadModuleCb> {

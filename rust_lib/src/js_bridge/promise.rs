@@ -1,7 +1,17 @@
+use futures::task::Poll;
+use futures::Future;
+use std::marker::Send;
+use std::result::Result::Ok;
+use std::sync::mpsc::channel;
+use std::sync::mpsc::{Receiver, Sender};
+use std::sync::{Arc, Mutex};
+use std::task::Waker;
+use std::thread;
+
 /// 运行的任务类型
 #[derive(Clone, Copy)]
 #[allow(dead_code)]
-enum PromiseType {
+pub enum PromiseType {
     /// 等待
     PENDING,
     ///  完成
@@ -10,137 +20,247 @@ enum PromiseType {
     REJECTED,
 }
 
-pub struct Promise {
-    value: PromiseImpl<T>,
-    reason: null,
-    status: PromiseType::PENDING,
-    onResolvedCallbacks: Vec<&self>,
-    onRejectedCallbacks: Vec<&self>,
+pub struct BufferInstance {
+    pub waitter: Arc<Mutex<PromiseOut>>,
+    // pub PromiseOut: Mutex<Option<BoxFuture<'static, ()>>>,
+    pub cache: Vec<Vec<u8>>,
+    pub currentHeight: i32,
+    pub waterThrotth: i32, // 8MB
 }
 
-impl Promise {
-    fn reoslve() {}
-    fn reject() {}
-    fn pending() {}
-    fn then() {}
-    fn catch() {}
-    fn finally(&self) {}
-    pub fn reoslve() {}
-    pub fn reject() {}
+impl BufferInstance {
+    pub fn new() -> Self {
+        let promise_out = Arc::new(Mutex::new(PromiseOut {
+            waker: None,
+            status: PromiseType::PENDING,
+            promise: None,
+        }));
+        // thread::spawn(move || {
+        //     let mut shared_state = promise_out.lock().unwrap();
+        //     // 通知执行器定时器已经完成，可以继续`poll`对应的`Future`了
+        //     shared_state.status = PromiseType::FULFILLED;
+        //     // if let Some(waker) = shared_state.waker.take() {
+        //     //     waker.wake()
+        //     // }
+        // });
+        BufferInstance {
+            waitter: promise_out,
+            cache: vec![vec![]],
+            currentHeight: 0,
+            waterThrotth: 1024 * 1024 * 8,
+        }
+    }
 }
 
-/// 运行的任务类型
-#[derive(Clone, Copy)]
-#[allow(dead_code)]
-pub enum TaskType {
-    /// 任务在本地线程中运行。
-    Local,
-    ///  在另一个线程中异步运行。
-    Async,
-    /// 其他情况。
-    None,
-}
+impl Future for BufferInstance {
+    type Output = Result<Vec<u8>, &'static str>;
 
-pub enum PromiseImpl<T: Send + 'static> {
-    Pending(std::sync::mpsc::Receiver<T>),
-    Ready(T),
-}
-
- impl<T: Send + 'static> PromiseImpl<T> {
-    /// 查看是否准备完
-    #[allow(unused_variables)]
-    fn poll_mut(&mut self, task_type: TaskType) -> std::task::Poll<&mut T> {
-        match self {
-            Self::Pending(rx) => {
-                // 在不阻塞的情况下，在channel通道中返回一个值，有可能是空对象
-                if let Ok(value) = rx.try_recv() {
-                    *self = Self::Ready(value);
-                    match self {
-                        Self::Ready(ref mut value) => std::task::Poll::Ready(value),
-                        Self::Pending(_) => unreachable!(), // 设置为无法访问，结束pending
-                    }
-                } else {
-                    std::task::Poll::Pending
-                }
+    fn poll(
+        self: std::pin::Pin<&mut Self>,
+        cx: &mut std::task::Context<'_>,
+    ) -> std::task::Poll<Self::Output> {
+        let mut shared_state = self.waitter.lock().unwrap();
+        match shared_state.status {
+            PromiseType::PENDING => {
+                cx.waker().to_owned();
+                Poll::Pending
             }
-            // 我准备好啦
-            Self::Ready(ref mut value) => std::task::Poll::Ready(value),
+            PromiseType::FULFILLED => {
+                let res = self.cache.remove(0);
+                Poll::Ready(Ok(res))
+            }
+            PromiseType::REJECTED => Poll::Ready(Err("promise Error")),
+        }
+    }
+}
+
+pub struct PromiseOut {
+    pub waker: Option<Waker>,
+    pub promise: Option<Promise<u8, &'static str>>,
+    pub status: PromiseType,
+}
+
+impl PromiseOut {
+    fn new() -> Self {
+        Self {
+            promise: None,
+            waker: None,
+            status: PromiseType::PENDING,
+        }
+    }
+}
+
+pub struct Promise<T: Send, E: Send> {
+    receiver: Receiver<Result<T, E>>,
+}
+
+impl<T: Send + 'static, E: Send + 'static> Promise<T, E> {
+    pub fn new<F>(func: F) -> Promise<T, E>
+    where
+        F: FnOnce() -> Result<T, E>,
+        F: Send + 'static,
+    {
+        let (tx, rx) = channel();
+
+        thread::spawn(move || {
+            Promise::impl_new(tx, func);
+        });
+
+        Promise { receiver: rx }
+    }
+
+    pub fn resolve(val: T) -> Promise<T, E> {
+        Promise::from_result(Ok(val))
+    }
+
+    pub fn reject(val: E) -> Promise<T, E> {
+        Promise::from_result(Err(val))
+    }
+    pub fn then<T2, E2, F1, F2>(self, callback: F1, errback: F2) -> Promise<T2, E2>
+    where
+        T2: Send + 'static,
+        E2: Send + 'static,
+        F1: FnOnce(T) -> Result<T2, E2>,
+        F2: FnOnce(E) -> Result<T2, E2>,
+        F1: Send + 'static,
+        F2: Send + 'static,
+    {
+        let recv = self.receiver;
+        let (tx, rx) = channel();
+
+        thread::spawn(move || {
+            Promise::impl_then(tx, recv, callback, errback);
+        });
+
+        Promise { receiver: rx }
+    }
+
+    pub fn then_result<T2, E2, F>(self, callback: F) -> Promise<T2, E2>
+    where
+        T2: Send + 'static,
+        E2: Send + 'static,
+        F: FnOnce(Result<T, E>) -> Result<T2, E2>,
+        F: Send + 'static,
+    {
+        let recv = self.receiver;
+        let (tx, rx) = channel();
+
+        thread::spawn(move || {
+            Promise::impl_then_result(tx, recv, callback);
+        });
+
+        Promise { receiver: rx }
+    }
+
+    pub fn ok_then<T2, F>(self, callback: F) -> Promise<T2, E>
+    where
+        T2: Send + 'static,
+        F: Send + 'static,
+        F: FnOnce(T) -> Result<T2, E>,
+    {
+        let recv = self.receiver;
+        let (tx, rx) = channel();
+
+        thread::spawn(move || {
+            Promise::impl_ok_then(tx, recv, callback);
+        });
+
+        Promise { receiver: rx }
+    }
+
+    pub fn catch<E2, F>(self, errback: F) -> Promise<T, E2>
+    where
+        F: FnOnce(E) -> Result<T, E2>,
+        F: Send + 'static,
+        E2: Send + 'static,
+    {
+        let recv = self.receiver;
+        let (tx, rx) = channel();
+
+        thread::spawn(move || {
+            Promise::impl_err_then(tx, recv, errback);
+        });
+
+        Promise { receiver: rx }
+    }
+
+    pub fn from_result(result: Result<T, E>) -> Promise<T, E> {
+        let (tx, rx) = channel();
+        tx.send(result).unwrap();
+
+        Promise { receiver: rx }
+    }
+
+    fn impl_new<F>(tx: Sender<Result<T, E>>, func: F)
+    where
+        F: FnOnce() -> Result<T, E>,
+        F: Send + 'static,
+    {
+        let result = func();
+        tx.send(result).unwrap_or(());
+    }
+
+    fn impl_then<T2, E2, F1, F2>(
+        tx: Sender<Result<T2, E2>>,
+        rx: Receiver<Result<T, E>>,
+        callback: F1,
+        errback: F2,
+    ) where
+        T2: Send + 'static,
+        E2: Send + 'static,
+        F1: FnOnce(T) -> Result<T2, E2>,
+        F2: FnOnce(E) -> Result<T2, E2>,
+        F1: Send + 'static,
+        F2: Send + 'static,
+    {
+        if let Ok(message) = rx.recv() {
+            match message {
+                Ok(val) => tx.send(callback(val)).unwrap_or(()),
+                Err(err) => tx.send(errback(err)).unwrap_or(()),
+            };
         }
     }
 
-    /// 看看状态是否完成，返回已完成的promise对象或promise本身。
-    fn try_take(self) -> Result<T, Self> {
-        match self {
-            Self::Pending(ref rx) => match rx.try_recv() {
-                Ok(value) => Ok(value),
-                Err(std::sync::mpsc::TryRecvError::Empty) => Err(self),
-                Err(std::sync::mpsc::TryRecvError::Disconnected) => {
-                    panic!("The Promise Sender was dropped")
-                }
-            },
-            Self::Ready(value) => Ok(value),
-        }
-    }
-    /// 查看是否准备完
-    #[allow(unsafe_code)]
-    #[allow(unused_variables)]
-    fn poll(&self, task_type: TaskType) -> std::task::Poll<&T> {
-        match self {
-            Self::Pending(rx) => {
-                match rx.try_recv() {
-                    Ok(value) => {
-                        // 只可以是Pending->Ready 的状态改变
-                        unsafe {
-                            let myself = self as *const Self as *mut Self;
-                            *myself = Self::Ready(value);
-                        }
-                        match self {
-                            Self::Ready(ref value) => std::task::Poll::Ready(value),
-                            Self::Pending(_) => unreachable!(),
-                        }
-                    }
-                    Err(std::sync::mpsc::TryRecvError::Empty) => std::task::Poll::Pending,
-                    Err(std::sync::mpsc::TryRecvError::Disconnected) => {
-                        panic!("The Promise Sender was dropped")
-                    }
-                }
-            }
-            Self::Ready(ref value) => std::task::Poll::Ready(value),
-        }
-    }
-    /// 阻塞直到准备好 可变传递
-    #[allow(unused_variables)]
-    fn block_until_ready_mut(&mut self, task_type: TaskType) -> &mut T {
-        match self {
-            Self::Pending(rx) => {
-                let value = rx.recv().expect("The Promise Sender was dropped");
-                *self = Self::Ready(value);
-                match self {
-                    Self::Ready(ref mut value) => value,
-                    Self::Pending(_) => unreachable!(),
-                }
-            }
-            Self::Ready(ref mut value) => value,
+    fn impl_then_result<T2, E2, F>(
+        tx: Sender<Result<T2, E2>>,
+        rx: Receiver<Result<T, E>>,
+        callback: F,
+    ) where
+        T2: Send + 'static,
+        E2: Send + 'static,
+        F: FnOnce(Result<T, E>) -> Result<T2, E2>,
+        F: Send + 'static,
+    {
+        if let Ok(result) = rx.recv() {
+            tx.send(callback(result)).unwrap_or(());
         }
     }
 
-    /// 阻塞直到准备好  不可变传递
-    #[allow(unsafe_code)]
-    #[allow(unused_variables)]
-    fn block_until_ready(&self, task_type: TaskType) -> &T {
-        match self {
-            Self::Pending(rx) => {
-                let value = rx.recv().expect("The Promise Sender was dropped");
-                unsafe {
-                    let myself = self as *const Self as *mut Self;
-                    *myself = Self::Ready(value);
-                }
-                match self {
-                    Self::Ready(ref value) => value,
-                    Self::Pending(_) => unreachable!(),
-                }
+    fn impl_ok_then<T2, F>(tx: Sender<Result<T2, E>>, rx: Receiver<Result<T, E>>, callback: F)
+    where
+        F: FnOnce(T) -> Result<T2, E>,
+        F: Send + 'static,
+        T2: Send + 'static,
+    {
+        if let Ok(message) = rx.recv() {
+            match message {
+                Ok(val) => tx.send(callback(val)).unwrap_or(()),
+                Err(err) => tx.send(Err(err)).unwrap_or(()),
             }
-            Self::Ready(ref value) => value,
+        }
+    }
+
+    fn impl_err_then<E2, F>(tx: Sender<Result<T, E2>>, rx: Receiver<Result<T, E>>, errback: F)
+    where
+        F: FnOnce(E) -> Result<T, E2>,
+        F: Send + 'static,
+        E2: Send + 'static,
+    {
+        if let Ok(message) = rx.recv() {
+            match message {
+                Ok(val) => tx.send(Ok(val)).unwrap_or(()),
+                Err(err) => tx.send(errback(err)).unwrap_or(()),
+            }
         }
     }
 }

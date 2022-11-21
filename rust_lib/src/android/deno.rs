@@ -1,25 +1,23 @@
 // #![cfg(target_os = "android")]
-use android_logger::Config;
-use log::Level;
-use ndk_sys::AAssetManager;
-use serde::Deserialize;
-use serde_json::from_str;
-use std::{borrow::Borrow, fmt, sync::RwLock};
-// 引用 jni 库的一些内容，就是上面添加的 jni 依赖
-// use crate::js_bridge::call_js_function::BUFFER_RESOLVE;
-use crate::js_bridge::call_js_function::BUFFER_SYSTEM;
+use crate::js_bridge::call_js_function::{BUFFER_INSTANCES_MAP, BUFFER_SYSTEM};
+#[cfg(target_os = "android")]
 use crate::module_loader::AssetsModuleLoader;
 use crate::my_deno_runtime::{bootstrap_deno_fs_runtime, bootstrap_deno_runtime};
+use android_logger::Config;
 use jni::{
     objects::{JObject, JString, JValue},
     JNIEnv,
 };
-
 use jni_sys::jbyteArray;
+use log::Level;
+#[cfg(target_os = "android")]
 use ndk::asset::{Asset, AssetManager};
-use std::rc::Rc;
-use std::sync::{Arc, Mutex};
-use std::{collections::HashMap, ptr::NonNull};
+#[cfg(target_os = "android")]
+use ndk_sys::AAssetManager;
+use serde::Deserialize;
+use std::fmt;
+use std::ptr::NonNull;
+use std::sync::Arc;
 
 /// 初始化的一些操作
 
@@ -38,11 +36,13 @@ pub async extern "system" fn Java_info_bagen_rust_plaoc_DenoService_onlyReadRunt
     );
     log::info!(" onlyReadRuntime :启动BFS后端 !!");
     let asset_manager_ptr = unsafe {
+        #[cfg(target_os = "android")]
         ndk_sys::AAssetManager_fromJava(env.get_native_interface(), jasset_manager.cast())
     };
     let entrance: String = env.get_string(terget).unwrap().into();
+    #[cfg(target_os = "android")]
     bootstrap_deno_runtime(
-        Arc::new(AssetsModuleLoader::from_ptr(
+        *Arc::new(AssetsModuleLoader::from_ptr(
             NonNull::new(asset_manager_ptr).unwrap(),
         )),
         &entrance,
@@ -81,24 +81,18 @@ pub async extern "system" fn Java_info_bagen_rust_plaoc_DenoService_backDataToRu
 ) {
     let scanner_data = env.convert_byte_array(byteData).unwrap();
     let data_string = std::str::from_utf8(&scanner_data).unwrap();
+    // JString tramsfrom String
+    let token_string: String = env.get_string(token).unwrap().into();
     log::info!(" backDataToRust:{:?}", data_string);
-    let buffer = BUFFER_INSTANCES_MAP.lock().get(token);
-    if buffer::waitter {
-        buffer::waitter.resolve();
-        buffer::waitter = null;
-        return 0; // 0 代表没有阻塞
-    }
+    let buffer = BUFFER_INSTANCES_MAP.lock().get(&token_string).unwrap();
 
     if buffer.currentHeight >= buffer.waterThrotth {
         println!()
     }
-    buffer::cache.push(&scanner_data.to_vec());
-    buffer::currentHeight += scanner_data.len();
+    buffer.cache.push(scanner_data.to_vec());
+    buffer.currentHeight += scanner_data.len() as i32;
     // 1 代表已经被阻塞
-    if buffer.currentHeight >= buffer.waterThrotth {
-        1
-    }
-    0
+    if buffer.currentHeight >= buffer.waterThrotth {}
 }
 
 /// 接收返回的系统API二进制数据 deno-js请求kotlin(系统函数)返回值走这里
