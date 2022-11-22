@@ -4,7 +4,6 @@ use crate::js_bridge::call_js_function::{BUFFER_INSTANCES_MAP, BUFFER_SYSTEM};
 use crate::module_loader::AssetsModuleLoader;
 use crate::my_deno_runtime::{bootstrap_deno_fs_runtime, bootstrap_deno_runtime};
 use android_logger::Config;
-use futures::future::ok;
 use jni::{
     objects::{JObject, JString, JValue},
     JNIEnv,
@@ -78,7 +77,7 @@ pub async extern "system" fn Java_info_bagen_rust_plaoc_DenoService_backDataToRu
     env: JNIEnv,
     _context: JObject,
     byteData: jbyteArray,
-) {
+) -> i32 {
     let scanner_data = env.convert_byte_array(byteData).unwrap();
     let data_string = std::str::from_utf8(&scanner_data).unwrap().to_string();
     log::info!(" backDataToRust:{:?}", &data_string);
@@ -88,15 +87,21 @@ pub async extern "system" fn Java_info_bagen_rust_plaoc_DenoService_backDataToRu
     // let token_string: String = env.get_string(token).unwrap().into();
 
     let mutex_buff = BUFFER_INSTANCES_MAP.lock();
-    let buffer_data = mutex_buff.get(&token).unwrap().clone();
+    let mut buffer_data = mutex_buff.get(&token).unwrap().lock();
 
-    if buffer_data.clone().over_flow() {
-        println!()
+    // 已经存在等待者，直接将数据交给等待者
+    if buffer_data.has_waitter() {
+        let data: &'static Vec<u8> = Box::leak(Box::new(scanner_data));
+        buffer_data.resolve_waitter(data);
+        return 0;
     }
-    let buffer_array = scanner_data.to_vec();
-    let flow = buffer_data.push(buffer_array);
+
+    if buffer_data.full {
+        return -1;
+    }
+    let is_full = buffer_data.push(scanner_data).unwrap();
     // 1 代表已经被阻塞
-    if flow {}
+    return if is_full { 1 } else { 0 };
 }
 
 /// 截取channelId /channel/354481793036294/chunk=
@@ -105,7 +110,7 @@ fn get_channel_id(url: String) -> Result<String, &'static str> {
         return Err("not found channel request!");
     }
     let channel_id = &url[url.find("/channel/").unwrap() + 9..url.find("/chunk").unwrap()];
-    Ok(channel_id.to_owned())
+    return Ok(channel_id.to_owned());
 }
 
 /// 接收返回的系统API二进制数据 deno-js请求kotlin(系统函数)返回值走这里

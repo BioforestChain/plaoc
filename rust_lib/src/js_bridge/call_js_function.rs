@@ -2,7 +2,10 @@
 use crate::android::android_inter;
 use crate::js_bridge::call_android_function;
 use android_logger::Config;
+use futures::future::maybe_done;
 use core::result::Result::Ok;
+use std::borrow::BorrowMut;
+use std::sync::Arc;
 use deno_core::error::{custom_error, AnyError};
 use deno_core::parking_lot::Mutex;
 use deno_core::{op, ZeroCopyBuf};
@@ -21,7 +24,7 @@ lazy_static! {
     // 系统操作通道
     pub(crate) static ref BUFFER_SYSTEM: Mutex<Vec<Vec<u8>>> = Mutex::new(vec![]);
 
-    pub(crate) static ref BUFFER_INSTANCES_MAP: Mutex<HashMap<ChannelId, BufferInstance>> = Mutex::new(HashMap::new());
+    pub(crate) static ref BUFFER_INSTANCES_MAP: Mutex<HashMap<ChannelId, Mutex<BufferInstance<'static> > >> = Mutex::new(HashMap::new());
 }
 
 type ChannelId = String;
@@ -46,35 +49,25 @@ pub fn op_eval_js(buffer: ZeroCopyBuf) {
 
 ///  deno-js 轮询访问这个方法，以达到把rust数据传递到deno-js的过程，这里负责的是移动端系统API的数据
 #[op]
-pub fn op_rust_to_js_system_buffer(channelId: String) -> Result<Vec<u8>, AnyError> {
-    let mut buffer = BufferInstance::new();
+pub async fn op_rust_to_js_system_buffer(channel_id: String) -> Result<Vec<u8>, AnyError> {
+    let map = BUFFER_INSTANCES_MAP.lock();
+    let mut  buffer = map.get(&channel_id).unwrap().lock();
+
     if !buffer.cache.is_empty() {
-        let result = buffer.cache.remove(0); // like javascript shift()
-        buffer.current_height -= result.len();
+        let result = buffer.shift();
+        
         // TODO: 背压放水策略： buffer.current_height < buffer.water_throtth/2
-        if buffer.current_height < buffer.water_throtth {
-            call_android_function::call_java_open_back_pressure(channelId) // 通知前端放水
+        if buffer.full && buffer.current_height < buffer.water_threshold {
+            buffer.full = false;
+            call_android_function::call_java_open_back_pressure(channel_id) // 通知前端放水
         }
         return Ok(result);
     }
-    let mut promise_out = buffer.waitter.lock().unwrap();
-    // 创建新线程
-    let mut thread_promise_out = promise_out.waker.clone();
-    // if waitter.waker {
-    //     Err(custom_error("op_rust_to_js_system_buffer", "超过"))
-    // }
-    promise_out.status = PromiseType::FULFILLED;
-    if let Some(waker) = thread_promise_out.take() {
-        waker.wake()
-    }
-    // thread::spawn(move || {
-    //     // 通知执行器定时器已经完成，可以继续`poll`对应的`Future`了
-    //     promise_out.status = PromiseType::FULFILLED;
-    //     if let Some(waker) = thread_promise_out.take() {
-    //         waker.wake()
-    //     }
-    // });
-    return Ok(vec![0]);
+
+    let waitter = buffer.init_waitter().unwrap().clone();
+    let buffer = waitter.await.as_ref().unwrap().clone();
+    return Ok(buffer.clone());
+    // return Ok(vec![0]);
 }
 
 /// deno-js 轮询访问这个方法，以达到把rust数据传递到deno-js的过程

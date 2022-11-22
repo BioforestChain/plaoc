@@ -1,7 +1,10 @@
+use deno_core::anyhow::Ok;
+use futures::future::maybe_done;
 use futures::task::Poll;
 use futures::Future;
+use std::borrow::Borrow;
 use std::marker::Send;
-use std::result::Result::Ok;
+use std::rc::Rc;
 use std::sync::mpsc::channel;
 use std::sync::mpsc::{Receiver, Sender};
 use std::sync::{Arc, Mutex};
@@ -20,22 +23,18 @@ pub enum PromiseType {
     REJECTED,
 }
 
-#[derive(Clone)]
-pub struct BufferInstance {
-    pub waitter: Arc<Mutex<PromiseOut>>,
-    // pub PromiseOut: Mutex<Option<BoxFuture<'static, ()>>>,
+// #[derive(Clone)]
+pub struct BufferInstance<'a> {
+    waitter: Option<PromiseOut<'a, Vec<u8>, ()>>,
     pub cache: Vec<Vec<u8>>,
+    pub full: bool,
     pub current_height: usize,
-    pub water_throtth: usize, // 8MB 1024 * 1024 * 8
+    pub water_threshold: usize, // 8MB 1024 * 1024 * 8
 }
 
-impl BufferInstance {
+impl<'a> BufferInstance<'a> {
     pub fn new() -> Self {
-        let promise_out = Arc::new(Mutex::new(PromiseOut {
-            waker: None,
-            status: PromiseType::PENDING,
-            promise: None,
-        }));
+        let promise_out = None;
         // thread::spawn(move || {
         //     let mut shared_state = promise_out.lock().unwrap();
         //     // 通知执行器定时器已经完成，可以继续`poll`对应的`Future`了
@@ -46,228 +45,102 @@ impl BufferInstance {
         // });
         BufferInstance {
             waitter: promise_out,
+            full: false,
             cache: vec![vec![]],
             current_height: 0,
-            water_throtth: 1024 * 1024 * 8,
+            water_threshold: 1024 * 1024 * 8,
         }
     }
-    pub fn push(mut self, bufferArray: Vec<u8>) -> bool {
-        self.current_height += bufferArray.len();
-        self.cache.push(bufferArray);
-        self.over_flow()
+    pub fn push(&mut self, buffer_array: Vec<u8>) -> Result<bool, String> {
+        if self.full {
+            return Err("request full ".to_string());
+        }
+        self.current_height += buffer_array.len();
+        self.cache.push(buffer_array);
+        return Result::Ok(self.over_flow());
     }
-    pub fn over_flow(self) -> bool {
-        self.current_height >= self.water_throtth
+    pub fn shift(&mut self) -> Vec<u8> {
+        let vec = self.cache.remove(0);
+        self.current_height -= vec.len();
+        return vec;
+    }
+    pub fn over_flow(&mut self) -> bool {
+        self.full = self.current_height >= self.water_threshold;
+        self.full
+    }
+
+    pub fn init_waitter(&mut self) -> Result<&PromiseOut<Vec<u8>, ()>, String> {
+        match &self.waitter {
+            Some(_) => Err("already exist waitter".to_string()),
+            None => {
+                self.waitter = Some(PromiseOut::new());
+                Result::Ok(&self.waitter.as_ref().unwrap())
+            }
+        }
+    }
+    pub fn has_waitter(&self) -> bool {
+        match self.waitter {
+            Some(_) => true,
+            None => false,
+        }
+    }
+    pub fn resolve_waitter(&mut self, data: &'a Vec<u8>) {
+        // let data: &'a Vec<u8> = Box::leak(Box::new(scanner_data));
+        self.waitter.as_mut().unwrap().resolve(data);
+        self.waitter = None;
     }
 }
 
-// impl Future for BufferInstance {
-//     type Output = Result<Vec<u8>, &'static str>;
-
-//     fn poll(
-//         self: std::pin::Pin<&mut Self>,
-//         cx: &mut std::task::Context<'_>,
-//     ) -> std::task::Poll<Self::Output> {
-//         let shared_state = self.waitter.lock().unwrap();
-//         match shared_state.status {
-//             PromiseType::PENDING => {
-//                 cx.waker();
-//                 Poll::Pending
-//             }
-//             PromiseType::FULFILLED => {
-//                 let res = self.cache.pop().unwrap();
-//                 Poll::Ready(Ok(res))
-//             }
-//             PromiseType::REJECTED => Poll::Ready(Err("promise Error")),
-//         }
-//     }
-// }
-pub struct PromiseOut {
-    pub waker: Option<Waker>,
-    pub promise: Option<Promise<u8, &'static str>>,
+#[derive(Clone)]
+pub struct PromiseOut<'a, T, E> {
+    //  waker:   Option< &'static dyn FnOnce() -> ()>,
+    // waker: Option< &'a Waker >,
+    mux: Vec<Waker>,
     pub status: PromiseType,
+    result: Option<Result<&'a T, &'a E>>,
 }
 
-impl PromiseOut {
-    fn new() -> Self {
+impl<'a, T, E> Future for PromiseOut<'a, T, E> {
+    type Output = Result<&'a T, &'a E>;
+
+    fn poll(
+        mut self: std::pin::Pin<&mut Self>,
+        cx: &mut std::task::Context<'_>,
+    ) -> std::task::Poll<Self::Output> {
+        if let PromiseType::PENDING = self.status {
+            self.mux.push(cx.waker().clone());
+            Poll::Pending
+        } else {
+            let res = self.result.unwrap();
+            Poll::Ready(res)
+        }
+    }
+}
+
+impl<'a, T, E> PromiseOut<'a, T, E> {
+    fn new() -> PromiseOut<'a, T, E> {
         Self {
-            promise: None,
-            waker: None,
+            // waker: None,
+            mux: vec![],
+            result: None,
             status: PromiseType::PENDING,
         }
     }
-}
-pub struct Promise<T: Send, E: Send> {
-    receiver: Receiver<Result<T, E>>,
-}
 
-impl<T: Send + 'static, E: Send + 'static> Promise<T, E> {
-    pub fn new<F>(func: F) -> Promise<T, E>
-    where
-        F: FnOnce() -> Result<T, E>,
-        F: Send + 'static,
-    {
-        let (tx, rx) = channel();
-
-        thread::spawn(move || {
-            Promise::impl_new(tx, func);
-        });
-
-        Promise { receiver: rx }
+    pub fn resolve(&mut self, value: &'a T) {
+        self.result = Some(Result::Ok(value));
+        self.status = PromiseType::FULFILLED;
+        self._wake();
     }
-
-    pub fn resolve(val: T) -> Promise<T, E> {
-        Promise::from_result(Ok(val))
+    pub fn reject(&mut self, error: &'a E) {
+        self.result = Some(Result::Err(error));
+        self.status = PromiseType::REJECTED;
+        self._wake();
     }
-
-    pub fn reject(val: E) -> Promise<T, E> {
-        Promise::from_result(Err(val))
-    }
-    pub fn then<T2, E2, F1, F2>(self, callback: F1, errback: F2) -> Promise<T2, E2>
-    where
-        T2: Send + 'static,
-        E2: Send + 'static,
-        F1: FnOnce(T) -> Result<T2, E2>,
-        F2: FnOnce(E) -> Result<T2, E2>,
-        F1: Send + 'static,
-        F2: Send + 'static,
-    {
-        let recv = self.receiver;
-        let (tx, rx) = channel();
-
-        thread::spawn(move || {
-            Promise::impl_then(tx, recv, callback, errback);
-        });
-
-        Promise { receiver: rx }
-    }
-
-    pub fn then_result<T2, E2, F>(self, callback: F) -> Promise<T2, E2>
-    where
-        T2: Send + 'static,
-        E2: Send + 'static,
-        F: FnOnce(Result<T, E>) -> Result<T2, E2>,
-        F: Send + 'static,
-    {
-        let recv = self.receiver;
-        let (tx, rx) = channel();
-
-        thread::spawn(move || {
-            Promise::impl_then_result(tx, recv, callback);
-        });
-
-        Promise { receiver: rx }
-    }
-
-    pub fn ok_then<T2, F>(self, callback: F) -> Promise<T2, E>
-    where
-        T2: Send + 'static,
-        F: Send + 'static,
-        F: FnOnce(T) -> Result<T2, E>,
-    {
-        let recv = self.receiver;
-        let (tx, rx) = channel();
-
-        thread::spawn(move || {
-            Promise::impl_ok_then(tx, recv, callback);
-        });
-
-        Promise { receiver: rx }
-    }
-
-    pub fn catch<E2, F>(self, errback: F) -> Promise<T, E2>
-    where
-        F: FnOnce(E) -> Result<T, E2>,
-        F: Send + 'static,
-        E2: Send + 'static,
-    {
-        let recv = self.receiver;
-        let (tx, rx) = channel();
-
-        thread::spawn(move || {
-            Promise::impl_err_then(tx, recv, errback);
-        });
-
-        Promise { receiver: rx }
-    }
-
-    pub fn from_result(result: Result<T, E>) -> Promise<T, E> {
-        let (tx, rx) = channel();
-        tx.send(result).unwrap();
-
-        Promise { receiver: rx }
-    }
-
-    fn impl_new<F>(tx: Sender<Result<T, E>>, func: F)
-    where
-        F: FnOnce() -> Result<T, E>,
-        F: Send + 'static,
-    {
-        let result = func();
-        tx.send(result).unwrap_or(());
-    }
-
-    fn impl_then<T2, E2, F1, F2>(
-        tx: Sender<Result<T2, E2>>,
-        rx: Receiver<Result<T, E>>,
-        callback: F1,
-        errback: F2,
-    ) where
-        T2: Send + 'static,
-        E2: Send + 'static,
-        F1: FnOnce(T) -> Result<T2, E2>,
-        F2: FnOnce(E) -> Result<T2, E2>,
-        F1: Send + 'static,
-        F2: Send + 'static,
-    {
-        if let Ok(message) = rx.recv() {
-            match message {
-                Ok(val) => tx.send(callback(val)).unwrap_or(()),
-                Err(err) => tx.send(errback(err)).unwrap_or(()),
-            };
+    fn _wake(&mut self) {
+        for waker in self.mux.iter() {
+            waker.clone().wake()
         }
-    }
-
-    fn impl_then_result<T2, E2, F>(
-        tx: Sender<Result<T2, E2>>,
-        rx: Receiver<Result<T, E>>,
-        callback: F,
-    ) where
-        T2: Send + 'static,
-        E2: Send + 'static,
-        F: FnOnce(Result<T, E>) -> Result<T2, E2>,
-        F: Send + 'static,
-    {
-        if let Ok(result) = rx.recv() {
-            tx.send(callback(result)).unwrap_or(());
-        }
-    }
-
-    fn impl_ok_then<T2, F>(tx: Sender<Result<T2, E>>, rx: Receiver<Result<T, E>>, callback: F)
-    where
-        F: FnOnce(T) -> Result<T2, E>,
-        F: Send + 'static,
-        T2: Send + 'static,
-    {
-        if let Ok(message) = rx.recv() {
-            match message {
-                Ok(val) => tx.send(callback(val)).unwrap_or(()),
-                Err(err) => tx.send(Err(err)).unwrap_or(()),
-            }
-        }
-    }
-
-    fn impl_err_then<E2, F>(tx: Sender<Result<T, E2>>, rx: Receiver<Result<T, E>>, errback: F)
-    where
-        F: FnOnce(E) -> Result<T, E2>,
-        F: Send + 'static,
-        E2: Send + 'static,
-    {
-        if let Ok(message) = rx.recv() {
-            match message {
-                Ok(val) => tx.send(Ok(val)).unwrap_or(()),
-                Err(err) => tx.send(errback(err)).unwrap_or(()),
-            }
-        }
+        self.mux.clear()
     }
 }
