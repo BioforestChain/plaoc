@@ -4,6 +4,7 @@ use crate::js_bridge::call_js_function::{BUFFER_INSTANCES_MAP, BUFFER_SYSTEM};
 use crate::module_loader::AssetsModuleLoader;
 use crate::my_deno_runtime::{bootstrap_deno_fs_runtime, bootstrap_deno_runtime};
 use android_logger::Config;
+use futures::future::ok;
 use jni::{
     objects::{JObject, JString, JValue},
     JNIEnv,
@@ -76,23 +77,35 @@ pub async extern "system" fn Java_info_bagen_rust_plaoc_DenoService_denoRuntime(
 pub async extern "system" fn Java_info_bagen_rust_plaoc_DenoService_backDataToRust(
     env: JNIEnv,
     _context: JObject,
-    token: JString,
     byteData: jbyteArray,
 ) {
     let scanner_data = env.convert_byte_array(byteData).unwrap();
-    let data_string = std::str::from_utf8(&scanner_data).unwrap();
+    let data_string = std::str::from_utf8(&scanner_data).unwrap().to_string();
+    log::info!(" backDataToRust:{:?}", &data_string);
+    // get chunk /channel/354481793036294/chunk=
+    let token = get_channel_id(data_string).unwrap();
     // JString tramsfrom String
-    let token_string: String = env.get_string(token).unwrap().into();
-    log::info!(" backDataToRust:{:?}", data_string);
-    let buffer =  BUFFER_INSTANCES_MAP.lock().get(&token_string).unwrap();
+    // let token_string: String = env.get_string(token).unwrap().into();
 
-    if buffer.currentHeight >= buffer.waterThrotth {
+    let mutex_buff = BUFFER_INSTANCES_MAP.lock();
+    let buffer_data = mutex_buff.get(&token).unwrap().clone();
+
+    if buffer_data.clone().over_flow() {
         println!()
     }
-    buffer.cache.push(scanner_data.to_vec());
-    buffer.currentHeight += scanner_data.len() as i32;
+    let buffer_array = scanner_data.to_vec();
+    let flow = buffer_data.push(buffer_array);
     // 1 代表已经被阻塞
-    if buffer.currentHeight >= buffer.waterThrotth {}
+    if flow {}
+}
+
+/// 截取channelId /channel/354481793036294/chunk=
+fn get_channel_id(url: String) -> Result<String, &'static str> {
+    if !url.starts_with("/channel/") {
+        return Err("not found channel request!");
+    }
+    let channel_id = &url[url.find("/channel/").unwrap() + 9..url.find("/chunk").unwrap()];
+    Ok(channel_id.to_owned())
 }
 
 /// 接收返回的系统API二进制数据 deno-js请求kotlin(系统函数)返回值走这里

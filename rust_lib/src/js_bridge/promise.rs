@@ -20,12 +20,13 @@ pub enum PromiseType {
     REJECTED,
 }
 
+#[derive(Clone)]
 pub struct BufferInstance {
     pub waitter: Arc<Mutex<PromiseOut>>,
     // pub PromiseOut: Mutex<Option<BoxFuture<'static, ()>>>,
     pub cache: Vec<Vec<u8>>,
-    pub currentHeight: i32,
-    pub waterThrotth: i32, // 8MB
+    pub current_height: usize,
+    pub water_throtth: usize, // 8MB 1024 * 1024 * 8
 }
 
 impl BufferInstance {
@@ -46,34 +47,41 @@ impl BufferInstance {
         BufferInstance {
             waitter: promise_out,
             cache: vec![vec![]],
-            currentHeight: 0,
-            waterThrotth: 1024 * 1024 * 8,
+            current_height: 0,
+            water_throtth: 1024 * 1024 * 8,
         }
+    }
+    pub fn push(mut self, bufferArray: Vec<u8>) -> bool {
+        self.current_height += bufferArray.len();
+        self.cache.push(bufferArray);
+        self.over_flow()
+    }
+    pub fn over_flow(self) -> bool {
+        self.current_height >= self.water_throtth
     }
 }
 
-impl Future for BufferInstance {
-    type Output = Result<Vec<u8>, &'static str>;
+// impl Future for BufferInstance {
+//     type Output = Result<Vec<u8>, &'static str>;
 
-    fn poll(
-         self: std::pin::Pin<&mut Self>,
-        cx: &mut std::task::Context<'_>,
-    ) -> std::task::Poll<Self::Output> {
-        let mut shared_state = self.waitter.lock().unwrap();
-        match shared_state.status {
-            PromiseType::PENDING => {
-                cx.waker().to_owned();
-                Poll::Pending
-            }
-            PromiseType::FULFILLED => {
-                let res = self.cache.remove(0).clone();
-                Poll::Ready(Ok(res))
-            }
-            PromiseType::REJECTED => Poll::Ready(Err("promise Error")),
-        }
-    }
-}
-
+//     fn poll(
+//         self: std::pin::Pin<&mut Self>,
+//         cx: &mut std::task::Context<'_>,
+//     ) -> std::task::Poll<Self::Output> {
+//         let shared_state = self.waitter.lock().unwrap();
+//         match shared_state.status {
+//             PromiseType::PENDING => {
+//                 cx.waker();
+//                 Poll::Pending
+//             }
+//             PromiseType::FULFILLED => {
+//                 let res = self.cache.pop().unwrap();
+//                 Poll::Ready(Ok(res))
+//             }
+//             PromiseType::REJECTED => Poll::Ready(Err("promise Error")),
+//         }
+//     }
+// }
 pub struct PromiseOut {
     pub waker: Option<Waker>,
     pub promise: Option<Promise<u8, &'static str>>,
@@ -89,7 +97,6 @@ impl PromiseOut {
         }
     }
 }
-
 pub struct Promise<T: Send, E: Send> {
     receiver: Receiver<Result<T, E>>,
 }

@@ -11,7 +11,6 @@ use log::{debug, error, info, Level};
 use std::thread;
 use std::{collections::HashMap, str};
 
-use super::call_android_function::call_java_open_back_pressure;
 use super::promise::{BufferInstance, PromiseType};
 
 // 添加一个全局变量来缓存信息，让js每次来拿，防止js内存爆炸,这里应该用channelId来定位每条消息，而不是用现在的队列
@@ -21,11 +20,11 @@ lazy_static! {
     pub(crate) static ref BUFFER_RESOLVE: Mutex<Vec<Vec<u8>>> = Mutex::new(vec![]);
     // 系统操作通道
     pub(crate) static ref BUFFER_SYSTEM: Mutex<Vec<Vec<u8>>> = Mutex::new(vec![]);
+
+    pub(crate) static ref BUFFER_INSTANCES_MAP: Mutex<HashMap<ChannelId, BufferInstance>> = Mutex::new(HashMap::new());
 }
 
 type ChannelId = String;
-const  buff_map :HashMap<ChannelId, BufferInstance> = HashMap::new();
-pub const BUFFER_INSTANCES_MAP: Mutex<HashMap<ChannelId, BufferInstance>> = Mutex::new(buff_map);
 
 /// deno-js消息从这里走到移动端
 #[op]
@@ -48,19 +47,19 @@ pub fn op_eval_js(buffer: ZeroCopyBuf) {
 ///  deno-js 轮询访问这个方法，以达到把rust数据传递到deno-js的过程，这里负责的是移动端系统API的数据
 #[op]
 pub fn op_rust_to_js_system_buffer(channelId: String) -> Result<Vec<u8>, AnyError> {
-    let buffer = BufferInstance::new();
+    let mut buffer = BufferInstance::new();
     if !buffer.cache.is_empty() {
         let result = buffer.cache.remove(0); // like javascript shift()
-        buffer.currentHeight -= result.len() as i32;
-        // TODO: 背压放水策略： buffer.currentHeight < buffer.waterThrotth/2
-        if buffer.currentHeight < buffer.waterThrotth {
-            call_java_open_back_pressure(channelId) // 通知前端放水
+        buffer.current_height -= result.len();
+        // TODO: 背压放水策略： buffer.current_height < buffer.water_throtth/2
+        if buffer.current_height < buffer.water_throtth {
+            call_android_function::call_java_open_back_pressure(channelId) // 通知前端放水
         }
         return Ok(result);
     }
-    let promise_out = buffer.waitter.lock().unwrap();
+    let mut promise_out = buffer.waitter.lock().unwrap();
     // 创建新线程
-    let thread_promise_out = promise_out.waker.clone();
+    let mut thread_promise_out = promise_out.waker.clone();
     // if waitter.waker {
     //     Err(custom_error("op_rust_to_js_system_buffer", "超过"))
     // }

@@ -1,3 +1,5 @@
+use serde_json::json;
+
 // #![cfg(target_os = "android")]
 use crate::android::android_inter;
 
@@ -20,10 +22,14 @@ pub fn call_android_evaljs(bit: Vec<u8>) {
 
 /// 通知kotlin打开背压
 pub fn call_java_open_back_pressure(channelId: String) {
-    let bit = channelId.as_bytes().to_vec();
-    // 转换为static str
-    let callback = Box::leak(bit.into_boxed_slice());
-    android_inter::deno_evaljs_callback(callback);
+    let data = json!(
+    {
+        "function":"openBackPressure",
+        "data":channelId
+    }
+    );
+    let bit = data.as_str().to_owned().unwrap().as_bytes().to_vec();
+    call_android_evaljs(bit)
 }
 
 // #[allow(dead_code)]
