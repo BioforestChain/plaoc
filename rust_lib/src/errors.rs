@@ -13,7 +13,6 @@
 
 use deno_ast::Diagnostic;
 use deno_core::error::AnyError;
-use deno_graph::ModuleGraphError;
 use deno_graph::ResolutionError;
 use import_map::ImportMapError;
 

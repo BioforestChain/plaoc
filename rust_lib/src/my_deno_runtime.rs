@@ -31,7 +31,7 @@ fn create_web_worker_preload_module_callback() -> Arc<PreloadModuleCb> {
         LocalFutureObj::new(Box::new(fut))
     })
 }
-
+#[allow(dead_code)]
 fn create_web_worker_callback(
     #[cfg(target_os = "android")] module_loader_builder: Arc<AssetsModuleLoader>,
     #[cfg(not(target_os = "android"))] module_loader_builder: fn() -> Rc<dyn ModuleLoader>,
@@ -106,7 +106,7 @@ fn create_web_worker_callback(
         )
     })
 }
-
+#[allow(dead_code)]
 pub fn create_main_worker(
     #[cfg(target_os = "android")] module_loader_builder: Arc<AssetsModuleLoader>,
     #[cfg(not(target_os = "android"))] module_loader_builder: fn() -> Rc<dyn ModuleLoader>,
@@ -163,7 +163,7 @@ pub fn create_main_worker(
     MainWorker::bootstrap_from_options(main_module, permissions, options)
 }
 
-// #[tokio::main]
+#[allow(dead_code)]
 pub async fn bootstrap_deno_runtime(
     #[cfg(target_os = "android")] module_loader_builder: Arc<AssetsModuleLoader>,
     #[cfg(not(target_os = "android"))] module_loader_builder: fn() -> Rc<dyn ModuleLoader>,

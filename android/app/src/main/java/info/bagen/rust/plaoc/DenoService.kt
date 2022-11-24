@@ -85,10 +85,10 @@ class DenoService : IntentService("DenoService") {
   external fun onlyReadRuntime(assets: AssetManager, target: String)
 
   /** 传递dwebView到deno-js的消息*/
-  external fun backDataToRust(byteData: ByteArray) // op_rust_to_js_buffer
+  external fun backDataToRust(byte_data: ByteArray) // op_rust_to_js_buffer
 
   /** 这里负责直接返回数据到deno-js*/
-  external fun backSystemDataToRust(byteData: ByteArray) // op_rust_to_js_system_buffer
+  external fun backSystemDataToRust(byte_data: ByteArray) // op_rust_to_js_system_buffer
   external fun denoRuntime(path: String)
 
   @RequiresApi(Build.VERSION_CODES.S)
@@ -130,10 +130,11 @@ fun warpCallback(bytes: ByteArray, store: Boolean = true) {
 }
 
 fun warpRustCallback(bytes: ByteArray) {
-  mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true) //允许出现特殊字符和转义符
-  mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true) //允许使用单引号
-  val handle = mapper.readValue(String(bytes), RustHandle::class.java)
-  println("warpRustCallback==》 ${handle.data},${handle.function}")
+  println("warpRustCallback==》 $bytes")
+//  mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true) //允许出现特殊字符和转义符
+//  mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true) //允许使用单引号
+//  val handle = mapper.readValue(String(bytes), RustHandle::class.java)
+//  println("warpRustCallback==》 ${handle.data},${handle.function}")
 }
 
 // 解析二进制数据

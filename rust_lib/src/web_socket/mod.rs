@@ -4,7 +4,7 @@ use std::convert::Infallible;
 use std::sync::Arc;
 use tokio::sync::{mpsc, RwLock};
 use warp::{
-    hyper::{self, header, Method},
+    hyper::{header, Method},
     ws::Message,
     Filter, Rejection,
 };
@@ -12,6 +12,7 @@ use warp::{
 pub(crate) mod handler;
 pub(crate) mod ws;
 
+#[allow(dead_code)]
 type Result<T> = std::result::Result<T, Rejection>;
 pub type Clients = Arc<RwLock<HashMap<String, Client>>>;
 
@@ -26,7 +27,7 @@ lazy_static! {
     // clients
   pub(crate) static ref CLIENTS: Clients = Arc::new(RwLock::new(HashMap::new()));
 }
-
+#[allow(dead_code)]
 /// 启动web Socket
 pub async fn start() {
     // let clients: Clients = Arc::new(RwLock::new(HashMap::new()));
@@ -79,8 +80,9 @@ pub async fn start() {
     warp::serve(routes).run(([127, 0, 0, 1], 8000)).await;
 }
 
+#[allow(dead_code)]
 pub fn with_clients(
-    clients: Clients,
+    _clients: Clients,
 ) -> impl Filter<Extract = (Clients,), Error = Infallible> + Clone {
     warp::any().map(move || CLIENTS.clone())
 }

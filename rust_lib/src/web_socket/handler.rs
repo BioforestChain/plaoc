@@ -1,6 +1,4 @@
 use crate::web_socket::{ws, Client, Clients, Result};
-use android_logger::Config;
-use log::Level;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 use warp::{http::StatusCode, reply::json, ws::Message, Reply};
