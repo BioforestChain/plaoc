@@ -31,8 +31,8 @@ fun messageGateWay(
   stringData: String
 ) {
   Log.i(TAG, " messageGateWay: $stringData")
-  val backData = DenoService().backDataToRust(stringData.toByteArray())// 通知
-  println("messageGeWay back_data-> $backData")
+   DenoService().backDataToRust(stringData.toByteArray())// 通知
+//  println("messageGeWay back_data-> $backData")
 }
 
 /** 转发给ui*/

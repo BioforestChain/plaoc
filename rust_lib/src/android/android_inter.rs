@@ -17,6 +17,7 @@ lazy_static! {
     //callback
     static ref JNI_CALLBACK: Mutex<Option<GlobalRef>> = Mutex::new(None);
      static ref JNI_JS_CALLBACK: Mutex<Option<GlobalRef>> = Mutex::new(None);
+     static ref JNI_RUST_CALLBACK: Mutex<Option<GlobalRef>> = Mutex::new(None);
 }
 
 // 校验的包名
@@ -67,7 +68,7 @@ unsafe fn JNI_OnLoad(jvm: JavaVM, _reserved: *mut c_void) -> jint {
         ),
         jni_method!(
             rustCallback,
-            "(Linfo/bagen/rust/plaoc/DenoService$IDenoCallback;)V"
+            "(Linfo/bagen/rust/plaoc/DenoService$IRustCallback;)V"
         ),
     ];
 
@@ -107,7 +108,7 @@ pub fn rustCallback(env: JNIEnv, _obj: JObject, callback: JObject) {
     let callback = env.new_global_ref(JObject::from(callback)).unwrap();
 
     // 添加到全局缓存
-    let mut ptr_fn = JNI_JS_CALLBACK.lock().unwrap();
+    let mut ptr_fn = JNI_RUST_CALLBACK.lock().unwrap();
     *ptr_fn = Some(callback);
 }
 
@@ -179,11 +180,11 @@ pub fn deno_evaljs_callback(fun_type: &'static [u8]) {
 /// rust把数据传输给kotlin rust -> kotlin
 pub fn deno_rust_callback(fun_type: &'static [u8]) {
     log::info!("i am deno_rust_callback {:?}", fun_type);
-    call_jvm(&JNI_JS_CALLBACK, move |obj: JObject, env: &JNIEnv| {
+    call_jvm(&JNI_RUST_CALLBACK, move |obj: JObject, env: &JNIEnv| {
         let response: jbyteArray = env
             .byte_array_from_slice(fun_type)
             .expect("Couldn't create java string!");
-        match env.call_method(obj, "denoCallback", "([B)V", &[JValue::from(response)]) {
+        match env.call_method(obj, "rustCallback", "([B)V", &[JValue::from(response)]) {
             Ok(jvalue) => {
                 debug!("callback succeed: {:?}", jvalue);
             }

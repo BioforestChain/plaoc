@@ -1,8 +1,6 @@
 // #![cfg(target_os = "android")]
 use crate::js_bridge::{
     call_js_function::{BUFFER_INSTANCES, BUFFER_SYSTEM},
-    executor,
-    promise::{PromiseOut, BufferInstance},
 };
 #[cfg(target_os = "android")]
 use crate::module_loader::AssetsModuleLoader;
@@ -14,8 +12,9 @@ use jni::{
     objects::{JObject, JString},
     JNIEnv,
 };
-use jni_sys::jbyteArray;
+use jni_sys::{jbyteArray};
 use log::Level;
+use bytes::Bytes;
 #[cfg(target_os = "android")]
 use ndk::asset::{Asset, AssetManager};
 #[cfg(target_os = "android")]
@@ -74,9 +73,16 @@ pub async extern "system" fn Java_info_bagen_rust_plaoc_DenoService_denoRuntime(
     );
     let asset_path = String::from(env.get_string(path).unwrap());
     log::info!(" denoRuntime :启动BFS后端 !! => {}", asset_path);
-    bootstrap_deno_fs_runtime(asset_path.as_str())
-        .await
-        .unwrap();
+    let runtime =  bootstrap_deno_fs_runtime(asset_path.as_str()).await;
+    match runtime {
+        Ok(_worker) => {
+            log::info!("DenoService_denoRuntime end");
+            // DenoRuntime::new(worker);
+        }
+        Err(e) => {
+            log::info!("DenoService_denoRuntime error:{:?}", e);
+        }
+    }
 }
 /// 接收dwebview发送的chunk请求二进制数据 dwebview 的所有数据通过这个通道传输到deno-js
 #[no_mangle]
@@ -85,37 +91,35 @@ pub async extern "system" fn Java_info_bagen_rust_plaoc_DenoService_backDataToRu
     env: JNIEnv,
     _context: JObject,
     byte_data: jbyteArray, //  /channel/354481793036294/chunk=
-) {
+)  {
     let scanner_data = env.convert_byte_array(byte_data).unwrap();
     let data_string = std::str::from_utf8(&scanner_data).unwrap().to_string();
     log::info!(" backDataToRust:{:?}", &data_string);
-
-    log::info!(
-        " backDataToRust 111{:?}",
-        BUFFER_INSTANCES.lock().unwrap().has_waitter()
-    );
+    
     let mut buffer_data = BUFFER_INSTANCES.lock().unwrap();
-    // buffer_data.push(scanner_data);
-    log::info!(
-        " backDataToRust 222{:?}",
-        buffer_data.has_waitter()
-    );
-    // 已经存在等待者，直接将数据交给等待者
-    if buffer_data.has_waitter() {
-        // transfrom 'a to 'ststic lifetime
-        // 完成等待者
-        buffer_data.resolve_waitter(scanner_data.clone());
-        // return 0 as jint;
-        // 已经阻塞
-        if buffer_data.full {
-            log::info!(" backDataToRust 已经阻塞了:{:?}", &buffer_data.full);
-            // return -1 as jint;
-        }
-        let is_full = buffer_data.push(scanner_data).unwrap();
-        log::info!(" backDataToRust is_full:{:?}", &is_full);
-    }
 
-    log::info!(" backDataToRustxxxx");
+    if buffer_data.full {
+        log::info!(" backDataToRust 已经阻塞了:{:?}", &buffer_data.full);
+        // return -1 as jint;
+    }
+    let is_full = buffer_data.push(Bytes::from(scanner_data)).unwrap();
+    log::info!(" backDataToRust is_full:{:?},current_height:{:?}", &is_full,buffer_data.current_height);
+    // buffer_data.push(scanner_data);
+    // 已经存在等待者，直接将数据交给等待者
+    // if buffer_data.has_waitter() {
+    //     // transfrom 'a to 'ststic lifetime
+    //     // 完成等待者
+    //     buffer_data.resolve_waitter(scanner_data.clone());
+    //     // return 0 as jint;
+    //     // 已经阻塞
+    //     if buffer_data.full {
+    //         log::info!(" backDataToRust 已经阻塞了:{:?}", &buffer_data.full);
+    //         // return -1 as jint;
+    //     }
+    //     let is_full = buffer_data.push(scanner_data).unwrap();
+    //     log::info!(" backDataToRust is_full:{:?}", &is_full);
+    // }
+
     // buffer_data::init_waitter();
     // log::info!(" backDataToRust is_full:{:?}", &is_full);
     // 1 代表已经被阻塞

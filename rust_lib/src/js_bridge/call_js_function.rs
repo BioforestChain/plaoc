@@ -1,7 +1,7 @@
 // #![cfg(target_os = "android")]
-use crate::js_bridge::{call_android_function, executor};
+use crate::js_bridge::{call_android_function};
 use android_logger::Config;
-use std::sync::{Mutex};
+use std::sync::{Mutex, Arc};
 use deno_core::error::{custom_error, AnyError};
 use deno_core::{op, ZeroCopyBuf};
 use lazy_static::*;
@@ -9,6 +9,8 @@ use log::{ Level};
 use std::{collections::HashMap, str};
 
 use super::promise::{BufferInstance};
+
+pub type Db = Arc<Mutex<HashMap<ChannelId, BufferInstance>>>;
 
 // 添加一个全局变量来缓存信息，让js每次来拿，防止js内存爆炸,这里应该用channelId来定位每条消息，而不是用现在的队列
 lazy_static! {
@@ -18,8 +20,8 @@ lazy_static! {
     // 系统操作通道
     pub(crate) static ref BUFFER_SYSTEM: Mutex<Vec<Vec<u8>>> = Mutex::new(vec![]);
 
-    pub(crate) static ref BUFFER_INSTANCES: Mutex<BufferInstance> =  Mutex::new(BufferInstance::new(vec![]));
-    pub(crate) static ref BUFFER_INSTANCES_MAP: Mutex<HashMap<ChannelId, Mutex<BufferInstance > >> = Mutex::new(HashMap::new());
+    pub(crate) static ref BUFFER_INSTANCES: Arc<Mutex<BufferInstance>> =  Arc::new(Mutex::new(BufferInstance::new()));
+    pub(crate) static ref BUFFER_INSTANCES_MAP: Db = Arc::new(Mutex::new(HashMap::new()));
 }
 
 type ChannelId = String;
@@ -69,7 +71,7 @@ pub async fn op_rust_to_js_system_buffer(_channel_id:String) -> Result<Vec<u8>, 
     let box_data = BUFFER_SYSTEM.lock().unwrap().pop();
     match box_data {
         Some(r) => Ok(r),
-        None => Err(custom_error("op_rust_to_js_buffer", "未找到数据")),
+        None => Ok(vec![0]),
     }
 }
 
@@ -79,31 +81,36 @@ pub async fn op_rust_to_js_system_buffer(_channel_id:String) -> Result<Vec<u8>, 
 /// 
 /// deno-js 轮询访问这个方法，以达到把rust数据传递到deno-js的过程 也就是说这里传递的是chunk数据
 #[op]
-pub async fn op_rust_to_js_buffer() -> Result<Vec<u8>, AnyError> {
-    log::info!(" op_rust_to_js_buffer 🥸  ");
+pub fn op_rust_to_js_buffer() -> Result<Vec<u8>, AnyError> {
+
     let mut buffer =  BUFFER_INSTANCES.lock().unwrap();
+
     let result = buffer.shift();
-    log::info!(" op_rust_to_js_buffer 🤩 result:{:?}", &result);
-    if !result.is_empty() {
-        log::info!(" op_rust_to_js_buffer 😻 buffer.shift:{:?}", &result);
-        // TODO: 背压放水策略： buffer.current_height < buffer.water_throtth/2
-        if buffer.full && buffer.current_height < buffer.water_threshold {
-            buffer.full = false;
-            call_android_function::call_java_open_back_pressure() // 通知前端放水
-        }
-        log::info!(" op_rust_to_js_buffer result:{:?}", &result);
-        return Ok(result);
+    // log::info!(" op_rust_to_js_buffer 🤩 result:{:?}", &result);
+    
+    // 如果为空
+    if result.is_empty() {
+        return Ok(vec![0]);
+        // return Err(custom_error("op_rust_to_js_buffer","没有找到数据"))
     }
+    log::info!(" op_rust_to_js_buffer 😻 current_height:{:?},water_threshold:{:?}", buffer.current_height,buffer.water_threshold);
+    // TODO: 背压放水策略： buffer.current_height < buffer.water_throtth/2
+    if buffer.full && buffer.current_height < buffer.water_threshold {
+        buffer.full = false;
+        call_android_function::call_java_open_back_pressure() // 通知前端放水
+    }
+    log::info!(" op_rust_to_js_buffer result:{:?}", &result);
+    Ok(result.to_vec())
     // 初始化一个等待者
-    let waitter = buffer.init_waitter();
-    log::info!(" op_rust_to_js_buffer 👾 cache:{:?},waitter:{:?}", &result,&buffer.has_waitter());
-    let buffer =  waitter.lock().unwrap().result.clone();
-    log::info!(" op_rust_to_js_buffer buffer 🤖:{:?}", &buffer);
-    match buffer {
-        Some(data) => Ok(data),
-        None => Ok(vec![0])
-    }
-    // return Ok(vec![0]);
+    // let waitter = buffer.init_waitter();
+    // log::info!(" op_rust_to_js_buffer 👾 cache:{:?},waitter:{:?}", &result,&buffer.has_waitter());
+    // let promise_out =  waitter.lock().unwrap();
+    // let buffer = promise_out;
+    // log::info!(" op_rust_to_js_buffer buffer 🤖:{:?}", &buffer);
+    // match buffer {
+    //     Some(data) => Ok(data),
+    //     None => Ok(vec![0])
+    // }
 }
 
 /// 负责消息通知

@@ -65,6 +65,10 @@ class DenoService : IntentService("DenoService") {
     fun denoCallback(bytes: ByteArray)
   }
 
+  interface IRustCallback {
+    fun rustCallback(bytes: ByteArray)
+  }
+
   internal inner class CommBinder(private val service: DenoService) : Binder() {
     fun getService(): DenoService {
       return service
@@ -79,7 +83,7 @@ class DenoService : IntentService("DenoService") {
 
   private external fun denoSetCallback(callback: IDenoCallback)
   private external fun nativeSetCallback(callback: IHandleCallback)
-  private external fun rustCallback(callback: IDenoCallback)
+  private external fun rustCallback(callback: IRustCallback)
 
   /** 只读模式走这里*/
   external fun onlyReadRuntime(assets: AssetManager, target: String)
@@ -107,8 +111,8 @@ class DenoService : IntentService("DenoService") {
       }
     })
     // rust直接返回到能力
-    rustCallback(object : IDenoCallback {
-      override fun denoCallback(bytes: ByteArray) {
+    rustCallback(object : IRustCallback {
+      override fun rustCallback(bytes: ByteArray) {
         warpRustCallback(bytes)
       }
     })

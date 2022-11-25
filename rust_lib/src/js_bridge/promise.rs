@@ -1,6 +1,8 @@
+use bytes::Bytes;
 use futures::Future;
 use std::sync::mpsc::{channel, Sender};
 use std::task::Poll;
+use std::time::Duration;
 use std::{
     pin::Pin,
     sync::{Arc, Mutex},
@@ -11,7 +13,7 @@ use std::{
 /// 运行的任务类型
 #[derive(Clone, Copy)]
 #[allow(dead_code)]
- enum PromiseType {
+enum PromiseType {
     /// 等待
     PENDING,
     ///  完成
@@ -19,12 +21,11 @@ use std::{
                // REJECTED,
 }
 
-
 #[derive(Clone)]
 pub struct BufferInstance {
     // waitter: Option<PromiseOut<'a, Vec<u8>, ()>>,
-    waitter: Arc<Mutex<Box<PromiseOut>>>,
-    pub cache: Vec<Vec<u8>>,
+    // waitter: Arc<Mutex<Box<PromiseOut>>>,
+    pub cache: Vec<Bytes>,
     pub full: bool,
     pub current_height: usize,
     pub water_threshold: usize, // 8MB 1024 * 1024 * 8
@@ -35,27 +36,26 @@ pub struct PromiseOut {
     dispatcher: Sender<Event>,
     mux: Vec<Waker>,
     status: PromiseType,
-    pub result: Option<Vec<u8>>,
+    pub result: Option<Bytes>,
 }
 
 enum Event {
     Pending,
-    BufferArray(Vec<u8>),
+    BufferArray(Bytes),
 }
 
 impl BufferInstance {
-    pub fn new(data: Vec<u8>) -> Self {
-        let promise_out = PromiseOut::new();
-        let cache = vec![data];
+    pub fn new() -> Self {
+        // let promise_out = PromiseOut::new();
         BufferInstance {
-            waitter: promise_out,
+            // waitter: promise_out,
             full: false,
-            cache: cache,
+            cache: vec![Bytes::new()],
             current_height: 0,
             water_threshold: 1024 * 1024 * 8,
         }
     }
-    pub fn push(&mut self, buffer_array: Vec<u8>) -> Result<bool, String> {
+    pub fn push(&mut self, buffer_array: Bytes) -> Result<bool, String> {
         log::info!(" BufferInstancepush 👾 ==> :{:?}", &buffer_array);
         if self.full {
             return Err("request full ".to_string());
@@ -64,9 +64,12 @@ impl BufferInstance {
         self.cache.push(buffer_array);
         return Result::Ok(self.over_flow());
     }
-    pub fn shift(&mut self) -> Vec<u8> {
+    pub fn shift(&mut self) -> Bytes {
+        // log::info!(" BufferInstanceshift 👾 ==> :{:?}", self.cache);
+        if self.cache.is_empty() {
+           return Bytes::new()
+        }
         let vec = self.cache.remove(0);
-        log::info!(" BufferInstanceshift 👾 ==> :{:?}", &self.cache);
         self.current_height -= vec.len();
         return vec;
     }
@@ -75,78 +78,77 @@ impl BufferInstance {
         self.full = self.current_height >= self.water_threshold;
         self.full
     }
-    /// 初始化等待者
-    pub fn init_waitter(&mut self) -> Arc<Mutex<Box<PromiseOut>>> {
-        let waitter = self.waitter.lock();
-        match waitter {
-            Ok(_) => self.waitter.clone(),
-            Err(_) => {
-                // self.waitter = PromiseOut::new();
-                // self.waitter
-                PromiseOut::new()
-            }
-        }
-    }
-    /// 是否已经存在等待者
-    pub fn has_waitter(&self) -> bool {
-        let waitter = self.waitter.lock();
-        match waitter {
-            Ok(_) => true,
-            Err(_) => false,
-        }
-    }
-    /// 等待者完成了
-    pub fn resolve_waitter(&mut self, data: Vec<u8>) {
-        // let data: &'a Vec<u8> = Box::leak(Box::new(scanner_data));
-        log::info!(" BufferInstancere solve_waitter 👾 ==> :{:?}", &data);
-        self.waitter.lock().unwrap().resolve(data);
-        // self.waitter = None;
-    }
+    // /// 初始化等待者
+    // pub fn init_waitter(&mut self) -> Arc<Mutex<Box<PromiseOut>>> {
+    //     let waitter = self.waitter.lock();
+    //     match waitter {
+    //         Ok(_) => self.waitter.clone(),
+    //         Err(_) => {
+    //             // self.waitter = PromiseOut::new();
+    //             // self.waitter
+    //             PromiseOut::new()
+    //         }
+    //     }
+    // }
+    // /// 是否已经存在等待者
+    // pub fn has_waitter(&self) -> bool {
+    //     let waitter = self.waitter.lock();
+    //     match waitter {
+    //         Ok(_) => true,
+    //         Err(_) => false,
+    //     }
+    // }
+    // /// 等待者完成了
+    // pub fn resolve_waitter(&mut self, data: Bytes) {
+    //     // let data: &'a Vec<u8> = Box::leak(Box::new(scanner_data));
+    //     log::info!(" BufferInstancere solve_waitter 👾 ==> :{:?}", &data);
+    //     self.waitter.lock().unwrap().resolve(data);
+    //     // self.waitter = None;
+    // }
 }
 
-// impl Future for BufferInstance{
-//     type Output = Vec<u8>;
-
+// impl Future for BufferInstance {
+//     type Output = Bytes;
 //     fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
-//         let mut  waitter = self.waitter.lock().unwrap();
+//         let mut waitter = self.waitter.lock().unwrap();
 //         if let PromiseType::PENDING = waitter.status {
 //             // 存下来，等待下次任务调用 🤓
 //             // waitter.register(self.shift(), cx.waker().clone());
 //             waitter.mux.push(cx.waker().clone());
-//              log::info!(" PromiseOut Pending 😴");
+//             log::info!(" PromiseOut Pending 😴");
 //             Poll::Pending
-//             } else {
+//         } else {
 //             // 完成✅
 //             waitter.status = PromiseType::FULFILLED;
-//                 let res = waitter.result.clone();
-//                 log::info!(" PromiseOut Ready 😲 ");
-//                 match res {
-//                     Some(buffer) => Poll::Ready(buffer),
-//                     None => Poll::Ready(vec![0]),
-//                 }
+//             let res = waitter.result.clone();
+//             log::info!(" PromiseOut Ready 😲 ");
+//             match res {
+//                 Some(buffer) => Poll::Ready(buffer),
+//                 None => Poll::Ready(Bytes::new()),
 //             }
 //         }
+//     }
 // }
 
-impl Future for PromiseOut {
-    type Output = Vec<u8>;
+// impl Future for PromiseOut {
+//     type Output = Vec<u8>;
 
-    fn poll(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> std::task::Poll<Self::Output> {
-        if let PromiseType::PENDING = self.status {
-            self.mux.push(cx.waker().clone());
-            log::info!(" PromiseOut Pending 😴");
-            // cx.waker().wake();
-            Poll::Pending
-        } else {
-            let res = self.result.clone();
-            log::info!(" PromiseOut Ready 😲 ");
-            match res {
-                Some(buffer) => Poll::Ready(buffer),
-                None => Poll::Ready(vec![0]),
-            }
-        }
-    }
-}
+//     fn poll(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> std::task::Poll<Self::Output> {
+//         if let PromiseType::PENDING = self.status {
+//             self.mux.push(cx.waker().clone());
+//             log::info!(" PromiseOut Pending 😴");
+//             // cx.waker().wake();
+//             Poll::Pending
+//         } else {
+//             let res = self.result.clone();
+//             log::info!(" PromiseOut Ready 😲 ");
+//             match res {
+//                 Some(buffer) => Poll::Ready(buffer),
+//                 None => Poll::Ready(vec![0]),
+//             }
+//         }
+//     }
+// }
 
 impl PromiseOut {
     fn new() -> Arc<Mutex<Box<PromiseOut>>> {
@@ -175,23 +177,31 @@ impl PromiseOut {
                     }
                 }
             }
-            // join 
+            // join
             handles
                 .into_iter()
                 .for_each(|handle| handle.join().unwrap());
         });
-        promise_out.lock().map(|mut r| r.handle = Some(handle)).unwrap();
+        promise_out
+            .lock()
+            .map(|mut r| r.handle = Some(handle))
+            .unwrap();
         promise_out
     }
     /// 等到数据了
-    pub fn resolve(&mut self, value: Vec<u8>) {
+    pub fn resolve(&mut self, value: Bytes) {
         self.result = Some(value);
         self.status = PromiseType::FULFILLED;
         self.wake();
     }
-    pub fn register(&mut self,buffer_array:Vec<u8>,waker:Waker) {
+
+    pub async fn getData() {}
+
+    pub fn register(&mut self, buffer_array: Bytes, waker: Waker) {
         self.mux.push(waker);
-        self.dispatcher.send(Event::BufferArray(buffer_array)).unwrap();
+        self.dispatcher
+            .send(Event::BufferArray(buffer_array))
+            .unwrap();
     }
     // 没等到
     // #[allow(dead_code)]

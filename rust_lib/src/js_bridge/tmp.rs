@@ -1,3 +1,4 @@
+#[allow(dead_code)]
 fn main() {
     let start = Instant::now();
     let reactor = Reactor::new();

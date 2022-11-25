@@ -294,7 +294,7 @@ pub fn create_main_fs_worker(
 }
 
 // #[tokio::main]
-pub async fn bootstrap_deno_fs_runtime(entry_js_path: &str) -> Result<(), AnyError> {
+pub async fn bootstrap_deno_fs_runtime(entry_js_path: &str) -> Result<MainWorker, AnyError> {
     log::info!(
         "start deno runtime for entry_js_path FsModuleLoader!!!{:}",
         &entry_js_path
@@ -303,7 +303,10 @@ pub async fn bootstrap_deno_fs_runtime(entry_js_path: &str) -> Result<(), AnyErr
     let permissions = Permissions::allow_all();
 
     let mut worker = create_main_fs_worker(main_module.clone(), permissions, Default::default());
+    // let call_excute =  |script_name,source_code| {
+    //     worker.execute_script(script_name, source_code);
+    // };
     worker.execute_main_module(&main_module).await?;
     worker.run_event_loop(false).await?;
-    Ok(())
+    Ok(worker)
 }
