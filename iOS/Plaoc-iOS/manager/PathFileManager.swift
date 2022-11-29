@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import Alamofire
 
 class PathFileManager: NSObject {
 

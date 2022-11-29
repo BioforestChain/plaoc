@@ -10,7 +10,7 @@ import JavaScriptCore
 
 @objc protocol PlaocJSExport: JSExport {
     
-    func callJavaScriptWith(functionName: String, param: String) -> String
+    func openDWebView(test: String, param: String) -> String
     
 }
 
@@ -20,8 +20,8 @@ import JavaScriptCore
     var controller: UIViewController?
     var jsContext: JSContext?
     
-    func callJavaScriptWith(functionName: String, param: String) -> String {
-        switch functionName {
+    func openDWebView(test: String, param: String) -> String {
+        switch test {
         case "OpenDWebView":
             return executiveOpenDWebView(param: param)
         case "OpenQrScanner":

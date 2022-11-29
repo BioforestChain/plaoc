@@ -9,6 +9,7 @@ import UIKit
 import WebKit
 import UIColor_Hex_Swift
 import SwiftyJSON
+import JavaScriptCore
 
 class WebViewViewController: UIViewController {
 
@@ -20,6 +21,12 @@ class WebViewViewController: UIViewController {
     private var statusOverlay: Bool = true
     private var bottomOverlay: Bool = true
     private var style: UIStatusBarStyle = .default
+    var jsManager: JSCoreManager!
+    
+    
+    private let jsContext = JSContext()
+    
+    let sysManager: SystemManager = SystemManager()
     
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -64,7 +71,7 @@ class WebViewViewController: UIViewController {
 
         self.view.backgroundColor = .white
         
-        webView.openWebView(html: urlString)
+//        webView.openWebView(html: urlString)
         //https://awqdeqwewe.dweb/
         
 //        webView.openWebView(html: "iosqmkkx:/index.html")
@@ -74,9 +81,25 @@ class WebViewViewController: UIViewController {
 //            webView.openLocalWebView(name: urlString)
 //        }
         
+        jsManager = JSCoreManager.init(fileName: fileName, controller: self)
+        
         NotificationCenter.default.addObserver(self, selector: #selector(interceptAction(noti:)), name: NSNotification.Name.interceptNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(observerShowKeyboard(noti:)), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(observerHiddenKeyboard(noti:)), name: UIResponder.keyboardWillHideNotification, object: nil)
+        
+        testAction()
+    }
+    
+    func testAction() {
+        guard let entryPath = sysManager.fetchEntryPath() else { return }
+        
+        let plaoc = PlaocHandleModel()
+        plaoc.controller = self
+        plaoc.jsContext = jsContext
+        
+        jsContext?.setObject(plaoc, forKeyedSubscript: "PlaocJavascriptBridge" as NSCopying & NSObjectProtocol)
+        let content = try? String(contentsOfFile: entryPath)
+        jsContext?.evaluateScript(content)
     }
     
     @objc private func interceptAction(noti: Notification) {

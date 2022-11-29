@@ -21,4 +21,5 @@ class BatchRecommendManager: BatchReadManager {
     override func iconImagePath(fileName: String) -> String {
         return filePath() + "/\(fileName)/sys/"
     }
+    
 }

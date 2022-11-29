@@ -15,6 +15,7 @@ class FirstViewController: UIViewController {
     private var buttons: [UIButton] = []
     private var labels: [UILabel] = []
     private let disposeBag = DisposeBag()
+    private var jsCore: JSCoreManager!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -115,7 +116,6 @@ class FirstViewController: UIViewController {
         } else if type == .scan {
             BatchFileManager.shared.clickRecommendAppAction(fileName: name)
         }
- 
     }
     
     func addScanAppUI(name: String) {
