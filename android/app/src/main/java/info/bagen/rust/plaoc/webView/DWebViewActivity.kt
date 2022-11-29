@@ -135,7 +135,7 @@ fun openDWebWindow(activity: ComponentActivity, url: String) {
 
 /** 传递参数给前端*/
 fun sendToJavaScript(jsCode: String) {
-  println("sendToJavaScript: $jsCode");
+  // 这里的消息需要等待serviceWorker启动再执行
     dWebView?.post(Runnable {
         dWebView?.evaluateJavascript(jsCode,ValueCallback<String> { result ->
           Log.d(TAG, "sendToJavaScript 返回数据: $result,sendToJavaScript->:$jsCode")
