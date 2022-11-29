@@ -22,7 +22,7 @@ use deno_runtime::BootstrapOptions;
 use std::rc::Rc;
 use std::sync::Arc;
 
-// #[cfg(target_os = "android")]
+#[cfg(target_os = "android")]
 use crate::module_loader::AssetsModuleLoader;
 
 fn create_web_worker_preload_module_callback() -> Arc<PreloadModuleCb> {
@@ -31,7 +31,7 @@ fn create_web_worker_preload_module_callback() -> Arc<PreloadModuleCb> {
         LocalFutureObj::new(Box::new(fut))
     })
 }
-
+#[allow(dead_code)]
 fn create_web_worker_callback(
     #[cfg(target_os = "android")] module_loader_builder: Arc<AssetsModuleLoader>,
     #[cfg(not(target_os = "android"))] module_loader_builder: fn() -> Rc<dyn ModuleLoader>,
@@ -93,7 +93,7 @@ fn create_web_worker_callback(
             compiled_wasm_module_store: Some(CompiledWasmModuleStore::default()),
             // maybe_exit_code: args.maybe_exit_code,
             stdio: stdio.clone(),
-            unsafely_ignore_certificate_errors: todo!(),
+            unsafely_ignore_certificate_errors: None,
         };
         // log::info!("bootstrap_from_options: {:?}", args.name);
 
@@ -106,7 +106,7 @@ fn create_web_worker_callback(
         )
     })
 }
-
+#[allow(dead_code)]
 pub fn create_main_worker(
     #[cfg(target_os = "android")] module_loader_builder: Arc<AssetsModuleLoader>,
     #[cfg(not(target_os = "android"))] module_loader_builder: fn() -> Rc<dyn ModuleLoader>,
@@ -163,7 +163,7 @@ pub fn create_main_worker(
     MainWorker::bootstrap_from_options(main_module, permissions, options)
 }
 
-// #[tokio::main]
+#[allow(dead_code)]
 pub async fn bootstrap_deno_runtime(
     #[cfg(target_os = "android")] module_loader_builder: Arc<AssetsModuleLoader>,
     #[cfg(not(target_os = "android"))] module_loader_builder: fn() -> Rc<dyn ModuleLoader>,
@@ -294,7 +294,7 @@ pub fn create_main_fs_worker(
 }
 
 // #[tokio::main]
-pub async fn bootstrap_deno_fs_runtime(entry_js_path: &str) -> Result<(), AnyError> {
+pub async fn bootstrap_deno_fs_runtime(entry_js_path: &str) -> Result<MainWorker, AnyError> {
     log::info!(
         "start deno runtime for entry_js_path FsModuleLoader!!!{:}",
         &entry_js_path
@@ -303,7 +303,10 @@ pub async fn bootstrap_deno_fs_runtime(entry_js_path: &str) -> Result<(), AnyErr
     let permissions = Permissions::allow_all();
 
     let mut worker = create_main_fs_worker(main_module.clone(), permissions, Default::default());
+    // let call_excute =  |script_name,source_code| {
+    //     worker.execute_script(script_name, source_code);
+    // };
     worker.execute_main_module(&main_module).await?;
     worker.run_event_loop(false).await?;
-    Ok(())
+    Ok(worker)
 }

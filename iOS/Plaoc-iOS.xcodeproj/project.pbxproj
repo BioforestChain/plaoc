@@ -41,7 +41,6 @@
 		0443FCE928646E6A003425CD /* ConfirmConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0443FCE828646E6A003425CD /* ConfirmConfiguration.swift */; };
 		044C7DF0288E378F002D682A /* DocumentManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 044C7DEF288E378F002D682A /* DocumentManager.swift */; };
 		04560C872876E78E00638E2A /* CustomTabbarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04560C862876E78E00638E2A /* CustomTabbarViewController.swift */; };
-		045E369D286AF4B500A62263 /* resource_3rd in Resources */ = {isa = PBXBuildFile; fileRef = 045E369C286AF4B500A62263 /* resource_3rd */; };
 		04A664672898C43D006A11EB /* DiskManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04A664662898C43D006A11EB /* DiskManager.swift */; };
 		04B2B7D6287E5B8100172109 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04B2B7D5287E5B8100172109 /* NotificationManager.swift */; };
 		04B555E4287594C600314C9F /* ChangeTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04B555E3287594C600314C9F /* ChangeTools.swift */; };
@@ -83,6 +82,8 @@
 		F31B2BAC28F80E74008CDD5F /* recommend-app in Resources */ = {isa = PBXBuildFile; fileRef = F31B2BAB28F80E74008CDD5F /* recommend-app */; };
 		F31B2BAE28F80EC8008CDD5F /* FirstViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F31B2BAD28F80EC8008CDD5F /* FirstViewController.swift */; };
 		F380F6C628FE8C39001BC5C3 /* BatchScanManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F380F6C528FE8C39001BC5C3 /* BatchScanManager.swift */; };
+		F3872073290BB2C20018B8CC /* Snowflake.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3872072290BB2C20018B8CC /* Snowflake.swift */; };
+		F39535162919E4650071898A /* UIImage_extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F39535152919E4650071898A /* UIImage_extension.swift */; };
 		F39930022900E9D50017D721 /* PathFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F39930012900E9D50017D721 /* PathFileManager.swift */; };
 		F39930042900F4760017D721 /* FileModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F39930032900F4760017D721 /* FileModel.swift */; };
 		F39A940F28F79C8800E82EB2 /* NVHProgress.m in Sources */ = {isa = PBXBuildFile; fileRef = F39A940328F79C8700E82EB2 /* NVHProgress.m */; };
@@ -91,7 +92,10 @@
 		F39A941228F79C8800E82EB2 /* NSFileManager+NVHFileSize.m in Sources */ = {isa = PBXBuildFile; fileRef = F39A940C28F79C8800E82EB2 /* NSFileManager+NVHFileSize.m */; };
 		F39A941328F79C8800E82EB2 /* NVHFile.m in Sources */ = {isa = PBXBuildFile; fileRef = F39A940D28F79C8800E82EB2 /* NVHFile.m */; };
 		F39A941428F79C8800E82EB2 /* NVHTarFile.m in Sources */ = {isa = PBXBuildFile; fileRef = F39A940E28F79C8800E82EB2 /* NVHTarFile.m */; };
+		F39C2982291513BE0038EEBB /* JSCoreEntities.swift in Sources */ = {isa = PBXBuildFile; fileRef = F39C2981291513BE0038EEBB /* JSCoreEntities.swift */; };
+		F39C2984291516650038EEBB /* JSCoreManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F39C2983291516650038EEBB /* JSCoreManager.swift */; };
 		F3B0946528F558150027CD06 /* NotificationName.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3B0946428F558150027CD06 /* NotificationName.swift */; };
+		F3B77B682909369A005A384D /* QueueManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3B77B672909369A005A384D /* QueueManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -148,7 +152,6 @@
 		0443FCE828646E6A003425CD /* ConfirmConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmConfiguration.swift; sourceTree = "<group>"; };
 		044C7DEF288E378F002D682A /* DocumentManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DocumentManager.swift; sourceTree = "<group>"; };
 		04560C862876E78E00638E2A /* CustomTabbarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTabbarViewController.swift; sourceTree = "<group>"; };
-		045E369C286AF4B500A62263 /* resource_3rd */ = {isa = PBXFileReference; lastKnownFileType = folder; path = resource_3rd; sourceTree = "<group>"; };
 		04A664662898C43D006A11EB /* DiskManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiskManager.swift; sourceTree = "<group>"; };
 		04B2B7D5287E5B8100172109 /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
 		04B555E3287594C600314C9F /* ChangeTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeTools.swift; sourceTree = "<group>"; };
@@ -200,6 +203,8 @@
 		F31B2BAD28F80EC8008CDD5F /* FirstViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstViewController.swift; sourceTree = "<group>"; };
 		F37EA33E28F693B70068A66D /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
 		F380F6C528FE8C39001BC5C3 /* BatchScanManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatchScanManager.swift; sourceTree = "<group>"; };
+		F3872072290BB2C20018B8CC /* Snowflake.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Snowflake.swift; sourceTree = "<group>"; };
+		F39535152919E4650071898A /* UIImage_extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImage_extension.swift; sourceTree = "<group>"; };
 		F39930012900E9D50017D721 /* PathFileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PathFileManager.swift; sourceTree = "<group>"; };
 		F39930032900F4760017D721 /* FileModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileModel.swift; sourceTree = "<group>"; };
 		F39A940328F79C8700E82EB2 /* NVHProgress.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NVHProgress.m; sourceTree = "<group>"; };
@@ -214,7 +219,10 @@
 		F39A940C28F79C8800E82EB2 /* NSFileManager+NVHFileSize.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSFileManager+NVHFileSize.m"; sourceTree = "<group>"; };
 		F39A940D28F79C8800E82EB2 /* NVHFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NVHFile.m; sourceTree = "<group>"; };
 		F39A940E28F79C8800E82EB2 /* NVHTarFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NVHTarFile.m; sourceTree = "<group>"; };
+		F39C2981291513BE0038EEBB /* JSCoreEntities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSCoreEntities.swift; sourceTree = "<group>"; };
+		F39C2983291516650038EEBB /* JSCoreManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSCoreManager.swift; sourceTree = "<group>"; };
 		F3B0946428F558150027CD06 /* NotificationName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationName.swift; sourceTree = "<group>"; };
+		F3B77B672909369A005A384D /* QueueManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueManager.swift; sourceTree = "<group>"; };
 		F406C3D95E45CC0D87A9E05A /* Pods_Plaoc_iOSTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Plaoc_iOSTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -258,6 +266,7 @@
 				04BC49CB2858768E003FE6D9 /* LeadScriptHandle.swift */,
 				0406F5052865B3F9006F4F6F /* Schemehandler.swift */,
 				F31B2B9928F80A6B008CDD5F /* GlobalTimer.swift */,
+				F3872072290BB2C20018B8CC /* Snowflake.swift */,
 			);
 			path = Tools;
 			sourceTree = "<group>";
@@ -272,6 +281,7 @@
 				04C02436288011C4008E32C8 /* Data_extension.swift */,
 				F31B2B9328F8088F008CDD5F /* Date_extension.swift */,
 				F3B0946428F558150027CD06 /* NotificationName.swift */,
+				F39535152919E4650071898A /* UIImage_extension.swift */,
 			);
 			path = extension;
 			sourceTree = "<group>";
@@ -337,14 +347,13 @@
 		04BC49982858758E003FE6D9 /* Plaoc-iOS */ = {
 			isa = PBXGroup;
 			children = (
+				F31B2B9228F80743008CDD5F /* controller */,
 				F31B2BAB28F80E74008CDD5F /* recommend-app */,
 				F31B2BA028F80D04008CDD5F /* fileManager */,
 				F31B2B9B28F80BD3008CDD5F /* network */,
 				F31B2B9528F808E9008CDD5F /* manager */,
-				F31B2B9228F80743008CDD5F /* controller */,
 				040E4D0028727DF4003569F1 /* Tools */,
 				04376B56286C36500007B444 /* jsFile */,
-				045E369C286AF4B500A62263 /* resource_3rd */,
 				041D100328630B4E00AEFE7D /* model */,
 				041D0FFB2862AEC300AEFE7D /* ocFile */,
 				0419F103286051D700EF8DC2 /* extension */,
@@ -444,6 +453,9 @@
 				04002FAC2897701900D03CB0 /* DatabaseManager.swift */,
 				04A664662898C43D006A11EB /* DiskManager.swift */,
 				F39930012900E9D50017D721 /* PathFileManager.swift */,
+				F3B77B672909369A005A384D /* QueueManager.swift */,
+				F39C2981291513BE0038EEBB /* JSCoreEntities.swift */,
+				F39C2983291516650038EEBB /* JSCoreManager.swift */,
 			);
 			path = manager;
 			sourceTree = "<group>";
@@ -625,7 +637,6 @@
 				F31B2BAC28F80E74008CDD5F /* recommend-app in Resources */,
 				04BC49A628587590003FE6D9 /* LaunchScreen.storyboard in Resources */,
 				040E4D0C2872D9CF003569F1 /* coil_logo_colored.svg in Resources */,
-				045E369D286AF4B500A62263 /* resource_3rd in Resources */,
 				04BC49A328587590003FE6D9 /* Assets.xcassets in Resources */,
 				040E4D0D2872D9CF003569F1 /* angle_nft.png in Resources */,
 				04BC49A12858758E003FE6D9 /* Main.storyboard in Resources */,
@@ -792,7 +803,9 @@
 				0404B058287414F5000BABE8 /* XXWebView.swift in Sources */,
 				04B2B7D6287E5B8100172109 /* NotificationManager.swift in Sources */,
 				04BC499A2858758E003FE6D9 /* AppDelegate.swift in Sources */,
+				F3B77B682909369A005A384D /* QueueManager.swift in Sources */,
 				F3B0946528F558150027CD06 /* NotificationName.swift in Sources */,
+				F3872073290BB2C20018B8CC /* Snowflake.swift in Sources */,
 				04DCE25528869A5E001BE6B1 /* ThirdViewController.swift in Sources */,
 				F39A941328F79C8800E82EB2 /* NVHFile.m in Sources */,
 				04398601286593520081A9F7 /* CustomAlertPopView.swift in Sources */,
@@ -800,12 +813,14 @@
 				041D100528630B7800AEFE7D /* ButtonModel.swift in Sources */,
 				04002FAD2897701900D03CB0 /* DatabaseManager.swift in Sources */,
 				F31B2B9428F8088F008CDD5F /* Date_extension.swift in Sources */,
+				F39535162919E4650071898A /* UIImage_extension.swift in Sources */,
 				0443FCDE28640B70003425CD /* BottomBarModel.swift in Sources */,
 				04002FA928976D0F00D03CB0 /* CacheManager.swift in Sources */,
 				0419F107286051F500EF8DC2 /* UIDevice_extension.swift in Sources */,
 				F31B2B9728F80A1D008CDD5F /* ProgressAnimationView.swift in Sources */,
 				04C02432287FF3EA008E32C8 /* BluetoothManager.swift in Sources */,
 				0443FCE32864615D003425CD /* CustomBasePopView.swift in Sources */,
+				F39C2982291513BE0038EEBB /* JSCoreEntities.swift in Sources */,
 				0419F10F2861BFED00EF8DC2 /* CaptureViewController.swift in Sources */,
 				0435866728655794004A83BB /* CustomPromptPopView.swift in Sources */,
 				04BC49CE2858768E003FE6D9 /* LeadReplyHandle.swift in Sources */,
@@ -816,6 +831,7 @@
 				F39A940F28F79C8800E82EB2 /* NVHProgress.m in Sources */,
 				04BA30EC287D122C00F8F703 /* PermissionManager.swift in Sources */,
 				04D022672860514C0018716E /* BottomView.swift in Sources */,
+				F39C2984291516650038EEBB /* JSCoreManager.swift in Sources */,
 				042FCD20288A45D00017BA5B /* ScanPhotoViewController.swift in Sources */,
 				F39A941128F79C8800E82EB2 /* NVHTarGzip.m in Sources */,
 				F39A941228F79C8800E82EB2 /* NSFileManager+NVHFileSize.m in Sources */,

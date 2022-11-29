@@ -15,8 +15,6 @@ enum FilePathType {
     case none
 }
 
-let batchManager = BatchFileManager()
-
 class BatchFileManager: NSObject {
 
     private let disposeBag = DisposeBag()
@@ -30,7 +28,14 @@ class BatchFileManager: NSObject {
     
     private(set) var appFilePaths: [String] = []
     
-    func initBatchFile() {
+    static let shared = BatchFileManager()
+    
+    override init() {
+        super.init()
+        initBatchFile()
+    }
+    
+    private func initBatchFile() {
         
         let recommendFiles = recommendManager.readAppSubFile()
         let systemFiles = sysManager.readAppSubFile()
@@ -45,8 +50,8 @@ class BatchFileManager: NSObject {
             guard let strongSelf = self else { return }
             strongSelf.downloadNewFile(fileName: fileName)
         }).disposed(by: disposeBag)
-        
     }
+    
     //根据文件名获取app名称
     func currentAppName(fileName: String) -> String {
         return appNames[fileName] ?? ""
@@ -101,6 +106,13 @@ class BatchFileManager: NSObject {
     //获取扫码后app的下载地址
     func scanDownloadURLString(fileName: String) -> String {
         return refreshInfoFromCacheInfo(fileName: fileName) ?? ""
+    }
+    //扫码下载app
+    func scanToDownloadApp(fileName: String, dict: [String:Any]) {
+        BatchFileManager.shared.addAPPFromScan(fileName: fileName, dict: dict)
+        BatchFileManager.shared.updateScanType(fileName: fileName)
+        RefreshManager.saveLastUpdateTime(fileName: fileName, time: Date().timeStamp)
+        BatchFileManager.shared.writeUpdateContent(fileName: fileName, json: dict)
     }
 
     //定时刷新
@@ -160,6 +172,11 @@ class BatchFileManager: NSObject {
     //扫码添加安装的app数据
     func addAPPFromScan(fileName: String, dict: [String:Any]) {
         scanManager.writeLinkJson(fileName: fileName, dict: dict)
+    }
+    
+    //获取system-app的entryPath
+    func systemAPPEntryPath(fileName: String) -> String? {
+        return sysManager.fetchEntryPath(fileName: fileName)
     }
     
     //更新信息下载完后，重新下载项目文件,  可能不需要判断system-app 看最后system-app升级时的需求

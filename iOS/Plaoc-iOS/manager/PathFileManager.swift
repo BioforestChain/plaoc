@@ -103,7 +103,7 @@ class PathFileManager: NSObject {
     }
     
     //创建文件夹
-    func mkdir(fileName: String, path: String, recursive: Bool = false) -> Bool {
+    func mkdir(fileName: String, path: String) -> Bool {
         let filePath = rootFilePath(fileName: fileName) + path
         do {
             try FileManager.default.createDirectory(atPath: filePath, withIntermediateDirectories: true, attributes: nil)
@@ -139,7 +139,7 @@ class PathFileManager: NSObject {
     
     //读取数据返回字符串
     func readFileContent(fileName: String, path: String) -> String {
-        let filePath = "/Users/ui03/Desktop/tsconfig.json"//rootFilePath(fileName: fileName) + path
+        let filePath = rootFilePath(fileName: fileName) + path
         guard FileManager.default.fileExists(atPath: filePath) else { return "" }
         let stream = InputStream(fileAtPath: filePath)
         stream?.open()
@@ -192,6 +192,12 @@ class PathFileManager: NSObject {
 //        _ = contentData.withUnsafeBytes {
 //                output?.write($0.bindMemory(to: UInt8.self).baseAddress!, maxLength: contentData.count)
 //        }
+    }
+    
+    func removeFile(fileName: String, path: String) {
+        let filePath = rootFilePath(fileName: fileName) + path
+        guard FileManager.default.fileExists(atPath: filePath) else { return }
+        try? FileManager.default.removeItem(atPath: filePath)
     }
     
     

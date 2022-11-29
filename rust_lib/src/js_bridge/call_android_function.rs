@@ -1,30 +1,54 @@
-// #[cfg(target_os = "android")]
+use serde_json::json;
+
 use crate::android::android_inter;
-use crate::web_socket::ws::TopicsRequest;
-use std::sync::mpsc::{Receiver, Sender};
-use std::sync::{mpsc, Arc};
+
+/// call_java_callback 有返回记录
+/// deno_evaljs_callback 不需要返回记录
 
 /// 调用android方法
 pub fn call_android(bit: Vec<u8>) {
-    // let fun_type = &handle.function;
-    // let public_key = &handle.public_key;
-    // let data = &handle.data;
     // 转换为static str
     let callback = Box::leak(bit.into_boxed_slice());
-    // #[cfg(target_os = "android")]
     android_inter::call_java_callback(callback);
 }
 
 /// 调用android方法执行evenjs
 pub fn call_android_evaljs(bit: Vec<u8>) {
-    // let fun_type = &handle.function;
-    // let public_key = &handle.public_key;
-    // let data = &handle.data;
     // 转换为static str
     let callback = Box::leak(bit.into_boxed_slice());
-    // #[cfg(target_os = "android")]
     android_inter::deno_evaljs_callback(callback);
 }
+
+/// 通知kotlin叫serviceWorker打开背压
+pub fn call_java_open_back_pressure() {
+    let data = json!(
+    {
+        "function":"openBackPressure",
+        "data":""
+    }
+    );
+    call_deno_rust(data.as_str().unwrap())
+}
+
+/// 通知kotlin 已经溢出了不要再发数据了
+pub fn call_native_request_overflow() {
+    let data = json!(
+    {
+        "function":"requestOverflow",
+        "data":""
+    }
+    );
+    call_deno_rust(data.as_str().unwrap())
+}
+
+// 把数据转化为[u8]并call kotlin
+pub fn call_deno_rust(data:&str) {
+    let bit = data.to_owned().as_bytes().to_vec();
+    // 转换为static str
+    let callback = Box::leak(bit.into_boxed_slice());
+    android_inter::deno_rust_callback(callback);
+}
+
 
 // #[allow(dead_code)]
 // pub struct HandleFunction {

@@ -7,6 +7,7 @@
 
 import UIKit
 import AVFoundation
+import RxSwift
 
 class ScanPhotoViewController: UIViewController {
 
@@ -16,11 +17,21 @@ class ScanPhotoViewController: UIViewController {
     private var output: AVCaptureMetadataOutput?
     private var session: AVCaptureSession?
     private var preview: AVCaptureVideoPreviewLayer?
+    var callback: ThirdCallback?
+    private let disposeBag = DisposeBag()
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
         self.view.backgroundColor = .black
+        self.view.addSubview(naviView)
+        
+        operateMonitor.scanMonitor.subscribe(onNext: { [weak self] (fileName,dict) in
+            guard let strongSelf = self else { return }
+            DispatchQueue.main.async {
+                strongSelf.alertUpdateViewController(fileName: fileName, dataDict: dict)
+            }
+        }).disposed(by: disposeBag)
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -33,6 +44,11 @@ class ScanPhotoViewController: UIViewController {
         self.session?.stopRunning()
         
     }
+    
+    lazy private var naviView: NaviView = {
+        let naviView = NaviView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIDevice.current.statusBarHeight() + 44))
+        return naviView
+    }()
     
     //开始扫描
     func startScan() {
@@ -106,6 +122,25 @@ class ScanPhotoViewController: UIViewController {
         }
     }
     
+    private func alertUpdateViewController(fileName: String, dataDict: [String:Any]) {
+        let alertVC = UIAlertController(title: "确认下载更新吗？", message: nil, preferredStyle: .alert)
+        let sureAction = UIAlertAction(title: "确认", style: .default) { action in
+     
+            BatchFileManager.shared.scanToDownloadApp(fileName: fileName, dict: dataDict)
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                self.navigationController?.popViewController(animated: true)
+                self.callback?(fileName)
+            }
+        }
+        let cancelAction = UIAlertAction(title: "取消", style: .cancel) { action in
+            self.navigationController?.popViewController(animated: true)
+        }
+        alertVC.addAction(sureAction)
+        alertVC.addAction(cancelAction)
+        self.present(alertVC, animated: true)
+    }
+    
 }
 
 extension ScanPhotoViewController: AVCaptureMetadataOutputObjectsDelegate {
@@ -113,8 +148,9 @@ extension ScanPhotoViewController: AVCaptureMetadataOutputObjectsDelegate {
     func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
         if let metadataObj = metadataObjects.first as? AVMetadataMachineReadableCodeObject {
             let result = metadataObj.stringValue  //扫描结果
-                
             if result != nil {
+                let refreshManager = RefreshManager()
+                refreshManager.loadUpdateRequestInfo(fileName: nil, urlString: result, isCompare: false)
                 self.session?.stopRunning()
             }
         }
