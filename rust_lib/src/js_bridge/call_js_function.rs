@@ -1,37 +1,33 @@
 // #![cfg(target_os = "android")]
-use super::promise::PromiseImpl;
-use super::promsieOut::PromiseOut;
-use crate::android::android_inter;
-use crate::js_bridge::call_android_function;
+use crate::js_bridge::{call_android_function};
 use android_logger::Config;
+use std::sync::{Mutex, Arc};
 use deno_core::error::{custom_error, AnyError};
-use deno_core::parking_lot::Mutex;
 use deno_core::{op, ZeroCopyBuf};
 use lazy_static::*;
-use log::{debug, error, info, Level};
-use std::result::Result::Ok;
-use std::{collections::HashMap, str};
+use log::{ Level};
+use std::{str};
+use super::promise::{BufferInstance, BufferTask};
 
+// pub type Db = Arc<Mutex<HashMap<String,Bytes>>>;
+pub type Db = Arc<Mutex<BufferTask>>;
 // 添加一个全局变量来缓存信息，让js每次来拿，防止js内存爆炸,这里应该用channelId来定位每条消息，而不是用现在的队列
 lazy_static! {
     // 消息通道
     pub(crate) static ref BUFFER_NOTIFICATION: Mutex<Vec<Vec<u8>>> = Mutex::new(vec![]);
-    pub(crate) static ref BUFFER_RESOLVE: Mutex<Vec<Vec<u8>>> = Mutex::new(vec![]);
     // 系统操作通道
     pub(crate) static ref BUFFER_SYSTEM: Mutex<Vec<Vec<u8>>> = Mutex::new(vec![]);
+
+    pub(crate) static ref BUFFER_INSTANCES: Arc<Mutex<BufferInstance>> =  Arc::new(Mutex::new(BufferInstance::new()));
+    pub(crate) static ref BUFFER_INSTANCES_MAP: Db = Arc::new(Mutex::new(BufferTask::new()));
+    // pub(crate) static ref BUFFER_INSTANCES_MAP: Db = Arc::new(Mutex::new(BufferTask::new()));
 }
 
-type channelId = String;
-struct BufferInstance<T: Send + 'static> {
-    cache: Vec<u8>,
-    waitter: PromiseImpl<T>,
-    currentHeight: i32,
-    waterThrotth: i32, // 8MB
-}
 
-pub const BUFFER_INSTANCES_MAP: Mutex<HashMap<channelId, BufferInstance>> =
-    Mutex::new(HashMap::new());
-
+/// deno-js system data
+/// send channel: deno-js(ops.op_js_to_rust_buffer)->rust(op_js_to_rust_buffer) -> kotlin(call_java_callback)
+/// back channel: kotlin(backSystemDataToRust)->rust(Java_info_bagen_rust_plaoc_DenoService_backSystemDataToRust)->BUFFER_SYSTEM
+/// deno-js(loop function op_rust_to_js_system_buffer get data for BUFFER_SYSTEM)
 /// deno-js消息从这里走到移动端
 #[op]
 pub fn op_js_to_rust_buffer(buffer: ZeroCopyBuf) {
@@ -49,47 +45,57 @@ pub fn op_js_to_rust_buffer(buffer: ZeroCopyBuf) {
 pub fn op_eval_js(buffer: ZeroCopyBuf) {
     call_android_function::call_android_evaljs(buffer.to_vec()); // 通知FFI函数
 }
-
+ 
 ///  deno-js 轮询访问这个方法，以达到把rust数据传递到deno-js的过程，这里负责的是移动端系统API的数据
 #[op]
-pub fn op_rust_to_js_system_buffer(channelId: String) -> Result<Vec<u8>, AnyError> {
-    let buffer = BUFFER_INSTANCES_MAP.lock().get(&channelId);
-    if (buffer::cache.len() > 0) {
-        let result = buffer::cache::shift();
-        buffer::currentHeight -= result.len();
-        // TODO: 背压放水策略： buffer.currentHeight < buffer.waterThrotth/2
-        if (buffer::currentHeight < buffer::waterThrotth) {
-            Java_open_back_pressure(token)
-        }
-        return result;
-    }
-    if (buffer::waitter) {
-        Err(custom_error("op_rust_to_js_system_buffer", "超过"))
-    }
-    let waitter = PromiseImpl::new();
-    buffer::waitter = waitter;
-    buffer::waitter::poll_mut.await?;
-    let box_data = buffer::cache;
-    match box_data {
-        Some(r) => Ok(r),
-        None => Err(custom_error("op_rust_to_js_system_buffer", "未找到数据")),
-    }
+pub fn op_rust_to_js_system_buffer(head_view:String) -> Result<Vec<u8>, AnyError> {
+    let mut buffer_task = BUFFER_INSTANCES_MAP.lock().unwrap();
+    let buffer = buffer_task.get(head_view);
+    
+    Ok(buffer)
 }
 
-/// deno-js 轮询访问这个方法，以达到把rust数据传递到deno-js的过程
+/// chunk data 
+/// serviceworker->kotlin(backDataToRust)->rust(Java_info_bagen_rust_plaoc_DenoService_backDataToRust)->BUFFER_INSTANCES
+/// deno-js(loop function op_rust_to_js_buffer )
+/// 
+/// deno-js 轮询访问这个方法，以达到把rust数据传递到deno-js的过程 也就是说这里传递的是chunk数据
 #[op]
 pub fn op_rust_to_js_buffer() -> Result<Vec<u8>, AnyError> {
-    let box_data = BUFFER_RESOLVE.lock().pop();
-    match box_data {
-        Some(r) => Ok(r),
-        None => Err(custom_error("op_rust_to_js_buffer", "未找到数据")),
+
+    let mut buffer =  BUFFER_INSTANCES.lock().unwrap();
+
+    let result = buffer.shift();
+    // log::info!(" op_rust_to_js_buffer 🤩 result:{:?}", &result);
+    
+    // 如果为空
+    if result.is_empty() {
+        return Ok(vec![0]);
     }
+    log::info!(" op_rust_to_js_buffer 😻 current_height:{:?},water_threshold:{:?}", buffer.current_height,buffer.water_threshold);
+    // TODO: 背压放水策略： buffer.current_height < buffer.water_throtth/2
+    if buffer.full && buffer.current_height < buffer.water_threshold {
+        buffer.full = false;
+        call_android_function::call_java_open_back_pressure() // 通知前端放水
+    }
+    log::info!(" op_rust_to_js_buffer result:{:?}", &result);
+    Ok(result.to_vec())
+    // 初始化一个等待者
+    // let waitter = buffer.init_waitter();
+    // log::info!(" op_rust_to_js_buffer 👾 cache:{:?},waitter:{:?}", &result,&buffer.has_waitter());
+    // let promise_out =  waitter.lock().unwrap();
+    // let buffer = promise_out;
+    // log::info!(" op_rust_to_js_buffer buffer 🤖:{:?}", &buffer);
+    // match buffer {
+    //     Some(data) => Ok(data),
+    //     None => Ok(vec![0])
+    // }
 }
 
 /// 负责消息通知
 #[op]
 pub fn op_rust_to_js_app_notification() -> Result<Vec<u8>, AnyError> {
-    let box_data = BUFFER_NOTIFICATION.lock().pop();
+    let box_data = BUFFER_NOTIFICATION.lock().unwrap().pop();
     match box_data {
         Some(r) => Ok(r),
         None => Err(custom_error("op_rust_to_js_app_notification", "未找到数据")),
@@ -99,152 +105,6 @@ pub fn op_rust_to_js_app_notification() -> Result<Vec<u8>, AnyError> {
 /// 负责存储消息
 #[op]
 pub fn op_rust_to_js_set_app_notification(buffer: ZeroCopyBuf) {
-    BUFFER_NOTIFICATION.lock().push(buffer.to_vec());
+    BUFFER_NOTIFICATION.lock().unwrap().push(buffer.to_vec());
 }
 
-/**
-/// call_js_functions
-/// 这里的UUID是channnel的uuid
-const BUFFER_INSTANCES_MAP = new Map<UUID( xxx-xxxx-xxxx-xxxx) ,{
-    cache:[] as Array< Uint8Array >,
-    waitter: undefined as PromiseOut<Uint8Array> |undefined,
-    currentHeight: 0,
-    waterThrotth: 1024 * 1024 * 8 // 8MB
-}>();
-
-op_rust_to_js_system_buffer = async (token)=>{
-    const buffer = BUFFER_INSTANCES_MAP.lock().forceGet(token)
-
-    if(buffer.cache.length > 0){
-        const result = buffer.cache.shift();
-        buffer.currentHeight -= result.length;
-        // TODO: 背压放水策略： buffer.currentHeight < buffer.waterThrotth/2
-        if(buffer.currentHeight < buffer.waterThrotth){
-            Java_open_back_pressure(token)
-        }
-        return result;
-    }
-    if(buffer.waitter){
-        throw new Error("xxxx");
-    }
-    const waitter = new PromiseOut();
-    buffer.waitter = waitter;
-    return await waitter.promise;
-}
-
-/// deno
-Java_info_bagen_rust_plaoc_DenoService_backSystemDataToRust = (token:string, data:Uint8Array)=>{
-    const buffer = BUFFER_INSTANCES_MAP.lock().get(token);
-    if(buffer.waitter){
-         buffer.waitter.resolve();
-         buffer.waitter = undefined
-         return 0 // 0 代表没有阻塞
-    }
-
-    if(buffer.currentHeight >= buffer.waterThrotth) {
-        throw
-    }
-    buffer.cache.push(data)
-    buffer.currentHeight += data.length;
-    return buffer.currentHeight >= buffer.waterThrotth? 1: 0 // 1 代表已经被阻塞
-}
-Java_open_back_pressure = (token:string)=>{
-    Channel.get(token).webview.evalJavascript(`nav.serviceWorker.postMessage({cmd::"openbackpressure"})`);
-}
-
-
-// service worker
-
-let back_pressure?:PromiseOut<void>;
-
-const url_queue = [];
-let runnning = false
-const queueFetch = async <R>(url:string)=>{
-    const task = new PromiseOut<R>();
-    url_queue.push({url,task});
-    _runFetch();
-    return task.promise
-}
-const _runFetch = async()=>{
-  if(runnning){return}
-    running = true;
-    while(true){
-        const item = url_queue.shift();
-        if(item===undefined){
-            break
-        }
-        if(back_pressure){
-            await back_pressure.promise
-        }
-        if(await fetch(item.url).then(res=>res.text()) === 'ok'){
-            back_pressure = new PromiseOut()
-        }
-    }
-    running = false
-}
-
-on("fetch",event=> {
-    for(const channel of channels){
-        const matchResult = channel.match(event.request);
-        if(matchResult){
-            event.responseWith(channel.handle(matchResult))
-        }
-    }
-
-    event.responseWith((async()=>{
-        for await(const chunk of RequestBuidler.fromFetchEvent(event)){
-            await queueFetch('duplex?chunk=${chunk}').then(res=>res?.text())
-        }
-    })())
-});
-
-on('message', event=>{
-    if( matchBackPressureOpen(event.data)) {
-        back_pressure?.resolve()
-        return
-    }
-
-    if(mactchOpenChannel(event.data)){
-        channels.push(event.data) // { type: "pattern", url:"" }
-    }
-})
-/// web.js
-while(true) {
-    await requestAnimationFrame.promise();
-    canvas.setData = new ImageData(await fetch('/api/blur',{method:"POST", body:canvas.toBlob()}).then(res=>res.arrayBuffer()));
-}
-
-// requestAnimationFream(()=>{
-//     fetch('/api/blur',{method:"POST", body:canvas.toBlob()})
-// });
-
-
-/// server.js
-(async()=>{
-    for await(const request of dwebview.openRequest('/api/:api_method',{mode:"pattern"|"static"})){
-        await processApi(request)
-    }
-})();
-dwebview.open('./index.html');
-
-
-/// # static mode
-(async()=>{
-    for await(const request of dwebview.openRequest('/image/:api_method', new StaticMode(dir:import.meta.resolve('./www')))){
-        await processImage(request)
-    }
-})();
-
-// cache by service-worker
-class Channels{
-    push(config) {
-        if(config.mode === 'static') {
-            const cache = await caches.open(config.cacheName);
-            await cache.addAll(config.files);
-            const handler = (event)=>{
-               return caches.match(event.request)
-            }
-        }
-    }
-}
- */

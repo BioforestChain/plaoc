@@ -345,7 +345,7 @@ impl fmt::Display for Diagnostic {
 
 #[derive(Clone, Debug, Default, Eq, PartialEq)]
 pub struct Diagnostics(Vec<Diagnostic>);
-
+#[allow(dead_code)]
 impl Diagnostics {
   #[cfg(test)]
   pub fn new(diagnostics: Vec<Diagnostic>) -> Self {

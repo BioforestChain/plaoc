@@ -1,24 +1,14 @@
+#![allow(non_snake_case)]
 // #![cfg(target_os = "android")]
-use android_logger::Config;
 use lazy_static::*;
-use log::{debug, error, info, Level};
-use tokio;
-// 引用标准库的一些内容
-use std::{
-    ffi::{c_void, CStr, CString},
-    sync::{mpsc, Mutex},
-    thread,
-};
-// 引用 jni 库的一些内容，就是上面添加的 jni 依赖
-use crate::module_loader::AssetsModuleLoader;
+use log::{debug, error, info};
 use jni::{
-    objects::{GlobalRef, JByteBuffer, JObject, JString, JValue},
-    sys::{jint, jstring, JNI_ERR, JNI_VERSION_1_4},
+    objects::{GlobalRef, JObject, JValue},
+    sys::{jint, JNI_ERR, JNI_VERSION_1_4},
     JNIEnv, JavaVM, NativeMethod,
 };
 use jni_sys::jbyteArray;
-use std::ptr::NonNull;
-use std::sync::Arc;
+use std::{ffi::c_void, sync::Mutex};
 
 // 添加一个全局变量来缓存回调对象
 lazy_static! {
@@ -27,9 +17,11 @@ lazy_static! {
     //callback
     static ref JNI_CALLBACK: Mutex<Option<GlobalRef>> = Mutex::new(None);
      static ref JNI_JS_CALLBACK: Mutex<Option<GlobalRef>> = Mutex::new(None);
+     static ref JNI_RUST_CALLBACK: Mutex<Option<GlobalRef>> = Mutex::new(None);
 }
 
 // 校验的包名
+#[allow(unused_macros)]
 macro_rules! app_package {
     () => {
         "info.bagen.rust.plaoc"
@@ -37,6 +29,7 @@ macro_rules! app_package {
 }
 
 // 检验的签名 hash-code 获取方式可使用 info.bagen.rust.plaoc.denoService.Utils.getSignInfoHashCode 方式获取
+#[allow(unused_macros)]
 macro_rules! signature {
     () => {
         -779219788
@@ -58,46 +51,6 @@ macro_rules! jni_method {
     }};
 }
 
-// #[no_mangle]
-// pub extern "system" fn Java_info_bagen_rust_plaoc_DenoService_initialiseLogging(
-//     env: JNIEnv,
-//     _context: JObject,
-// ) {
-//     android_logger::init_once(
-//         Config::default()
-//             .with_min_level(Level::Trace)
-//             .with_tag("Rust"),
-//     );
-//     log_panics::init();
-
-//     log::info!("Logging initialised from Rust");
-
-//     std::env::set_var("NO_COLOR", "true");
-// }
-
-// #[no_mangle]
-// pub extern "system" fn Java_info_bagen_rust_plaoc_DenoService_hello(
-//     env: JNIEnv,
-//     context: JObject,
-// ) {
-//     log::info!("hello!!!hello!!!hello!!!hello!!!hello!!!");
-//     let global_context = env.new_global_ref(context).unwrap();
-//     rust_lib_ndk_context_initialize(env.get_java_vm().unwrap(), global_context.as_obj());
-// }
-
-// #[no_mangle]
-// pub extern "C" fn rust_lib_ndk_context_initialize(vm: JavaVM, context: JObject) {
-//     unsafe {
-//         ndk_context::initialize_android_context(vm.get_java_vm_pointer().cast(), context.cast())
-//     };
-//     log::info!("android context inited!!!!!");
-//     let aml = crate::module_loader::AssetsModuleLoader::new();
-//     log::info!(
-//         "hello_runtime.js: {}",
-//         aml.get_string_asset("hello_runtime.js")
-//     );
-// }
-
 /// 动态库被 java 加载时 会触发此函数, 在此动态注册本地方法
 #[no_mangle]
 #[allow(non_snake_case)]
@@ -113,9 +66,13 @@ unsafe fn JNI_OnLoad(jvm: JavaVM, _reserved: *mut c_void) -> jint {
             denoSetCallback,
             "(Linfo/bagen/rust/plaoc/DenoService$IDenoCallback;)V"
         ),
+        jni_method!(
+            rustCallback,
+            "(Linfo/bagen/rust/plaoc/DenoService$IRustCallback;)V"
+        ),
     ];
 
-    let ok = register_natives(&jvm, class_name, jni_methods.as_ref());
+    register_natives(&jvm, class_name, jni_methods.as_ref());
 
     // 在动态库被java加载时, 缓存一个jvm到全局变量, 调用回调时使用
     let mut ptr_jvm = JVM_GLOBAL.lock().unwrap();
@@ -144,6 +101,18 @@ pub fn denoSetCallback(env: JNIEnv, _obj: JObject, callback: JObject) {
     *ptr_fn = Some(callback);
 }
 
+/// 方法实现
+#[no_mangle]
+pub fn rustCallback(env: JNIEnv, _obj: JObject, callback: JObject) {
+    // 创建一个全局引用,
+    let callback = env.new_global_ref(JObject::from(callback)).unwrap();
+
+    // 添加到全局缓存
+    let mut ptr_fn = JNI_RUST_CALLBACK.lock().unwrap();
+    *ptr_fn = Some(callback);
+}
+
+
 unsafe fn register_natives(jvm: &JavaVM, class_name: &str, methods: &[NativeMethod]) -> jint {
     let env: JNIEnv = jvm.get_env().unwrap();
     let jni_version = env.get_version().unwrap();
@@ -169,7 +138,7 @@ unsafe fn register_natives(jvm: &JavaVM, class_name: &str, methods: &[NativeMeth
     }
 }
 
-/// 回调 Callback 对象的 { void handleCallback(byte: byteArray) } 函数
+/// 把数据传输给kotlin  回调 Callback 对象的 { void handleCallback(byte: byteArray) } 函数 deno-js -> rust->kotlin
 pub fn call_java_callback(fun_type: &'static [u8]) {
     log::info!("i am call_java_callback {:?}", fun_type);
     call_jvm(&JNI_CALLBACK, move |obj: JObject, env: &JNIEnv| {
@@ -190,7 +159,7 @@ pub fn call_java_callback(fun_type: &'static [u8]) {
     });
 }
 
-/// 回调 Callback 对象的 { void denoCallback(byte: Byte) } 函数
+/// 把数据传输给kotlin 不包含返回值 deno-js -> rust->kotlin
 pub fn deno_evaljs_callback(fun_type: &'static [u8]) {
     log::info!("i am deno_evaljs_callback {:?}", fun_type);
     call_jvm(&JNI_JS_CALLBACK, move |obj: JObject, env: &JNIEnv| {
@@ -207,6 +176,25 @@ pub fn deno_evaljs_callback(fun_type: &'static [u8]) {
         }
     });
 }
+
+/// rust把数据传输给kotlin rust -> kotlin
+pub fn deno_rust_callback(fun_type: &'static [u8]) {
+    log::info!("i am deno_rust_callback {:?}", fun_type);
+    call_jvm(&JNI_RUST_CALLBACK, move |obj: JObject, env: &JNIEnv| {
+        let response: jbyteArray = env
+            .byte_array_from_slice(fun_type)
+            .expect("Couldn't create java string!");
+        match env.call_method(obj, "rustCallback", "([B)V", &[JValue::from(response)]) {
+            Ok(jvalue) => {
+                debug!("callback succeed: {:?}", jvalue);
+            }
+            Err(e) => {
+                error!("callback failed : {:?}", e);
+            }
+        }
+    });
+}
+
 
 /// # 封装jvm调用
 fn call_jvm<F>(callback: &Mutex<Option<GlobalRef>>, run: F)

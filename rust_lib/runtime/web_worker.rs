@@ -684,7 +684,10 @@ pub fn run_web_worker(
                     worker.start_polling_for_messages();
                     worker.execute_main_module(id).await
                 }
-                Err(e) => Err(e),
+                Err(e) => {
+                    println!("execute_main_module:1->  {:?}",e);
+                    Err(e)
+                },
             }
         };
 
