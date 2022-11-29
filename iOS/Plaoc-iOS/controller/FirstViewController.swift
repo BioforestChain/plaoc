@@ -15,13 +15,12 @@ class FirstViewController: UIViewController {
     private var buttons: [UIButton] = []
     private var labels: [UILabel] = []
     private let disposeBag = DisposeBag()
+    private var jsCore: JSCoreManager!
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
         self.view.backgroundColor = .white
-        
-//        batchManager.initBatchFile()
         
         appNames = BatchFileManager.shared.appFilePaths
         

@@ -12,10 +12,12 @@ import SSZipArchive
 class BFSNetworkManager: NSObject {
     
     static let shared = BFSNetworkManager()
+    
+    private var requestDict: [String: DownloadRequest] = [:]
 
-    func loadAutoUpdateInfo(fileName: String? = nil, urlString: String) {
+    func loadAutoUpdateInfo(fileName: String, urlString: String) {
         
-        AF.download(urlString).downloadProgress { progress in
+        let request = AF.download(urlString).downloadProgress { progress in
             print(progress.fractionCompleted)  //进度值
             NotificationCenter.default.post(name: NSNotification.Name.progressNotification, object: nil, userInfo: ["progress": "\(progress.fractionCompleted)", "fileName": fileName])
         }.responseURL { response in
@@ -30,23 +32,14 @@ class BFSNetworkManager: NSObject {
                         
                         let filePath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first
                         
-                        if fileName != nil, filePath != nil {
+                        if filePath != nil {
                             let desPath = filePath! + "/system-app"
-                            
-//                            let aa = SSZipArchive.unzipFile(atPath: path, toDestination: desPath)
-//                            let schemePath = desPath + "/\(fileName!)/sys"   //后面看返回数据修改
-//                            Schemehandler.setupHTMLCache(fileName: fileName!, fromPath: schemePath)
-//                            RefreshManager.saveLastUpdateTime(fileName: fileName!, time: Date().timeStamp)
-//                            DispatchQueue.main.async {
-//                                NotificationCenter.default.post(name: NSNotification.Name.progressNotification, object: nil, userInfo: ["progress": "complete", "fileName": fileName])
-//                            }
-                            
                             DispatchQueue.main.async {
                                 NVHTarGzip.sharedInstance().unTarGzipFile(atPath: response.fileURL!.path, toPath: desPath) { error in
                                     if error == nil {
-                                        let schemePath = desPath + "/\(fileName!)/sys"   //后面看返回数据修改
-                                        Schemehandler.setupHTMLCache(fileName: fileName!, fromPath: schemePath)
-                                        RefreshManager.saveLastUpdateTime(fileName: fileName!, time: Date().timeStamp)
+                                        let schemePath = desPath + "/\(fileName)/sys"   //后面看返回数据修改
+                                        Schemehandler.setupHTMLCache(fileName: fileName, fromPath: schemePath)
+                                        RefreshManager.saveLastUpdateTime(fileName: fileName, time: Date().timeStamp)
                                         NotificationCenter.default.post(name: NSNotification.Name.progressNotification, object: nil, userInfo: ["progress": "complete", "fileName": fileName])
                                     }
                                 }
@@ -58,6 +51,7 @@ class BFSNetworkManager: NSObject {
                 NotificationCenter.default.post(name: NSNotification.Name.progressNotification, object: nil, userInfo: ["progress": "fail", "fileName": fileName])
             }
         }
+        self.requestDict[fileName] = request
     }
     
     func cancelNetworkRequest(urlString: String?) {
@@ -83,6 +77,19 @@ class BFSNetworkManager: NSObject {
                     task.cancel()
                 }
             }
+        }
+    }
+    
+    func suspendRequest(fileName: String) {
+        if let request = requestDict[fileName] {
+            request.suspend()
+        }
+        
+    }
+    
+    func resumeRequest(fileName: String) {
+        if let request = requestDict[fileName] {
+            request.resume()
         }
     }
 }

@@ -11,10 +11,9 @@ import Photos
 
 class PhotoManager: NSObject {
     
-    private var isPermissioned: Bool = false
-    private var isScan: Bool = false
     private var assets: [PHAsset] = []
     private var images: [UIImage] = []
+    private var assetDates: [Date] = []
     
     private func permissioned(action: @escaping (() -> Void)) {
         permissionManager.startPermissionAuthenticate(type: .photo, isSet: true) { result in
@@ -47,30 +46,34 @@ class PhotoManager: NSObject {
         }
     }
     //获取相册图片
-    func fetchTotalPhotos() -> [UIImage] {
+    func fetchTotalPhotos(photoCount: Int = 10) -> [UIImage] {
         
-        generateImagesFromPhoto()
+        generateImagesFromPhoto(photoCount: photoCount)
         return images
     }
     //获取相册图片转base64
-    func fetchBase64Photos() -> [String] {
-        generateImagesFromPhoto()
+    func fetchBase64Photos(photoCount: Int = 10) -> [String] {
+        generateImagesFromPhoto(photoCount: photoCount)
         guard images.count > 0 else { return [] }
         let results = images.map { $0.imageToBase64() }
         return results
     }
     
-    private func generateImagesFromPhoto() {
+    private func generateImagesFromPhoto(photoCount: Int) {
         permissioned {
             let photosOptions = PHFetchOptions()
             photosOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
-            photosOptions.predicate = NSPredicate(format: "mediaType = %d",
-                                                  PHAssetMediaType.image.rawValue)
+            photosOptions.predicate = NSPredicate(format: "mediaType = %d && NOT (creationDate IN %@)",
+                                                  PHAssetMediaType.image.rawValue,self.assetDates)
+            photosOptions.fetchLimit = photoCount
             let assets = PHAsset.fetchAssets(with: .image, options: photosOptions)
             let imageManager = PHCachingImageManager()
             imageManager.stopCachingImagesForAllAssets()
             for i in 0..<assets.count {
                 let asset = assets[i]
+                if asset.creationDate != nil {
+                    self.assetDates.append(asset.creationDate!)
+                }
                 imageManager.requestImage(for: asset, targetSize: CGSize(width: 36, height: 36), contentMode: .aspectFill, options: nil) { image, info in
                     if image != nil {
                         self.images.append(image!)

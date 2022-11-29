@@ -13,10 +13,14 @@ class JSCoreManager: NSObject {
     private var baseViewController: UIViewController?
     private let jsContext = JSContext()
     
+    let sysManager: SystemManager = SystemManager()
+    
     init(fileName: String, controller: UIViewController?) {
         super.init()
         baseViewController = controller
-        guard let entryPath = BatchFileManager.shared.systemAPPEntryPath(fileName: fileName) else { return }
+//        guard let entryPath = BatchFileManager.shared.systemAPPEntryPath(fileName: fileName) else { return }
+        
+        guard let entryPath = sysManager.fetchEntryPath() else { return }
         
         let plaoc = PlaocHandleModel()
         plaoc.controller = controller
@@ -25,6 +29,8 @@ class JSCoreManager: NSObject {
         jsContext?.setObject(plaoc, forKeyedSubscript: "PlaocJavascriptBridge" as NSCopying & NSObjectProtocol)
         let content = try? String(contentsOfFile: entryPath)
         jsContext?.evaluateScript(content)
+        
+//        let res = jsContext?.evaluateScript("start()")
     }
     
     func callFunction<T>(functionName: String, withData dataObject: Codable, type: T.Type) -> JSValue? where T:Codable {
