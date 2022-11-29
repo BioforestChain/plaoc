@@ -19,19 +19,34 @@ pub fn call_android_evaljs(bit: Vec<u8>) {
     android_inter::deno_evaljs_callback(callback);
 }
 
-/// 通知kotlin打开背压
+/// 通知kotlin叫serviceWorker打开背压
 pub fn call_java_open_back_pressure() {
-    let channel_id: String = String::from("channel_id");
     let data = json!(
     {
         "function":"openBackPressure",
-        "data":channel_id
+        "data":""
     }
     );
-    let bit = data.as_str().to_owned().unwrap().as_bytes().to_vec();
-     // 转换为static str
-     let callback = Box::leak(bit.into_boxed_slice());
-     android_inter::deno_rust_callback(callback);
+    call_deno_rust(data.as_str().unwrap())
+}
+
+/// 通知kotlin 已经溢出了不要再发数据了
+pub fn call_native_request_overflow() {
+    let data = json!(
+    {
+        "function":"requestOverflow",
+        "data":""
+    }
+    );
+    call_deno_rust(data.as_str().unwrap())
+}
+
+// 把数据转化为[u8]并call kotlin
+pub fn call_deno_rust(data:&str) {
+    let bit = data.to_owned().as_bytes().to_vec();
+    // 转换为static str
+    let callback = Box::leak(bit.into_boxed_slice());
+    android_inter::deno_rust_callback(callback);
 }
 
 

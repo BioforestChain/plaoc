@@ -6,25 +6,23 @@ use deno_core::error::{custom_error, AnyError};
 use deno_core::{op, ZeroCopyBuf};
 use lazy_static::*;
 use log::{ Level};
-use std::{collections::HashMap, str};
+use std::{str};
+use super::promise::{BufferInstance, BufferTask};
 
-use super::promise::{BufferInstance};
-
-pub type Db = Arc<Mutex<HashMap<ChannelId, BufferInstance>>>;
-
+// pub type Db = Arc<Mutex<HashMap<String,Bytes>>>;
+pub type Db = Arc<Mutex<BufferTask>>;
 // 添加一个全局变量来缓存信息，让js每次来拿，防止js内存爆炸,这里应该用channelId来定位每条消息，而不是用现在的队列
 lazy_static! {
     // 消息通道
     pub(crate) static ref BUFFER_NOTIFICATION: Mutex<Vec<Vec<u8>>> = Mutex::new(vec![]);
-    pub(crate) static ref BUFFER_RESOLVE: Mutex<Vec<Vec<u8>>> = Mutex::new(vec![]);
     // 系统操作通道
     pub(crate) static ref BUFFER_SYSTEM: Mutex<Vec<Vec<u8>>> = Mutex::new(vec![]);
 
     pub(crate) static ref BUFFER_INSTANCES: Arc<Mutex<BufferInstance>> =  Arc::new(Mutex::new(BufferInstance::new()));
-    pub(crate) static ref BUFFER_INSTANCES_MAP: Db = Arc::new(Mutex::new(HashMap::new()));
+    pub(crate) static ref BUFFER_INSTANCES_MAP: Db = Arc::new(Mutex::new(BufferTask::new()));
+    // pub(crate) static ref BUFFER_INSTANCES_MAP: Db = Arc::new(Mutex::new(BufferTask::new()));
 }
 
-type ChannelId = String;
 
 /// deno-js system data
 /// send channel: deno-js(ops.op_js_to_rust_buffer)->rust(op_js_to_rust_buffer) -> kotlin(call_java_callback)
@@ -47,32 +45,14 @@ pub fn op_js_to_rust_buffer(buffer: ZeroCopyBuf) {
 pub fn op_eval_js(buffer: ZeroCopyBuf) {
     call_android_function::call_android_evaljs(buffer.to_vec()); // 通知FFI函数
 }
-
+ 
 ///  deno-js 轮询访问这个方法，以达到把rust数据传递到deno-js的过程，这里负责的是移动端系统API的数据
 #[op]
-pub async fn op_rust_to_js_system_buffer(_channel_id:String) -> Result<Vec<u8>, AnyError> {
-    // let map = BUFFER_INSTANCES_MAP.lock();
-    // let mut  buffer = map.get(&channel_id).unwrap().lock();
-
-    // if !buffer.cache.is_empty() {
-    //     let result = buffer.shift();
-        
-    //     // TODO: 背压放水策略： buffer.current_height < buffer.water_throtth/2
-    //     if buffer.full && buffer.current_height < buffer.water_threshold {
-    //         buffer.full = false;
-    //         call_android_function::call_java_open_back_pressure() // 通知前端放水 channel_id
-    //     }
-    //     return Ok(result);
-    // }
-
-    // let waitter = buffer.init_waitter().clone();
-    // let buffer = waitter.await.as_ref().unwrap().clone();
-    // return Ok(buffer.clone());
-    let box_data = BUFFER_SYSTEM.lock().unwrap().pop();
-    match box_data {
-        Some(r) => Ok(r),
-        None => Ok(vec![0]),
-    }
+pub fn op_rust_to_js_system_buffer(head_view:String) -> Result<Vec<u8>, AnyError> {
+    let mut buffer_task = BUFFER_INSTANCES_MAP.lock().unwrap();
+    let buffer = buffer_task.get(head_view);
+    
+    Ok(buffer)
 }
 
 /// chunk data 
@@ -91,7 +71,6 @@ pub fn op_rust_to_js_buffer() -> Result<Vec<u8>, AnyError> {
     // 如果为空
     if result.is_empty() {
         return Ok(vec![0]);
-        // return Err(custom_error("op_rust_to_js_buffer","没有找到数据"))
     }
     log::info!(" op_rust_to_js_buffer 😻 current_height:{:?},water_threshold:{:?}", buffer.current_height,buffer.water_threshold);
     // TODO: 背压放水策略： buffer.current_height < buffer.water_throtth/2

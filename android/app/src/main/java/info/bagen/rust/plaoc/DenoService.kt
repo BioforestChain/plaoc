@@ -163,7 +163,7 @@ fun createBytesFactory(callFun: ExportNative, message: String) {
   // 移除使用完的标记
   rust_call_map.remove(callFun)
   version_head_map.remove(headId)
-  println("安卓返回数据:---headId=> ${headId[0]},${headId[1]},message=> $message")
+  println("安卓返回数据:---headViewId=> ${headId[0]},${headId[1]},message=> $message")
   thread {
     denoService.backSystemDataToRust(result.array())
   }

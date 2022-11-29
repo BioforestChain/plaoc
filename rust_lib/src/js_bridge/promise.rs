@@ -1,5 +1,6 @@
 use bytes::Bytes;
 use futures::Future;
+use std::collections::HashMap;
 use std::sync::mpsc::{channel, Sender};
 use std::task::Poll;
 use std::time::Duration;
@@ -24,21 +25,22 @@ enum PromiseType {
 #[derive(Clone)]
 pub struct BufferInstance {
     // waitter: Option<PromiseOut<'a, Vec<u8>, ()>>,
-    // waitter: Arc<Mutex<Box<PromiseOut>>>,
+    pub waitter: Arc<Mutex<Box<PromiseOut>>>,
     pub cache: Vec<Bytes>,
     pub full: bool,
     pub current_height: usize,
     pub water_threshold: usize, // 8MB 1024 * 1024 * 8
 }
-
+#[derive(Clone)]
 pub struct PromiseOut {
-    handle: Option<JoinHandle<()>>,
+    handle: Arc<Mutex<Box<Option<JoinHandle<()>>>>>,
     dispatcher: Sender<Event>,
     mux: Vec<Waker>,
     status: PromiseType,
     pub result: Option<Bytes>,
 }
 
+#[allow(dead_code)]
 enum Event {
     Pending,
     BufferArray(Bytes),
@@ -46,9 +48,9 @@ enum Event {
 
 impl BufferInstance {
     pub fn new() -> Self {
-        // let promise_out = PromiseOut::new();
+        let promise_out = PromiseOut::new();
         BufferInstance {
-            // waitter: promise_out,
+            waitter: promise_out,
             full: false,
             cache: vec![Bytes::new()],
             current_height: 0,
@@ -67,7 +69,7 @@ impl BufferInstance {
     pub fn shift(&mut self) -> Bytes {
         // log::info!(" BufferInstanceshift 👾 ==> :{:?}", self.cache);
         if self.cache.is_empty() {
-           return Bytes::new()
+            return Bytes::new();
         }
         let vec = self.cache.remove(0);
         self.current_height -= vec.len();
@@ -78,15 +80,14 @@ impl BufferInstance {
         self.full = self.current_height >= self.water_threshold;
         self.full
     }
-    // /// 初始化等待者
-    // pub fn init_waitter(&mut self) -> Arc<Mutex<Box<PromiseOut>>> {
+    // /// 获取等待者
+    // pub fn get_waitter(&mut self) -> Arc<Mutex<Box<PromiseOut>>> {
     //     let waitter = self.waitter.lock();
     //     match waitter {
-    //         Ok(_) => self.waitter.clone(),
+    //         Ok(_) => self.waitter,
     //         Err(_) => {
-    //             // self.waitter = PromiseOut::new();
-    //             // self.waitter
-    //             PromiseOut::new()
+    //             // *self.waitter = PromiseOut::new();
+    //             self.waitter
     //         }
     //     }
     // }
@@ -98,7 +99,7 @@ impl BufferInstance {
     //         Err(_) => false,
     //     }
     // }
-    // /// 等待者完成了
+    // // / 等待者完成了
     // pub fn resolve_waitter(&mut self, data: Bytes) {
     //     // let data: &'a Vec<u8> = Box::leak(Box::new(scanner_data));
     //     log::info!(" BufferInstancere solve_waitter 👾 ==> :{:?}", &data);
@@ -130,25 +131,25 @@ impl BufferInstance {
 //     }
 // }
 
-// impl Future for PromiseOut {
-//     type Output = Vec<u8>;
+impl Future for PromiseOut {
+    type Output = Vec<u8>;
 
-//     fn poll(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> std::task::Poll<Self::Output> {
-//         if let PromiseType::PENDING = self.status {
-//             self.mux.push(cx.waker().clone());
-//             log::info!(" PromiseOut Pending 😴");
-//             // cx.waker().wake();
-//             Poll::Pending
-//         } else {
-//             let res = self.result.clone();
-//             log::info!(" PromiseOut Ready 😲 ");
-//             match res {
-//                 Some(buffer) => Poll::Ready(buffer),
-//                 None => Poll::Ready(vec![0]),
-//             }
-//         }
-//     }
-// }
+    fn poll(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> std::task::Poll<Self::Output> {
+        if let PromiseType::PENDING = self.status {
+            self.mux.push(cx.waker().clone());
+            log::info!(" PromiseOut Pending 😴");
+            // cx.waker().wake();
+            Poll::Pending
+        } else {
+            let res = self.result.clone();
+            log::info!(" PromiseOut Ready 😲 ");
+            match res {
+                Some(buffer) => Poll::Ready(buffer.to_vec()),
+                None => Poll::Ready(vec![0]),
+            }
+        }
+    }
+}
 
 impl PromiseOut {
     fn new() -> Arc<Mutex<Box<PromiseOut>>> {
@@ -157,7 +158,7 @@ impl PromiseOut {
             mux: vec![],
             result: None,
             status: PromiseType::PENDING,
-            handle: None,
+            handle: Arc::new(Mutex::new(Box::new(None))),
             dispatcher: tx,
         })));
         let promise_out_clone = Arc::downgrade(&promise_out);
@@ -184,7 +185,7 @@ impl PromiseOut {
         });
         promise_out
             .lock()
-            .map(|mut r| r.handle = Some(handle))
+            .map(|mut r| r.handle = Arc::new(Mutex::new(Box::new(Some(handle)))))
             .unwrap();
         promise_out
     }
@@ -195,14 +196,13 @@ impl PromiseOut {
         self.wake();
     }
 
-    pub async fn getData() {}
 
-    pub fn register(&mut self, buffer_array: Bytes, waker: Waker) {
-        self.mux.push(waker);
-        self.dispatcher
-            .send(Event::BufferArray(buffer_array))
-            .unwrap();
-    }
+    // pub fn register(&mut self, buffer_array: Bytes, waker: Waker) {
+    //     self.mux.push(waker);
+    //     self.dispatcher
+    //         .send(Event::BufferArray(buffer_array))
+    //         .unwrap();
+    // }
     // 没等到
     // #[allow(dead_code)]
     // pub fn reject(&mut self, error: &'a E) {
@@ -221,6 +221,90 @@ impl PromiseOut {
 impl Drop for PromiseOut {
     fn drop(&mut self) {
         self.dispatcher.send(Event::Pending).unwrap();
-        self.handle.take().map(|h| h.join().unwrap()).unwrap();
+        self.handle
+            .lock()
+            .unwrap()
+            .take()
+            .map(|h| h.join().unwrap())
+            .unwrap();
+    }
+}
+
+type HeadView = String;
+
+pub struct BufferTask {
+    pub data: HashMap<HeadView, Bytes>,
+    buffer: Option<Bytes> ,
+    waker: Arc<Mutex<Option<Waker>>>,
+}
+
+// impl Future for BufferTask {
+//     type Output = Bytes;
+
+//     fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
+//         match self.buffer.clone() {
+//             Some(byte)=> {
+//                 log::info!(" BufferTask 🥳 future head_view ready");
+//                 Poll::Ready(byte)       
+//             }
+//             None => {
+//                 let mut waker = self.waker.lock().unwrap();
+//                 log::info!(" BufferTask 🥳 future head_view pending");
+//                 *waker = Some(cx.waker().clone());
+//                 Poll::Pending
+//             }
+//         }
+//     }
+// }
+
+impl BufferTask {
+    pub fn new() -> Self {
+        Self {
+            waker:Arc::new(Mutex::new(None)),
+            buffer: None,
+            data: HashMap::new(),
+        }
+    }
+    pub fn insert(&mut self,head_view:String, buffer: Bytes) -> Result<Bytes,()> {
+        self.data.insert(head_view.clone(),  buffer);
+        let res = self.data.get(&head_view);
+        // log::info!(" BufferTaskxx 🥳 insert res:{:?}",res);
+        match res {
+            Some(byte) => {
+                return Ok(byte.clone()); 
+            }
+            None => {
+                return Err(());
+            }
+        }
+    }
+    pub  fn get(&mut self,head_view: String) -> Vec<u8> {
+            let data = self.data.get(&head_view);
+            // thread::sleep(Duration::from_micros(500)); // 微秒
+            // log::info!("获取数据 🤖：{:?},headView:{:?}",data,head_view);
+            match data {
+                Some(byte) => {
+                    log::info!(" BufferTask 🥳 get Some {:?}",byte);
+                    return byte.to_vec();
+                },
+                None => {
+                    // log::info!(" BufferTask 🥵 get None");
+                    return vec![0]
+                },
+            };
+    }
+
+    pub fn resolve(&mut self,buffer:Bytes) {
+        self.buffer = Some(buffer);
+         // 创建新线程
+         let thread_shared_state = self.waker.clone();
+        thread::spawn(move || {
+            let mut shared_state = thread_shared_state.lock().unwrap();
+            // 通知执行器已经完成，可以继续`poll`对应的`Future`了
+            if let Some(waker) = shared_state.take() {
+                waker.wake()
+            }
+
+        });
     }
 }

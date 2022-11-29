@@ -1,6 +1,6 @@
 // #![cfg(target_os = "android")]
 use crate::js_bridge::{
-    call_js_function::{BUFFER_INSTANCES, BUFFER_SYSTEM},
+    call_js_function::{BUFFER_INSTANCES, BUFFER_INSTANCES_MAP}, call_android_function,
 };
 #[cfg(target_os = "android")]
 use crate::module_loader::AssetsModuleLoader;
@@ -20,7 +20,7 @@ use ndk::asset::{Asset, AssetManager};
 #[cfg(target_os = "android")]
 use ndk_sys::AAssetManager;
 use serde::Deserialize;
-use std::{fmt};
+use std::fmt;
 #[cfg(target_os = "android")]
 use std::ptr::NonNull;
 #[cfg(target_os = "android")]
@@ -48,15 +48,23 @@ pub async extern "system" fn Java_info_bagen_rust_plaoc_DenoService_onlyReadRunt
     };
     let _entrance: String = env.get_string(terget).unwrap().into();
     #[cfg(target_os = "android")]
-    bootstrap_deno_runtime(
+    let runtime = bootstrap_deno_runtime(
         Arc::new(AssetsModuleLoader::from_ptr(
             NonNull::new(_asset_manager_ptr).unwrap(),
         )),
         &_entrance,
-        // "/assets/hello_runtime.js",
     )
-    .await
-    .unwrap();
+    .await;
+    #[cfg(target_os = "android")]
+    match runtime {
+        Ok(_worker) => {
+            log::info!("DenoService_denoRuntime end");
+            // DenoRuntime::new(worker);
+        }
+        Err(e) => {
+            log::info!("DenoService_denoRuntime error:{:?}", e);
+        }
+    }
 }
 
 #[no_mangle]
@@ -69,7 +77,7 @@ pub async extern "system" fn Java_info_bagen_rust_plaoc_DenoService_denoRuntime(
     android_logger::init_once(
         Config::default()
             .with_min_level(Level::Debug)
-            .with_tag("myrust::BFS"),
+            .with_tag("plaoc::BFS"),
     );
     let asset_path = String::from(env.get_string(path).unwrap());
     log::info!(" denoRuntime :启动BFS后端 !! => {}", asset_path);
@@ -92,34 +100,32 @@ pub async extern "system" fn Java_info_bagen_rust_plaoc_DenoService_backDataToRu
     _context: JObject,
     byte_data: jbyteArray, //  /channel/354481793036294/chunk=
 )  {
-    let scanner_data = env.convert_byte_array(byte_data).unwrap();
-    let data_string = std::str::from_utf8(&scanner_data).unwrap().to_string();
+    let buffer_array = env.convert_byte_array(byte_data).unwrap();
+    let data_string = std::str::from_utf8(&buffer_array).unwrap().to_string();
     log::info!(" backDataToRust:{:?}", &data_string);
     
     let mut buffer_data = BUFFER_INSTANCES.lock().unwrap();
 
     if buffer_data.full {
         log::info!(" backDataToRust 已经阻塞了:{:?}", &buffer_data.full);
-        // return -1 as jint;
+         return call_android_function::call_native_request_overflow();
     }
-    let is_full = buffer_data.push(Bytes::from(scanner_data)).unwrap();
+    let is_full = buffer_data.push(Bytes::from(buffer_array)).unwrap();
     log::info!(" backDataToRust is_full:{:?},current_height:{:?}", &is_full,buffer_data.current_height);
-    // buffer_data.push(scanner_data);
     // 已经存在等待者，直接将数据交给等待者
     // if buffer_data.has_waitter() {
     //     // transfrom 'a to 'ststic lifetime
     //     // 完成等待者
-    //     buffer_data.resolve_waitter(scanner_data.clone());
+    //     buffer_data.resolve_waitter(buffer_array.clone());
     //     // return 0 as jint;
     //     // 已经阻塞
     //     if buffer_data.full {
     //         log::info!(" backDataToRust 已经阻塞了:{:?}", &buffer_data.full);
     //         // return -1 as jint;
     //     }
-    //     let is_full = buffer_data.push(scanner_data).unwrap();
+    //     let is_full = buffer_data.push(buffer_array).unwrap();
     //     log::info!(" backDataToRust is_full:{:?}", &is_full);
     // }
-
     // buffer_data::init_waitter();
     // log::info!(" backDataToRust is_full:{:?}", &is_full);
     // 1 代表已经被阻塞
@@ -133,31 +139,19 @@ pub async extern "C" fn Java_info_bagen_rust_plaoc_DenoService_backSystemDataToR
     env: JNIEnv,
     _context: JObject,
     byte_data: jbyteArray,
-) {
-    let scanner_data = env.convert_byte_array(byte_data).unwrap();
-    let data_string = std::str::from_utf8(&scanner_data).unwrap();
+)  {
+    let buffer_array = env.convert_byte_array(byte_data).unwrap();
+    let data_string = std::str::from_utf8(&buffer_array).unwrap();
     log::info!(" backSystemDataToRust:{:?}", data_string);
-    BUFFER_SYSTEM.lock().unwrap().push(scanner_data.to_vec());
-    //  let token = get_channel_id(data_string.to_string()).unwrap();
-    //  log::info!(" backDataToRust token:{:?}", &token);
-    //  let mut buffer_map = BUFFER_INSTANCES_MAP.lock();
-    //  let buffer_instance = BufferInstance::new();
-    //  // 存入map
-    //      buffer_map.insert(token.clone(), Mutex::new(buffer_instance));
-    //  let mut buffer_data = buffer_map.get(&token).expect("not found this BufferInstance 🥲").lock();
-    //  // 已经存在等待者，直接将数据交给等待者
-    //  if buffer_data.has_waitter() {
-    //      let data: &'static Vec<u8> = Box::leak(Box::new(scanner_data));
-    //      buffer_data.resolve_waitter(data);
-    //      return 0 as jint;
-    //  }
-    //  // 已经阻塞
-    //  if buffer_data.full {
-    //      return -1 as jint;
-    //  }
-    //  let is_full = buffer_data.push(scanner_data).unwrap();
-    //  // 1 代表已经被阻塞
-    //  return if is_full { 1 as jint } else { 0 as jint };
+    // BUFFER_SYSTEM.lock().unwrap().push(buffer_array.to_vec());
+     let head_view = get_head_view_id(&buffer_array);
+     let mut buffer_map = BUFFER_INSTANCES_MAP.lock().unwrap();
+     // 存入map
+     let buffer =  buffer_map.insert(head_view, Bytes::from(buffer_array));
+     log::info!(" backSystemDataToRustxxbuffer:{:?}", buffer);
+    if let Ok(byte) = buffer {
+        buffer_map.resolve(byte);
+    }
 }
 
 #[allow(dead_code)]
@@ -168,6 +162,11 @@ fn get_channel_id(url: String) -> Result<String, &'static str> {
     }
     let channel_id = &url[url.find("/channel/").unwrap() + 9..url.find("/chunk").unwrap()];
     return Ok(channel_id.to_owned());
+}
+
+pub fn get_head_view_id(buffer_array:&Vec<u8>) -> String{
+    let head_view = format!("{}-{}",buffer_array[1],buffer_array[2]);
+    head_view
 }
 
 #[derive(Deserialize, Debug)]
