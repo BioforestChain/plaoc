@@ -36,6 +36,7 @@ class ApiServiceImpl(private val client: HttpClient) : ApiService {
     file: File?,
     DLProgress: (Long, Long) -> Unit
   ) {
+    if (path.isEmpty()) throw(java.lang.Exception("地址有误，下载失败！"))
     client.prepareGet(path).execute { httpResponse ->
       if (!httpResponse.status.isSuccess()) { // 如果网络请求失败，直接抛异常
         throw(java.lang.Exception(httpResponse.status.toString()))

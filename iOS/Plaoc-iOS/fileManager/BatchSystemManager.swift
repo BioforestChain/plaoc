@@ -24,9 +24,18 @@ class BatchSystemManager: BatchReadManager {
         return filePath() + "/\(fileName)/sys/"
     }
     
+    func fetchEntryPath(fileName: String) -> String? {
+        guard let dict = readBFSAMatedataContent(fileName: fileName) else { return nil }
+        guard let maniDict = dict["manifest"] as? [String:Any] else { return nil }
+        guard var entryPath = maniDict["bfsaEntry"] as? String else { return nil }
+        entryPath = entryPath.regexReplacePattern(pattern: "^(./|/|../)")
+        let path = filePath() + "/\(fileName)/" + entryPath
+        return path
+    }
+    
     //读取matedata.json文件
     func readBFSAMatedataContent(fileName: String) -> [String:Any]? {
-        let path = filePath() + "/\(fileName)/boot/bfsa-matedata.json"
+        let path = filePath() + "/\(fileName)/boot/bfsa-metadata.json"
         let manager = FileManager.default
         guard let data = manager.contents(atPath: path) else { return nil }
         guard let content = String(data: data, encoding: .utf8) else { return nil }

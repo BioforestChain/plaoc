@@ -69,9 +69,9 @@ class ProgressAnimationView: UIImageView {
         let layer = CAShapeLayer()
         layer.fillColor = UIColor.clear.cgColor
         layer.strokeColor = UIColor.black.withAlphaComponent(0.5).cgColor
-        layer.lineWidth = (self.bounds.height - 20) * 0.5
+        layer.lineWidth = (self.bounds.height - 30) * 0.5
         layer.strokeEnd = 1
-        layer.path = self.pathWithDiameter(diameter: (self.bounds.height - 20) * 0.5).cgPath
+        layer.path = self.pathWithDiameter(diameter: (self.bounds.height - 30) * 0.5).cgPath
         layer.fillRule = .evenOdd
         return layer
     }()

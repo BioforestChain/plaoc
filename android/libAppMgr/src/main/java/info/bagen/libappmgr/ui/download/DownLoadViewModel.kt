@@ -20,7 +20,7 @@ data class DownLoadUIState(
   var dialogInfo: DialogInfo = DialogInfo(),
 )
 
-enum class DownLoadState { IDLE, LOADING, PAUSE, COMPLETED, FAILURE, INSTALL }
+enum class DownLoadState { IDLE, LOADING, PAUSE, COMPLETED, FAILURE, INSTALL, CLOSE }
 
 data class DownLoadProgress(var current: Long = 0L, var total: Long = 0L, var progress: Float = 0f)
 
@@ -70,13 +70,16 @@ class DownLoadViewModel(private val repository: DownLoadRepository = DownLoadRep
         } else {
           uiState.value.downLoadState.value = DownLoadState.FAILURE
           uiState.value.dialogInfo = DialogInfo(
-            DialogType.CUSTOM, title = "异常提示", text = "安装失败! 下载的应用无法正常安装，请联系管理员!", confirmText = "重新下载"
+            DialogType.CUSTOM,
+            title = "异常提示",
+            text = "安装失败! 下载的应用无法正常安装，请联系管理员!",
+            confirmText = "重新下载"
           )
         }
       }, onFailure = {
         uiState.value.downLoadState.value = DownLoadState.FAILURE
         uiState.value.dialogInfo = DialogInfo(
-          DialogType.CUSTOM, title = "异常提示", text = "下载失败! 请确认是否重新下载!", confirmText = "重新下载"
+          DialogType.CUSTOM, title = "异常提示", text = "下载失败! 请联系管理员!", confirmText = "重新下载"
         )
       }, onLoading = {
         uiState.value.downLoadState.value = DownLoadState.LOADING

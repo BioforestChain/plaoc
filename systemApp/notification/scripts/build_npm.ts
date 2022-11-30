@@ -29,8 +29,8 @@ export const doBuild = async (npmFile: string) => {
     compilerOptions: {
       target: "Latest",
       importHelpers: true,
-      isolatedModules: true,
-      experimentalDecorators: true,
+      // isolatedModules: true,
+      // experimentalDecorators: true,
       emitDecoratorMetadata: true,
       lib: ["es2020"],
     },
@@ -48,9 +48,9 @@ export const doBuild = async (npmFile: string) => {
       bugs: {
         url: "https://github.com/BioforestChain/plaoc/issues",
       },
-      devDependencies: {
-        "@bfsx/typings": "^0.1.2",
-      },
+      // devDependencies: {
+      //   "@bfsx/typings": "^0.2.0",
+      // },
     },
   });
 

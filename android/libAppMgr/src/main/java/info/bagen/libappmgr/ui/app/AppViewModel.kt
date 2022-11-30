@@ -1,5 +1,6 @@
 package info.bagen.libappmgr.ui.app
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -215,7 +216,11 @@ class AppViewModel(private val repository: AppRepository = AppRepository()) : Vi
       DownLoadState.FAILURE -> Toast.makeText(
         AppContextUtil.sInstance!!, dialogInfo.text, Toast.LENGTH_SHORT
       ).show()
+      DownLoadState.CLOSE -> appViewState.maskViewState.value =
+        appViewState.maskViewState.value.copy(show = false)
     }
-    appViewState.maskViewState.value.downLoadState = downLoadState
+    appViewState.maskViewState.value = appViewState.maskViewState.value.copy(
+      downLoadState = downLoadState
+    )
   }
 }

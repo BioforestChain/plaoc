@@ -13,11 +13,7 @@ import {
 import SnowFlake from "../utils/snowFlake.ts";
 import { NOTIFICATION_MESSAGE_QUEUE, CODE_MAP } from "./constants.ts";
 
-/**
- * 消息入队列
- * @param messageInfo 消息体
- */
-export function messageToQueue(messageInfo: IMessageSource) {
+function messageAssembly(messageInfo: IMessageSource) {
   const msg_priority = messagePriorityInit(messageInfo.priority);
   const msg_id = genMessageIds(messageInfo.app_id);
 
@@ -34,6 +30,34 @@ export function messageToQueue(messageInfo: IMessageSource) {
   };
 
   NOTIFICATION_MESSAGE_QUEUE.push(messageInfoItem);
+
+  return;
+}
+
+/**
+ * 消息入队列
+ * @param messageInfo 消息体
+ */
+export function messageToQueue(messageInfo: IMessageSource) {
+  messageAssembly(messageInfo);
+  messagePriorityAscension();
+
+  // 根据优先级排序
+  NOTIFICATION_MESSAGE_QUEUE.sort((a, b) => b.msg_priority - a.msg_priority);
+
+  return;
+}
+
+/**
+ * ios消息入队列
+ * @param messageArray 消息体数组
+ * @returns
+ */
+export function messageToQueueIOS(messageArray: IMessageSource[]) {
+  messageArray.forEach((message: IMessageSource) => {
+    messageAssembly(message);
+  });
+
   messagePriorityAscension();
 
   // 根据优先级排序

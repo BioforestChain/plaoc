@@ -1,3 +1,16 @@
+use bytes::Bytes;
+use futures::Future;
+use std::collections::HashMap;
+use std::sync::mpsc::{channel, Sender};
+use std::task::Poll;
+use std::time::Duration;
+use std::{
+    pin::Pin,
+    sync::{Arc, Mutex},
+    task::{Context, Waker},
+    thread::{self, JoinHandle},
+};
+
 /// 运行的任务类型
 #[derive(Clone, Copy)]
 #[allow(dead_code)]
@@ -5,142 +18,293 @@ enum PromiseType {
     /// 等待
     PENDING,
     ///  完成
-    FULFILLED,
-    /// 拒绝
-    REJECTED,
+    FULFILLED, // 拒绝
+               // REJECTED,
 }
 
-pub struct Promise {
-    value: PromiseImpl<T>,
-    reason: null,
-    status: PromiseType::PENDING,
-    onResolvedCallbacks: vec![&self],
-    onRejectedCallbacks: vec![&self],
+#[derive(Clone)]
+pub struct BufferInstance {
+    // waitter: Option<PromiseOut<'a, Vec<u8>, ()>>,
+    pub waitter: Arc<Mutex<Box<PromiseOut>>>,
+    pub cache: Vec<Bytes>,
+    pub full: bool,
+    pub current_height: usize,
+    pub water_threshold: usize, // 8MB 1024 * 1024 * 8
+}
+#[derive(Clone)]
+pub struct PromiseOut {
+    handle: Arc<Mutex<Box<Option<JoinHandle<()>>>>>,
+    dispatcher: Sender<Event>,
+    mux: Vec<Waker>,
+    status: PromiseType,
+    pub result: Option<Bytes>,
 }
 
-impl Promise {
-    fn reoslve() {}
-    fn reject() {}
-    fn pending() {}
-    fn then() {}
-    fn catch() {}
-    fn finally(&self) {}
-    pub fn reoslve() {}
-    pub fn reject() {}
-}
-
-/// 运行的任务类型
-#[derive(Clone, Copy)]
 #[allow(dead_code)]
-pub enum TaskType {
-    /// 任务在本地线程中运行。
-    Local,
-    ///  在另一个线程中异步运行。
-    Async,
-    /// 其他情况。
-    None,
+enum Event {
+    Pending,
+    BufferArray(Bytes),
 }
 
-pub enum PromiseImpl<T: Send + 'static> {
-    Pending(std::sync::mpsc::Receiver<T>),
-    Ready(T),
+impl BufferInstance {
+    pub fn new() -> Self {
+        let promise_out = PromiseOut::new();
+        BufferInstance {
+            waitter: promise_out,
+            full: false,
+            cache: vec![Bytes::new()],
+            current_height: 0,
+            water_threshold: 1024 * 1024 * 8,
+        }
+    }
+    pub fn push(&mut self, buffer_array: Bytes) -> Result<bool, String> {
+        log::info!(" BufferInstancepush 👾 ==> :{:?}", &buffer_array);
+        if self.full {
+            return Err("request full ".to_string());
+        }
+        self.current_height += buffer_array.len();
+        self.cache.push(buffer_array);
+        return Result::Ok(self.over_flow());
+    }
+    pub fn shift(&mut self) -> Bytes {
+        // log::info!(" BufferInstanceshift 👾 ==> :{:?}", self.cache);
+        if self.cache.is_empty() {
+            return Bytes::new();
+        }
+        let vec = self.cache.remove(0);
+        self.current_height -= vec.len();
+        return vec;
+    }
+    /// 如果当前水位已经超过阈值，返回true 已经阻塞
+    pub fn over_flow(&mut self) -> bool {
+        self.full = self.current_height >= self.water_threshold;
+        self.full
+    }
+    // /// 获取等待者
+    // pub fn get_waitter(&mut self) -> Arc<Mutex<Box<PromiseOut>>> {
+    //     let waitter = self.waitter.lock();
+    //     match waitter {
+    //         Ok(_) => self.waitter,
+    //         Err(_) => {
+    //             // *self.waitter = PromiseOut::new();
+    //             self.waitter
+    //         }
+    //     }
+    // }
+    // /// 是否已经存在等待者
+    // pub fn has_waitter(&self) -> bool {
+    //     let waitter = self.waitter.lock();
+    //     match waitter {
+    //         Ok(_) => true,
+    //         Err(_) => false,
+    //     }
+    // }
+    // // / 等待者完成了
+    // pub fn resolve_waitter(&mut self, data: Bytes) {
+    //     // let data: &'a Vec<u8> = Box::leak(Box::new(scanner_data));
+    //     log::info!(" BufferInstancere solve_waitter 👾 ==> :{:?}", &data);
+    //     self.waitter.lock().unwrap().resolve(data);
+    //     // self.waitter = None;
+    // }
 }
 
-pub impl<T: Send + 'static> PromiseImpl<T> {
-    /// 查看是否准备完
-    #[allow(unused_variables)]
-    fn poll_mut(&mut self, task_type: TaskType) -> std::task::Poll<&mut T> {
-        match self {
-            Self::Pending(rx) => {
-                // 在不阻塞的情况下，在channel通道中返回一个值，有可能是空对象
-                if let Ok(value) = rx.try_recv() {
-                    *self = Self::Ready(value);
-                    match self {
-                        Self::Ready(ref mut value) => std::task::Poll::Ready(value),
-                        Self::Pending(_) => unreachable!(), // 设置为无法访问，结束pending
+// impl Future for BufferInstance {
+//     type Output = Bytes;
+//     fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
+//         let mut waitter = self.waitter.lock().unwrap();
+//         if let PromiseType::PENDING = waitter.status {
+//             // 存下来，等待下次任务调用 🤓
+//             // waitter.register(self.shift(), cx.waker().clone());
+//             waitter.mux.push(cx.waker().clone());
+//             log::info!(" PromiseOut Pending 😴");
+//             Poll::Pending
+//         } else {
+//             // 完成✅
+//             waitter.status = PromiseType::FULFILLED;
+//             let res = waitter.result.clone();
+//             log::info!(" PromiseOut Ready 😲 ");
+//             match res {
+//                 Some(buffer) => Poll::Ready(buffer),
+//                 None => Poll::Ready(Bytes::new()),
+//             }
+//         }
+//     }
+// }
+
+impl Future for PromiseOut {
+    type Output = Vec<u8>;
+
+    fn poll(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> std::task::Poll<Self::Output> {
+        if let PromiseType::PENDING = self.status {
+            self.mux.push(cx.waker().clone());
+            log::info!(" PromiseOut Pending 😴");
+            // cx.waker().wake();
+            Poll::Pending
+        } else {
+            let res = self.result.clone();
+            log::info!(" PromiseOut Ready 😲 ");
+            match res {
+                Some(buffer) => Poll::Ready(buffer.to_vec()),
+                None => Poll::Ready(vec![0]),
+            }
+        }
+    }
+}
+
+impl PromiseOut {
+    fn new() -> Arc<Mutex<Box<PromiseOut>>> {
+        let (tx, rx) = channel::<Event>();
+        let promise_out = Arc::new(Mutex::new(Box::new(PromiseOut {
+            mux: vec![],
+            result: None,
+            status: PromiseType::PENDING,
+            handle: Arc::new(Mutex::new(Box::new(None))),
+            dispatcher: tx,
+        })));
+        let promise_out_clone = Arc::downgrade(&promise_out);
+        let handle = thread::spawn(move || {
+            let mut handles = vec![];
+            // 执行
+            for obj in rx {
+                let reactor = promise_out_clone.clone();
+                match obj {
+                    Event::Pending => break,
+                    Event::BufferArray(buffer_array) => {
+                        let event_handle = thread::spawn(move || {
+                            let reactor = reactor.upgrade().unwrap();
+                            reactor.lock().map(|mut r| r.resolve(buffer_array)).unwrap();
+                        });
+                        handles.push(event_handle);
                     }
-                } else {
-                    std::task::Poll::Pending
                 }
             }
-            // 我准备好啦
-            Self::Ready(ref mut value) => std::task::Poll::Ready(value),
-        }
+            // join
+            handles
+                .into_iter()
+                .for_each(|handle| handle.join().unwrap());
+        });
+        promise_out
+            .lock()
+            .map(|mut r| r.handle = Arc::new(Mutex::new(Box::new(Some(handle)))))
+            .unwrap();
+        promise_out
+    }
+    /// 等到数据了
+    pub fn resolve(&mut self, value: Bytes) {
+        self.result = Some(value);
+        self.status = PromiseType::FULFILLED;
+        self.wake();
     }
 
-    /// 看看状态是否完成，返回已完成的promise对象或promise本身。
-    fn try_take(self) -> Result<T, Self> {
-        match self {
-            Self::Pending(ref rx) => match rx.try_recv() {
-                Ok(value) => Ok(value),
-                Err(std::sync::mpsc::TryRecvError::Empty) => Err(self),
-                Err(std::sync::mpsc::TryRecvError::Disconnected) => {
-                    panic!("The Promise Sender was dropped")
-                }
-            },
-            Self::Ready(value) => Ok(value),
+
+    // pub fn register(&mut self, buffer_array: Bytes, waker: Waker) {
+    //     self.mux.push(waker);
+    //     self.dispatcher
+    //         .send(Event::BufferArray(buffer_array))
+    //         .unwrap();
+    // }
+    // 没等到
+    // #[allow(dead_code)]
+    // pub fn reject(&mut self, error: &'a E) {
+    //     self.result = Some(Result::Err(error));
+    //     self.status = PromiseType::REJECTED;
+    //     self._wake();
+    // }
+    fn wake(&mut self) {
+        for waker in self.mux.iter() {
+            waker.clone().wake()
+        }
+        self.mux.clear()
+    }
+}
+
+impl Drop for PromiseOut {
+    fn drop(&mut self) {
+        self.dispatcher.send(Event::Pending).unwrap();
+        self.handle
+            .lock()
+            .unwrap()
+            .take()
+            .map(|h| h.join().unwrap())
+            .unwrap();
+    }
+}
+
+type HeadView = String;
+
+pub struct BufferTask {
+    pub data: HashMap<HeadView, Bytes>,
+    buffer: Option<Bytes> ,
+    waker: Arc<Mutex<Option<Waker>>>,
+}
+
+// impl Future for BufferTask {
+//     type Output = Bytes;
+
+//     fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
+//         match self.buffer.clone() {
+//             Some(byte)=> {
+//                 log::info!(" BufferTask 🥳 future head_view ready");
+//                 Poll::Ready(byte)       
+//             }
+//             None => {
+//                 let mut waker = self.waker.lock().unwrap();
+//                 log::info!(" BufferTask 🥳 future head_view pending");
+//                 *waker = Some(cx.waker().clone());
+//                 Poll::Pending
+//             }
+//         }
+//     }
+// }
+
+impl BufferTask {
+    pub fn new() -> Self {
+        Self {
+            waker:Arc::new(Mutex::new(None)),
+            buffer: None,
+            data: HashMap::new(),
         }
     }
-    /// 查看是否准备完
-    #[allow(unsafe_code)]
-    #[allow(unused_variables)]
-    fn poll(&self, task_type: TaskType) -> std::task::Poll<&T> {
-        match self {
-            Self::Pending(rx) => {
-                match rx.try_recv() {
-                    Ok(value) => {
-                        // 只可以是Pending->Ready 的状态改变
-                        unsafe {
-                            let myself = self as *const Self as *mut Self;
-                            *myself = Self::Ready(value);
-                        }
-                        match self {
-                            Self::Ready(ref value) => std::task::Poll::Ready(value),
-                            Self::Pending(_) => unreachable!(),
-                        }
-                    }
-                    Err(std::sync::mpsc::TryRecvError::Empty) => std::task::Poll::Pending,
-                    Err(std::sync::mpsc::TryRecvError::Disconnected) => {
-                        panic!("The Promise Sender was dropped")
-                    }
-                }
+    pub fn insert(&mut self,head_view:String, buffer: Bytes) -> Result<Bytes,()> {
+        self.data.insert(head_view.clone(),  buffer);
+        let res = self.data.get(&head_view);
+        // log::info!(" BufferTaskxx 🥳 insert res:{:?}",res);
+        match res {
+            Some(byte) => {
+                return Ok(byte.clone()); 
             }
-            Self::Ready(ref value) => std::task::Poll::Ready(value),
+            None => {
+                return Err(());
+            }
         }
     }
-    /// 阻塞直到准备好 可变传递
-    #[allow(unused_variables)]
-    fn block_until_ready_mut(&mut self, task_type: TaskType) -> &mut T {
-        match self {
-            Self::Pending(rx) => {
-                let value = rx.recv().expect("The Promise Sender was dropped");
-                *self = Self::Ready(value);
-                match self {
-                    Self::Ready(ref mut value) => value,
-                    Self::Pending(_) => unreachable!(),
-                }
-            }
-            Self::Ready(ref mut value) => value,
-        }
+    pub  fn get(&mut self,head_view: String) -> Vec<u8> {
+            let data = self.data.get(&head_view);
+            // thread::sleep(Duration::from_micros(500)); // 微秒
+            // log::info!("获取数据 🤖：{:?},headView:{:?}",data,head_view);
+            match data {
+                Some(byte) => {
+                    log::info!(" BufferTask 🥳 get Some {:?}",byte);
+                    return byte.to_vec();
+                },
+                None => {
+                    // log::info!(" BufferTask 🥵 get None");
+                    return vec![0]
+                },
+            };
     }
 
-    /// 阻塞直到准备好  不可变传递
-    #[allow(unsafe_code)]
-    #[allow(unused_variables)]
-    fn block_until_ready(&self, task_type: TaskType) -> &T {
-        match self {
-            Self::Pending(rx) => {
-                let value = rx.recv().expect("The Promise Sender was dropped");
-                unsafe {
-                    let myself = self as *const Self as *mut Self;
-                    *myself = Self::Ready(value);
-                }
-                match self {
-                    Self::Ready(ref value) => value,
-                    Self::Pending(_) => unreachable!(),
-                }
+    pub fn resolve(&mut self,buffer:Bytes) {
+        self.buffer = Some(buffer);
+         // 创建新线程
+         let thread_shared_state = self.waker.clone();
+        thread::spawn(move || {
+            let mut shared_state = thread_shared_state.lock().unwrap();
+            // 通知执行器已经完成，可以继续`poll`对应的`Future`了
+            if let Some(waker) = shared_state.take() {
+                waker.wake()
             }
-            Self::Ready(ref value) => value,
-        }
+
+        });
     }
 }

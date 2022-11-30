@@ -1,6 +1,5 @@
 package info.bagen.libappmgr.ui.download
 
-import android.util.Log
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -77,7 +76,8 @@ private fun DownloadAppProgressView(
   val radius = remember { mutableStateOf(0f) }
   var canvasSize by remember { mutableStateOf(0f) }
   when (downLoadViewModel.uiState.value.downLoadState.value) { // 为了在状态变化后能够及时通知调用方刷新状态
-    DownLoadState.COMPLETED, DownLoadState.FAILURE -> {
+    DownLoadState.COMPLETED, DownLoadState.FAILURE, DownLoadState.INSTALL, DownLoadState.CLOSE,
+    DownLoadState.LOADING, DownLoadState.PAUSE -> {
       callbackState(
         downLoadViewModel.uiState.value.downLoadState.value,
         downLoadViewModel.uiState.value.dialogInfo
@@ -103,26 +103,40 @@ private fun DownloadAppProgressView(
       }
     }
   } else {
-    var trigger by remember { mutableStateOf(radius.value) }
-    var isFinished by remember { mutableStateOf(false) }
+    HideAppMaskView(
+      radius = radius.value,
+      canvasSize = canvasSize,
+      modifier = modifier,
+      callbackState = callbackState
+    )
+  }
+}
 
-    val animatedRadius by animateFloatAsState(targetValue = trigger, animationSpec = tween(
-      durationMillis = 200, easing = LinearEasing
-    ), finishedListener = {
-      isFinished = true
-    })
+@Composable
+fun HideAppMaskView(
+  radius: Float, canvasSize: Float, modifier: Modifier,
+  callbackState: (DownLoadState, DialogInfo) -> Unit
+) {
+  var trigger by remember { mutableStateOf(if (radius == 0f) 90f else radius) }
+  var isFinished by remember { mutableStateOf(false) }
 
-    DisposableEffect(Unit) {
-      trigger = canvasSize
-      onDispose {}
-    }
+  val animatedRadius by animateFloatAsState(targetValue = trigger, animationSpec = tween(
+    durationMillis = 200, easing = LinearEasing
+  ), finishedListener = {
+    isFinished = true
+    callbackState(DownLoadState.CLOSE, DialogInfo())
+  })
 
-    if (!isFinished) {
-      Box(modifier = modifier) {
-        Canvas(modifier = Modifier.fillMaxSize()) {
-          translate { // 绘制一个白色的圆弧
-            drawCircle(color = Color.White.copy(0.6f), style = Fill, radius = animatedRadius)
-          }
+  DisposableEffect(Unit) {
+    trigger = if (canvasSize == 0f) 190f else canvasSize
+    onDispose {}
+  }
+
+  if (!isFinished) {
+    Box(modifier = modifier) {
+      Canvas(modifier = Modifier.fillMaxSize()) {
+        translate { // 绘制一个白色的圆弧
+          drawCircle(color = Color.White.copy(0.6f), style = Fill, radius = animatedRadius)
         }
       }
     }

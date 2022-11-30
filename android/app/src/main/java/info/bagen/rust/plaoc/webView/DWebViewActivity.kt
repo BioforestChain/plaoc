@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.webkit.ValueCallback
 import android.webkit.WebView
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -37,6 +38,7 @@ import info.bagen.rust.plaoc.webkit.rememberAdWebViewState
 import java.net.URLDecoder
 import java.net.URLEncoder
 import kotlin.io.path.Path
+
 
 private const val TAG = "DWebViewActivity"
 var dWebView: AdAndroidWebView? = null
@@ -132,15 +134,15 @@ fun openDWebWindow(activity: ComponentActivity, url: String) {
 }
 
 /** 传递参数给前端*/
-fun sendToJavaScript(message: String) {
-    Log.i("xxx", "sendToJavaScript->:$message")
+fun sendToJavaScript(jsCode: String) {
+  // 这里的消息需要等待serviceWorker启动再执行
     dWebView?.post(Runnable {
-        dWebView?.evaluateJavascript(message) {
-            Log.d(TAG, "sendToJavaScript 返回数据: $message")
-//          if (message.isNotEmpty()) {
-//            createBytesFactory(ExportNative.EvalJsRuntime, message)// 返回数据给后端
-//          }
-        }
+        dWebView?.evaluateJavascript(jsCode,ValueCallback<String> { result ->
+          Log.d(TAG, "sendToJavaScript 返回数据: $result,sendToJavaScript->:$jsCode")
+          if (result.isNotEmpty()) {
+            createBytesFactory(ExportNative.EvalJsRuntime, result)// 返回数据给后端
+          }
+        })
     })
 
 }

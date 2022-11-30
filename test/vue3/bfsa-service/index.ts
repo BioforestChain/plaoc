@@ -2,6 +2,7 @@ import metaData from "./bfsa-metadata.ts";
 import { DWebView, sendNotification } from "@bfsx/core";
 import { EChannelMode } from "@bfsx/typings";
 // export * from "./vfs/index.ts"
+    // console.log("window.Deno.core.ops--->",window.Deno.core.ops)
 
 const webView = new DWebView(metaData);
 

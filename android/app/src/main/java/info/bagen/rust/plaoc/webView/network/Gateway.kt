@@ -31,7 +31,8 @@ fun messageGateWay(
   stringData: String
 ) {
   Log.i(TAG, " messageGateWay: $stringData")
-  DenoService().backDataToRust(stringData.toByteArray())// 通知
+   DenoService().backDataToRust(stringData.toByteArray())// 通知
+//  println("messageGeWay back_data-> $backData")
 }
 
 /** 转发给ui*/

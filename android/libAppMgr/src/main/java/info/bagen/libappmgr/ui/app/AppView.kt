@@ -113,7 +113,6 @@ fun AppInfoView(appViewState: AppViewState, onOpenApp: (() -> Unit)?) {
         appViewModel.handleIntent(AppViewIntent.LoadAppNewVersion(appViewState))
       }
     }
-    // AppMaskView(appViewState = appViewState)
     if (appViewState.maskViewState.value.show) {
       DownloadAppMaskView(
         path = appViewState.maskViewState.value.path,
