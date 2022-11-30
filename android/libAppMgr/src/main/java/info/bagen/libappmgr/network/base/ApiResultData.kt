@@ -16,7 +16,7 @@ const val BASE_URL_PATH = "http://linge.plaoc.com/"*/
 
 
 /*typealias _ERROR = suspend (Throwable) -> Unit
-typealias _PROCESS = suspend (downloadedSize: Long, length: Long, progress: Float) -> Unit
+typealias _PROGRESS = suspend (downloadedSize: Long, length: Long, progress: Float) -> Unit
 typealias _SUCCESS<T> = suspend (result: T) -> Unit*/
 
 /*sealed class ApiResult<T>() {
@@ -41,15 +41,13 @@ class ApiResultData<out T> constructor(val value: Any?) {
   val isLoading: Boolean get() = value is Progress
   val isPrepare: Boolean get() = value is Prepare
 
-  fun exceptionOrNull(): Throwable? =
-    when (value) {
-      is Failure -> value.exception
-      else -> null
-    }
+  fun exceptionOrNull(): Throwable? = when (value) {
+    is Failure -> value.exception
+    else -> null
+  }
 
   companion object {
-    fun <T> success(value: T): ApiResultData<T> =
-      ApiResultData(value)
+    fun <T> success(value: T): ApiResultData<T> = ApiResultData(value)
 
     fun <T> failure(exception: Throwable): ApiResultData<T> =
       ApiResultData(createFailure(exception))
@@ -57,13 +55,14 @@ class ApiResultData<out T> constructor(val value: Any?) {
     fun <T> prepare(exception: Throwable? = null): ApiResultData<T> =
       ApiResultData(createPrepare(exception))
 
-    fun <T> progress(currentLength: Long, length: Long, process: Float): ApiResultData<T> =
-      ApiResultData(createLoading(currentLength, length, process))
+    fun <T> progress(
+      currentLength: Long = 0L, length: Long = 0L, progress: Float = 0f
+    ): ApiResultData<T> = ApiResultData(createLoading(currentLength, length, progress))
   }
 
   data class Failure(val exception: Throwable)
 
-  data class Progress(val currentLength: Long, val length: Long, val process: Float)
+  data class Progress(val currentLength: Long, val length: Long, val progress: Float)
 
   data class Prepare(val exception: Throwable?)
 
@@ -76,8 +75,8 @@ private fun createFailure(exception: Throwable): ApiResultData.Failure =
   ApiResultData.Failure(exception)
 
 
-private fun createLoading(currentLength: Long, length: Long, process: Float) =
-  ApiResultData.Progress(currentLength, length, process)
+private fun createLoading(currentLength: Long, length: Long, progress: Float) =
+  ApiResultData.Progress(currentLength, length, progress)
 
 
 inline fun <R, T> ApiResultData<T>.fold(
@@ -110,9 +109,8 @@ inline fun <R> runCatching(block: () -> R): ApiResultData<R> {
   }
 }
 
-suspend inline fun <reified T> HttpResponse.checkAndBody(): T =
-  if (this.status.value == 200) {
-    this.body() // body有做bodyNullable判断，导致会有exception打印，这边做过滤
-  } else {
-    BaseData(this.status.value, this.status.description, null) as T
-  }
+suspend inline fun <reified T> HttpResponse.checkAndBody(): T = if (this.status.value == 200) {
+  this.body() // body有做bodyNullable判断，导致会有exception打印，这边做过滤
+} else {
+  BaseData(this.status.value, this.status.description, null) as T
+}

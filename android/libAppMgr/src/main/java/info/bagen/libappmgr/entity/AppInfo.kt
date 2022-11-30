@@ -59,8 +59,6 @@ data class AppInfo(
   var iconPath: String = "", // 将icon转为实际路径
 )
 
-enum class DownLoadState { IDLE, LOADING, PAUSE, COMPLETED }
-
 /**
  * 解析bfsa-metadata.json
  *

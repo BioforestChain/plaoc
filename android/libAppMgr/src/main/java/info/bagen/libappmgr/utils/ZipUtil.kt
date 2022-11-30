@@ -87,6 +87,7 @@ object ZipUtil {
       Log.e(TAG, "decompress file not exist.")
       return false
     }
+    var unzip = false
     try {
       if (filePath.endsWith(".zip")) {
         unZip(file, outputDir)
@@ -98,14 +99,15 @@ object ZipUtil {
         decompressTarBz2(file, outputDir)
       }
       filterFile(File(outputDir))
+      unzip = true
+    } catch (e: IOException) {
+      Log.e(TAG, "decompress occur error.")
+    } finally {
       if (isDeleted) {
         FilesUtil.deleteQuietly(file)
       }
-      return true
-    } catch (e: IOException) {
-      Log.e(TAG, "decompress occur error.")
     }
-    return false
+    return unzip
   }
 
   /**

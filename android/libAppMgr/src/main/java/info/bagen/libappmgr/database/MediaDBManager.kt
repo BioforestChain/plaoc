@@ -252,7 +252,6 @@ object MediaDBManager {
       val uri = AppContextUtil.sInstance!!.contentResolver.insert(
         AppContract.Medias.CONTENT_URI, mi.createContentValues()
       )
-      Log.d("lin.huang", "insertMediaInfoByPath->$path,$uri")
     }
   }
 
@@ -264,7 +263,6 @@ object MediaDBManager {
       val count = AppContextUtil.sInstance!!.contentResolver.update(
         AppContract.Medias.CONTENT_URI, mi.createContentValues(), selection, selectionArgs
       )
-      Log.d("lin.huang", "updateMediaInfoByPath->$path,$count")
     }
   }
 
@@ -274,6 +272,5 @@ object MediaDBManager {
     val count = AppContextUtil.sInstance!!.contentResolver.delete(
       AppContract.Medias.CONTENT_URI, selection, selectionArgs
     )
-    Log.d("lin.huang", "deleteMediaInfoByPath->$path,$count")
   }
 }
