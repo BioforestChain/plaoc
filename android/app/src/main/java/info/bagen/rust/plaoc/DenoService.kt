@@ -7,11 +7,11 @@ import android.content.res.AssetManager
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
-import android.util.Log
 import androidx.annotation.RequiresApi
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.ObjectMapper
 import info.bagen.rust.plaoc.system.deepLink.DWebReceiver
+import info.bagen.rust.plaoc.util.UnicodeUtils
 import java.nio.ByteBuffer
 import kotlin.concurrent.thread
 
@@ -123,6 +123,7 @@ fun warpCallback(bytes: ByteArray, store: Boolean = true) {
   val (versionId, headId, stringData) = parseBytesFactory(bytes) // 处理二进制
   mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true) //允许出现特殊字符和转义符
   mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true) //允许使用单引号
+
   val handle = mapper.readValue(stringData, RustHandle::class.java)
   val funName = ExportNative.valueOf(handle.function)
   println("warpCallback 🤩headId:${headId[0]},${headId[1]},funName:$funName")
@@ -143,10 +144,11 @@ fun warpRustCallback(bytes: ByteArray) {
 
 // 解析二进制数据
 fun parseBytesFactory(bytes: ByteArray): Triple<ByteArray, ByteArray, String> {
-  val versionId = bytes.sliceArray(0..0)
-  val headId = bytes.sliceArray(1..2)
-  val message = bytes.sliceArray(3 until bytes.size)
-  val stringData = String(message)
+  val versionId = bytes.sliceArray(0..1)
+  val headId = bytes.sliceArray(2..5)
+  val message = bytes.sliceArray(6 until bytes.size)
+  val stringData = UnicodeUtils.decode(message);
+  println("parseBytesFactory🍙 $stringData, ${message[0]}" )
   return Triple(versionId, headId, stringData)
 }
 
