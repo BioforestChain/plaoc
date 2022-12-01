@@ -1,6 +1,6 @@
 {
   "name": "@bfsx/bundle",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": ".bfsa application bundle service.",
   "importMap": "./import_map.json",
   "outDir": "./.npm"
