@@ -1,6 +1,5 @@
 package info.bagen.libappmgr.ui.app
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -36,8 +35,8 @@ data class AppViewState(
 )
 
 data class MaskProgressState(
-  var show: Boolean = false,
-  var downLoadState: DownLoadState = DownLoadState.IDLE,
+  var show: MutableState<Boolean> = mutableStateOf(false),
+  var downLoadState: MutableState<DownLoadState> = mutableStateOf(DownLoadState.IDLE),
   var path: String = ""
 )
 
@@ -74,9 +73,12 @@ data class AppDialogInfo(
 sealed class AppViewIntent {
   object LoadAppInfoList : AppViewIntent()
   class LoadAppNewVersion(val appViewState: AppViewState) : AppViewIntent()
+
   class MaskDownloadCallback(
     val downLoadState: DownLoadState, val dialogInfo: DialogInfo, val appViewState: AppViewState
   ) : AppViewIntent()
+
+  class ShowAppViewBadge(val appViewState: AppViewState, val show: Boolean) : AppViewIntent()
 
   class DialogDownloadCallback(
     val downLoadState: DownLoadState, val dialogInfo: DialogInfo, val appViewState: AppViewState
@@ -103,14 +105,17 @@ class AppViewModel(private val repository: AppRepository = AppRepository()) : Vi
       when (action) {
         is AppViewIntent.LoadAppInfoList -> loadAppInfoList()
         is AppViewIntent.LoadAppNewVersion -> loadAppNewVersion(action.appViewState)
+        is AppViewIntent.MaskDownloadCallback -> maskDownloadCallback(
+          action.downLoadState, action.dialogInfo, action.appViewState
+        )
+        is AppViewIntent.ShowAppViewBadge -> {
+          action.appViewState.showBadge.value = action.show
+        }
         is AppViewIntent.DialogHide -> {
           uiState.value.appDialogInfo.value = uiState.value.appDialogInfo.value.copy(
             dialogInfo = DialogInfo(type = DialogType.HIDE)
           )
         }
-        is AppViewIntent.MaskDownloadCallback -> maskDownloadCallback(
-          action.downLoadState, action.dialogInfo, action.appViewState
-        )
         is AppViewIntent.DialogDownloadCallback -> dialogDownloadCallback(
           action.downLoadState, action.dialogInfo, action.appViewState
         )
@@ -166,7 +171,7 @@ class AppViewModel(private val repository: AppRepository = AppRepository()) : Vi
       AppDialogType.NewVersion, AppDialogType.ReDownLoad -> {
         if (uiState.value.useMaskView) { // 在app上面显示遮罩
           uiState.value.curAppViewState?.let {
-            it.maskViewState.value = it.maskViewState.value.copy(show = true)
+            it.maskViewState.value.show.value = true
           }
           uiState.value.appDialogInfo.value = uiState.value.appDialogInfo.value.copy(
             dialogInfo = DialogInfo(DialogType.HIDE)
@@ -213,14 +218,13 @@ class AppViewModel(private val repository: AppRepository = AppRepository()) : Vi
         appViewState.isSystemApp.value = true
         appViewState.dAppUrl = repository.loadDAppUrl(appViewState.bfsId) // 跳转需要的地址
       }
-      DownLoadState.FAILURE -> Toast.makeText(
-        AppContextUtil.sInstance!!, dialogInfo.text, Toast.LENGTH_SHORT
-      ).show()
-      DownLoadState.CLOSE -> appViewState.maskViewState.value =
-        appViewState.maskViewState.value.copy(show = false)
+      DownLoadState.FAILURE -> {
+        Toast.makeText(AppContextUtil.sInstance!!, dialogInfo.text, Toast.LENGTH_SHORT).show()
+      }
+      DownLoadState.CLOSE -> {
+        appViewState.maskViewState.value.show.value = false
+      }
     }
-    appViewState.maskViewState.value = appViewState.maskViewState.value.copy(
-      downLoadState = downLoadState
-    )
+    appViewState.maskViewState.value.downLoadState.value = downLoadState
   }
 }

@@ -1,9 +1,11 @@
 package info.bagen.libappmgr.ui.download
 
+import android.util.Log
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
@@ -68,8 +70,8 @@ private fun DownloadAppProgressView(
   val show = remember {
     derivedStateOf { // 多个状态归类判断，只有出现变化后，才会刷新show值
       when (downLoadViewModel.uiState.value.downLoadState.value) {
-        DownLoadState.LOADING, DownLoadState.INSTALL -> true
-        else -> false
+        DownLoadState.COMPLETED, DownLoadState.FAILURE, DownLoadState.CLOSE -> false
+        else -> true
       }
     }
   }
@@ -85,7 +87,9 @@ private fun DownloadAppProgressView(
     }
   }
   if (show.value) {
-    Box(modifier = modifier) {
+    Box(modifier = modifier.clickable {
+      downLoadViewModel.handleIntent(DownLoadIntent.DownLoadStop)
+    }) {
       Canvas(modifier = Modifier.fillMaxSize()) {
         radius.value = size.minDimension / 2f
         canvasSize = size.maxDimension

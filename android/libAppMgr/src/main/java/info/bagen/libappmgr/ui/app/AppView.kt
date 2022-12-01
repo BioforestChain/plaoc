@@ -54,7 +54,7 @@ private fun BoxScope.AppIcon(appViewState: AppViewState) {
 
 @Composable
 private fun BoxScope.AppName(appViewState: AppViewState) {
-  val name = when (appViewState.maskViewState.value.downLoadState) {
+  val name = when (appViewState.maskViewState.value.downLoadState.value) {
     DownLoadState.LOADING -> "下载中"
     DownLoadState.PAUSE -> "暂停"
     DownLoadState.INSTALL -> "正在安装"
@@ -78,12 +78,19 @@ private fun BoxScope.AppName(appViewState: AppViewState) {
  */
 @SuppressLint("UnrememberedMutableState")
 @Composable
-fun BoxScope.AppInfoItem(appViewState: AppViewState, onClick: (() -> Unit)? = null) {
+fun BoxScope.AppInfoItem(appViewState: AppViewState, onOpenApp: (() -> Unit)?) {
+  val appViewModel = viewModel() as AppViewModel
   Box(
     modifier = Modifier
       .size(72.dp)
       .align(Alignment.TopCenter)
-      .clickable { onClick?.let { it() } }) {
+      .clickable {
+        if (appViewState.isSystemApp.value) {
+          onOpenApp?.let { it() }
+        } else {
+          appViewModel.handleIntent(AppViewIntent.LoadAppNewVersion(appViewState))
+        }
+      }) {
     AppIcon(appViewState)
     if (appViewState.showBadge.value) {
       Box(
@@ -106,25 +113,19 @@ fun AppInfoView(appViewState: AppViewState, onOpenApp: (() -> Unit)?) {
       .fillMaxWidth()
       .height(108.dp)
   ) {
-    AppInfoItem(appViewState) {
-      if (appViewState.isSystemApp.value) {
-        onOpenApp?.let { it() }
-      } else {
-        appViewModel.handleIntent(AppViewIntent.LoadAppNewVersion(appViewState))
-      }
-    }
-    if (appViewState.maskViewState.value.show) {
+    AppInfoItem(appViewState, onOpenApp)
+    if (appViewState.maskViewState.value.show.value) {
       DownloadAppMaskView(
-        path = appViewState.maskViewState.value.path,
+        path = appViewState.maskViewState.value.path, //"https://shop.plaoc.com/KEJPMHLA/KEJPMHLA.bfsa"
         modifier = Modifier
           .size(66.dp)
           .clip(RoundedCornerShape(12.dp))
           .align(Alignment.TopCenter)
           .background(Color.Black.copy(alpha = 0.6f))
-          .padding(6.dp)
-      ) { state, dInfo ->
-        appViewModel.handleIntent(AppViewIntent.MaskDownloadCallback(state, dInfo, appViewState))
-      }
+          .padding(6.dp),
+        callbackState = { state, dInfo ->
+          appViewModel.handleIntent(AppViewIntent.MaskDownloadCallback(state, dInfo, appViewState))
+        })
     }
   }
 }
@@ -168,6 +169,7 @@ fun AppDialogView(
     }
     AppDialogType.OpenDApp -> {
       appViewModel.uiState.value.curAppViewState?.let { appViewState ->
+        appViewModel.handleIntent(AppViewIntent.ShowAppViewBadge(appViewState, false))
         onOpenApp?.let { open -> open(appViewState.bfsId, appViewState.dAppUrl) }
       }
       appViewModel.handleIntent(AppViewIntent.DialogHide)
