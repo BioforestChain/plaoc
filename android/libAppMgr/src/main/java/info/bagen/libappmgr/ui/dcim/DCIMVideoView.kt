@@ -2,7 +2,6 @@ package info.bagen.libappmgr.ui.dcim
 
 import android.annotation.SuppressLint
 import android.net.Uri
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -26,7 +25,7 @@ import java.io.File
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
-fun VideoScreen(dcimVM: DCIMViewModel, path: String, page: Int) {
+fun VideoScreen(dcimVM: DCIMViewModel, path: String) {
   val context = LocalContext.current
   val exoPlayerData = remember {
     ExoPlayerData(
@@ -53,7 +52,6 @@ fun VideoScreen(dcimVM: DCIMViewModel, path: String, page: Int) {
     override fun onPlaybackStateChanged(eventTime: AnalyticsListener.EventTime, state: Int) {
       when (state) {
         Player.STATE_ENDED -> exoPlayerData.playerState.value = PlayerState.END
-        else -> null
       }
     }
   })
@@ -65,7 +63,7 @@ fun VideoScreen(dcimVM: DCIMViewModel, path: String, page: Int) {
           .fillMaxWidth()
           .align(Alignment.Center),
         factory = { context ->
-          dcimVM.exoPlayerList.add(exoPlayerData)
+          dcimVM.handlerIntent(DCIMIntent.AddExoPlayer(exoPlayerData))
           PlayerView(context).apply {
             useController = false // 是否显示控制视图
             resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIT
@@ -84,13 +82,7 @@ fun VideoScreen(dcimVM: DCIMViewModel, path: String, page: Int) {
     }
   ) {
     onDispose {
-      dcimVM.exoPlayerList.forEach {
-        it.exoPlayer.pause()
-        it.exoPlayer.seekTo(0)
-        it.playerState.value = PlayerState.Play
-      } // 为了把其他在播放的进行暂停
-      exoPlayerData.exoPlayer.release()
-      dcimVM.exoPlayerList.remove(exoPlayerData)
+      dcimVM.handlerIntent(DCIMIntent.RemoveExoPlayer(exoPlayerData))
     }
   }
 }

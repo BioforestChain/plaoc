@@ -26,8 +26,8 @@ data class DCIMInfo(
 
 data class DCIMSpinner(
   val name: String,
-  val count: MutableState<Int> = mutableStateOf(0),
-  var path: MutableState<Any> = mutableStateOf(""),
+  var count: Int = 0,
+  var path: Any = "",
   val checked: MutableState<Boolean> = mutableStateOf(false)
 )
 
@@ -45,7 +45,7 @@ data class ExoPlayerData(
   var playerState: MutableState<PlayerState>
 )
 
-fun MediaInfo.createDCIMInfo() : DCIMInfo {
+fun MediaInfo.createDCIMInfo(): DCIMInfo {
   return DCIMInfo(path = this.path)
 }
 
