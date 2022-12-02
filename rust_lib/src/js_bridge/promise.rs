@@ -1,9 +1,9 @@
-use bytes::Bytes;
+use deno_core::ZeroCopyBuf;
 use futures::Future;
 use std::collections::HashMap;
 use std::sync::mpsc::{channel, Sender};
 use std::task::Poll;
-use std::time::Duration;
+// use std::time::Duration;
 use std::{
     pin::Pin,
     sync::{Arc, Mutex},
@@ -26,7 +26,7 @@ enum PromiseType {
 pub struct BufferInstance {
     // waitter: Option<PromiseOut<'a, Vec<u8>, ()>>,
     pub waitter: Arc<Mutex<Box<PromiseOut>>>,
-    pub cache: Vec<Bytes>,
+    pub cache: Vec<ZeroCopyBuf>,
     pub full: bool,
     pub current_height: usize,
     pub water_threshold: usize, // 8MB 1024 * 1024 * 8
@@ -37,13 +37,13 @@ pub struct PromiseOut {
     dispatcher: Sender<Event>,
     mux: Vec<Waker>,
     status: PromiseType,
-    pub result: Option<Bytes>,
+    pub result: Option<ZeroCopyBuf>,
 }
 
 #[allow(dead_code)]
 enum Event {
     Pending,
-    BufferArray(Bytes),
+    BufferArray(ZeroCopyBuf),
 }
 
 impl BufferInstance {
@@ -52,12 +52,12 @@ impl BufferInstance {
         BufferInstance {
             waitter: promise_out,
             full: false,
-            cache: vec![Bytes::new()],
+            cache: vec![ZeroCopyBuf::new_temp(vec![0])],
             current_height: 0,
             water_threshold: 1024 * 1024 * 8,
         }
     }
-    pub fn push(&mut self, buffer_array: Bytes) -> Result<bool, String> {
+    pub fn push(&mut self, buffer_array: ZeroCopyBuf) -> Result<bool, String> {
         log::info!(" BufferInstancepush 👾 ==> :{:?}", &buffer_array);
         if self.full {
             return Err("request full ".to_string());
@@ -66,10 +66,10 @@ impl BufferInstance {
         self.cache.push(buffer_array);
         return Result::Ok(self.over_flow());
     }
-    pub fn shift(&mut self) -> Bytes {
+    pub fn shift(&mut self) -> ZeroCopyBuf {
         // log::info!(" BufferInstanceshift 👾 ==> :{:?}", self.cache);
         if self.cache.is_empty() {
-            return Bytes::new();
+            return ZeroCopyBuf::new_temp(vec![0]);
         }
         let vec = self.cache.remove(0);
         self.current_height -= vec.len();
@@ -190,7 +190,7 @@ impl PromiseOut {
         promise_out
     }
     /// 等到数据了
-    pub fn resolve(&mut self, value: Bytes) {
+    pub fn resolve(&mut self, value: ZeroCopyBuf) {
         self.result = Some(value);
         self.status = PromiseType::FULFILLED;
         self.wake();
@@ -233,9 +233,9 @@ impl Drop for PromiseOut {
 type HeadView = String;
 
 pub struct BufferTask {
-    pub data: HashMap<HeadView, Bytes>,
-    buffer: Option<Bytes> ,
-    waker: Arc<Mutex<Option<Waker>>>,
+    pub data: HashMap<HeadView, ZeroCopyBuf>,
+    // buffer: Option<ZeroCopyBuf> ,
+    // waker: Arc<Mutex<Option<Waker>>>,
 }
 
 // impl Future for BufferTask {
@@ -260,12 +260,12 @@ pub struct BufferTask {
 impl BufferTask {
     pub fn new() -> Self {
         Self {
-            waker:Arc::new(Mutex::new(None)),
-            buffer: None,
+            // waker:Arc::new(Mutex::new(None)),
+            // buffer: None,
             data: HashMap::new(),
         }
     }
-    pub fn insert(&mut self,head_view:String, buffer: Bytes) -> Result<Bytes,()> {
+    pub fn insert(&mut self,head_view:String, buffer: ZeroCopyBuf) -> Result<ZeroCopyBuf,()> {
         self.data.insert(head_view.clone(),  buffer);
         let res = self.data.get(&head_view);
         // log::info!(" BufferTaskxx 🥳 insert res:{:?}",res);
@@ -278,33 +278,33 @@ impl BufferTask {
             }
         }
     }
-    pub  fn get(&mut self,head_view: String) -> Vec<u8> {
+    pub  fn get(&mut self,head_view: String) -> ZeroCopyBuf {
             let data = self.data.get(&head_view);
             // thread::sleep(Duration::from_micros(500)); // 微秒
             // log::info!("获取数据 🤖：{:?},headView:{:?}",data,head_view);
             match data {
                 Some(byte) => {
                     log::info!(" BufferTask 🥳 get Some {:?}",byte);
-                    return byte.to_vec();
+                    return byte.clone();
                 },
                 None => {
                     // log::info!(" BufferTask 🥵 get None");
-                    return vec![0]
+                    return ZeroCopyBuf::new_temp(vec![0])
                 },
             };
     }
 
-    pub fn resolve(&mut self,buffer:Bytes) {
-        self.buffer = Some(buffer);
-         // 创建新线程
-         let thread_shared_state = self.waker.clone();
-        thread::spawn(move || {
-            let mut shared_state = thread_shared_state.lock().unwrap();
-            // 通知执行器已经完成，可以继续`poll`对应的`Future`了
-            if let Some(waker) = shared_state.take() {
-                waker.wake()
-            }
+    // pub fn resolve(&mut self,buffer:ZeroCopyBuf) {
+    //     self.buffer = Some(buffer);
+    //      // 创建新线程
+    //      let thread_shared_state = self.waker.clone();
+    //     thread::spawn(move || {
+    //         let mut shared_state = thread_shared_state.lock().unwrap();
+    //         // 通知执行器已经完成，可以继续`poll`对应的`Future`了
+    //         if let Some(waker) = shared_state.take() {
+    //             waker.wake()
+    //         }
 
-        });
-    }
+    //     });
+    // }
 }

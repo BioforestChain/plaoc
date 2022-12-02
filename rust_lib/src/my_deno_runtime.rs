@@ -7,6 +7,7 @@ use deno_core::error::AnyError;
 use deno_core::futures::future::LocalFutureObj;
 use deno_core::CompiledWasmModuleStore;
 use deno_core::FsModuleLoader;
+#[allow(unused_imports)]
 use deno_core::ModuleLoader;
 use deno_core::ModuleSpecifier;
 use deno_core::SharedArrayBufferStore;
@@ -182,7 +183,7 @@ pub async fn bootstrap_deno_runtime(
     log::info!("start deno runtime!!!");
 
     worker.execute_main_module(&main_module).await?;
-    worker.run_event_loop(false).await?;
+    // worker.run_event_loop(false).await?;
     Ok(())
 }
 
@@ -307,6 +308,6 @@ pub async fn bootstrap_deno_fs_runtime(entry_js_path: &str) -> Result<MainWorker
     //     worker.execute_script(script_name, source_code);
     // };
     worker.execute_main_module(&main_module).await?;
-    worker.run_event_loop(false).await?;
+    // worker.run_event_loop(false).await?;
     Ok(worker)
 }

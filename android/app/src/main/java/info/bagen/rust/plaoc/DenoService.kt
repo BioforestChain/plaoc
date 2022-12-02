@@ -10,6 +10,7 @@ import android.os.IBinder
 import androidx.annotation.RequiresApi
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.google.gson.internal.`$Gson$Types`.arrayOf
 import info.bagen.rust.plaoc.system.deepLink.DWebReceiver
 import info.bagen.rust.plaoc.util.UnicodeUtils
 import java.nio.ByteBuffer
@@ -145,10 +146,11 @@ fun warpRustCallback(bytes: ByteArray) {
 // 解析二进制数据
 fun parseBytesFactory(bytes: ByteArray): Triple<ByteArray, ByteArray, String> {
   val versionId = bytes.sliceArray(0..1)
-  val headId = bytes.sliceArray(2..5)
-  val message = bytes.sliceArray(6 until bytes.size)
-  val stringData = UnicodeUtils.decode(message);
-  println("parseBytesFactory🍙 $stringData, ${message[0]}" )
+  val headId = bytes.sliceArray(2..3)
+  val message = bytes.sliceArray(4 until bytes.size)
+  val stringData = String(message,Charsets.UTF_16LE);
+
+//  println("parseBytesFactory🍙 $stringData, ${String(byteArrayOf(107,98,1,120),Charsets.UTF_16LE)} ")
   return Triple(versionId, headId, stringData)
 }
 
@@ -156,7 +158,7 @@ fun parseBytesFactory(bytes: ByteArray): Triple<ByteArray, ByteArray, String> {
 /*** 创建二进制数据返回*/
 fun createBytesFactory(callFun: ExportNative, message: String) {
   val headId = rust_call_map[callFun] ?: ByteArray(2).plus(0x00)
-  val versionId = version_head_map[headId] ?: ByteArray(1).plus(0x01)
+  val versionId = version_head_map[headId] ?: ByteArray(2).plus(0x01)
   val msgBit = message.encodeToByteArray()
   val result = ByteBuffer.allocate(headId.size + versionId.size + msgBit.size)
     .put(versionId)
