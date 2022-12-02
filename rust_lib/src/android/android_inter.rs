@@ -64,7 +64,7 @@ unsafe fn JNI_OnLoad(jvm: JavaVM, _reserved: *mut c_void) -> jint {
         ),
         jni_method!(
             denoSetCallback,
-            "(Linfo/bagen/rust/plaoc/DenoService$IDenoCallback;)V"
+            "(Linfo/bagen/rust/plaoc/DenoService$IDenoZeroCopyBufCallback;)V"
         ),
         jni_method!(
             rustCallback,
@@ -139,18 +139,18 @@ unsafe fn register_natives(jvm: &JavaVM, class_name: &str, methods: &[NativeMeth
 }
 
 /// 把数据传输给kotlin  回调 Callback 对象的 { void handleCallback(byte: byteArray) } 函数 deno-js -> rust->kotlin
-pub fn call_java_callback(fun_type: &'static [u8]) {
-    log::info!("i am call_java_callback {:?}", fun_type);
+pub fn call_java_callback(buffer: &'static [u8]) {
+    log::info!("i am call_java_callback buffer:{:?}", buffer);
     call_jvm(&JNI_CALLBACK, move |obj: JObject, env: &JNIEnv| {
         // let response: JString = env
         //     .new_string(fun_type)
         //     .expect("Couldn't create java string!");
-        let response: jbyteArray = env
-            .byte_array_from_slice(fun_type)
+        let data: jbyteArray = env
+            .byte_array_from_slice(buffer)
             .expect("Couldn't create java byteArray!");
         // let response:jcharArray = env.new_int_array(fun_type.len().try_into().unwrap()).expect("Couldn't create java int!");
-        log::info!("i am call_java_callback response {:?}", response);
-        match env.call_method(obj, "handleCallback", "([B)V", &[JValue::from(response)]) {
+        log::info!("i am call_java_callback response {:?}", data);
+        match env.call_method(obj, "handleCallback", "([B)V", &[JValue::from(data)]) {
             Ok(jvalue) => {
                 debug!("callback succeed: {:?}", jvalue);
             }
@@ -162,13 +162,16 @@ pub fn call_java_callback(fun_type: &'static [u8]) {
 }
 
 /// 把数据传输给kotlin 不包含返回值 deno-js -> rust->kotlin
-pub fn deno_evaljs_callback(fun_type: &'static [u8]) {
-    log::info!("i am deno_evaljs_callback {:?}", fun_type);
+pub fn deno_zerocopybuffer_callback(req_id: &'static [u8],buffer: &'static [u8]) {
+    log::info!("i am deno_zerocopybuffer_callback req_id:{:?} buffer:{:?}",req_id, buffer);
     call_jvm(&JNI_JS_CALLBACK, move |obj: JObject, env: &JNIEnv| {
-        let response: jbyteArray = env
-            .byte_array_from_slice(fun_type)
-            .expect("Couldn't create java string!");
-        match env.call_method(obj, "denoCallback", "([B)V", &[JValue::from(response)]) {
+        let data: jbyteArray = env
+            .byte_array_from_slice(buffer)
+            .expect("Couldn't create java byteArray!");
+            let id: jbyteArray = env
+            .byte_array_from_slice(req_id)
+            .expect("Couldn't create java byteArray!");
+        match env.call_method(obj, "denoZeroCopyBufCallback", "([B)V", &[JValue::from(id),JValue::from(data)]) {
             Ok(jvalue) => {
                 debug!("callback succeed: {:?}", jvalue);
             }

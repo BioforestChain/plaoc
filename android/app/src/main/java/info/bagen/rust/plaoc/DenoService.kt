@@ -62,8 +62,8 @@ class DenoService : IntentService("DenoService") {
     fun handleCallback(bytes: ByteArray)
   }
 
-  interface IDenoCallback {
-    fun denoCallback(bytes: ByteArray)
+  interface IDenoZeroCopyBufCallback {
+    fun denoZeroCopyBufCallback(bytes: ByteArray)
   }
 
   interface IRustCallback {
@@ -82,7 +82,7 @@ class DenoService : IntentService("DenoService") {
     return mBinder
   }
 
-  private external fun denoSetCallback(callback: IDenoCallback)
+  private external fun denoSetCallback(callback: IDenoZeroCopyBufCallback)
   private external fun nativeSetCallback(callback: IHandleCallback)
   private external fun rustCallback(callback: IRustCallback)
 
@@ -105,9 +105,9 @@ class DenoService : IntentService("DenoService") {
         warpCallback(bytes)
       }
     })
-    // 单项执行evalJs
-    denoSetCallback(object : IDenoCallback {
-      override fun denoCallback(bytes: ByteArray) {
+    // 传递zeroCopyBuffer
+    denoSetCallback(object : IDenoZeroCopyBufCallback {
+      override fun denoZeroCopyBufCallback(bytes: ByteArray) {
         warpCallback(bytes, false) // 单工模式不要存储
       }
     })
