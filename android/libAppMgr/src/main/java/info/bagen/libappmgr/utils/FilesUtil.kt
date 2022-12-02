@@ -77,7 +77,7 @@ object FilesUtil {
   /**
    * 获取应用的解压路径
    */
-  fun getAppUnzipPath(appInfo: AppInfo): String {
+  fun getAppUnzipPath(appInfo: AppInfo? = null): String {
     return getAppRootDirectory(APP_DIR_TYPE.SystemApp) + File.separator //+ appInfo.bfsAppId
   }
 
@@ -135,10 +135,24 @@ object FilesUtil {
    * 获取应用更新路径中最新文件
    */
   fun getLastUpdateContent(appInfo: AppInfo): String? {
-    var directory = getAppUpdateDirectory(appInfo)
-    var file = File(directory)
+    val directory = getAppUpdateDirectory(appInfo)
+    val file = File(directory)
     if (file.exists()) {
-      var files = file.listFiles()
+      val files = file.listFiles()
+      return if (files.isNotEmpty()) {
+        getFileContent(files.last().absolutePath)
+      } else {
+        null
+      }
+    }
+    return null
+  }
+
+  fun getLastUpdateContent(bfsAppId: String, type: APP_DIR_TYPE = APP_DIR_TYPE.SystemApp): String? {
+    val directory = getAppRootDirectory(type) + File.separator + bfsAppId + File.separator + DIR_AUTO_UPDATE
+    val file = File(directory)
+    if (file.exists()) {
+      val files = file.listFiles()
       return if (files.isNotEmpty()) {
         getFileContent(files.last().absolutePath)
       } else {
@@ -317,6 +331,7 @@ object FilesUtil {
       }
       // Log.d(TAG, "getAppInfoList system-app $appInfo")
       if (appInfo != null) {
+        getDAppInfo(bfsAppId = appInfo.bfsAppId, )
         appInfoList.add(appInfo)
         systemAppExist[it.key] = it.value
       }

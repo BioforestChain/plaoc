@@ -34,7 +34,7 @@ export async function build(options: {
 export async function buildSw(cwd: string, dest: string) {
   const entryFile = path.resolve(
     cwd,
-    "../../node_modules/@bfsx/sw/esm/serviceWorker.js"
+    "../../node_modules/@bfsx/sw/esm/sw/serviceWorker.js"
   );
 
   const bundle = await rollup({

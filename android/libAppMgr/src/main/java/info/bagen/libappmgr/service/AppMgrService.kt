@@ -188,7 +188,6 @@ class AppMgrService : Service() {
       val file = File(path)
       if (file.exists() && file.isFile) {
         // 更新当前文件
-        Log.d("lin.huang", "updateDatabase 更新当前文件")
         MediaDBManager.updateMediaInfoByPath(path)
       }
     }
@@ -197,13 +196,11 @@ class AppMgrService : Service() {
       val file = File(path)
       if (file.exists() && file.isFile) {
         // 保存当前文件
-        Log.d("lin.huang", "insertDatabase 保存当前文件")
         MediaDBManager.insertMediaInfoByPath(path)
       }
     }
 
     private fun deleteDatabase(path: String) {
-      Log.d("lin.huang", "deleteDatabase 直接删除数据库")
       MediaDBManager.deleteMediaInfoByPath(path)
     }
 

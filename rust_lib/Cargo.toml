@@ -41,7 +41,6 @@ import_map = "=0.12.1"
 regex = "=1.7.0"
 serde = {version = "=1.0.141", features = ["derive"]}
 tokio = "1.19.0"
-bytes = "1" # 我们使用 Vec<u8> 来保存目标数据，但是它有一个问题，对它进行克隆时会将底层数据也整个复制一份，效率很低,用这个跟Arc一样引用计数
 # assets_manager = "0.7.2"
 # android-ndk = "0.0.6"
 futures = {version = "0.3.21", default-features = false}

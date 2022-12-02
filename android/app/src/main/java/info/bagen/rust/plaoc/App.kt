@@ -5,10 +5,10 @@ import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import info.bagen.libappmgr.di.libRepositoryModule
+import info.bagen.libappmgr.di.libViewModelModule
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import info.bagen.libappmgr.di.repositoryModule
-import info.bagen.libappmgr.di.viewModelModule
 import info.bagen.libappmgr.utils.ClipboardUtil
 import info.bagen.rust.plaoc.util.PlaocUtil
 import org.koin.android.ext.koin.androidContext
@@ -34,7 +34,7 @@ class App : Application() {
       androidContext(this@App)
       androidFileProperties()
       modules(
-        viewModelModule, repositoryModule
+        libViewModelModule, libRepositoryModule
       )
     }
     PlaocUtil.addShortcut(this) // 添加桌面快捷方式

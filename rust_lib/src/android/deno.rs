@@ -8,15 +8,17 @@ use crate::my_deno_runtime::bootstrap_deno_fs_runtime;
 #[cfg(target_os = "android")]
 use crate::my_deno_runtime::bootstrap_deno_runtime;
 use android_logger::Config;
+use deno_core::ZeroCopyBuf;
 use jni::{
     objects::{JObject, JString},
     JNIEnv,
 };
 use jni_sys::{jbyteArray};
 use log::Level;
-use bytes::Bytes;
+#[allow(unused_imports)]
 #[cfg(target_os = "android")]
 use ndk::asset::{Asset, AssetManager};
+#[allow(unused_imports)]
 #[cfg(target_os = "android")]
 use ndk_sys::AAssetManager;
 use serde::Deserialize;
@@ -110,7 +112,7 @@ pub async extern "system" fn Java_info_bagen_rust_plaoc_DenoService_backDataToRu
         log::info!(" backDataToRust 已经阻塞了:{:?}", &buffer_data.full);
          return call_android_function::call_native_request_overflow();
     }
-    let is_full = buffer_data.push(Bytes::from(buffer_array)).unwrap();
+    let is_full = buffer_data.push(ZeroCopyBuf::Temp(buffer_array)).unwrap();
     log::info!(" backDataToRust is_full:{:?},current_height:{:?}", &is_full,buffer_data.current_height);
     // 已经存在等待者，直接将数据交给等待者
     // if buffer_data.has_waitter() {
@@ -138,20 +140,21 @@ pub async extern "system" fn Java_info_bagen_rust_plaoc_DenoService_backDataToRu
 pub async extern "C" fn Java_info_bagen_rust_plaoc_DenoService_backSystemDataToRust(
     env: JNIEnv,
     _context: JObject,
-    byte_data: jbyteArray,
+    byte_data: jbyteArray, // 内存地址
 )  {
     let buffer_array = env.convert_byte_array(byte_data).unwrap();
     let data_string = std::str::from_utf8(&buffer_array).unwrap();
     log::info!(" backSystemDataToRust:{:?}", data_string);
-    // BUFFER_SYSTEM.lock().unwrap().push(buffer_array.to_vec());
+
      let head_view = get_head_view_id(&buffer_array);
      let mut buffer_map = BUFFER_INSTANCES_MAP.lock().unwrap();
      // 存入map
-     let buffer =  buffer_map.insert(head_view, Bytes::from(buffer_array));
+     let buffer =  buffer_map.insert(head_view, ZeroCopyBuf::new_temp(buffer_array));
      log::info!(" backSystemDataToRustxxbuffer:{:?}", buffer);
-    if let Ok(byte) = buffer {
-        buffer_map.resolve(byte);
-    }
+     // 此处需要等deno-js 那边不再轮询才能使用future
+    // if let Ok(byte) = buffer {
+    //     buffer_map.resolve(byte);
+    // }
 }
 
 #[allow(dead_code)]

@@ -1,294 +1,177 @@
 package info.bagen.libappmgr.ui.download
 
-import android.annotation.SuppressLint
-import android.widget.Toast
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.lifecycle.viewmodel.compose.viewModel
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import info.bagen.libappmgr.data.*
-import info.bagen.libappmgr.entity.AppInfo
-import info.bagen.libappmgr.entity.AppVersion
-import info.bagen.libappmgr.entity.DAppInfo
-import info.bagen.libappmgr.entity.DownLoadState
-import info.bagen.libappmgr.network.base.IApiResult
-import info.bagen.libappmgr.ui.main.MainViewModel
-import info.bagen.libappmgr.ui.view.*
-import info.bagen.libappmgr.utils.AppContextUtil
+import android.util.Log
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Fill
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.translate
+import info.bagen.libappmgr.ui.view.DialogInfo
+import info.bagen.libappmgr.ui.view.DialogType
+import info.bagen.libappmgr.ui.view.DialogView
 import info.bagen.libappmgr.utils.FilesUtil
-import info.bagen.libappmgr.utils.JsonUtil
-import info.bagen.libappmgr.utils.ZipUtil
-import java.io.File
 
 /**
- * 下面界面显示在图标上
+ * 显示下载进度框
+ * @param path 提供下载地址
+ * @param callbackState 回调下载结果信息
+ *     DownLoadState: 表示下载状态，目前返回内容(DownLoadState.COMPLETED, DownLoadState.FAILURE)
+ *     DialogInfo: 使用对话框形式返回下载结果的具体内容信息，可直接显示，当然也可以做相应调整后显示
  */
-@SuppressLint("UnrememberedMutableState")
 @Composable
-fun DownloadAppInfoView(
-  appInfo: AppInfo,
-  onOpenApp: ((appId: String, url: String) -> Unit)? = null
+fun DownloadDialogView(path: String, callbackState: (DownLoadState, DialogInfo) -> Unit) {
+  val downLoadViewModel = DownLoadViewModel()
+  downLoadViewModel.handleIntent(
+    DownLoadIntent.DownLoadAndSave(path, FilesUtil.getAppDownloadPath())
+  )
+  DownloadDialogProgressView(
+    downLoadViewModel = downLoadViewModel, callbackState = callbackState
+  )
+}
+
+/**
+ * 使用遮罩的形式显示下载进度
+ * @param path 提供下载地址
+ * @param callbackState 回调下载结果信息
+ *     DownLoadState: 表示下载状态，目前返回内容(DownLoadState.COMPLETED, DownLoadState.FAILURE)
+ *     DialogInfo: 使用对话框形式返回下载结果的具体内容信息，可直接显示，当然也可以做相应调整后显示
+ */
+@Composable
+fun DownloadAppMaskView(
+  path: String, modifier: Modifier = Modifier, callbackState: (DownLoadState, DialogInfo) -> Unit
 ) {
-  var coroutineScope = rememberCoroutineScope()
-  var vmMain: MainViewModel = viewModel()
-  var vmDown: DownLoadViewModel = viewModel()
+  val downLoadViewModel = DownLoadViewModel()
+  downLoadViewModel.handleIntent(
+    DownLoadIntent.DownLoadAndSave(path, FilesUtil.getAppDownloadPath())
+  )
+  DownloadAppProgressView(
+    downLoadViewModel = downLoadViewModel, modifier = modifier, callbackState = callbackState
+  )
+}
 
-  var customDialogData = CustomDialogData(confirmText = mutableStateOf("下载"))
-  var dialogState = rememberDialogAllState(customDialogData)
-  var maskProgressMode = rememberMaskProgressMode()
-  var appInfoMode = createAppInfoMode(appInfo.iconPath, appInfo.name)
-  var appVersion: AppVersion? = null
-  var dAppInfo: DAppInfo? = null
-
-  AppInfoView(
-    appInfoMode = appInfoMode,
-    maskProgressMode = maskProgressMode,
-    onMaskProgressClick = {
-      /*when (appInfoMode.downLoadState.value) {
-        DownLoadState.LOADING -> {
-          appInfoMode.updateDLState(DownLoadState.PAUSE).updateName("暂停下载")
-        }
-        DownLoadState.PAUSE -> {
-          appInfoMode.updateDLState(DownLoadState.LOADING).updateName("正在下载")
-        }
-      }*/
-    },
-    onClick = {
-      if (!appInfo.isSystemApp) {
-        dialogState.updateState(customShow = true)
-        var requestFinish = false
-        coroutineScope.launch {
-          var version = FilesUtil.getLastUpdateContent(appInfo)?.let {
-            JsonUtil.fromJson(AppVersion::class.java, it)
-          }
-          if (!requestFinish) {
-            appVersion = version
-            customDialogData.updateNewVersion(appVersion = appVersion)
-          }
-        }
-        vmMain.getAppVersionAndSave(appInfo, object : IApiResult<AppVersion> {
-          override fun onSuccess(errorCode: Int, errorMsg: String, data: AppVersion) {
-            requestFinish = true
-            appVersion = data
-            customDialogData.updateNewVersion(appVersion = appVersion)
-          }
-        })
-      } else {
-        // 1.打开应用
-        dAppInfo = FilesUtil.getDAppInfo(appInfo.bfsAppId)
-        dAppInfo?.let { dApp ->
-          onOpenApp?.let {
-            onOpenApp(
-              appInfo.bfsAppId,
-              getDAppInfoUrl(appInfo, dApp)
-            )
-          } // 回调dweb请求的地址
-          Toast.makeText(
-            AppContextUtil.sInstance, "直接打开应用-->${dApp.manifest.bfsaEntry}", Toast.LENGTH_SHORT
-          ).show()
-          appInfoMode.showBadge.value = false // 打开后，隐藏小红点
-        }
-        vmMain.getAppVersion(appInfo, object : IApiResult<AppVersion> {
-          override fun onSuccess(errorCode: Int, errorMsg: String, data: AppVersion) {
-            // 请求成功后，比对获取的版本号和当前版本号
-            if (dAppInfo == null || hasNewVersion(dAppInfo!!.manifest.version, data.version)) {
-              appVersion = data
-              dialogState.updateState(customShow = true).customDialog.updateNewVersion(appVersion)
-            }
-          }
-        })
+@Composable
+private fun DownloadAppProgressView(
+  downLoadViewModel: DownLoadViewModel,
+  modifier: Modifier,
+  callbackState: (DownLoadState, DialogInfo) -> Unit
+) {
+  val dialogInfo = DialogInfo(
+    type = DialogType.PROGRESS, progress = downLoadViewModel.uiState.value.progress.value.progress
+  )
+  val show = remember {
+    derivedStateOf { // 多个状态归类判断，只有出现变化后，才会刷新show值
+      when (downLoadViewModel.uiState.value.downLoadState.value) {
+        DownLoadState.COMPLETED, DownLoadState.FAILURE, DownLoadState.CLOSE -> false
+        else -> true
       }
-    })
-
-  CustomAlertDialog(state = dialogState, onConfirm = {
-    if (appVersion != null && appVersion!!.files != null && appVersion!!.files!!.isNotEmpty()) {
-      dialogState.updateState(customShow = false)
-      maskProgressMode.updateState(DownLoadState.LOADING)
-      vmDown.downloadAndSave(
-        appVersion!!.files!![0].url,
-        FilesUtil.getAppDownloadPath(),
-        object : IApiResult<Nothing> {
-          override fun downloadProgress(current: Long, total: Long, progress: Float) {
-            appInfoMode.updateDLState(DownLoadState.LOADING).updateName("正在下载")
-            maskProgressMode.progress(progress)
-          }
-
-          override fun downloadSuccess(file: File) {
-            GlobalScope.launch {
-              // 显示当前状态
-              appInfoMode.updateDLState(DownLoadState.LOADING).updateName("正在解压")
-              // 解压耗时
-              ZipUtil.decompress(file.absolutePath, FilesUtil.getAppUnzipPath(appInfo))
-              appInfo.isSystemApp = true
-              maskProgressMode.updateState(DownLoadState.IDLE)
-              appInfoMode.updateShowBadge(true).updateDLState(DownLoadState.COMPLETED)
-                .updateName(appInfo.name)
-            }
-          }
-
-          override fun onError(errorCode: Int, errorMsg: String, exception: Throwable?) {
-            // 隐藏下载进度界面，显示对话框界面
-            dialogState.updateState(customShow = true).customDialog.update(
-              title = "异常提醒", content = errorMsg, confirmText = "重新下载"
-            )
-            maskProgressMode.updateState(DownLoadState.IDLE)
-          }
-        })
-    } else {
-      maskProgressMode.updateState(DownLoadState.IDLE)
-      dialogState.updateState(customShow = true).customDialog.update(
-        title = "异常提醒", content = "下载失败，找不到版本信息", confirmText = "重新下载"
+    }
+  }
+  val radius = remember { mutableStateOf(0f) }
+  var canvasSize by remember { mutableStateOf(0f) }
+  when (downLoadViewModel.uiState.value.downLoadState.value) { // 为了在状态变化后能够及时通知调用方刷新状态
+    DownLoadState.COMPLETED, DownLoadState.FAILURE, DownLoadState.INSTALL, DownLoadState.CLOSE,
+    DownLoadState.LOADING, DownLoadState.PAUSE -> {
+      callbackState(
+        downLoadViewModel.uiState.value.downLoadState.value,
+        downLoadViewModel.uiState.value.dialogInfo
       )
     }
+  }
+  if (show.value) {
+    Box(modifier = modifier.clickable {
+      downLoadViewModel.handleIntent(DownLoadIntent.DownLoadStop)
+    }) {
+      Canvas(modifier = Modifier.fillMaxSize()) {
+        radius.value = size.minDimension / 2f
+        canvasSize = size.maxDimension
+        val topLeftOffset = Offset(size.width / 2 - radius.value, size.height / 2 - radius.value)
+        val strokeWith = Stroke(12f)
+        // 绘制一个白色的圆弧
+        drawCircle(color = Color.White.copy(0.6f), style = strokeWith, radius = radius.value)
+        // 绘制一个进度条
+        drawArc(
+          startAngle = -90f, // 0表示3点
+          sweepAngle = 360 * dialogInfo.progress, color = Color.White.copy(0.6f), // 外围圆弧的颜色
+          useCenter = true, // true 表示半径需要填充颜色
+          size = size, topLeft = topLeftOffset, style = Fill // 圆弧宽度
+        )
+      }
+    }
+  } else {
+    HideAppMaskView(
+      radius = radius.value,
+      canvasSize = canvasSize,
+      modifier = modifier,
+      callbackState = callbackState
+    )
+  }
+}
+
+@Composable
+fun HideAppMaskView(
+  radius: Float, canvasSize: Float, modifier: Modifier,
+  callbackState: (DownLoadState, DialogInfo) -> Unit
+) {
+  var trigger by remember { mutableStateOf(if (radius == 0f) 90f else radius) }
+  var isFinished by remember { mutableStateOf(false) }
+
+  val animatedRadius by animateFloatAsState(targetValue = trigger, animationSpec = tween(
+    durationMillis = 200, easing = LinearEasing
+  ), finishedListener = {
+    isFinished = true
+    callbackState(DownLoadState.CLOSE, DialogInfo())
   })
+
+  DisposableEffect(Unit) {
+    trigger = if (canvasSize == 0f) 190f else canvasSize
+    onDispose {}
+  }
+
+  if (!isFinished) {
+    Box(modifier = modifier) {
+      Canvas(modifier = Modifier.fillMaxSize()) {
+        translate { // 绘制一个白色的圆弧
+          drawCircle(color = Color.White.copy(0.6f), style = Fill, radius = animatedRadius)
+        }
+      }
+    }
+  }
 }
 
-/**
- * 基于Android类型的下载界面
- */
-@SuppressLint("UnrememberedMutableState")
+
 @Composable
-fun DownloadDialogView(
-  appInfo: AppInfo,
-  onOpenApp: ((appId: String, url: String) -> Unit)? = null
+private fun DownloadDialogProgressView(
+  downLoadViewModel: DownLoadViewModel, callbackState: (DownLoadState, DialogInfo) -> Unit
 ) {
-  var coroutineScope = rememberCoroutineScope()
-  var vmMain: MainViewModel = viewModel()
-  var vmDown: DownLoadViewModel = viewModel()
-
-  var customDialogData = CustomDialogData(confirmText = mutableStateOf("下载"))
-  var dialogState = rememberDialogAllState(customDialogData)
-  var appInfoMode = createAppInfoMode(appInfo.iconPath, appInfo.name)
-  var appVersion: AppVersion? = null
-  var dAppInfo: DAppInfo? = null
-
-  // 显示界面图标
-  AppInfoView(
-    appInfoMode = appInfoMode,
-    onClick = {
-      if (!appInfo.isSystemApp) {
-        dialogState.updateState(customShow = true)
-        var requestFinish = false
-        coroutineScope.launch {
-          var version = FilesUtil.getLastUpdateContent(appInfo)?.let {
-            JsonUtil.fromJson(AppVersion::class.java, it)
-          }
-          if (!requestFinish) {
-            appVersion = version
-            customDialogData.updateNewVersion(appVersion = appVersion)
-          }
-        }
-        vmMain.getAppVersionAndSave(appInfo, object : IApiResult<AppVersion> {
-          override fun onSuccess(errorCode: Int, errorMsg: String, data: AppVersion) {
-            requestFinish = true
-            appVersion = data
-            customDialogData.updateNewVersion(appVersion = appVersion)
-          }
-        })
-      } else {
-        // 1.打开应用
-        dAppInfo = FilesUtil.getDAppInfo(appInfo.bfsAppId)
-        dAppInfo?.let { dApp ->
-          onOpenApp?.let {
-            onOpenApp(
-              appInfo.bfsAppId,
-              getDAppInfoUrl(appInfo, dApp)
-            )
-          } // 回调dweb请求的地址
-          Toast.makeText(
-            AppContextUtil.sInstance, "直接打开应用-->${dApp.manifest.bfsaEntry}", Toast.LENGTH_SHORT
-          ).show()
-          appInfoMode.showBadge.value = false // 打开后，隐藏小红点
-        }
-        vmMain.getAppVersion(appInfo, object : IApiResult<AppVersion> {
-          override fun onSuccess(errorCode: Int, errorMsg: String, data: AppVersion) {
-            // 请求成功后，比对获取的版本号和当前版本号
-            if (dAppInfo == null || hasNewVersion(dAppInfo!!.manifest.version, data.version)) {
-              appVersion = data
-              dialogState.updateState(customShow = true).customDialog.updateNewVersion(appVersion)
-            }
-          }
-        })
+  val dialogInfo = DialogInfo(
+    type = DialogType.PROGRESS, progress = downLoadViewModel.uiState.value.progress.value.progress
+  )
+  val show = remember {
+    derivedStateOf { // 多个状态归类判断，只有出现变化后，才会刷新show值
+      when (downLoadViewModel.uiState.value.downLoadState.value) {
+        DownLoadState.LOADING, DownLoadState.INSTALL -> true
+        else -> false
       }
-    })
-  // 显示提示对话框
-  CustomAlertDialog(dialogState, onConfirm = {
-    if (appInfoMode.downLoadState.value == DownLoadState.COMPLETED) {
-      dialogState.updateState(customShow = false)
-      appInfoMode.downLoadState.value = DownLoadState.IDLE
-      if (dAppInfo != null) {
-        var url = getDAppInfoUrl(appInfo, dAppInfo!!)
-        Toast.makeText(
-          AppContextUtil.sInstance, "直接打开应用-->${appInfo.name} url->$url", Toast.LENGTH_SHORT
-        ).show()
-        onOpenApp?.let { onOpenApp(appInfo.bfsAppId, url) }
-      }
-      appInfoMode.showBadge.value = false // 打开后，隐藏小红点
-    } else if (appVersion != null && appVersion!!.files != null && appVersion!!.files!!.isNotEmpty()) {
-      // 调用下载操作
-      dialogState.updateState(progressShow = true)
-      appInfoMode.downLoadState.value = DownLoadState.LOADING
-      vmDown.downloadAndSave(
-        appVersion!!.files!![0].url,
-        FilesUtil.getAppDownloadPath(),
-        object : IApiResult<Nothing> {
-          override fun downloadProgress(current: Long, total: Long, progress: Float) {
-            dialogState.progressDialog.progress.value = progress
-          }
-
-          override fun downloadSuccess(file: File) {
-            GlobalScope.launch {
-              ZipUtil.decompress(file.absolutePath, FilesUtil.getAppUnzipPath(appInfo))
-              // 隐藏下载进度界面，显示对话框界面
-              dialogState.updateState(customShow = true).customDialog.update(
-                content = "下载完成", confirmText = "打开"
-              )
-              appInfo.isSystemApp = true
-              appInfoMode.downLoadState.value = DownLoadState.COMPLETED
-              appInfoMode.showBadge.value = true
-            }
-          }
-
-          override fun onError(errorCode: Int, errorMsg: String, exception: Throwable?) {
-            // 隐藏下载进度界面，显示对话框界面
-            dialogState.updateState(customShow = true).customDialog.update(
-              title = "异常提醒", content = errorMsg, confirmText = "重新下载"
-            )
-            appInfoMode.downLoadState.value = DownLoadState.IDLE
-          }
-        })
-    } else {
-      appInfoMode.downLoadState.value = DownLoadState.IDLE
-      dialogState.updateState(customShow = true).customDialog.update(
-        title = "异常提醒", content = "下载失败，找不到版本信息", confirmText = "重新下载"
+    }
+  }
+  when (downLoadViewModel.uiState.value.downLoadState.value) { // 为了在状态变化后能够及时通知调用方刷新状态
+    DownLoadState.COMPLETED, DownLoadState.FAILURE -> {
+      callbackState(
+        downLoadViewModel.uiState.value.downLoadState.value,
+        downLoadViewModel.uiState.value.dialogInfo
       )
     }
-  }, onCancel = { appInfoMode.downLoadState.value = DownLoadState.IDLE })
-  // 显示正在请求对话框
-  // LoadingDialog(dialogState)
-  // 显示下载进度对话框
-  ProgressDialog(dialogState, onCancel = { appInfoMode.downLoadState.value = DownLoadState.IDLE })
-}
-
-private fun getDAppInfoUrl(appInfo: AppInfo, dAppInfo: DAppInfo): String {
-  // return FilesUtil.getDAppInfo(appInfo)?.let { it.enter.main } ?: ""
-  return FilesUtil.getAppDenoUrl(appInfo.bfsAppId, dAppInfo.manifest.bfsaEntry)
-}
-
-private fun hasNewVersion(cur: String, net: String): Boolean {
-  var curArray = cur.split(".")
-  var netArray = net.split(".")
-  var minSize = when (curArray.size > netArray.size) {
-    true -> netArray.size
-    false -> curArray.size
   }
-  for (i in (0 until minSize)) {
-    if (curArray[i].toInt() < netArray[i].toInt()) {
-      return true
-    }
+  if (show.value) {
+    DialogView(dialogInfo = dialogInfo)
   }
-  if (curArray.size < netArray.size) return true
-  return false
 }

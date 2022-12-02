@@ -1,18 +1,17 @@
 import { GET_NOTIFICATION, NOTIFICATION_MESSAGE_PUSH } from "./constants.ts";
-import { messageToQueue } from "./message_queue.ts";
+import { messageToQueue, messageToQueueIOS } from "./message_queue.ts";
 import { messagePush } from "./message_push.ts";
 
-import type * as types from "@bfsx/typings";
 import type { IMessageSource } from "../typings/message.type.ts";
+import type * as types from "@bfsx/typings";
 
 /**
  * 轮询拿取APP消息(Android端)
  * @param timeout - 延迟
- * @param ee      - 事件监听
  * @returns
  */
+let isLocked = false;
 export async function asyncPollingCallDenoNotification(timeout = 3000) {
-  let isLocked = false;
   const listener = async () => {
     isLocked = true;
     await messagePush();
@@ -84,50 +83,31 @@ export function loopRustNotification() {
   };
 }
 
-/**
- * 轮询拿取APP消息(iOS端)
- * @param timeout - 延迟
- * @param ee      - 事件监听
- * @returns
- */
-export async function netCallNativeNotification(timeout = 3000) {
+export async function callNativeNotification() {
   // dnt-shim-ignore
-  const jscore = (window as any)
+  const jscore = (globalThis as any)
     .PlaocJavascriptBridge as types.PlaocJavascriptBridge;
-  let isLocked = false;
-  const listener = async () => {
+
+  const result = jscore.callJavaScriptWithFunctionNameParam(
+    GET_NOTIFICATION,
+    ""
+  );
+
+  const messageString = String.fromCharCode(...result);
+
+  if (messageString) {
+    const messages = JSON.parse(messageString);
+
+    if (Array.isArray(messages) && messages.length > 0) {
+      messageToQueueIOS(messages);
+    }
+  }
+
+  if (!isLocked) {
     isLocked = true;
     await messagePush();
     isLocked = false;
-  };
-  const polling = async () => {
-    const messageString = await jscore.callJavaScriptWithFunctionNameParam(
-      GET_NOTIFICATION,
-      ""
-    );
+  }
 
-    if (messageString) {
-      const messages = JSON.parse(messageString);
-
-      if (Array.isArray(messages) && messages.length > 0) {
-        messages.forEach((message: IMessageSource) => {
-          messageToQueue(message);
-        });
-      }
-
-      addEventListener(NOTIFICATION_MESSAGE_PUSH, listener);
-    }
-
-    if (!isLocked) {
-      dispatchEvent(new Event(NOTIFICATION_MESSAGE_PUSH));
-    } else {
-      removeEventListener(NOTIFICATION_MESSAGE_PUSH, listener);
-    }
-
-    setTimeout(async () => {
-      await polling();
-    }, timeout);
-  };
-
-  await polling();
+  return;
 }

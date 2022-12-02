@@ -1,108 +1,160 @@
 package info.bagen.libappmgr.ui.download
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.launch
-import info.bagen.libappmgr.network.ApiService
-import info.bagen.libappmgr.network.base.ApiResultData
 import info.bagen.libappmgr.network.base.IApiResult
 import info.bagen.libappmgr.network.base.fold
-import java.io.File
+import info.bagen.libappmgr.ui.view.DialogInfo
+import info.bagen.libappmgr.ui.view.DialogType
+import info.bagen.libappmgr.utils.FilesUtil
+import info.bagen.libappmgr.utils.ZipUtil
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.launch
 
-class DownLoadViewModel : ViewModel() {
+data class DownLoadUIState(
+  val downLoadState: MutableState<DownLoadState> = mutableStateOf(DownLoadState.IDLE),
+  val progress: MutableState<DownLoadProgress> = mutableStateOf(DownLoadProgress()),
+  var dialogInfo: DialogInfo = DialogInfo(),
+)
 
-  fun downloadAndSave(url: String, outputFile: String, apiResult: IApiResult<Nothing>) {
+enum class DownLoadState { IDLE, LOADING, PAUSE, COMPLETED, FAILURE, INSTALL, CLOSE }
+
+data class DownLoadProgress(
+  var current: Long = 0L,
+  var total: Long = 0L,
+  var progress: Float = 0f,
+  var downloadFile: String = "",
+  var downloadUrl: String = ""
+)
+
+/**
+ * MIV中的Intent部分
+ */
+sealed class DownLoadIntent {
+  object DownLoadStop : DownLoadIntent()
+  class DownLoadAndSave(val url: String, val saveFile: String) : DownLoadIntent()
+}
+
+class DownLoadViewModel(private val repository: DownLoadRepository = DownLoadRepository()) :
+  ViewModel() {
+  // val channel = Channel<DownLoadIntent>(2) // 表示最多两个buffer，超过后挂起
+  val uiState = mutableStateOf(DownLoadUIState())
+  var downloadInfo = DownLoadProgress()
+
+  /*init { // 这边是初始化的时候执行的内容
     viewModelScope.launch {
-      flow {
-        emit(ApiResultData.prepare())
-        try {
-          var file = File(outputFile)
-          ApiService.instance.downloadAndSave(url, file) { current, total ->
-            var progress = current.toFloat() / (total)
-            apiResult.downloadProgress(current, total, progress)
-          }
-          delay(100)
+      channel.consumeAsFlow().collect { TODO("这功能是持续监听channel信道的内容，有收到就做处理") }
+    }
+  }*/
 
-          emit(ApiResultData.success(file))
-        } catch (e: Exception) {
-          emit(ApiResultData.failure(e))
+  fun handleIntent(action: DownLoadIntent) {
+    viewModelScope.launch {
+      /* channel.send(action) // 进行发送操作，可以根据传参进行发送 */
+      when (action) {
+        is DownLoadIntent.DownLoadAndSave -> {
+          // downLoadAndSave(action.url, action.saveFile)
+          downloadInfo.downloadFile = action.saveFile
+          downloadInfo.downloadUrl = action.url
+          downLoadAndSave(action.url, action.saveFile)
         }
-      }.flowOn(Dispatchers.IO)
-        .collect() {
-          it.fold(onFailure = { e ->
-            e?.let { it1 -> apiResult.onError(-1, it1.message?:"", it1) }
-          }, onSuccess = { file ->
-            apiResult.downloadSuccess(file)
-          }, onLoading = { progress ->
-            apiResult.downloadProgress(
-              progress.currentLength,
-              progress.length,
-              progress.process
-            )
-          }, onPrepare = {
-            apiResult.onPrepare()
-          })
+        is DownLoadIntent.DownLoadStop -> {
+          when (uiState.value.downLoadState.value) {
+            DownLoadState.PAUSE -> {
+              uiState.value.downLoadState.value = DownLoadState.LOADING
+              breakpointDownLoadAndSave(
+                downloadInfo.downloadUrl,
+                downloadInfo.downloadFile,
+                downloadInfo.total
+              )
+            }
+            else -> uiState.value.downLoadState.value = DownLoadState.PAUSE
+          }
         }
+      }
     }
   }
 
-  /*fun downloadAndSave(url: String, outputFile: String, apiResult: IApiResult<Nothing>) {
-    viewModelScope.launch {
-      flow {
-        emit(ApiResultData.prepare())
-        try {
-
-          val httpResponse = ApiService.instance.download(url, DLProgress = { current, total ->
-            var progress = current.toFloat() / (total * 2) // 下载占用一半
-            apiResult.downloadProgress(current, total, progress)
-          })
-
-          val file = File(outputFile)
-          val length = httpResponse.contentLength() ?: 0
-          val outputStream = FileOutputStream(file)
-          var currentLength: Long = 0
-          val inputStream: InputStream = httpResponse.bodyAsChannel().toInputStream()
-          val bufferSize = 1024 * 8
-          val buffer = ByteArray(bufferSize)
-          val bufferedInputStream = BufferedInputStream(inputStream, bufferSize)
-          var readLength: Int
-          while (bufferedInputStream.read(buffer, 0, bufferSize)
-              .also { readLength = it } != -1
-          ) {
-            outputStream.write(buffer, 0, readLength)
-            currentLength += readLength
-            var progress = currentLength.toFloat() / (length * 2) + 0.5f // 存储占用一半
-            emit(ApiResultData.progress(currentLength, length, progress))
-          }
-          emit(ApiResultData.progress(length, length, 1.0f)) // 下载和存储完成后显示进度100%
-          delay(100)
-          bufferedInputStream.close()
-          outputStream.close()
-          inputStream.close()
-          emit(ApiResultData.success(file))
-        } catch (e: Exception) {
-          emit(ApiResultData.failure(e))
+  private suspend fun downLoadAndSave(url: String, saveFile: String) {
+    repository.downLoadAndSave(url, saveFile, isStop = {
+      uiState.value.downLoadState.value == DownLoadState.PAUSE // 用来控制是否停止下载
+    }, object : IApiResult<Nothing> {
+      override fun downloadProgress(current: Long, total: Long, progress: Float) {
+        downloadInfo.total = total
+        uiState.value.progress.value = uiState.value.progress.value.copy(
+          current = current, total = total, progress = progress
+        )
+      }
+    }).flowOn(Dispatchers.IO).collect {
+      it.fold(onSuccess = { file ->
+        uiState.value.downLoadState.value = DownLoadState.INSTALL
+        // 解压文件
+        val enableUnzip = ZipUtil.decompress(file.absolutePath, FilesUtil.getAppUnzipPath())
+        if (enableUnzip) {
+          uiState.value.downLoadState.value = DownLoadState.COMPLETED
+          uiState.value.dialogInfo =
+            DialogInfo(DialogType.CUSTOM, title = "提示", text = "下载并安装完成", confirmText = "打开")
+        } else {
+          uiState.value.downLoadState.value = DownLoadState.FAILURE
+          uiState.value.dialogInfo = DialogInfo(
+            DialogType.CUSTOM,
+            title = "异常提示",
+            text = "安装失败! 下载的应用无法正常安装，请联系管理员!",
+            confirmText = "重新下载"
+          )
         }
-      }.flowOn(Dispatchers.IO)
-        .collect {
-          it.fold(onFailure = { e ->
-            e?.let { it1 -> apiResult.onError(-1, it1.message!!, it1) }
-          }, onSuccess = { file ->
-            apiResult.downloadSuccess(file)
-          }, onLoading = { progress ->
-            apiResult.downloadProgress(
-              progress.currentLength,
-              progress.length,
-              progress.process
-            )
-          }, onPrepare = {
-            apiResult.onPrepare()
-          })
-        }
+      }, onFailure = {
+        uiState.value.downLoadState.value = DownLoadState.FAILURE
+        uiState.value.dialogInfo = DialogInfo(
+          DialogType.CUSTOM, title = "异常提示", text = "下载失败! 请联系管理员!", confirmText = "重新下载"
+        )
+      }, onLoading = {
+        uiState.value.downLoadState.value = DownLoadState.LOADING
+      }, onPrepare = {
+        uiState.value.downLoadState.value = DownLoadState.IDLE
+      })
     }
-  }*/
+  }
+
+  private suspend fun breakpointDownLoadAndSave(url: String, saveFile: String, total: Long) {
+    repository.breakpointDownloadAndSave(url, saveFile, total, isStop = {
+      uiState.value.downLoadState.value == DownLoadState.PAUSE // 用来控制是否停止下载
+    }, object : IApiResult<Nothing> {
+      override fun downloadProgress(current: Long, total: Long, progress: Float) {
+        uiState.value.progress.value = uiState.value.progress.value.copy(
+          current = current, total = total, progress = progress
+        )
+      }
+    }).flowOn(Dispatchers.IO).collect {
+      it.fold(onSuccess = { file ->
+        uiState.value.downLoadState.value = DownLoadState.INSTALL
+        // 解压文件
+        val enableUnzip = ZipUtil.decompress(file.absolutePath, FilesUtil.getAppUnzipPath())
+        if (enableUnzip) {
+          uiState.value.downLoadState.value = DownLoadState.COMPLETED
+          uiState.value.dialogInfo =
+            DialogInfo(DialogType.CUSTOM, title = "提示", text = "下载并安装完成", confirmText = "打开")
+        } else {
+          uiState.value.downLoadState.value = DownLoadState.FAILURE
+          uiState.value.dialogInfo = DialogInfo(
+            DialogType.CUSTOM,
+            title = "异常提示",
+            text = "安装失败! 下载的应用无法正常安装，请联系管理员!",
+            confirmText = "重新下载"
+          )
+        }
+      }, onFailure = {
+        uiState.value.downLoadState.value = DownLoadState.FAILURE
+        uiState.value.dialogInfo = DialogInfo(
+          DialogType.CUSTOM, title = "异常提示", text = "下载失败! 请联系管理员!", confirmText = "重新下载"
+        )
+      }, onLoading = {
+        uiState.value.downLoadState.value = DownLoadState.LOADING
+      }, onPrepare = {
+        uiState.value.downLoadState.value = DownLoadState.IDLE
+      })
+    }
+  }
 }

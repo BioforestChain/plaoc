@@ -7,7 +7,7 @@ use jni::{
     sys::{jint, JNI_ERR, JNI_VERSION_1_4},
     JNIEnv, JavaVM, NativeMethod,
 };
-use jni_sys::jbyteArray;
+use jni_sys::{jbyteArray};
 use std::{ffi::c_void, sync::Mutex};
 
 // 添加一个全局变量来缓存回调对象
@@ -147,7 +147,9 @@ pub fn call_java_callback(fun_type: &'static [u8]) {
         //     .expect("Couldn't create java string!");
         let response: jbyteArray = env
             .byte_array_from_slice(fun_type)
-            .expect("Couldn't create java string!");
+            .expect("Couldn't create java byteArray!");
+        // let response:jcharArray = env.new_int_array(fun_type.len().try_into().unwrap()).expect("Couldn't create java int!");
+        log::info!("i am call_java_callback response {:?}", response);
         match env.call_method(obj, "handleCallback", "([B)V", &[JValue::from(response)]) {
             Ok(jvalue) => {
                 debug!("callback succeed: {:?}", jvalue);

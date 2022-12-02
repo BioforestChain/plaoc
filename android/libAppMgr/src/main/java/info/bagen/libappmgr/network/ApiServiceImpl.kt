@@ -1,5 +1,10 @@
 package info.bagen.libappmgr.network
 
+import info.bagen.libappmgr.entity.AppVersion
+import info.bagen.libappmgr.network.base.ApiResultData
+import info.bagen.libappmgr.network.base.BaseData
+import info.bagen.libappmgr.network.base.bodyData
+import info.bagen.libappmgr.network.base.checkAndBody
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.plugins.*
@@ -8,11 +13,7 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.utils.io.*
 import io.ktor.utils.io.core.*
-import info.bagen.libappmgr.entity.AppVersion
-import info.bagen.libappmgr.network.base.ApiResultData
-import info.bagen.libappmgr.network.base.BaseData
-import info.bagen.libappmgr.network.base.bodyData
-import info.bagen.libappmgr.network.base.checkAndBody
+import kotlinx.coroutines.cancel
 import java.io.File
 
 class ApiServiceImpl(private val client: HttpClient) : ApiService {
@@ -32,15 +33,19 @@ class ApiServiceImpl(private val client: HttpClient) : ApiService {
     }
 
   override suspend fun downloadAndSave(
-    path: String,
-    file: File?,
-    DLProgress: (Long, Long) -> Unit
+    path: String, file: File?, isStop: () -> Boolean, DLProgress: (Long, Long) -> Unit
   ) {
+    if (path.isEmpty()) throw(java.lang.Exception("地址有误，下载失败！"))
     client.prepareGet(path).execute { httpResponse ->
+      if (!httpResponse.status.isSuccess()) { // 如果网络请求失败，直接抛异常
+        throw(java.lang.Exception(httpResponse.status.toString()))
+      }
       val channel: ByteReadChannel = httpResponse.body()
-      val contentLength = httpResponse.contentLength() // 文件大小
+      val contentLength = httpResponse.contentLength() // 网络请求数据的大小
       var currentLength = 0L
-      while (!channel.isClosedForRead) {
+      var isStop = isStop()
+
+      while (!channel.isClosedForRead && !isStop) {
         val packet = channel.readRemaining(DEFAULT_BUFFER_SIZE.toLong())
         while (!packet.isEmpty) {
           val bytes = packet.readBytes()
@@ -48,35 +53,49 @@ class ApiServiceImpl(private val client: HttpClient) : ApiService {
           file?.appendBytes(bytes)
           DLProgress(currentLength, contentLength!!) // 将下载进度回调
         }
+        isStop = isStop()
       }
+      if (isStop) httpResponse.cancel()
+    }
+  }
+
+  override suspend fun breakpointDownloadAndSave(
+    path: String, file: File?, total: Long, isStop: () -> Boolean, DLProgress: (Long, Long) -> Unit
+  ) {
+    if (path.isEmpty()) throw(java.lang.Exception("地址有误，下载失败！"))
+
+    var currentLength = file?.let { if (total > 0) it.length() else 0L } ?: 0L // 文件的大小
+
+    // 判断当前地址获取的大小跟之前下载的大小是否一致，如果不一致，直接重新下载
+    client.prepareGet(path).execute {
+      val length = it.contentLength() ?: 0L
+      if (length != total) currentLength = 0L
     }
 
-    /*val builder = HttpRequestBuilder().apply {
-      url(getUrlPath(path)) {
-        protocol = URLProtocol.HTTPS
+    client.prepareGet(path) {
+      if (currentLength > 0) {
+        this.header("Range", "bytes=$currentLength-${total}") // 设置获取内容位置
       }
-    }
-    val httpStatement = HttpStatement(builder, client)
-    httpStatement.execute { response: HttpResponse ->
-      if (response.status.value != 200) {
-        throw Exception("网络请求异常[$path]->${response.status}")
+    }.execute { httpResponse ->
+      if (!httpResponse.status.isSuccess()) { // 如果网络请求失败，直接抛异常
+        throw(java.lang.Exception(httpResponse.status.toString()))
       }
-      // 下载放在这边实现
-      val channel = response.content//response.body<ByteReadChannel>()
-      val contentLength = response.contentLength() // 文件大小
-      requireNotNull(contentLength) { "Header needs to be set by server" }
+      val channel: ByteReadChannel = httpResponse.body()
+      val contentLength =
+        (httpResponse.contentLength() ?: 0L) + currentLength // 网络请求数据的大小，由于请求时扣减了。所以这边手动补上
+      var isStop = isStop()
 
-      var currentLength = 0
-      var readBytes: Int
-      var buffer = ByteArray(DEFAULT_BUFFER_SIZE)
-      var outputStream = file?.let { it.outputStream() }
-      // 读取buffer大小的数据，然后写入文件中，并返回当前进度
-      while (channel.readAvailable(buffer, offset = 0, DEFAULT_BUFFER_SIZE).also { readBytes = it } != -1) {
-        currentLength += readBytes
-        outputStream?.let { it.write(buffer, 0, readBytes) } // 将获取的数据保存到文件
-        DLProgress(currentLength.toLong(), contentLength) // 将下载进度回调
+      while (!channel.isClosedForRead && !isStop) {
+        val packet = channel.readRemaining(DEFAULT_BUFFER_SIZE.toLong())
+        while (!packet.isEmpty) {
+          val bytes = packet.readBytes()
+          currentLength += bytes.size
+          file?.appendBytes(bytes)
+          DLProgress(currentLength, contentLength!!) // 将下载进度回调
+        }
+        isStop = isStop()
       }
-      outputStream?.let { it.close() } // 写入完成，关闭
-    }*/
+      if (isStop) httpResponse.cancel()
+    }
   }
 }

@@ -15,10 +15,9 @@ pub type Db = Arc<Mutex<BufferTask>>;
 lazy_static! {
     // 消息通道
     pub(crate) static ref BUFFER_NOTIFICATION: Mutex<Vec<Vec<u8>>> = Mutex::new(vec![]);
-    // 系统操作通道
-    pub(crate) static ref BUFFER_SYSTEM: Mutex<Vec<Vec<u8>>> = Mutex::new(vec![]);
-
+    // 来自webview的消息
     pub(crate) static ref BUFFER_INSTANCES: Arc<Mutex<BufferInstance>> =  Arc::new(Mutex::new(BufferInstance::new()));
+    // 系统操作通道
     pub(crate) static ref BUFFER_INSTANCES_MAP: Db = Arc::new(Mutex::new(BufferTask::new()));
     // pub(crate) static ref BUFFER_INSTANCES_MAP: Db = Arc::new(Mutex::new(BufferTask::new()));
 }
@@ -52,7 +51,7 @@ pub fn op_rust_to_js_system_buffer(head_view:String) -> Result<Vec<u8>, AnyError
     let mut buffer_task = BUFFER_INSTANCES_MAP.lock().unwrap();
     let buffer = buffer_task.get(head_view);
     
-    Ok(buffer)
+    Ok(buffer.to_vec())
 }
 
 /// chunk data 

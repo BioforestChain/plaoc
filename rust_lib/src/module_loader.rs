@@ -1,4 +1,5 @@
 #![cfg(target_os = "android")]
+#![allow(unused_imports,dead_code)]
 use deno_core::anyhow::Error;
 // use assets_manager::{loader, Asset, AssetCache};
 use deno_core::error::generic_error;
@@ -9,8 +10,6 @@ use deno_core::ModuleSourceFuture;
 use deno_core::ModuleSpecifier;
 use deno_core::ModuleType;
 use futures::future::FutureExt;
-#[allow(dead_code)]
-#[cfg(target_os = "android")]
 use ndk::asset::{Asset, AssetManager};
 use std::ffi::CString;
 
