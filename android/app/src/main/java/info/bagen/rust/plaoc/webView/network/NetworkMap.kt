@@ -151,7 +151,7 @@ fun hexStrToByteArray(str: String): ByteArray {
 
 data class UserMetaData(
     val baseUrl: String = "",
-    val manifest: Manifest = Manifest("", arrayOf("xx"), "", arrayOf(""), "", arrayOf("")),
+    val manifest: Manifest = Manifest("", arrayOf("xx"), "", arrayOf(""), "","", arrayOf("")),
     val dwebview: ImportMap = ImportMap(arrayOf(DwebViewMap("", ""))),
     val whitelist: Array<String> = arrayOf("http://localhost")
 )
@@ -169,6 +169,7 @@ data class Manifest(
 //  val dwebId: String = "",
 // 私钥文件，用于最终的应用签名
   val privateKey: String = "",
+  val homepage: String = "",
 // 应用入口，可以配置多个，其中index为缺省名称。
 // 外部可以使用 DWEB_ID.bfchain (等价同于index.DWEB_ID.bfchain)、admin.DWEB_ID.bfchain 来启动其它页面
   val enters: Array<String> = arrayOf("index.html")

@@ -10,9 +10,7 @@ import android.os.IBinder
 import androidx.annotation.RequiresApi
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.google.gson.internal.`$Gson$Types`.arrayOf
 import info.bagen.rust.plaoc.system.deepLink.DWebReceiver
-import info.bagen.rust.plaoc.util.UnicodeUtils
 import java.nio.ByteBuffer
 import kotlin.concurrent.thread
 
@@ -108,7 +106,7 @@ class DenoService : IntentService("DenoService") {
     // 传递zeroCopyBuffer
     denoSetCallback(object : IDenoZeroCopyBufCallback {
       override fun denoZeroCopyBufCallback(bytes: ByteArray) {
-        warpCallback(bytes, false) // 单工模式不要存储
+        warpCallback(bytes) // 传递zeroCopyBuffer
       }
     })
     // rust直接返回到能力
@@ -120,19 +118,21 @@ class DenoService : IntentService("DenoService") {
   }
 }
 
-fun warpCallback(bytes: ByteArray, store: Boolean = true) {
+fun warpCallback(bytes: ByteArray) {
   val (versionId, headId, stringData) = parseBytesFactory(bytes) // 处理二进制
   mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true) //允许出现特殊字符和转义符
   mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true) //允许使用单引号
 
   val handle = mapper.readValue(stringData, RustHandle::class.java)
-  val funName = ExportNative.valueOf(handle.function)
-  println("warpCallback 🤩headId:${headId[0]},${headId[1]},funName:$funName")
-  if (store) {
+  val funName = ExportNative.valueOf(handle.cmd)
+  println("warpCallback 🤩headId:${headId[0]},${headId[1]},funName:$funName,type:${handle.type}")
+  if (handle.type == TransformType.HAS_RETURN.type) { // 有返回的 2
     version_head_map[headId] = versionId // 存版本号
     rust_call_map[funName] = headId     // 存一下头部标记，返回数据的时候才知道给谁,存储的调用的函数名跟头部标记一一对应
   }
-  callable_map[funName]?.let { it -> it(handle.data) } // 执行函数
+  handle.data.forEach { data ->
+    callable_map[funName]?.let { it -> it(data) } // 执行函数
+   }
 }
 
 fun warpRustCallback(bytes: ByteArray) {
@@ -173,10 +173,16 @@ fun createBytesFactory(callFun: ExportNative, message: String) {
   }
 }
 
+enum class TransformType(val type: Number) {
+   HAS_RETURN(2),
+   COMMON(1),
+}
 
 data class RustHandle(
-  val function: String = "",
-  val data: String = ""
+  val cmd: String = "",
+  val type: Number = 0,
+  val data:Array<String> = arrayOf(""),
+  val transferable_metadata:Array<String> = arrayOf("")
 )
 
 data class JsHandle(
