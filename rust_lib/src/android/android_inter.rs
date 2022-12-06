@@ -177,7 +177,7 @@ pub fn deno_zerocopybuffer_callback(req_id: &'static [u8], buffer: &'static [u8]
         match env.call_method(
             obj,
             "denoZeroCopyBufCallback",
-            "([B)V",
+            "([B[B)V",
             &[JValue::from(id), JValue::from(data)],
         ) {
             Ok(jvalue) => {

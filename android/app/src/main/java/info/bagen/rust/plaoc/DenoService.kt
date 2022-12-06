@@ -154,7 +154,7 @@ fun parseBytesFactory(bytes: ByteArray): Triple<ByteArray, ByteArray, String> {
   val message = bytes.sliceArray(4 until bytes.size)
   val stringData = String(message,Charsets.UTF_16LE);
 
-//  println("parseBytesFactory🍙 $stringData, ${String(byteArrayOf(107,98,1,120),Charsets.UTF_16LE)} ")
+  println("parseBytesFactory🍙 $stringData,headId:[${headId[0]},${headId[1]}] ")
   return Triple(versionId, headId, stringData)
 }
 

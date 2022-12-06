@@ -284,7 +284,7 @@ impl BufferTask {
             // log::info!("获取数据 🤖：{:?},headView:{:?}",data,head_view);
             match data {
                 Some(byte) => {
-                    log::info!(" BufferTask 🥳 get Some {:?}",byte);
+                    // log::info!(" BufferTask 🥳 get Some {:?}",byte);
                     return byte.clone();
                 },
                 None => {
