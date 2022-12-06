@@ -1,13 +1,13 @@
 #![allow(non_snake_case)]
 // #![cfg(target_os = "android")]
-use lazy_static::*;
-use log::{debug, error, info};
 use jni::{
     objects::{GlobalRef, JObject, JValue},
     sys::{jint, JNI_ERR, JNI_VERSION_1_4},
     JNIEnv, JavaVM, NativeMethod,
 };
-use jni_sys::{jbyteArray};
+use jni_sys::jbyteArray;
+use lazy_static::*;
+use log::{debug, error, info};
 use std::{ffi::c_void, sync::Mutex};
 
 // 添加一个全局变量来缓存回调对象
@@ -112,7 +112,6 @@ pub fn rustCallback(env: JNIEnv, _obj: JObject, callback: JObject) {
     *ptr_fn = Some(callback);
 }
 
-
 unsafe fn register_natives(jvm: &JavaVM, class_name: &str, methods: &[NativeMethod]) -> jint {
     let env: JNIEnv = jvm.get_env().unwrap();
     let jni_version = env.get_version().unwrap();
@@ -162,16 +161,25 @@ pub fn call_java_callback(buffer: &'static [u8]) {
 }
 
 /// 把数据传输给kotlin 不包含返回值 deno-js -> rust->kotlin
-pub fn deno_zerocopybuffer_callback(req_id: &'static [u8],buffer: &'static [u8]) {
-    log::info!("i am deno_zerocopybuffer_callback req_id:{:?} buffer:{:?}",req_id, buffer);
+pub fn deno_zerocopybuffer_callback(req_id: &'static [u8], buffer: &'static [u8]) {
+    log::info!(
+        "i am deno_zerocopybuffer_callback req_id:{:?} buffer:{:?}",
+        req_id,
+        buffer
+    );
     call_jvm(&JNI_JS_CALLBACK, move |obj: JObject, env: &JNIEnv| {
         let data: jbyteArray = env
             .byte_array_from_slice(buffer)
             .expect("Couldn't create java byteArray!");
-            let id: jbyteArray = env
+        let id: jbyteArray = env
             .byte_array_from_slice(req_id)
             .expect("Couldn't create java byteArray!");
-        match env.call_method(obj, "denoZeroCopyBufCallback", "([B)V", &[JValue::from(id),JValue::from(data)]) {
+        match env.call_method(
+            obj,
+            "denoZeroCopyBufCallback",
+            "([B)V",
+            &[JValue::from(id), JValue::from(data)],
+        ) {
             Ok(jvalue) => {
                 debug!("callback succeed: {:?}", jvalue);
             }
@@ -199,7 +207,6 @@ pub fn deno_rust_callback(fun_type: &'static [u8]) {
         }
     });
 }
-
 
 /// # 封装jvm调用
 fn call_jvm<F>(callback: &Mutex<Option<GlobalRef>>, run: F)

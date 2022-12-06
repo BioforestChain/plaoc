@@ -61,7 +61,7 @@ class DenoService : IntentService("DenoService") {
   }
 
   interface IDenoZeroCopyBufCallback {
-    fun denoZeroCopyBufCallback(bytes: ByteArray)
+    fun denoZeroCopyBufCallback(req_id: ByteArray,bytes: ByteArray)
   }
 
   interface IRustCallback {
@@ -105,8 +105,8 @@ class DenoService : IntentService("DenoService") {
     })
     // 传递zeroCopyBuffer
     denoSetCallback(object : IDenoZeroCopyBufCallback {
-      override fun denoZeroCopyBufCallback(bytes: ByteArray) {
-        warpCallback(bytes) // 传递zeroCopyBuffer
+      override fun denoZeroCopyBufCallback(req_id: ByteArray,bytes: ByteArray) {
+        warpZeroCopyBuffCallback(req_id,bytes) // 传递zeroCopyBuffer
       }
     })
     // rust直接返回到能力
@@ -133,6 +133,10 @@ fun warpCallback(bytes: ByteArray) {
   handle.data.forEach { data ->
     callable_map[funName]?.let { it -> it(data) } // 执行函数
    }
+}
+
+fun warpZeroCopyBuffCallback(req_id:ByteArray,buffers:ByteArray){
+  println("warpZeroCopyBuffCallback==》 req_id:$req_id,buffers:$buffers")
 }
 
 fun warpRustCallback(bytes: ByteArray) {
