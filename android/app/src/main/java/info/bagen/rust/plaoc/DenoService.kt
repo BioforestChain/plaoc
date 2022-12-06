@@ -157,7 +157,7 @@ fun parseBytesFactory(bytes: ByteArray): Triple<ByteArray, ByteArray, String> {
 
 /*** 创建二进制数据返回*/
 fun createBytesFactory(callFun: ExportNative, message: String) {
-  val headId = rust_call_map[callFun] ?: ByteArray(2).plus(0x00)
+  val headId = rust_call_map[callFun] ?: ByteArray(2).plus(0x01)
   val versionId = version_head_map[headId] ?: ByteArray(2).plus(0x01)
   val msgBit = message.encodeToByteArray()
   val result = ByteBuffer.allocate(headId.size + versionId.size + msgBit.size)
@@ -167,7 +167,7 @@ fun createBytesFactory(callFun: ExportNative, message: String) {
   // 移除使用完的标记
   rust_call_map.remove(callFun)
   version_head_map.remove(headId)
-  println("安卓返回数据:---headViewId=> ${headId[0]},${headId[1]},message=> $message")
+  println("安卓返回数据:callFun:${callFun.type}---headViewId=> ${headId[0]},${headId[1]},message=> $message")
   thread {
     denoService.backSystemDataToRust(result.array())
   }

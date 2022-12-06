@@ -139,7 +139,8 @@ fun sendToJavaScript(jsCode: String) {
     dWebView?.post(Runnable {
         dWebView?.evaluateJavascript(jsCode,ValueCallback<String> { result ->
           Log.d(TAG, "sendToJavaScript 返回数据: $result,sendToJavaScript->:$jsCode")
-          if (result.isNotEmpty()) {
+          if (result.isNotEmpty() && result != "null") {
+            println("kotlin#sendToJavaScript:$result")
             createBytesFactory(ExportNative.EvalJsRuntime, result)// 返回数据给后端
           }
         })
