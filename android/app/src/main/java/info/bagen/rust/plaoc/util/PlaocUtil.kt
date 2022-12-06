@@ -32,4 +32,8 @@ object PlaocUtil {
       ShortcutManagerCompat.addDynamicShortcuts(context, shortcutInfoList);
     }
   }
+
+  fun transformKey(req_id:ByteArray):String {
+    return "${req_id[0]}-${req_id[1]}"
+  }
 }

@@ -11,6 +11,8 @@ import androidx.annotation.RequiresApi
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.ObjectMapper
 import info.bagen.rust.plaoc.system.deepLink.DWebReceiver
+import info.bagen.rust.plaoc.util.PlaocUtil
+import info.bagen.rust.plaoc.webView.network.toHexString
 import java.nio.ByteBuffer
 import kotlin.concurrent.thread
 
@@ -23,6 +25,8 @@ private const val TAG = "DENO_SERVICE"
  */
 // 这里当做一个连接池，每当有客户端传过来方法就注册一下，返回的时候就知道数据是谁要的了 <handleFunction,headId>
 val rust_call_map = mutableMapOf<ExportNative, ByteArray>()
+
+val zero_copy_buff = mutableMapOf<String, ByteArray>()
 
 // 存储版本号 <versionID,headerID>
 val version_head_map = mutableMapOf<ByteArray, ByteArray>()
@@ -122,7 +126,6 @@ fun warpCallback(bytes: ByteArray) {
   val (versionId, headId, stringData) = parseBytesFactory(bytes) // 处理二进制
   mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true) //允许出现特殊字符和转义符
   mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true) //允许使用单引号
-
   val handle = mapper.readValue(stringData, RustHandle::class.java)
   val funName = ExportNative.valueOf(handle.cmd)
   println("warpCallback 🤩headId:${headId[0]},${headId[1]},funName:$funName,type:${handle.type}")
@@ -130,13 +133,31 @@ fun warpCallback(bytes: ByteArray) {
     version_head_map[headId] = versionId // 存版本号
     rust_call_map[funName] = headId     // 存一下头部标记，返回数据的时候才知道给谁,存储的调用的函数名跟头部标记一一对应
   }
-  handle.data.forEach { data ->
-    callable_map[funName]?.let { it -> it(data) } // 执行函数
-   }
+  println("transferable_metadata:${handle.transferable_metadata.isNotEmpty()},cmd:${handle.cmd}")
+  // 填充deno-js 发送的bufferView
+  if (handle.transferable_metadata.isNotEmpty()) {
+   val bufferArray =  matchZeroCopyBuff(headId,handle.data,handle.transferable_metadata)
+    bufferArray.forEach { data ->
+      callable_map[funName]?.let { it -> it(data.toHexString()) } // 执行函数
+    }
+  } else {
+    handle.data.forEach { data ->
+      callable_map[funName]?.let { it -> it(data) } // 执行函数
+    }
+  }
 }
 
+/**
+ * 填充来自deno-js的zeroCopyBuff
+ */
 fun warpZeroCopyBuffCallback(req_id:ByteArray,buffers:ByteArray){
-  println("warpZeroCopyBuffCallback==》 req_id:$req_id,buffers:$buffers")
+  val key = PlaocUtil.transformKey(req_id);
+  var index = 0;
+  while (zero_copy_buff["$key-$index"] == null) {
+    index++
+  }
+  println("warpZeroCopyBuffCallback==》 req_id:[${key},${req_id[1]}],buffers:,${key}")
+  zero_copy_buff["$key-$index"] = buffers;
 }
 
 fun warpRustCallback(bytes: ByteArray) {
@@ -177,6 +198,20 @@ fun createBytesFactory(callFun: ExportNative, message: String) {
   }
 }
 
+// 填充数据返回
+fun matchZeroCopyBuff(headId:ByteArray,data:Array<String>,transferable_metadata: Array<Int>):Array<ByteArray>{
+  val request:Array<ByteArray> = arrayOf();
+  val key = PlaocUtil.transformKey(headId);
+  data.map { index ->
+    val buff = zero_copy_buff["$key-$index"]
+    println("kotlin#matchZeroCopyBuff,key:$key-$index,buff:$buff")
+    if (buff !== null) {
+      request[transferable_metadata[index.toInt()]] = buff
+    }
+  }
+  return request
+}
+
 enum class TransformType(val type: Number) {
    HAS_RETURN(2),
    COMMON(1),
@@ -186,7 +221,7 @@ data class RustHandle(
   val cmd: String = "",
   val type: Number = 0,
   val data:Array<String> = arrayOf(""),
-  val transferable_metadata:Array<String> = arrayOf("")
+  val transferable_metadata:Array<Int> = arrayOf()
 )
 
 data class JsHandle(
