@@ -13,11 +13,10 @@ pub fn call_android(bit: Vec<u8>) {
 }
 
 /// 调用android方法执行evenjs
-pub fn call_send_zero_copy_buffer(req_id:Vec<u8>,bit: Vec<u8>) {
+pub fn call_send_zero_copy_buffer(bit: Vec<u8>) {
     // 转换为static str
     let buffer = Box::leak(bit.into_boxed_slice());
-    let id = Box::leak(req_id.into_boxed_slice());
-    android_inter::deno_zerocopybuffer_callback(id,buffer);
+    android_inter::deno_zerocopybuffer_callback(buffer);
 }
 
 /// 通知kotlin叫serviceWorker打开背压

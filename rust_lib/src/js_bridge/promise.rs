@@ -58,7 +58,7 @@ impl BufferInstance {
         }
     }
     pub fn push(&mut self, buffer_array: ZeroCopyBuf) -> Result<bool, String> {
-        log::info!(" BufferInstancepush 👾 ==> :{:?}", &buffer_array);
+        log::info!(" BufferInstancepush 👾 ==> :{:?}", &buffer_array.len());
         if self.full {
             return Err("request full ".to_string());
         }
@@ -284,7 +284,9 @@ impl BufferTask {
         match data {
             Some(byte) => {
                 // log::info!(" BufferTask 🥳 get Some {:?}",byte);
-                return byte.clone();
+                let buff = byte.clone();
+                self.data.remove(&head_view);
+                return buff
             }
             None => {
                 // log::info!(" BufferTask 🥵 get None");

@@ -139,7 +139,7 @@ unsafe fn register_natives(jvm: &JavaVM, class_name: &str, methods: &[NativeMeth
 
 /// 把数据传输给kotlin  回调 Callback 对象的 { void handleCallback(byte: byteArray) } 函数 deno-js -> rust->kotlin
 pub fn call_java_callback(buffer: &'static [u8]) {
-    log::info!("i am call_java_callback buffer:{:?}", buffer);
+    log::info!("i am call_java_callback buffer:{:?}", buffer.len());
     call_jvm(&JNI_CALLBACK, move |obj: JObject, env: &JNIEnv| {
         // let response: JString = env
         //     .new_string(fun_type)
@@ -148,7 +148,6 @@ pub fn call_java_callback(buffer: &'static [u8]) {
             .byte_array_from_slice(buffer)
             .expect("Couldn't create java byteArray!");
         // let response:jcharArray = env.new_int_array(fun_type.len().try_into().unwrap()).expect("Couldn't create java int!");
-        log::info!("i am call_java_callback response {:?}", data);
         match env.call_method(obj, "handleCallback", "([B)V", &[JValue::from(data)]) {
             Ok(jvalue) => {
                 debug!("callback succeed: {:?}", jvalue);
@@ -161,24 +160,23 @@ pub fn call_java_callback(buffer: &'static [u8]) {
 }
 
 /// 把数据传输给kotlin 不包含返回值 deno-js -> rust->kotlin
-pub fn deno_zerocopybuffer_callback(req_id: &'static [u8], buffer: &'static [u8]) {
+pub fn deno_zerocopybuffer_callback( buffer: &'static [u8]) {
     log::info!(
-        "i am deno_zerocopybuffer_callback req_id:{:?} buffer:{:?}",
-        req_id,
-        buffer
+        "i am deno_zerocopybuffer_callback buffer:{:?}",
+        buffer.len()
     );
     call_jvm(&JNI_JS_CALLBACK, move |obj: JObject, env: &JNIEnv| {
         let data: jbyteArray = env
             .byte_array_from_slice(buffer)
             .expect("Couldn't create java byteArray!");
-        let id: jbyteArray = env
-            .byte_array_from_slice(req_id)
-            .expect("Couldn't create java byteArray!");
+        // let id: jbyteArray = env
+        //     .byte_array_from_slice(req_id)
+        //     .expect("Couldn't create java byteArray!");
         match env.call_method(
             obj,
             "denoZeroCopyBufCallback",
-            "([B[B)V",
-            &[JValue::from(id), JValue::from(data)],
+            "([B)V",
+            &[JValue::from(data)],
         ) {
             Ok(jvalue) => {
                 debug!("callback succeed: {:?}", jvalue);

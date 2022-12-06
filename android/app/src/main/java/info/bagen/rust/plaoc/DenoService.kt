@@ -65,7 +65,7 @@ class DenoService : IntentService("DenoService") {
   }
 
   interface IDenoZeroCopyBufCallback {
-    fun denoZeroCopyBufCallback(req_id: ByteArray,bytes: ByteArray)
+    fun denoZeroCopyBufCallback(bytes: ByteArray)
   }
 
   interface IRustCallback {
@@ -104,13 +104,14 @@ class DenoService : IntentService("DenoService") {
     // rust 通知 kotlin doing sting
     nativeSetCallback(object : IHandleCallback {
       override fun handleCallback(bytes: ByteArray) {
+        println("handleCallback bytes:${bytes[0]}")
         warpCallback(bytes)
       }
     })
     // 传递zeroCopyBuffer
     denoSetCallback(object : IDenoZeroCopyBufCallback {
-      override fun denoZeroCopyBufCallback(req_id: ByteArray,bytes: ByteArray) {
-        warpZeroCopyBuffCallback(req_id,bytes) // 传递zeroCopyBuffer
+      override fun denoZeroCopyBufCallback(bytes: ByteArray) {
+        warpZeroCopyBuffCallback(bytes) // 传递zeroCopyBuffer
       }
     })
     // rust直接返回到能力
@@ -150,7 +151,8 @@ fun warpCallback(bytes: ByteArray) {
 /**
  * 填充来自deno-js的zeroCopyBuff
  */
-fun warpZeroCopyBuffCallback(req_id:ByteArray,buffers:ByteArray){
+fun warpZeroCopyBuffCallback(buffers:ByteArray){
+  val req_id = buffers.sliceArray(0..1);
   val key = PlaocUtil.transformKey(req_id);
   var index = 0;
   while (zero_copy_buff["$key-$index"] == null) {

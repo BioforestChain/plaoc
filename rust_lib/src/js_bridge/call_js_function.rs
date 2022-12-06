@@ -35,14 +35,14 @@ pub fn op_js_to_rust_buffer(buffer: ZeroCopyBuf) {
             .with_min_level(Level::Debug)
             .with_tag("deno_runtime::rust_to_js_buffer"),
     );
-    log::info!("deno_js调用了消息要传递到android 😯 buffer:{:?}", buffer);
+    log::info!("deno_js调用了消息要传递到android 😯 buffer:{:?}", buffer.len());
     call_android_function::call_android(buffer.to_vec()); // 通知FFI函数
 }
 
 /// deno-js通过移动端的evalJs，把数据传递到dwebview-js
 #[op]
-pub fn op_send_zero_copy_buffer(req_id:ZeroCopyBuf,buffer: ZeroCopyBuf) {
-    call_android_function::call_send_zero_copy_buffer(req_id.to_vec(),buffer.to_vec()); // 通知FFI函数
+pub fn op_send_zero_copy_buffer(buffer: ZeroCopyBuf) {
+    call_android_function::call_send_zero_copy_buffer(buffer.to_vec()); // 通知FFI函数
 }
  
 ///  deno-js 轮询访问这个方法，以达到把rust数据传递到deno-js的过程，这里负责的是移动端系统API的数据
