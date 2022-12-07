@@ -104,7 +104,7 @@ class DenoService : IntentService("DenoService") {
     // rust 通知 kotlin doing sting
     nativeSetCallback(object : IHandleCallback {
       override fun handleCallback(bytes: ByteArray) {
-        println("handleCallback bytes:${bytes[0]}")
+        println("handleCallback bytes:${bytes[0]},${bytes[1]},${bytes[2]},${bytes[3]},${bytes[4]},${bytes[5]}")
         warpCallback(bytes)
       }
     })
