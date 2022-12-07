@@ -134,12 +134,15 @@ fun warpCallback(bytes: ByteArray) {
     version_head_map[headId] = versionId // 存版本号
     rust_call_map[funName] = headId     // 存一下头部标记，返回数据的时候才知道给谁,存储的调用的函数名跟头部标记一一对应
   }
-  println("transferable_metadata:${handle.transferable_metadata.isNotEmpty()},cmd:${handle.cmd}")
   // 填充deno-js 发送的bufferView
   if (handle.transferable_metadata.isNotEmpty()) {
    val bufferArray =  matchZeroCopyBuff(headId,handle.data,handle.transferable_metadata)
-    bufferArray.forEach { data ->
-      callable_map[funName]?.let { it -> it(data.toHexString()) } // 执行函数
+    println("kotlin#funName:$funName, data:${bufferArray}")
+    bufferArray.map { data ->
+      println("kotlin#funName:$funName, data:${data}")
+      callable_map[funName]?.let { it ->
+          it(data)
+      } // 执行函数
     }
   } else {
     handle.data.forEach { data ->
@@ -152,14 +155,14 @@ fun warpCallback(bytes: ByteArray) {
  * 填充来自deno-js的zeroCopyBuff
  */
 fun warpZeroCopyBuffCallback(buffers:ByteArray){
-  val req_id = buffers.sliceArray(0..1);
-  val key = PlaocUtil.transformKey(req_id);
+  val reqId = buffers.sliceArray(0..1);
+  val key = PlaocUtil.saveZeroBuffKey(reqId);
   var index = 0;
-  while (zero_copy_buff["$key-$index"] == null) {
+  println("warpZeroCopyBuffCallback==》 req_id:[${key},${reqId[1]}],buffers:,${zero_copy_buff["$key-$index"]}")
+  while (zero_copy_buff["$key-$index"] != null) {
     index++
   }
-  println("warpZeroCopyBuffCallback==》 req_id:[${key},${req_id[1]}],buffers:,${key}")
-  zero_copy_buff["$key-$index"] = buffers;
+  zero_copy_buff["$key-$index"] = buffers.sliceArray(2 until buffers.size) // 拿掉req_id
 }
 
 fun warpRustCallback(bytes: ByteArray) {
@@ -201,14 +204,15 @@ fun createBytesFactory(callFun: ExportNative, message: String) {
 }
 
 // 填充数据返回
-fun matchZeroCopyBuff(headId:ByteArray,data:Array<String>,transferable_metadata: Array<Int>):Array<ByteArray>{
-  val request:Array<ByteArray> = arrayOf();
-  val key = PlaocUtil.transformKey(headId);
+fun matchZeroCopyBuff(headId:ByteArray,data:Array<String>,transferable_metadata: Array<Int>):MutableList<ByteArray>{
+  val request : MutableList<ByteArray> = mutableListOf();
+  val key = PlaocUtil.getZeroBuffKey(headId);
   data.map { index ->
-    val buff = zero_copy_buff["$key-$index"]
-    println("kotlin#matchZeroCopyBuff,key:$key-$index,buff:$buff")
+    val i = transferable_metadata[index.toInt()];
+    val buff = zero_copy_buff["${key}-$i"]
+    println("kotlin#matchZeroCopyBuff,key:$key-${i},buff:${buff}")
     if (buff !== null) {
-      request[transferable_metadata[index.toInt()]] = buff
+      request.add(buff)
     }
   }
   return request

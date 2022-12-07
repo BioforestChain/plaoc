@@ -33,7 +33,10 @@ object PlaocUtil {
     }
   }
 
-  fun transformKey(req_id:ByteArray):String {
+  fun saveZeroBuffKey(req_id:ByteArray):String {
     return "${req_id[0]}-${req_id[1]}"
+  }
+  fun getZeroBuffKey(req_id:ByteArray):String {
+    return "${req_id[0] - 1}-${req_id[1]}"
   }
 }

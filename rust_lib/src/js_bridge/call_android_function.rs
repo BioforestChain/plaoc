@@ -42,13 +42,12 @@ pub fn call_native_request_overflow() {
 }
 
 // 把数据转化为[u8]并call kotlin
-pub fn call_deno_rust(data:&str) {
+pub fn call_deno_rust(data: &str) {
     let bit = data.to_owned().as_bytes().to_vec();
     // 转换为static str
     let callback = Box::leak(bit.into_boxed_slice());
     android_inter::deno_rust_callback(callback);
 }
-
 
 // #[allow(dead_code)]
 // pub struct HandleFunction {
