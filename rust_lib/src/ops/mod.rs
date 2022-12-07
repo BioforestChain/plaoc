@@ -8,7 +8,7 @@ pub fn cli_exts() -> Vec<Extension> {
     let ext = Extension::builder()
         .ops(vec![
             call_js_function::op_js_to_rust_buffer::decl(),
-            call_js_function::op_eval_js::decl(),
+            call_js_function::op_send_zero_copy_buffer::decl(),
             // call_js_function::op_rust_to_js_hander::decl(),
             call_js_function::op_rust_to_js_buffer::decl(),
             call_js_function::op_rust_to_js_system_buffer::decl(),

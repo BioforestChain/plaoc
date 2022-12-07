@@ -35,20 +35,22 @@ pub fn op_js_to_rust_buffer(buffer: ZeroCopyBuf) {
             .with_min_level(Level::Debug)
             .with_tag("deno_runtime::rust_to_js_buffer"),
     );
-    log::info!("i am op_js_to_rust_buffer {:?}", buffer);
+    log::info!("deno_js调用了消息要传递到android 😯 buffer:{:?}", buffer.len());
     call_android_function::call_android(buffer.to_vec()); // 通知FFI函数
 }
 
 /// deno-js通过移动端的evalJs，把数据传递到dwebview-js
 #[op]
-pub fn op_eval_js(buffer: ZeroCopyBuf) {
-    call_android_function::call_android_evaljs(buffer.to_vec()); // 通知FFI函数
+pub fn op_send_zero_copy_buffer(buffer: ZeroCopyBuf) {
+    call_android_function::call_send_zero_copy_buffer(buffer.to_vec()); // 通知FFI函数
 }
  
 ///  deno-js 轮询访问这个方法，以达到把rust数据传递到deno-js的过程，这里负责的是移动端系统API的数据
 #[op]
 pub fn op_rust_to_js_system_buffer(head_view:String) -> Result<Vec<u8>, AnyError> {
+    // log::info!("i am op_rust_to_js_system_buffer {:?}", head_view);
     let mut buffer_task = BUFFER_INSTANCES_MAP.lock().unwrap();
+    
     let buffer = buffer_task.get(head_view);
     
     Ok(buffer.to_vec())
@@ -71,13 +73,13 @@ pub fn op_rust_to_js_buffer() -> Result<Vec<u8>, AnyError> {
     if result.is_empty() {
         return Ok(vec![0]);
     }
-    log::info!(" op_rust_to_js_buffer 😻 current_height:{:?},water_threshold:{:?}", buffer.current_height,buffer.water_threshold);
+    // log::info!(" op_rust_to_js_buffer 😻 current_height:{:?},water_threshold:{:?}", buffer.current_height,buffer.water_threshold);
     // TODO: 背压放水策略： buffer.current_height < buffer.water_throtth/2
     if buffer.full && buffer.current_height < buffer.water_threshold {
         buffer.full = false;
         call_android_function::call_java_open_back_pressure() // 通知前端放水
     }
-    log::info!(" op_rust_to_js_buffer result:{:?}", &result);
+    // log::info!(" op_rust_to_js_buffer result:{:?}", &result);
     Ok(result.to_vec())
     // 初始化一个等待者
     // let waitter = buffer.init_waitter();

@@ -143,14 +143,16 @@ pub async extern "C" fn Java_info_bagen_rust_plaoc_DenoService_backSystemDataToR
     byte_data: jbyteArray, // 内存地址
 )  {
     let buffer_array = env.convert_byte_array(byte_data).unwrap();
-    let data_string = std::str::from_utf8(&buffer_array).unwrap();
-    log::info!(" backSystemDataToRust:{:?}", data_string);
-
+    // log::info!("rust#backSystemDataToRust:{:?}",buffer_array);
+    // let data_string = std::str::from_utf8(&buffer_array).unwrap();
+    // log::info!(" backSystemDataToRust:{:?}", data_string);
      let head_view = get_head_view_id(&buffer_array);
+    log::info!("rust#backSystemDataToRust,head_view{:?}",head_view);
+
      let mut buffer_map = BUFFER_INSTANCES_MAP.lock().unwrap();
      // 存入map
      let buffer =  buffer_map.insert(head_view, ZeroCopyBuf::new_temp(buffer_array));
-     log::info!(" backSystemDataToRustxxbuffer:{:?}", buffer);
+     log::info!("rust#backSystemDataToRustxxbuffer:{:?}", buffer);
      // 此处需要等deno-js 那边不再轮询才能使用future
     // if let Ok(byte) = buffer {
     //     buffer_map.resolve(byte);
@@ -168,7 +170,7 @@ fn get_channel_id(url: String) -> Result<String, &'static str> {
 }
 
 pub fn get_head_view_id(buffer_array:&Vec<u8>) -> String{
-    let head_view = format!("{}-{}",buffer_array[1],buffer_array[2]);
+    let head_view = format!("{}-{}",buffer_array[2],buffer_array[3]);
     head_view
 }
 

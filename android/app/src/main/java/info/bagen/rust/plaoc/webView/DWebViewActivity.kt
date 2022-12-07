@@ -138,8 +138,9 @@ fun sendToJavaScript(jsCode: String) {
   // 这里的消息需要等待serviceWorker启动再执行
     dWebView?.post(Runnable {
         dWebView?.evaluateJavascript(jsCode,ValueCallback<String> { result ->
-          Log.d(TAG, "sendToJavaScript 返回数据: $result,sendToJavaScript->:$jsCode")
-          if (result.isNotEmpty()) {
+//          Log.d(TAG, "sendToJavaScript 返回数据: $result,sendToJavaScript->:$jsCode")
+          if (result.isNotEmpty() && result != "null") {
+            println("kotlin#sendToJavaScript:$result")
             createBytesFactory(ExportNative.EvalJsRuntime, result)// 返回数据给后端
           }
         })

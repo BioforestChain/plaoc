@@ -37,9 +37,15 @@ fun messageGateWay(
 
 /** 转发给ui*/
 fun uiGateWay(
-  stringHex: String
+  stringHex: Any
 ): String {
-  val stringData = String(hexStrToByteArray(stringHex))
+  var stringData = "";
+  // 是不是string类型
+  stringData = if (stringHex is String) {
+    String(hexStrToByteArray(stringHex))
+  } else { // 那么肯定是ByteArray
+    String(stringHex as ByteArray)
+  }
   Log.i(TAG, " uiGateWay2: $stringData")
   if (stringData.isEmpty()) return ""
   try {

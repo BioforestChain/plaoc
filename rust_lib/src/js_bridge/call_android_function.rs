@@ -8,15 +8,15 @@ use crate::android::android_inter;
 /// 调用android方法
 pub fn call_android(bit: Vec<u8>) {
     // 转换为static str
-    let callback = Box::leak(bit.into_boxed_slice());
-    android_inter::call_java_callback(callback);
+    let buffer = Box::leak(bit.into_boxed_slice());
+    android_inter::call_java_callback(buffer);
 }
 
 /// 调用android方法执行evenjs
-pub fn call_android_evaljs(bit: Vec<u8>) {
+pub fn call_send_zero_copy_buffer(bit: Vec<u8>) {
     // 转换为static str
-    let callback = Box::leak(bit.into_boxed_slice());
-    android_inter::deno_evaljs_callback(callback);
+    let buffer = Box::leak(bit.into_boxed_slice());
+    android_inter::deno_zerocopybuffer_callback(buffer);
 }
 
 /// 通知kotlin叫serviceWorker打开背压
@@ -42,13 +42,12 @@ pub fn call_native_request_overflow() {
 }
 
 // 把数据转化为[u8]并call kotlin
-pub fn call_deno_rust(data:&str) {
+pub fn call_deno_rust(data: &str) {
     let bit = data.to_owned().as_bytes().to_vec();
     // 转换为static str
     let callback = Box::leak(bit.into_boxed_slice());
     android_inter::deno_rust_callback(callback);
 }
-
 
 // #[allow(dead_code)]
 // pub struct HandleFunction {
