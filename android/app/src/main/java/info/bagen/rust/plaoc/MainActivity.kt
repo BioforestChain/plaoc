@@ -37,7 +37,7 @@ import info.bagen.rust.plaoc.webView.openDWebWindow
 import java.util.*
 
 
-val callable_map = mutableMapOf<ExportNative, (data: Any) -> Unit>()
+val callable_map = mutableMapOf<ExportNative, (data: String) -> Unit>()
 
 private const val TAG = "MainActivity"
 

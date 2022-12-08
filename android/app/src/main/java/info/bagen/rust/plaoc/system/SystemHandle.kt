@@ -54,57 +54,57 @@ fun splicingPath(bfsId:String, entry:String):String {
   callable_map[ExportNative.OpenQrScanner] = { activity.openScannerActivity() }
   callable_map[ExportNative.BarcodeScanner] = { activity.openBarCodeScannerActivity() }
   callable_map[ExportNative.OpenDWebView] = {
-    activity.openDWebViewActivity((it as String))
+    activity.openDWebViewActivity(it)
   }
   // 初始化用户配置
   callable_map[ExportNative.InitMetaData] = {
-    initMetaData((it as String))
+    initMetaData(it)
   }
   // 执行ui函数
   callable_map[ExportNative.SetDWebViewUI] = {
     uiGateWay(it)
   }
   callable_map[ExportNative.DenoRuntime] = {
-    denoService.denoRuntime((it as String))
+    denoService.denoRuntime(it)
   }
   callable_map[ExportNative.ReadOnlyRuntime] = {
     println("ReadOnlyRuntime：$it")
-    denoService.onlyReadRuntime(App.appContext.assets,(it as String))
+    denoService.onlyReadRuntime(App.appContext.assets,it)
   }
   // 返回数据给DWebView-js
   callable_map[ExportNative.EvalJsRuntime] =
-    { sendToJavaScript((it as String)) }
+    { sendToJavaScript(it) }
   /** fs System*/
   callable_map[ExportNative.FileSystemLs] = {
-    val handle = mapper.readValue((it as String), FileLs::class.java)
+    val handle = mapper.readValue(it, FileLs::class.java)
     fileSystem.ls(handle.path,handle.option.filter, handle.option.recursive)
   }
   callable_map[ExportNative.FileSystemList] = {
-    val handle = mapper.readValue((it as String), FileLs::class.java)
+    val handle = mapper.readValue(it, FileLs::class.java)
     fileSystem.list(handle.path)
   }
   callable_map[ExportNative.FileSystemMkdir] = {
-    val handle = mapper.readValue((it as String), FileLs::class.java)
+    val handle = mapper.readValue(it, FileLs::class.java)
     fileSystem.mkdir(handle.path,handle.option.recursive)
   }
   callable_map[ExportNative.FileSystemWrite] = {
-    val handle = mapper.readValue((it as String), FileWrite::class.java)
+    val handle = mapper.readValue(it, FileWrite::class.java)
     fileSystem.write(handle.path,handle.option.content, handle.option.append,handle.option.autoCreate)
   }
   callable_map[ExportNative.FileSystemRead] = {
-    val handle = mapper.readValue((it as String), FileRead::class.java)
+    val handle = mapper.readValue(it, FileRead::class.java)
     fileSystem.read(handle.path)
   }
   callable_map[ExportNative.FileSystemReadBuffer] = {
-    val handle = mapper.readValue((it as String), FileRead::class.java)
+    val handle = mapper.readValue(it, FileRead::class.java)
     fileSystem.readBuffer(handle.path)
   }
   callable_map[ExportNative.FileSystemRename] = {
-    val handle = mapper.readValue((it as String), FileRename::class.java)
+    val handle = mapper.readValue(it, FileRename::class.java)
     fileSystem.rename(handle.path,handle.newPath)
   }
   callable_map[ExportNative.FileSystemRm] = {
-    val handle = mapper.readValue((it as String), FileRm::class.java)
+    val handle = mapper.readValue(it, FileRm::class.java)
     fileSystem.rm(handle.path,handle.option.deepDelete)
   }
   /**获取appId */
@@ -117,11 +117,11 @@ fun splicingPath(bfsId:String, entry:String):String {
   }
   /**申请应用权限 */
   callable_map[ExportNative.ApplyPermissions] = {
-    PermissionManager.requestPermissions(activity, (it as String))
+    PermissionManager.requestPermissions(activity, it)
   }
   /** Notification */
   callable_map[ExportNative.CreateNotificationMsg] = {
-    createBytesFactory(ExportNative.CreateNotificationMsg, (it as String))
+    createBytesFactory(ExportNative.CreateNotificationMsg, it)
     val message = mapper.readValue(it, NotificationMsgItem::class.java)
    val channelType =  when(message.msg_src) {
      "app_message" -> NotifyManager.ChannelType.DEFAULT

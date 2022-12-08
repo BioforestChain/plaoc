@@ -120,23 +120,6 @@ fun shakeUrl(path: String): String {
   return pathname
 }
 
-/**
- * 十六进制String转Byte数组
- *
- * @param str
- * @return
- */
-fun hexStrToByteArray(str: String): ByteArray {
-  if (str.isEmpty()) {
-    return ByteArray(0)
-  }
-  val currentStr = str.split(",")
-  val byteArray = ByteArray(currentStr.size)
-  for (i in byteArray.indices) {
-    byteArray[i] = currentStr[i].toInt().toByte()
-  }
-  return byteArray
-}
 
 // 读取到了配置文件 ， mock : https://62b94efd41bf319d22797acd.mockapi.io/bfchain/v1/getBlockInfo
 /**

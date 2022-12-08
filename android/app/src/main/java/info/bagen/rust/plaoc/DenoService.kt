@@ -11,6 +11,7 @@ import androidx.annotation.RequiresApi
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.ObjectMapper
 import info.bagen.rust.plaoc.system.deepLink.DWebReceiver
+import info.bagen.rust.plaoc.util.PlaocToString
 import info.bagen.rust.plaoc.util.PlaocUtil
 import info.bagen.rust.plaoc.webView.network.toHexString
 import java.nio.ByteBuffer
@@ -141,12 +142,12 @@ fun warpCallback(bytes: ByteArray) {
     bufferArray.map { data ->
       println("kotlin#funName:$funName, data:${data}")
       callable_map[funName]?.let { it ->
-          it(data)
+          it(PlaocToString.transByteArray(data))
       } // 执行函数
     }
   } else {
     handle.data.forEach { data ->
-      callable_map[funName]?.let { it -> it(data) } // 执行函数
+      callable_map[funName]?.let { it -> it(PlaocToString.transHexString(data)) } // 执行函数
     }
   }
 }
