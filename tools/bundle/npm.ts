@@ -19,7 +19,7 @@ export const buildOptions: BuildOptions = {
   compilerOptions: {
     target: "Latest",
     importHelpers: true,
-    isolatedModules: false,
+    // isolatedModules: false,
   },
   packageManager: "yarn",
   package: {
@@ -39,7 +39,7 @@ export const buildOptions: BuildOptions = {
       "@bfsx/sw": "^1.0.0",
     },
     devDependencies: {
-      "@types/node": "latest",
+      // "@types/node": "latest",
       "@types/tar": "^6.1.3",
       "@types/inquirer": "^9.0.2",
       "@bfsx/typings": "^0.0.7",

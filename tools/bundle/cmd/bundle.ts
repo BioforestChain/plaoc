@@ -7,12 +7,12 @@ import { checksumFile } from "crypto";
 import { compressToSuffixesBfsa } from "compress";
 import { build, buildSw } from "rollup-bundle";
 
-import type * as types from "@bfsx/typings";
+import "@bfsx/typings";
 import type { IAppversion } from "../types/appversion.type.ts";
 import type { IProblemConfig } from "../types/problem.type.ts";
 
 const { existsSync } = fs;
-const { mkdir, writeFile, copyFile, readdir, stat, rm, readFile } = fs.promises;
+const { mkdir, writeFile, copyFile, readdir, stat, rm } = fs.promises;
 
 /**
  * 打包入口
