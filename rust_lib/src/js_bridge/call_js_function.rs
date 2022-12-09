@@ -42,6 +42,7 @@ pub fn op_js_to_rust_buffer(buffer: ZeroCopyBuf) {
 /// deno-js通过移动端的evalJs，把数据传递到dwebview-js
 #[op]
 pub fn op_send_zero_copy_buffer(buffer: ZeroCopyBuf) {
+    log::info!("rust#op_send_zero_copy_buffer1 --> {:?}", buffer.len());
     call_android_function::call_send_zero_copy_buffer(buffer.to_vec()); // 通知FFI函数
 }
  

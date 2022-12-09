@@ -131,7 +131,7 @@ fun warpCallback(bytes: ByteArray) {
   mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true) //允许使用单引号
   val handle = mapper.readValue(stringData, RustHandle::class.java)
   val cmd = ExportNative.valueOf(handle.cmd)
-  println("warpCallback 🤩headId:${headId[0]},${headId[1]},cmd:$cmd,type:${handle.type}")
+  println("warpCallback 🤩headId:${headId[0]},${headId[1]},cmd:$cmd,type:${handle.type}, isReturn:${(handle.type and TransformType.HAS_RETURN.type) == TransformType.HAS_RETURN.type}")
   if ((handle.type and TransformType.HAS_RETURN.type) == TransformType.HAS_RETURN.type) { // 有需要返回的 2(位与)
     version_head_map[headId] = versionId // 存版本号
     rust_call_map[cmd] = headId     // 存一下头部标记，返回数据的时候才知道给谁,存储的调用的函数名跟头部标记一一对应

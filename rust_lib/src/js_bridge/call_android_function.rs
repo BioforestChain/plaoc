@@ -15,7 +15,9 @@ pub fn call_android(bit: Vec<u8>) {
 /// 调用android方法执行evenjs
 pub fn call_send_zero_copy_buffer(bit: Vec<u8>) {
     // 转换为static str
+    log::info!("rust#op_send_zero_copy_buffer2 --> {:?}", bit.len());
     let buffer = Box::leak(bit.into_boxed_slice());
+    log::info!("rust#op_send_zero_copy_buffer3 --> {:?}", buffer.len());
     android_inter::deno_zerocopybuffer_callback(buffer);
 }
 
