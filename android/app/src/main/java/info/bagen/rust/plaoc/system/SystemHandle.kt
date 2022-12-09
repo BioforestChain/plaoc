@@ -12,7 +12,7 @@ import info.bagen.rust.plaoc.system.notification.NotifyManager
 import info.bagen.rust.plaoc.system.permission.PermissionManager
 import info.bagen.rust.plaoc.webView.network.*
 
-
+val callable_map = mutableMapOf<ExportNative, (data: String) -> Unit>()
 private val fileSystem = FileSystem()
 private val notifyManager = NotifyManager()
 

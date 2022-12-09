@@ -9,7 +9,7 @@ import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.work.*
-import info.bagen.rust.plaoc.R
+import info.bagen.rust.plaoc.system.callable_map
 import kotlin.concurrent.thread
 
 private const val TAG = "DENO_WORKER"

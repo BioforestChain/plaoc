@@ -39,7 +39,7 @@ object PlaocUtil {
   }
   /** 获取零拷贝key(因为是前后生成的，所以需要减1)*/
   fun getZeroBuffKey(req_id:ByteArray):String {
-    return "${req_id[0] - 1}-${req_id[1]}"
+    return "${req_id[0]}-${req_id[1]}"
   }
 }
 

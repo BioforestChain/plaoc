@@ -7,6 +7,7 @@ import com.fasterxml.jackson.core.JsonParser
 import com.github.yitter.idgen.YitIdHelper
 import info.bagen.rust.plaoc.*
 import info.bagen.libappmgr.utils.JsonUtil
+import info.bagen.rust.plaoc.util.PlaocToString
 import info.bagen.rust.plaoc.webView.urlscheme.CustomUrlScheme
 import java.io.ByteArrayInputStream
 import java.net.HttpURLConnection
