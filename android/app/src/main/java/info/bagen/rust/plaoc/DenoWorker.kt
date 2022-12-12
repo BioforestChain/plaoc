@@ -22,7 +22,8 @@ class DenoWorker(val appContext: Context, workerParams: WorkerParameters) :
     Log.i(TAG, "WorkerName=$funName,WorkerData=$data")
     if (funName !== null) {
       val calFn = ExportNative.valueOf(funName)
-      thread {
+      thread(name = funName)  {
+       println("kotlin#DenoWorker: ${this.id}")
         callable_map[calFn]?.let { it ->
           if (data != null) {
             it(data)

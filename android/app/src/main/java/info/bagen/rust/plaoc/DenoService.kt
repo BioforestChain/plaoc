@@ -14,7 +14,6 @@ import info.bagen.rust.plaoc.system.callable_map
 import info.bagen.rust.plaoc.system.deepLink.DWebReceiver
 import info.bagen.rust.plaoc.util.PlaocToString
 import info.bagen.rust.plaoc.util.PlaocUtil
-import info.bagen.rust.plaoc.util.hexStrToByteArray
 import java.nio.ByteBuffer
 import kotlin.concurrent.thread
 

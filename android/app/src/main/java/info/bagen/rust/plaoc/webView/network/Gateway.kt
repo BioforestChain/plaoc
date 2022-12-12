@@ -69,7 +69,7 @@ fun viewGateWay(
   if (url.contains("?")) {
     url = url.split("?", limit = 2)[0];
   }
-  Log.i(TAG, " viewGateWay: $url,contains: ${front_to_rear_map.contains(url)}")
+//  Log.i(TAG, " viewGateWay: $url,contains: ${front_to_rear_map.contains(url)}")
   if (front_to_rear_map.contains(url)) {
     val trueUrl = front_to_rear_map[url]
     Log.i(TAG, " viewGateWay: $trueUrl")
@@ -103,7 +103,7 @@ fun viewGateWay(
 /** 注册channelId*/
 fun registerChannelId(): WebResourceResponse {
   val newId = YitIdHelper.nextId()
-  println("TightUUID: ${newId}")
+//  println("TightUUID: ${newId}")
   return WebResourceResponse(
     "application/json",
     "utf-8",

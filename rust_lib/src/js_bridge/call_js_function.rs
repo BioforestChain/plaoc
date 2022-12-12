@@ -1,13 +1,13 @@
 // #![cfg(target_os = "android")]
-use crate::js_bridge::{call_android_function};
+use super::promise::{BufferInstance, BufferTask};
+use crate::js_bridge::call_android_function;
 use android_logger::Config;
-use std::sync::{Mutex, Arc};
 use deno_core::error::{custom_error, AnyError};
 use deno_core::{op, ZeroCopyBuf};
 use lazy_static::*;
-use log::{ Level};
-use std::{str};
-use super::promise::{BufferInstance, BufferTask};
+use log::Level;
+use std::str;
+use std::sync::{Arc, Mutex};
 
 // pub type Db = Arc<Mutex<HashMap<String,Bytes>>>;
 pub type Db = Arc<Mutex<BufferTask>>;
@@ -22,7 +22,6 @@ lazy_static! {
     // pub(crate) static ref BUFFER_INSTANCES_MAP: Db = Arc::new(Mutex::new(BufferTask::new()));
 }
 
-
 /// deno-js system data
 /// send channel: deno-js(ops.op_js_to_rust_buffer)->rust(op_js_to_rust_buffer) -> kotlin(call_java_callback)
 /// back channel: kotlin(backSystemDataToRust)->rust(Java_info_bagen_rust_plaoc_DenoService_backSystemDataToRust)->BUFFER_SYSTEM
@@ -30,12 +29,10 @@ lazy_static! {
 /// deno-js消息从这里走到移动端
 #[op]
 pub fn op_js_to_rust_buffer(buffer: ZeroCopyBuf) {
-    android_logger::init_once(
-        Config::default()
-            .with_min_level(Level::Debug)
-            .with_tag("deno_runtime::rust_to_js_buffer"),
+    log::info!(
+        "deno_js调用了消息要传递到android 😯 buffer:{:?}",
+        buffer.len()
     );
-    log::info!("deno_js调用了消息要传递到android 😯 buffer:{:?}", buffer.len());
     call_android_function::call_android(buffer.to_vec()); // 通知FFI函数
 }
 
@@ -45,31 +42,30 @@ pub fn op_send_zero_copy_buffer(buffer: ZeroCopyBuf) {
     log::info!("rust#op_send_zero_copy_buffer1 --> {:?}", buffer.len());
     call_android_function::call_send_zero_copy_buffer(buffer.to_vec()); // 通知FFI函数
 }
- 
+
 ///  deno-js 轮询访问这个方法，以达到把rust数据传递到deno-js的过程，这里负责的是移动端系统API的数据
 #[op]
-pub fn op_rust_to_js_system_buffer(head_view:String) -> Result<Vec<u8>, AnyError> {
+pub fn op_rust_to_js_system_buffer(head_view: String) -> Result<Vec<u8>, AnyError> {
     // log::info!("i am op_rust_to_js_system_buffer {:?}", head_view);
     let mut buffer_task = BUFFER_INSTANCES_MAP.lock().unwrap();
-    
+
     let buffer = buffer_task.get(head_view);
-    
+
     Ok(buffer.to_vec())
 }
 
-/// chunk data 
+/// chunk data
 /// serviceworker->kotlin(backDataToRust)->rust(Java_info_bagen_rust_plaoc_DenoService_backDataToRust)->BUFFER_INSTANCES
 /// deno-js(loop function op_rust_to_js_buffer )
-/// 
+///
 /// deno-js 轮询访问这个方法，以达到把rust数据传递到deno-js的过程 也就是说这里传递的是chunk数据
 #[op]
 pub fn op_rust_to_js_buffer() -> Result<Vec<u8>, AnyError> {
-
-    let mut buffer =  BUFFER_INSTANCES.lock().unwrap();
+    let mut buffer = BUFFER_INSTANCES.lock().unwrap();
 
     let result = buffer.shift();
     // log::info!(" op_rust_to_js_buffer 🤩 result:{:?}", &result);
-    
+
     // 如果为空
     if result.is_empty() {
         return Ok(vec![0]);
@@ -109,4 +105,3 @@ pub fn op_rust_to_js_app_notification() -> Result<Vec<u8>, AnyError> {
 pub fn op_rust_to_js_set_app_notification(buffer: ZeroCopyBuf) {
     BUFFER_NOTIFICATION.lock().unwrap().push(buffer.to_vec());
 }
-
