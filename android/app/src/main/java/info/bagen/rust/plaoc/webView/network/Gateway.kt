@@ -12,7 +12,6 @@ import java.io.ByteArrayInputStream
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.*
-import kotlin.text.String
 import kotlin.text.toByteArray
 
 private const val TAG = "Gateway"
@@ -31,21 +30,14 @@ fun messageGateWay(
   stringData: String
 ) {
   Log.i(TAG, " messageGateWay: $stringData")
-   DenoService().backDataToRust(stringData.toByteArray())// 通知
+  denoService.backDataToRust(stringData.toByteArray())// 通知
 //  println("messageGeWay back_data-> $backData")
 }
 
 /** 转发给ui*/
 fun uiGateWay(
-  stringHex: Any
+  stringData: String
 ): String {
-  var stringData = "";
-  // 是不是string类型
-  stringData = if (stringHex is String) {
-    String(hexStrToByteArray(stringHex))
-  } else { // 那么肯定是ByteArray
-    String(stringHex as ByteArray)
-  }
   Log.i(TAG, " uiGateWay2: $stringData")
   if (stringData.isEmpty()) return ""
   try {
@@ -75,7 +67,7 @@ fun viewGateWay(
   if (url.contains("?")) {
     url = url.split("?", limit = 2)[0];
   }
-  Log.i(TAG, " viewGateWay: $url,contains: ${front_to_rear_map.contains(url)}")
+//  Log.i(TAG, " viewGateWay: $url,contains: ${front_to_rear_map.contains(url)}")
   if (front_to_rear_map.contains(url)) {
     val trueUrl = front_to_rear_map[url]
     Log.i(TAG, " viewGateWay: $trueUrl")
@@ -109,7 +101,7 @@ fun viewGateWay(
 /** 注册channelId*/
 fun registerChannelId(): WebResourceResponse {
   val newId = YitIdHelper.nextId()
-  println("TightUUID: ${newId}")
+//  println("TightUUID: ${newId}")
   return WebResourceResponse(
     "application/json",
     "utf-8",

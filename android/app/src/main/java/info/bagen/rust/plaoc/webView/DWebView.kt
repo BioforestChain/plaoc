@@ -5,6 +5,7 @@ import android.app.ActivityManager
 import android.os.Message
 import android.util.Log
 import android.webkit.*
+import android.webkit.WebMessagePort.WebMessageCallback
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
@@ -21,9 +22,9 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import info.bagen.rust.plaoc.webView.bottombar.BottomBarFFI
-import info.bagen.rust.plaoc.webView.dialog.*
 import info.bagen.rust.plaoc.webView.bottombar.BottomBarState
 import info.bagen.rust.plaoc.webView.bottombar.DWebBottomBar
+import info.bagen.rust.plaoc.webView.dialog.*
 import info.bagen.rust.plaoc.webView.jsutil.JsUtil
 import info.bagen.rust.plaoc.webView.network.*
 import info.bagen.rust.plaoc.webView.systemui.SystemUIState
@@ -347,6 +348,14 @@ fun DWebView(
               view: WebView?,
               request: WebResourceRequest?
             ): WebResourceResponse? {
+//              if (view != null) {
+//               val channel = view.createWebMessageChannel()
+//                channel[0].setWebMessageCallback(object : WebMessageCallback() {
+//                  override fun onMessage(port: WebMessagePort, message: WebMessage) {
+//                    Log.d(TAG, "On port $port, received this message: $message")
+//                  }
+//                })
+//              }
               // 只加载资源文件 index.js index.html
               if (request !== null && request.url.path?.lastIndexOf(".")  != -1) {
                 // 这里出来的url全部都用是小写，serviceWorker没办法一开始就注册，所以还会走一次这里

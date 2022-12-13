@@ -139,7 +139,7 @@ unsafe fn register_natives(jvm: &JavaVM, class_name: &str, methods: &[NativeMeth
 
 /// 把数据传输给kotlin  回调 Callback 对象的 { void handleCallback(byte: byteArray) } 函数 deno-js -> rust->kotlin
 pub fn call_java_callback(buffer: &'static [u8]) {
-    log::info!("rust#call_java_callback buffer:{:?}", buffer);
+    log::info!("rust#call_java_callback buffer:{:?}", buffer.len());
     call_jvm(&JNI_CALLBACK, move |obj: JObject, env: &JNIEnv| {
         // let response: JString = env
         //     .new_string(fun_type)

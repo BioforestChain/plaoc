@@ -10,9 +10,10 @@ import android.os.IBinder
 import androidx.annotation.RequiresApi
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.ObjectMapper
+import info.bagen.rust.plaoc.system.callable_map
 import info.bagen.rust.plaoc.system.deepLink.DWebReceiver
+import info.bagen.rust.plaoc.util.PlaocToString
 import info.bagen.rust.plaoc.util.PlaocUtil
-import info.bagen.rust.plaoc.webView.network.toHexString
 import java.nio.ByteBuffer
 import kotlin.concurrent.thread
 
@@ -128,33 +129,48 @@ fun warpCallback(bytes: ByteArray) {
   mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true) //允许出现特殊字符和转义符
   mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true) //允许使用单引号
   val handle = mapper.readValue(stringData, RustHandle::class.java)
-  val funName = ExportNative.valueOf(handle.cmd)
-  println("warpCallback 🤩headId:${headId[0]},${headId[1]},funName:$funName,type:${handle.type}")
-  if (handle.type == TransformType.HAS_RETURN.type) { // 有返回的 2
+  val cmd = ExportNative.valueOf(handle.cmd)
+  println("warpCallback 🤩headId:${headId[0]},${headId[1]},cmd:$cmd,type:${handle.type}, isReturn:${(handle.type and TransformType.HAS_RETURN.type) == TransformType.HAS_RETURN.type}")
+  if ((handle.type and TransformType.HAS_RETURN.type) == TransformType.HAS_RETURN.type) { // 有需要返回的 2(位与)
     version_head_map[headId] = versionId // 存版本号
-    rust_call_map[funName] = headId     // 存一下头部标记，返回数据的时候才知道给谁,存储的调用的函数名跟头部标记一一对应
+    rust_call_map[cmd] = headId     // 存一下头部标记，返回数据的时候才知道给谁,存储的调用的函数名跟头部标记一一对应
   }
-  // 填充deno-js 发送的bufferView
+  mathInputType(cmd, handle, headId)
+}
+
+/**
+ * 针对不同的数据进行不同的处理
+ */
+fun mathInputType(cmd: ExportNative, handle: RustHandle, headId: ByteArray) {
+  // 处理二进制
   if (handle.transferable_metadata.isNotEmpty()) {
-   val bufferArray =  matchZeroCopyBuff(headId,handle.data,handle.transferable_metadata)
-    println("kotlin#funName:$funName, data:${bufferArray}")
+    val bufferArray =
+      matchZeroCopyBuff(headId, handle.data, handle.transferable_metadata)// 填充deno-js 发送的bufferView
+    println("kotlin#funName:$cmd, data:${bufferArray}")
     bufferArray.map { data ->
-      println("kotlin#funName:$funName, data:${data}")
-      callable_map[funName]?.let { it ->
-          it(data)
+      println("kotlin#funName:$cmd, data:${data}")
+      callable_map[cmd]?.let { it ->
+        it(String(data))
       } // 执行函数
     }
-  } else {
+    return
+  }
+  if (cmd === ExportNative.SetDWebViewUI) {
     handle.data.forEach { data ->
-      callable_map[funName]?.let { it -> it(data) } // 执行函数
+      println("kotlin#SetDWebViewUI:${PlaocToString.transHexString(data)}")
+      callable_map[cmd]?.let { it -> it(PlaocToString.transHexString(data)) } // 执行函数
     }
+    return
+  }
+  handle.data.forEach { data ->
+    callable_map[cmd]?.let { it -> it(data) } // 执行函数
   }
 }
 
 /**
  * 填充来自deno-js的zeroCopyBuff
  */
-fun warpZeroCopyBuffCallback(buffers:ByteArray){
+fun warpZeroCopyBuffCallback(buffers: ByteArray) {
   val reqId = buffers.sliceArray(0..1);
   val key = PlaocUtil.saveZeroBuffKey(reqId);
   var index = 0;
@@ -178,7 +194,7 @@ fun parseBytesFactory(bytes: ByteArray): Triple<ByteArray, ByteArray, String> {
   val versionId = bytes.sliceArray(0..1)
   val headId = bytes.sliceArray(2..3)
   val message = bytes.sliceArray(4 until bytes.size)
-  val stringData = String(message,Charsets.UTF_16LE);
+  val stringData = String(message, Charsets.UTF_16LE);
 
   println("parseBytesFactory🍙 $stringData,headId:[${headId[0]},${headId[1]}] ")
   return Triple(versionId, headId, stringData)
@@ -204,8 +220,12 @@ fun createBytesFactory(callFun: ExportNative, message: String) {
 }
 
 // 填充数据返回
-fun matchZeroCopyBuff(headId:ByteArray,data:Array<String>,transferable_metadata: Array<Int>):MutableList<ByteArray>{
-  val request : MutableList<ByteArray> = mutableListOf();
+fun matchZeroCopyBuff(
+  headId: ByteArray,
+  data: Array<String>,
+  transferable_metadata: Array<Int>
+): MutableList<ByteArray> {
+  val request: MutableList<ByteArray> = mutableListOf();
   val key = PlaocUtil.getZeroBuffKey(headId);
   data.map { index ->
     val i = transferable_metadata[index.toInt()];
@@ -218,16 +238,16 @@ fun matchZeroCopyBuff(headId:ByteArray,data:Array<String>,transferable_metadata:
   return request
 }
 
-enum class TransformType(val type: Number) {
-   HAS_RETURN(2),
-   COMMON(1),
+enum class TransformType(val type: Int) {
+  HAS_RETURN(2),
+  COMMON(1),
 }
 
 data class RustHandle(
   val cmd: String = "",
-  val type: Number = 0,
-  val data:Array<String> = arrayOf(""),
-  val transferable_metadata:Array<Int> = arrayOf()
+  val type: Int = 0,
+  val data: Array<String> = arrayOf(""),
+  val transferable_metadata: Array<Int> = arrayOf()
 )
 
 data class JsHandle(
