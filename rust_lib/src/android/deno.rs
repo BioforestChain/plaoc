@@ -1,6 +1,7 @@
 // #![cfg(target_os = "android")]
 use crate::js_bridge::{
-    call_js_function::{BUFFER_INSTANCES, BUFFER_INSTANCES_MAP}, call_android_function,
+    call_android_function,
+    call_js_function::{BUFFER_INSTANCES, BUFFER_INSTANCES_MAP},
 };
 #[cfg(target_os = "android")]
 use crate::module_loader::AssetsModuleLoader;
@@ -13,7 +14,7 @@ use jni::{
     objects::{JObject, JString},
     JNIEnv,
 };
-use jni_sys::{jbyteArray};
+use jni_sys::jbyteArray;
 use log::Level;
 #[allow(unused_imports)]
 #[cfg(target_os = "android")]
@@ -83,7 +84,7 @@ pub async extern "system" fn Java_info_bagen_rust_plaoc_DenoService_denoRuntime(
     );
     let asset_path = String::from(env.get_string(path).unwrap());
     log::info!(" denoRuntime :启动BFS后端 !! => {}", asset_path);
-    let runtime =  bootstrap_deno_fs_runtime(asset_path.as_str()).await;
+    let runtime = bootstrap_deno_fs_runtime(asset_path.as_str()).await;
     match runtime {
         Ok(_worker) => {
             log::info!("DenoService_denoRuntime end");
@@ -101,19 +102,23 @@ pub async extern "system" fn Java_info_bagen_rust_plaoc_DenoService_backDataToRu
     env: JNIEnv,
     _context: JObject,
     byte_data: jbyteArray, //  /channel/354481793036294/chunk=
-)  {
+) {
     let buffer_array = env.convert_byte_array(byte_data).unwrap();
     let data_string = std::str::from_utf8(&buffer_array).unwrap().to_string();
     log::info!(" backDataToRust:{:?}", &data_string);
-    
+
     let mut buffer_data = BUFFER_INSTANCES.lock().unwrap();
 
     if buffer_data.full {
         log::info!(" backDataToRust 已经阻塞了:{:?}", &buffer_data.full);
-         return call_android_function::call_native_request_overflow();
+        return call_android_function::call_native_request_overflow();
     }
     let is_full = buffer_data.push(ZeroCopyBuf::Temp(buffer_array)).unwrap();
-    log::info!(" backDataToRust is_full:{:?},current_height:{:?}", &is_full,buffer_data.current_height);
+    log::info!(
+        " backDataToRust is_full:{:?},current_height:{:?}",
+        &is_full,
+        buffer_data.current_height
+    );
     // 已经存在等待者，直接将数据交给等待者
     // if buffer_data.has_waitter() {
     //     // transfrom 'a to 'ststic lifetime
@@ -141,19 +146,19 @@ pub async extern "C" fn Java_info_bagen_rust_plaoc_DenoService_backSystemDataToR
     env: JNIEnv,
     _context: JObject,
     byte_data: jbyteArray, // 内存地址
-)  {
+) {
     let buffer_array = env.convert_byte_array(byte_data).unwrap();
     // log::info!("rust#backSystemDataToRust:{:?}",buffer_array);
     // let data_string = std::str::from_utf8(&buffer_array).unwrap();
     // log::info!(" backSystemDataToRust:{:?}", data_string);
-     let head_view = get_head_view_id(&buffer_array);
-    log::info!("rust#backSystemDataToRust,head_view{:?}",head_view);
+    let head_view = get_head_view_id(&buffer_array);
+    log::info!("rust#backSystemDataToRust,head_view{:?}", head_view);
 
-     let mut buffer_map = BUFFER_INSTANCES_MAP.lock().unwrap();
-     // 存入map
-     let buffer =  buffer_map.insert(head_view, ZeroCopyBuf::new_temp(buffer_array));
-     log::info!("rust#backSystemDataToRustxxbuffer:{:?}", buffer);
-     // 此处需要等deno-js 那边不再轮询才能使用future
+    let mut buffer_map = BUFFER_INSTANCES_MAP.lock().unwrap();
+    // 存入map
+    let buffer = buffer_map.insert(head_view, ZeroCopyBuf::new_temp(buffer_array));
+    log::info!("rust#backSystemDataToRustxxbuffer:{:?}", buffer);
+    // 此处需要等deno-js 那边不再轮询才能使用future
     // if let Ok(byte) = buffer {
     //     buffer_map.resolve(byte);
     // }
@@ -169,8 +174,8 @@ fn get_channel_id(url: String) -> Result<String, &'static str> {
     return Ok(channel_id.to_owned());
 }
 
-pub fn get_head_view_id(buffer_array:&Vec<u8>) -> String{
-    let head_view = format!("{}-{}",buffer_array[2],buffer_array[3]);
+pub fn get_head_view_id(buffer_array: &Vec<u8>) -> String {
+    let head_view = format!("{}-{}", buffer_array[2], buffer_array[3]);
     head_view
 }
 

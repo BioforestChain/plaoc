@@ -7,13 +7,11 @@ import com.fasterxml.jackson.core.JsonParser
 import com.github.yitter.idgen.YitIdHelper
 import info.bagen.rust.plaoc.*
 import info.bagen.libappmgr.utils.JsonUtil
-import info.bagen.rust.plaoc.util.PlaocToString
 import info.bagen.rust.plaoc.webView.urlscheme.CustomUrlScheme
 import java.io.ByteArrayInputStream
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.*
-import kotlin.text.String
 import kotlin.text.toByteArray
 
 private const val TAG = "Gateway"
@@ -32,7 +30,7 @@ fun messageGateWay(
   stringData: String
 ) {
   Log.i(TAG, " messageGateWay: $stringData")
-   DenoService().backDataToRust(stringData.toByteArray())// 通知
+  denoService.backDataToRust(stringData.toByteArray())// 通知
 //  println("messageGeWay back_data-> $backData")
 }
 
