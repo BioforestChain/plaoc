@@ -1,5 +1,3 @@
-#! /usr/bin/env node
-
 import * as process from "node_process";
 import { Command } from "commander";
 import { bundle } from "cmd_bundle";
