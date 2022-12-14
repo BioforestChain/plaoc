@@ -38,6 +38,10 @@ async function onPushFile(e: Event) {
   }
 }
 
+function InstallBFS() {
+  (window as any).installBFS("https://shop.plaoc.com/KEJPMHLA/KEJPMHLA.zip")
+}
+
 </script>
 <template>
 
@@ -48,7 +52,7 @@ async function onPushFile(e: Event) {
       <ion-card-title>文件上传From形式</ion-card-title>
     </ion-card-header>
     <ion-card-content>
-      <div> {{dwebPluginData}} </div>
+      <div> {{ dwebPluginData }} </div>
       <form class="from-data" method="post" enctype="multipart/from-data" action="api/upload">
         <input id="toastMessage" type="file" placeholder="Toast message" name="file">
         <ion-button type="submit">上传文件</ion-button>
@@ -73,7 +77,9 @@ async function onPushFile(e: Event) {
     <a href="https://github.com/johnsoncodehk/volar" target="_blank">Volar</a>
     in your IDE for a better DX
   </p>
-  <p class="read-the-docs">Click on the Vite and Vue logos to learn more</p>
+  <p class="read-the-docs">
+    <ion-button expand="block" fill="outline" @click="InstallBFS()">下载应用</ion-button>
+  </p>
 </template>
 
 <style scoped>
