@@ -1,6 +1,7 @@
 package info.bagen.libappmgr.ui.app
 
 import android.content.Intent
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -20,8 +21,8 @@ import kotlinx.coroutines.launch
 
 data class AppViewUIState(
   val useMaskView: MutableState<Boolean> = mutableStateOf(true), // 表示使用app遮罩的方式下载
-  val appViewStateList: ArrayList<AppViewState> = arrayListOf(),
   val appDialogInfo: MutableState<AppDialogInfo> = mutableStateOf(AppDialogInfo()),
+  val appViewStateList: ArrayList<AppViewState> = arrayListOf(),
   var curAppViewState: AppViewState? = null,
 )
 
@@ -145,6 +146,7 @@ class AppViewModel(private val repository: AppRepository = AppRepository()) : Vi
         is AppViewIntent.UninstallApp -> {
           // 卸载就是删除当前目录，然后重新捞取
           AppContextUtil.sInstance?.let {
+            uiState.value.curAppViewState = null
             val path = "${it.dataDir}/${APP_DIR_TYPE.SystemApp.rootName}/${action.appViewState.bfsId}"
             FilesUtil.deleteQuietly(path)
             loadAppInfoList()
@@ -168,6 +170,7 @@ class AppViewModel(private val repository: AppRepository = AppRepository()) : Vi
 
   private suspend fun loadAppNewVersion(appViewState: AppViewState) {
     uiState.value.curAppViewState = appViewState
+    Log.e("lin.huang", "AppViewModel::loadAppNewVersion $this == $appViewState")
     // 调用下载接口，然后弹出对话框
     val path = FilesUtil.getLastUpdateContent(appViewState.bfsId, APP_DIR_TYPE.RecommendApp)
     path?.let {

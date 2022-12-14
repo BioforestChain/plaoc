@@ -16,8 +16,8 @@ object PlaocUtil {
    */
   fun addShortcut(context: Context) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
-      var shortcutInfoList = arrayListOf<ShortcutInfoCompat>()
-      var builder = ShortcutInfoCompat.Builder(context, "plaoc")
+      val shortcutInfoList = arrayListOf<ShortcutInfoCompat>()
+      val builder = ShortcutInfoCompat.Builder(context, "plaoc")
       builder.setShortLabel("扫一扫")
         .setIcon(IconCompat.createWithResource(context, R.mipmap.ic_scan))
         .setIntent(
@@ -32,38 +32,43 @@ object PlaocUtil {
       ShortcutManagerCompat.addDynamicShortcuts(context, shortcutInfoList);
     }
   }
+
+  /**生成零拷贝key*/
+  fun saveZeroBuffKey(req_id:ByteArray):String {
+    return "${req_id[0]}-${req_id[1]}"
+  }
+  /** 获取零拷贝key(因为是前后生成的，所以需要减1)*/
+  fun getZeroBuffKey(req_id:ByteArray):String {
+    return "${req_id[0]}-${req_id[1]}"
+  }
 }
 
-object UnicodeUtils {
-  /**
-   * 将字符串转成Unicode编码，包括但不限于中文
-   *
-   * @param src 原始字符串，包括但不限于中文
-   * @return Unicode编码字符串
-   */
-  fun encode(src: String): String {
-    val builder = StringBuilder()
-    for (element in src) {
-      var s = Integer.toHexString(element.code)
-      if (s.length == 2) {// 英文转16进制后只有两位，补全4位
-        s = "00$s"
-      }
-      builder.append("\\u$s")
-    }
-    return builder.toString()
-  }
 
-  /**
-   * 解码Unicode字符串，得到原始字符串
-   *
-   * @param unicode Unicode字符串
-   * @return 解码后的原始字符串
-   */
-  fun decode(hex:Array<Int>): String {
-    val builder = StringBuilder()
-    hex.forEach {
-      builder.append(it.toChar().toString())
+object PlaocToString {
+    /**二进制解析成字符串*/
+    fun transByteArray(bytes:ByteArray) : String {
+       return String(bytes)
     }
-    return builder.toString()
+  /** hex String 解析成字符串*/
+    fun transHexString(stringHex:String) :String {
+      return String(hexStrToByteArray(stringHex))
+    }
+}
+
+/**
+ * 十六进制String转Byte数组
+ *
+ * @param str
+ * @return
+ */
+fun hexStrToByteArray(str: String): ByteArray {
+  if (str.isEmpty()) {
+    return ByteArray(0)
   }
+  val currentStr = str.split(",")
+  val byteArray = ByteArray(currentStr.size)
+  for (i in byteArray.indices) {
+    byteArray[i] = currentStr[i].toInt().toByte()
+  }
+  return byteArray
 }

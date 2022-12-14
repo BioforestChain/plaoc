@@ -58,7 +58,7 @@ impl BufferInstance {
         }
     }
     pub fn push(&mut self, buffer_array: ZeroCopyBuf) -> Result<bool, String> {
-        log::info!(" BufferInstancepush 👾 ==> :{:?}", &buffer_array);
+        log::info!(" BufferInstancepush 👾 ==> :{:?}", &buffer_array.len());
         if self.full {
             return Err("request full ".to_string());
         }
@@ -196,7 +196,6 @@ impl PromiseOut {
         self.wake();
     }
 
-
     // pub fn register(&mut self, buffer_array: Bytes, waker: Waker) {
     //     self.mux.push(waker);
     //     self.dispatcher
@@ -245,7 +244,7 @@ pub struct BufferTask {
 //         match self.buffer.clone() {
 //             Some(byte)=> {
 //                 log::info!(" BufferTask 🥳 future head_view ready");
-//                 Poll::Ready(byte)       
+//                 Poll::Ready(byte)
 //             }
 //             None => {
 //                 let mut waker = self.waker.lock().unwrap();
@@ -265,33 +264,35 @@ impl BufferTask {
             data: HashMap::new(),
         }
     }
-    pub fn insert(&mut self,head_view:String, buffer: ZeroCopyBuf) -> Result<ZeroCopyBuf,()> {
-        self.data.insert(head_view.clone(),  buffer);
+    pub fn insert(&mut self, head_view: String, buffer: ZeroCopyBuf) -> Result<ZeroCopyBuf, ()> {
+        self.data.insert(head_view.clone(), buffer);
         let res = self.data.get(&head_view);
         // log::info!(" BufferTaskxx 🥳 insert res:{:?}",res);
         match res {
             Some(byte) => {
-                return Ok(byte.clone()); 
+                return Ok(byte.clone());
             }
             None => {
                 return Err(());
             }
         }
     }
-    pub  fn get(&mut self,head_view: String) -> ZeroCopyBuf {
-            let data = self.data.get(&head_view);
-            // thread::sleep(Duration::from_micros(500)); // 微秒
-            // log::info!("获取数据 🤖：{:?},headView:{:?}",data,head_view);
-            match data {
-                Some(byte) => {
-                    log::info!(" BufferTask 🥳 get Some {:?}",byte);
-                    return byte.clone();
-                },
-                None => {
-                    // log::info!(" BufferTask 🥵 get None");
-                    return ZeroCopyBuf::new_temp(vec![0])
-                },
-            };
+    pub fn get(&mut self, head_view: String) -> ZeroCopyBuf {
+        let data = self.data.get(&head_view);
+        // thread::sleep(Duration::from_micros(500)); // 微秒
+        // log::info!("获取数据 🤖：{:?},headView:{:?}",data,head_view);
+        match data {
+            Some(byte) => {
+                // log::info!(" BufferTask 🥳 get Some {:?}",byte);
+                let buff = byte.clone();
+                self.data.remove(&head_view);
+                return buff
+            }
+            None => {
+                // log::info!(" BufferTask 🥵 get None");
+                return ZeroCopyBuf::new_temp(vec![0]);
+            }
+        };
     }
 
     // pub fn resolve(&mut self,buffer:ZeroCopyBuf) {

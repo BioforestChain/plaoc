@@ -1,6 +1,7 @@
 package info.bagen.libappmgr.ui.app
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -20,6 +21,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
@@ -82,6 +84,13 @@ private fun BoxScope.AppName(appViewState: AppViewState) {
   )
 }
 
+private fun Modifier.longClick(onLongClick: (Offset) -> Unit): Modifier =
+  pointerInput(this) {
+    detectTapGestures(
+      onLongPress = onLongClick
+    )
+  }
+
 /**
  * AppView 只存放App的信息，包括图标，字段
  */
@@ -90,13 +99,18 @@ private fun BoxScope.AppName(appViewState: AppViewState) {
 fun BoxScope.AppInfoItem(
   appViewModel: AppViewModel, appViewState: AppViewState, onOpenApp: (() -> Unit)?
 ) {
+  Log.e(
+    "lin.huang",
+    "AppView::AppInfoItem enter appViewModel=$appViewModel, appViewState=$appViewState"
+  )
   Box(modifier = Modifier
     //.size(72.dp)
     .size(50.dp)
     .align(Alignment.TopCenter)
-    .pointerInput(Unit) {
+    .pointerInput(appViewState) {
       detectTapGestures(onPress = {}, // 触摸事件
         onTap = { // 点击事件
+          Log.e("lin.huang", "AppView::AppInfoItem onTap=$appViewModel == $appViewState")
           if (appViewState.isSystemApp.value) {
             onOpenApp?.let { it() }
           } else {

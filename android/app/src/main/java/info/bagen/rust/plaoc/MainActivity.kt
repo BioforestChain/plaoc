@@ -2,9 +2,11 @@ package info.bagen.rust.plaoc
 
 
 import android.Manifest
+import android.app.Application.getProcessName
 import android.content.Intent
 import android.os.Bundle
 import android.provider.MediaStore
+import android.text.TextUtils
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.compose.setContent
@@ -38,13 +40,12 @@ import info.bagen.rust.plaoc.webView.openDWebWindow
 import java.util.*
 
 
-val callable_map = mutableMapOf<ExportNative, (data: String) -> Unit>()
-
 private const val TAG = "MainActivity"
 
 class MainActivity : AppCompatActivity() {
   var isQRCode = false //是否是识别二维码
   fun getContext() = this
+
   companion object {
     const val REQUEST_CODE_PHOTO = 1
     const val REQUEST_CODE_REQUEST_EXTERNAL_STORAGE = 2
@@ -53,37 +54,50 @@ class MainActivity : AppCompatActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    // 初始化无界面APP
-    initServiceApp()
-    // 初始化系统函数map
-    initSystemFn(this)
-    // 初始化id生成
-    initYitIdHelper()
-    setContent {
-      RustApplicationTheme {
-        Box(
-          modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colors.primary)
-        ) {
-          Home(
-            onSearchAction = { action, data ->
-              LogUtils.d("搜索框内容响应：$action--$data")
-              when (action) {
-                SearchAction.Search -> { openDWebWindow(this@MainActivity, data) }
-                SearchAction.OpenCamera -> { openScannerActivity() }
+    //多个Application创建的问题：
+    //避免重复初始化
+    var processName = getProcessName()
+    if (!TextUtils.isEmpty(processName) && processName.equals(packageName)) {
+      // 初始化无界面APP
+      initServiceApp()
+      // 初始化系统函数map
+      initSystemFn(this)
+      // 初始化id生成
+      initYitIdHelper()
+      setContent {
+        RustApplicationTheme {
+          Box(
+            modifier = Modifier
+              .fillMaxSize()
+              .background(MaterialTheme.colors.primary)
+          ) {
+            Home(
+              onSearchAction = { action, data ->
+                LogUtils.d("搜索框内容响应：$action--$data")
+                when (action) {
+                  SearchAction.Search -> {
+                    openDWebWindow(this@MainActivity, data)
+                  }
+                  SearchAction.OpenCamera -> {
+                    openScannerActivity()
+                  }
+                }
+              },
+              onOpenDWebview = { appId, url ->
+                //执行初始化
+                val pid = android.os.Process.myPid()
+                println("app pid = $pid")
+                dWebView_host = appId
+                LogUtils.d("启动了Ar 扫雷：$dWebView_host--$url")
+                createWorker(WorkerNative.valueOf("DenoRuntime"), url)
               }
-            },
-            onOpenDWebview = {appId, url ->
-              dWebView_host = appId
-              LogUtils.d("启动了Ar 扫雷：$dWebView_host--$url")
-              createWorker(WorkerNative.valueOf("DenoRuntime"), url)
-            }
-          )
+            )
+          }
         }
       }
     }
   }
+
   /** 初始化唯一id*/
   private fun initYitIdHelper() {
     val options = IdGeneratorOptions()
@@ -201,7 +215,7 @@ class MainActivity : AppCompatActivity() {
   }
 
   // 打开条形码（现在这里的效果是不断扫二维码,还需要修改）
-   fun openBarCodeScannerActivity() {
+  fun openBarCodeScannerActivity() {
     startActivityForResult(
       Intent(this, BarcodeScanningActivity::class.java),
       REQUEST_CODE_SCAN_CODE
@@ -209,18 +223,20 @@ class MainActivity : AppCompatActivity() {
   }
 
   // 打开二维码
-   fun openScannerActivity() {
+  fun openScannerActivity() {
     startActivityForResult(
       Intent(this, QRCodeScanningActivity::class.java),
       REQUEST_CODE_SCAN_CODE
     )
   }
+
   fun openDWebViewActivity(path: String) {
     // 存储一下host，用来判断是远程的还是本地的
     if (dWebView_host == "") {
       return
     }
-    val url = "https://${dWebView_host.lowercase(Locale.ROOT)}.dweb${shakeUrl(path)}?_=${Date().time}"
+    val url =
+      "https://${dWebView_host.lowercase(Locale.ROOT)}.dweb${shakeUrl(path)}?_=${Date().time}"
     LogUtils.d("启动了DWebView:$url")
     openDWebWindow(
       activity = getContext(),

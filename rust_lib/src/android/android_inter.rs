@@ -1,13 +1,13 @@
 #![allow(non_snake_case)]
 // #![cfg(target_os = "android")]
-use lazy_static::*;
-use log::{debug, error, info};
 use jni::{
     objects::{GlobalRef, JObject, JValue},
     sys::{jint, JNI_ERR, JNI_VERSION_1_4},
     JNIEnv, JavaVM, NativeMethod,
 };
-use jni_sys::{jbyteArray};
+use jni_sys::jbyteArray;
+use lazy_static::*;
+use log::{debug, error, info};
 use std::{ffi::c_void, sync::Mutex};
 
 // 添加一个全局变量来缓存回调对象
@@ -64,7 +64,7 @@ unsafe fn JNI_OnLoad(jvm: JavaVM, _reserved: *mut c_void) -> jint {
         ),
         jni_method!(
             denoSetCallback,
-            "(Linfo/bagen/rust/plaoc/DenoService$IDenoCallback;)V"
+            "(Linfo/bagen/rust/plaoc/DenoService$IDenoZeroCopyBufCallback;)V"
         ),
         jni_method!(
             rustCallback,
@@ -112,7 +112,6 @@ pub fn rustCallback(env: JNIEnv, _obj: JObject, callback: JObject) {
     *ptr_fn = Some(callback);
 }
 
-
 unsafe fn register_natives(jvm: &JavaVM, class_name: &str, methods: &[NativeMethod]) -> jint {
     let env: JNIEnv = jvm.get_env().unwrap();
     let jni_version = env.get_version().unwrap();
@@ -139,38 +138,47 @@ unsafe fn register_natives(jvm: &JavaVM, class_name: &str, methods: &[NativeMeth
 }
 
 /// 把数据传输给kotlin  回调 Callback 对象的 { void handleCallback(byte: byteArray) } 函数 deno-js -> rust->kotlin
-pub fn call_java_callback(fun_type: &'static [u8]) {
-    log::info!("i am call_java_callback {:?}", fun_type);
+pub fn call_java_callback(buffer: &'static [u8]) {
+    log::info!("rust#call_java_callback buffer:{:?}", buffer.len());
     call_jvm(&JNI_CALLBACK, move |obj: JObject, env: &JNIEnv| {
         // let response: JString = env
         //     .new_string(fun_type)
         //     .expect("Couldn't create java string!");
-        let response: jbyteArray = env
-            .byte_array_from_slice(fun_type)
+        let data: jbyteArray = env
+            .byte_array_from_slice(buffer)
             .expect("Couldn't create java byteArray!");
+            log::info!("rust#call_java_callback kotlinBuffer:{:?}",data);
         // let response:jcharArray = env.new_int_array(fun_type.len().try_into().unwrap()).expect("Couldn't create java int!");
-        log::info!("i am call_java_callback response {:?}", response);
-        match env.call_method(obj, "handleCallback", "([B)V", &[JValue::from(response)]) {
+        match env.call_method(obj, "handleCallback", "([B)V", &[JValue::from(data)]) {
             Ok(jvalue) => {
-                debug!("callback succeed: {:?}", jvalue);
+                log::info!("rust#call_java_callback: {:?}",jvalue)
             }
             Err(e) => {
-                error!("callback failed : {:?}", e);
+               log::info!("call_java_callback failed: {:?}",e)
             }
         }
     });
 }
 
 /// 把数据传输给kotlin 不包含返回值 deno-js -> rust->kotlin
-pub fn deno_evaljs_callback(fun_type: &'static [u8]) {
-    log::info!("i am deno_evaljs_callback {:?}", fun_type);
+pub fn deno_zerocopybuffer_callback( buffer: &'static [u8]) {
+    log::info!(
+        "i am deno_zerocopybuffer_callback buffer:{:?}",
+        buffer.len()
+    );
     call_jvm(&JNI_JS_CALLBACK, move |obj: JObject, env: &JNIEnv| {
-        let response: jbyteArray = env
-            .byte_array_from_slice(fun_type)
-            .expect("Couldn't create java string!");
-        match env.call_method(obj, "denoCallback", "([B)V", &[JValue::from(response)]) {
+        let data: jbyteArray = env
+            .byte_array_from_slice(buffer)
+            .expect("Couldn't create java byteArray!");
+            log::info!("rust#deno_zerocopybuffer_callback:{:?}",data);
+        match env.call_method(
+            obj,
+            "denoZeroCopyBufCallback",
+            "([B)V",
+            &[JValue::from(data)],
+        ) {
             Ok(jvalue) => {
-                debug!("callback succeed: {:?}", jvalue);
+                log::info!("rust#deno_zerocopybuffer_callback: {:?}",jvalue)
             }
             Err(e) => {
                 error!("callback failed : {:?}", e);
@@ -188,15 +196,14 @@ pub fn deno_rust_callback(fun_type: &'static [u8]) {
             .expect("Couldn't create java string!");
         match env.call_method(obj, "rustCallback", "([B)V", &[JValue::from(response)]) {
             Ok(jvalue) => {
-                debug!("callback succeed: {:?}", jvalue);
+                log::info!("rust#deno_rust_callback: {:?}",jvalue)
             }
             Err(e) => {
-                error!("callback failed : {:?}", e);
+                error!("deno_rust_callback failed : {:?}", e);
             }
         }
     });
 }
-
 
 /// # 封装jvm调用
 fn call_jvm<F>(callback: &Mutex<Option<GlobalRef>>, run: F)
