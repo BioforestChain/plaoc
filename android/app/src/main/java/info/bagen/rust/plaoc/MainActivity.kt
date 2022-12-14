@@ -25,6 +25,7 @@ import com.king.mlkit.vision.camera.analyze.Analyzer.OnAnalyzeListener
 import com.king.mlkit.vision.camera.util.LogUtils
 import com.king.mlkit.vision.camera.util.PermissionUtils
 import info.bagen.libappmgr.ui.main.Home
+import info.bagen.libappmgr.ui.main.SearchAction
 import info.bagen.rust.plaoc.lib.drawRect
 import info.bagen.rust.plaoc.system.barcode.BarcodeScanningActivity
 import info.bagen.rust.plaoc.system.barcode.QRCodeScanningActivity
@@ -65,11 +66,20 @@ class MainActivity : AppCompatActivity() {
             .fillMaxSize()
             .background(MaterialTheme.colors.primary)
         ) {
-          Home() {appId, url ->
-            dWebView_host = appId
-            LogUtils.d("启动了Ar 扫雷：$dWebView_host--$url")
-            createWorker(WorkerNative.valueOf("DenoRuntime"), url)
-          }
+          Home(
+            onSearchAction = { action, data ->
+              LogUtils.d("搜索框内容响应：$action--$data")
+              when (action) {
+                SearchAction.Search -> { openDWebWindow(this@MainActivity, data) }
+                SearchAction.OpenCamera -> { openScannerActivity() }
+              }
+            },
+            onOpenDWebview = {appId, url ->
+              dWebView_host = appId
+              LogUtils.d("启动了Ar 扫雷：$dWebView_host--$url")
+              createWorker(WorkerNative.valueOf("DenoRuntime"), url)
+            }
+          )
         }
       }
     }

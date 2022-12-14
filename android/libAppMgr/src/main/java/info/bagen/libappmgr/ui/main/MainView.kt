@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.ExperimentalTextApi
@@ -41,17 +42,18 @@ import info.bagen.libappmgr.utils.AppContextUtil
 fun MainView(
   mainViewModel: MainViewModel,
   appViewModel: AppViewModel,
+  onSearchAction: ((SearchAction, String) -> Unit)? = null,
   onOpenApp: ((appId: String, url: String) -> Unit)? = null
 ) {
   val navController = rememberNavController()
-  Scaffold(bottomBar = { MainBottomNav(navController, mainViewModel) }) { innerPading ->
+  Scaffold(bottomBar = { MainBottomNav(navController, mainViewModel) }) { innerPadding ->
     NavHost(
       navController = navController,
       startDestination = RouteScreen.Home.route,
-      modifier = Modifier.padding(innerPading)
+      modifier = Modifier.padding(innerPadding)
     ) {
       composable(RouteScreen.Home.route) {
-        MainHomeView(appViewModel, onOpenApp)
+        MainHomeView(appViewModel, onSearchAction, onOpenApp)
       }
 
       composable(RouteScreen.Contact.route) {
@@ -91,9 +93,9 @@ fun MainBottomNav(navController: NavHostController, mainViewModel: MainViewModel
             saveState = true
           }
           // Avoid multiple copies of the same destination when
-          // reselecting the same item
+          // reselect the same item
           launchSingleTop = true
-          // Restore state when reselecting a previously selected item
+          // Restore state when reselect a previously selected item
           restoreState = true
         }
       })
@@ -104,7 +106,9 @@ fun MainBottomNav(navController: NavHostController, mainViewModel: MainViewModel
 @OptIn(ExperimentalTextApi::class)
 @Composable
 fun MainHomeView(
-  appViewModel: AppViewModel, onOpenApp: ((appId: String, url: String) -> Unit)? = null
+  appViewModel: AppViewModel,
+  onSearchAction: ((SearchAction, String) -> Unit)? = null,
+  onOpenApp: ((appId: String, url: String) -> Unit)? = null
 ) {
   Column(modifier = Modifier.fillMaxSize()) {
     Box(
@@ -131,7 +135,7 @@ fun MainHomeView(
             )
           )
         }
-        MainSearchView()
+        MainSearchView(onSearchAction)
       }
     }
 
@@ -167,8 +171,9 @@ fun MainMeView() {
 }
 
 @Composable
-fun MainSearchView(onSearch: ((String) -> Unit)? = null, openCamera: (() -> Unit)? = null) {
+fun MainSearchView(onSearchAction: ((SearchAction, String) -> Unit)? = null) {
   var inputText by remember { mutableStateOf("") }
+  val focusManager = LocalFocusManager.current
   BasicTextField(
     value = inputText,
     onValueChange = { inputText = it },
@@ -180,8 +185,9 @@ fun MainSearchView(onSearch: ((String) -> Unit)? = null, openCamera: (() -> Unit
     singleLine = true,
     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
     keyboardActions = KeyboardActions(onSearch = {
+      focusManager.clearFocus() // 取消聚焦，就会间接的隐藏键盘
       val url = "https://cn.bing.com/search?q=${inputText}"
-      onSearch?.let { it(url) }
+      onSearchAction?.let { it(SearchAction.Search, url) }
       Toast.makeText(AppContextUtil.sInstance, "搜索：$url", Toast.LENGTH_SHORT).show()
     })
   ) { innerTextField ->
@@ -220,7 +226,7 @@ fun MainSearchView(onSearch: ((String) -> Unit)? = null, openCamera: (() -> Unit
               tint = Color(0xFF000000),
               modifier = Modifier.clickable {
                 Toast.makeText(AppContextUtil.sInstance, "打开扫码界面", Toast.LENGTH_SHORT).show()
-                openCamera?.let { it() }
+                onSearchAction?.let { it(SearchAction.OpenCamera, "") }
               }
             )
           }

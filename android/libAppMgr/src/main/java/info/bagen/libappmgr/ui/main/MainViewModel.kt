@@ -7,7 +7,6 @@ import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -25,9 +24,9 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 
-data class MainUiState(
-  var selectIndex: Int = 0,
-)
+enum class SearchAction {
+  Search, OpenCamera
+}
 
 sealed class RouteScreen(val route: String, @StringRes val resourceId: Int,val image :ImageVector) {
   object Home : RouteScreen("Home", R.string.navitem_home, Icons.Filled.Home)
@@ -36,26 +35,13 @@ sealed class RouteScreen(val route: String, @StringRes val resourceId: Int,val i
   object Me : RouteScreen("Me", R.string.navitem_me, Icons.Filled.AccountBox)
 }
 
-
-sealed class MainViewIntent() {
-  object InitNav : MainViewIntent()
-}
-
 class MainViewModel : ViewModel() {
-  val uiState = mutableStateOf(MainUiState())
   val navList = listOf(
     RouteScreen.Home,
     RouteScreen.Contact,
     RouteScreen.Message,
     RouteScreen.Me
   )
-
-  fun handleIntent(action: MainViewIntent) {
-    when (action) {
-      is MainViewIntent.InitNav -> {
-      }
-    }
-  }
 
   fun getAppVersionAndSave(
     appInfo: AppInfo, apiResult: IApiResult<AppVersion>? = null
@@ -77,16 +63,14 @@ class MainViewModel : ViewModel() {
             FilesUtil.writeFileContent(
               FilesUtil.getAppVersionSaveFile(appInfo), JsonUtil.toJson(appVersion)
             )
-            apiResult?.let {
-              apiResult.onSuccess(
-                baseData.errorCode, baseData.errorMsg, baseData.data
-              )
-            }
+            apiResult?.onSuccess(
+              baseData.errorCode, baseData.errorMsg, baseData.data
+            )
           }
         }, onFailure = { e ->
           Log.d("MainViewModel", "fail->$e")
           e?.printStackTrace()
-          apiResult?.let { api -> api.onError(-1, "fail", e) }
+          apiResult?.onError(-1, "fail", e)
         }, onLoading = {}, onPrepare = {})
       }
     }

@@ -2,6 +2,7 @@ package info.bagen.libappmgr.ui.main
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -29,7 +30,14 @@ class MainActivity : ComponentActivity() {
             .fillMaxSize()
             .background(MaterialTheme.colors.primary)
         ) {
-          Home()
+          Home(
+            onSearchAction = { action, data ->
+              Toast.makeText(this@MainActivity, "onSearchAction($action->$data)", Toast.LENGTH_SHORT).show()
+            },
+            onOpenDWebview = { appId, url ->
+              Toast.makeText(this@MainActivity, "onOpenDWebview($appId->$url)", Toast.LENGTH_SHORT).show()
+            }
+          )
         }
       }
     }
@@ -38,7 +46,10 @@ class MainActivity : ComponentActivity() {
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
-fun Home(onOpenDWebview: ((appId: String, url: String) -> Unit)? = null) {
+fun Home(
+  onSearchAction: ((SearchAction, String) -> Unit)? = null,
+  onOpenDWebview: ((appId: String, url: String) -> Unit)? = null
+) {
   val appViewModel = viewModel() as AppViewModel
   val mainViewModel = viewModel() as MainViewModel
   LaunchedEffect(Unit) {
@@ -54,5 +65,5 @@ fun Home(onOpenDWebview: ((appId: String, url: String) -> Unit)? = null) {
   }
   //AppInfoGridView(appInfoList = AppContextUtil.appInfoList, downModeDialog = true, onOpenApp = onOpenDWebview)
   //AppInfoGridView(appViewModel, onOpenApp = onOpenDWebview)
-  MainView(mainViewModel, appViewModel, onOpenDWebview)
+  MainView(mainViewModel, appViewModel, onSearchAction, onOpenDWebview)
 }
