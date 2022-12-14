@@ -37,6 +37,7 @@ import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.decode.SvgDecoder
 import info.bagen.libappmgr.R
+import info.bagen.libappmgr.entity.DAppInfoUI
 import info.bagen.libappmgr.ui.download.DownLoadState
 import info.bagen.libappmgr.ui.download.DownloadAppMaskView
 import info.bagen.libappmgr.ui.download.DownloadDialogView
@@ -99,10 +100,6 @@ private fun Modifier.longClick(onLongClick: (Offset) -> Unit): Modifier =
 fun BoxScope.AppInfoItem(
   appViewModel: AppViewModel, appViewState: AppViewState, onOpenApp: (() -> Unit)?
 ) {
-  Log.e(
-    "lin.huang",
-    "AppView::AppInfoItem enter appViewModel=$appViewModel, appViewState=$appViewState"
-  )
   Box(modifier = Modifier
     //.size(72.dp)
     .size(50.dp)
@@ -110,7 +107,6 @@ fun BoxScope.AppInfoItem(
     .pointerInput(appViewState) {
       detectTapGestures(onPress = {}, // 触摸事件
         onTap = { // 点击事件
-          Log.e("lin.huang", "AppView::AppInfoItem onTap=$appViewModel == $appViewState")
           if (appViewState.isSystemApp.value) {
             onOpenApp?.let { it() }
           } else {
@@ -162,7 +158,7 @@ fun AppInfoView(appViewModel: AppViewModel, appViewState: AppViewState, onOpenAp
 
 @Composable
 fun AppInfoGridView(
-  appViewModel: AppViewModel, onOpenApp: ((appId: String, url: String) -> Unit)? = null
+  appViewModel: AppViewModel, onOpenApp: ((appId: String, url: DAppInfoUI?) -> Unit)? = null
 ) {
   val uiState = appViewModel.uiState.value
   Box(modifier = Modifier.fillMaxSize()) {
@@ -180,7 +176,7 @@ fun AppInfoGridView(
 
 @Composable
 fun AppDialogView(
-  appViewModel: AppViewModel, onOpenApp: ((appId: String, url: String) -> Unit)? = null
+  appViewModel: AppViewModel, onOpenApp: ((appId: String, url: DAppInfoUI?) -> Unit)? = null
 ) {
   when (appViewModel.uiState.value.appDialogInfo.value.lastType) {
     AppDialogType.DownLoading -> {

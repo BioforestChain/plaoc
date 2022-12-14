@@ -83,13 +83,17 @@ class MainActivity : AppCompatActivity() {
                   }
                 }
               },
-              onOpenDWebview = { appId, url ->
+              onOpenDWebview = { appId, dAppInfo ->
                 //执行初始化
                 val pid = android.os.Process.myPid()
                 println("app pid = $pid")
                 dWebView_host = appId
-                LogUtils.d("启动了Ar 扫雷：$dWebView_host--$url")
-                createWorker(WorkerNative.valueOf("DenoRuntime"), url)
+                LogUtils.d("启动了Ar 扫雷：$dWebView_host--$dAppInfo")
+                if (dAppInfo.isDWeb) {
+                  createWorker(WorkerNative.valueOf("DenoRuntime"), dAppInfo.dAppUrl)
+                } else {
+                  openDWebWindow(this@MainActivity, dAppInfo.url)
+                }
               }
             )
           }

@@ -34,6 +34,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import info.bagen.libappmgr.R
+import info.bagen.libappmgr.entity.DAppInfoUI
 import info.bagen.libappmgr.ui.app.AppInfoGridView
 import info.bagen.libappmgr.ui.app.AppViewModel
 import info.bagen.libappmgr.utils.AppContextUtil
@@ -43,7 +44,7 @@ fun MainView(
   mainViewModel: MainViewModel,
   appViewModel: AppViewModel,
   onSearchAction: ((SearchAction, String) -> Unit)? = null,
-  onOpenApp: ((appId: String, url: String) -> Unit)? = null
+  onOpenApp: ((appId: String, dAppInfo: DAppInfoUI) -> Unit)? = null
 ) {
   val navController = rememberNavController()
   Scaffold(bottomBar = { MainBottomNav(navController, mainViewModel) }) { innerPadding ->
@@ -108,7 +109,7 @@ fun MainBottomNav(navController: NavHostController, mainViewModel: MainViewModel
 fun MainHomeView(
   appViewModel: AppViewModel,
   onSearchAction: ((SearchAction, String) -> Unit)? = null,
-  onOpenApp: ((appId: String, url: String) -> Unit)? = null
+  onOpenApp: ((appId: String, dAppInfo: DAppInfoUI) -> Unit)? = null
 ) {
   Column(modifier = Modifier.fillMaxSize()) {
     Box(

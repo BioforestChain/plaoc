@@ -95,6 +95,8 @@ data class MANIFEST(
   val releaseName: String,
   val releaseDate: String,
   val bfsaEntry: String,
+  val appType: String? = null, // 如果当前内容为 web时，直接使用 url 地址
+  val url: String? = null, // 如果 appType 为 web 时，跳转该地址
 )
 
 data class ENGINES(
@@ -108,6 +110,15 @@ data class DWebView(
 data class ImportData(
   val url: String,
   val response: String,
+)
+
+/**
+ * UI使用
+ */
+data class DAppInfoUI(
+  val dAppUrl:String,
+  val url:String,
+  val isDWeb:Boolean = true
 )
 
 

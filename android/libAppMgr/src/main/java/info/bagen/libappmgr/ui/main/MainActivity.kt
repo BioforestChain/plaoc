@@ -13,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import info.bagen.libappmgr.data.PreferencesHelper
+import info.bagen.libappmgr.entity.DAppInfoUI
 import info.bagen.libappmgr.schedule.CoroutineUpdateTask
 import info.bagen.libappmgr.ui.app.AppViewIntent
 import info.bagen.libappmgr.ui.app.AppViewModel
@@ -34,8 +35,8 @@ class MainActivity : ComponentActivity() {
             onSearchAction = { action, data ->
               Toast.makeText(this@MainActivity, "onSearchAction($action->$data)", Toast.LENGTH_SHORT).show()
             },
-            onOpenDWebview = { appId, url ->
-              Toast.makeText(this@MainActivity, "onOpenDWebview($appId->$url)", Toast.LENGTH_SHORT).show()
+            onOpenDWebview = { appId, dAppInfo ->
+              Toast.makeText(this@MainActivity, "onOpenDWebview($appId->$dAppInfo)", Toast.LENGTH_SHORT).show()
             }
           )
         }
@@ -48,7 +49,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun Home(
   onSearchAction: ((SearchAction, String) -> Unit)? = null,
-  onOpenDWebview: ((appId: String, url: String) -> Unit)? = null
+  onOpenDWebview: ((appId: String, dAppInfo: DAppInfoUI) -> Unit)? = null
 ) {
   val appViewModel = viewModel() as AppViewModel
   val mainViewModel = viewModel() as MainViewModel

@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import info.bagen.libappmgr.entity.AppInfo
 import info.bagen.libappmgr.entity.AppVersion
+import info.bagen.libappmgr.entity.DAppInfoUI
 import info.bagen.libappmgr.ui.download.DownLoadState
 import info.bagen.libappmgr.ui.view.DialogInfo
 import info.bagen.libappmgr.ui.view.DialogType
@@ -35,7 +36,7 @@ data class AppViewState(
   var maskViewState: MutableState<MaskProgressState> = mutableStateOf(MaskProgressState()),
   // var maskDownLoadState: MutableState<DownLoadState> = mutableStateOf(DownLoadState.IDLE),
   var bfsId: String = "",
-  var dAppUrl: String = "",
+  var dAppUrl: DAppInfoUI? = null,
   var showPopView: MutableState<Boolean> = mutableStateOf(false),
 )
 
@@ -52,7 +53,7 @@ private fun AppInfo.createAppViewState(
   name: String? = null,
   versionPath: String? = null,
   bfsId: String? = null,
-  dAppUrl: String = "",
+  dAppUrl: DAppInfoUI? = null,
 ): AppViewState {
   return AppViewState(
     showBadge = showBadge?.let { mutableStateOf(it) } ?: mutableStateOf(false),
@@ -170,7 +171,6 @@ class AppViewModel(private val repository: AppRepository = AppRepository()) : Vi
 
   private suspend fun loadAppNewVersion(appViewState: AppViewState) {
     uiState.value.curAppViewState = appViewState
-    Log.e("lin.huang", "AppViewModel::loadAppNewVersion $this == $appViewState")
     // 调用下载接口，然后弹出对话框
     val path = FilesUtil.getLastUpdateContent(appViewState.bfsId, APP_DIR_TYPE.RecommendApp)
     path?.let {
