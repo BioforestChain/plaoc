@@ -16,4 +16,9 @@
   <string name="permission_deny_sensor">需要传感器权限许可才能获取传感器相关的身体健康状况</string>
   <string name="permission_deny_sms">需要信息权限许可才能阅读短信和新建/修改/删除/发送信息</string>
   <string name="permission_deny_device">需要设备权限许可才能获取设备的相关信息</string>
+
+  <string name="navitem_home">首页</string>
+  <string name="navitem_contact">联系人</string>
+  <string name="navitem_message">消息</string>
+  <string name="navitem_me">我的</string>
 </resources>

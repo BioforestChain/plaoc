@@ -5,7 +5,6 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -16,7 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
-import androidx.lifecycle.viewmodel.compose.viewModel
 import info.bagen.libappmgr.system.media.MediaInfo
 import info.bagen.libappmgr.ui.theme.AppMgrTheme
 import info.bagen.libappmgr.ui.theme.ColorBackgroundBar
@@ -35,25 +33,6 @@ class DCIMActivity : ComponentActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    // Setup Coil
-    /*val imageLoader = Coil.imageLoader(applicationContext)
-    imageLoader.newBuilder()
-      .components {
-        if (Build.VERSION.SDK_INT >= 28) {
-          add(ImageDecoderDecoder.Factory())
-        } else {
-          add(GifDecoder.Factory())
-        }
-        add(SvgDecoder.Factory()) // 加载svg图片
-        add(VideoFrameDecoder.Factory()) // 显示视频的某一帧
-      }
-      .placeholder(
-        ActivityCompat.getDrawable(this@DCIMActivity, R.drawable.ic_img_placeholder)
-      ) // 占位图片
-      //.error(ActivityCompat.getDrawable(this@DCIMActivity, R.drawable.)) // 加载失败图片
-      .build()
-    Coil.setImageLoader(imageLoader)*/
-
     if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED || checkSelfPermission(
         Manifest.permission.WRITE_EXTERNAL_STORAGE
       ) != PackageManager.PERMISSION_GRANTED
@@ -108,7 +87,7 @@ class DCIMActivity : ComponentActivity() {
           DCIMGreeting(onGridClick = {
             window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
           }, onViewerClick = {
-            showWindowStatusBar(dcimViewModel.showViewerBar.value)
+            showWindowStatusBar(dcimViewModel.uiState.value.showViewerBar.value)
           }, dcimVM = dcimViewModel
           )
         }
@@ -117,8 +96,8 @@ class DCIMActivity : ComponentActivity() {
   }
 
   override fun onBackPressed() {
-    if (dcimViewModel.showViewer.value) {
-      dcimViewModel.showViewer.value = false
+    if (dcimViewModel.uiState.value.showViewer.value) {
+      dcimViewModel.handlerIntent(DCIMIntent.UpdateViewerState(false))
       showWindowStatusBar(true)
       window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     } else {
@@ -147,12 +126,12 @@ class DCIMActivity : ComponentActivity() {
 fun DCIMGreeting(
   onGridClick: () -> Unit, onViewerClick: () -> Unit, dcimVM: DCIMViewModel = koinViewModel()
 ) {
-  var model = viewModel() as DCIMViewModel
   LaunchedEffect(Unit) {
-    model.loadDCIMInfo { maps ->
+    /*dcimVM.loadDCIMInfo { maps ->
       dcimVM.dcimMaps.putAll(maps)
       dcimVM.initDCIMInfoList()
-    }
+    }*/
+    dcimVM.handlerIntent(DCIMIntent.InitDCIMInfoList)
   }
   DCIMView(dcimVM, onGridClick, onViewerClick)
 }

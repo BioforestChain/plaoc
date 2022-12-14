@@ -259,8 +259,19 @@ object FilesUtil {
     file.bufferedWriter().append(content)
   }
 
-  fun deleteQuietly(file: File) {
-    file.delete()
+  fun deleteQuietly(file: File, recursively: Boolean = true) {
+    try {
+      if (recursively) {
+        file.deleteRecursively()
+      } else {
+        file.delete()
+      }
+    } catch (e: Exception) {
+    }
+  }
+
+  fun deleteQuietly(path: String, recursively: Boolean = true) {
+    deleteQuietly(File(path), recursively)
   }
 
   /**

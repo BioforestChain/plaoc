@@ -1,5 +1,7 @@
 package info.bagen.libappmgr.ui.app
 
+import android.content.Intent
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -7,18 +9,21 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import info.bagen.libappmgr.entity.AppInfo
 import info.bagen.libappmgr.entity.AppVersion
+import info.bagen.libappmgr.entity.DAppInfoUI
 import info.bagen.libappmgr.ui.download.DownLoadState
 import info.bagen.libappmgr.ui.view.DialogInfo
 import info.bagen.libappmgr.ui.view.DialogType
+import info.bagen.libappmgr.utils.APP_DIR_TYPE
 import info.bagen.libappmgr.utils.AppContextUtil
 import info.bagen.libappmgr.utils.FilesUtil
 import info.bagen.libappmgr.utils.JsonUtil
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 data class AppViewUIState(
-  val useMaskView: Boolean = true, // 表示使用app遮罩的方式下载
-  val appViewStateList: ArrayList<AppViewState> = arrayListOf(),
+  val useMaskView: MutableState<Boolean> = mutableStateOf(true), // 表示使用app遮罩的方式下载
   val appDialogInfo: MutableState<AppDialogInfo> = mutableStateOf(AppDialogInfo()),
+  val appViewStateList: ArrayList<AppViewState> = arrayListOf(),
   var curAppViewState: AppViewState? = null,
 )
 
@@ -31,7 +36,8 @@ data class AppViewState(
   var maskViewState: MutableState<MaskProgressState> = mutableStateOf(MaskProgressState()),
   // var maskDownLoadState: MutableState<DownLoadState> = mutableStateOf(DownLoadState.IDLE),
   var bfsId: String = "",
-  var dAppUrl: String = "",
+  var dAppUrl: DAppInfoUI? = null,
+  var showPopView: MutableState<Boolean> = mutableStateOf(false),
 )
 
 data class MaskProgressState(
@@ -47,7 +53,7 @@ private fun AppInfo.createAppViewState(
   name: String? = null,
   versionPath: String? = null,
   bfsId: String? = null,
-  dAppUrl: String = "",
+  dAppUrl: DAppInfoUI? = null,
 ): AppViewState {
   return AppViewState(
     showBadge = showBadge?.let { mutableStateOf(it) } ?: mutableStateOf(false),
@@ -86,6 +92,10 @@ sealed class AppViewIntent {
 
   object DialogHide : AppViewIntent()
   object DialogConfirm : AppViewIntent()
+
+  class PopAppMenu(val appViewState: AppViewState, val show:Boolean): AppViewIntent()
+  class ShareAppMenu(val appViewState: AppViewState): AppViewIntent()
+  class UninstallApp(val appViewState: AppViewState): AppViewIntent()
 }
 
 
@@ -120,6 +130,29 @@ class AppViewModel(private val repository: AppRepository = AppRepository()) : Vi
           action.downLoadState, action.dialogInfo, action.appViewState
         )
         is AppViewIntent.DialogConfirm -> dialogConfirm()
+        is AppViewIntent.PopAppMenu -> {
+          action.appViewState.showPopView.value = action.show
+        }
+        is AppViewIntent.ShareAppMenu -> {
+          val sendIntent = Intent(Intent.ACTION_SEND).apply {
+            putExtra(Intent.EXTRA_TITLE, action.appViewState.name.value)
+            putExtra(Intent.EXTRA_TEXT, action.appViewState.versionPath.value)
+            type = "text/plain"
+          }
+          val shareIntent = Intent.createChooser(sendIntent, null).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+          }
+          AppContextUtil.sInstance?.startActivity(shareIntent)
+        }
+        is AppViewIntent.UninstallApp -> {
+          // 卸载就是删除当前目录，然后重新捞取
+          AppContextUtil.sInstance?.let {
+            uiState.value.curAppViewState = null
+            val path = "${it.dataDir}/${APP_DIR_TYPE.SystemApp.rootName}/${action.appViewState.bfsId}"
+            FilesUtil.deleteQuietly(path)
+            loadAppInfoList()
+          }
+        }
       }
     }
   }
@@ -139,13 +172,13 @@ class AppViewModel(private val repository: AppRepository = AppRepository()) : Vi
   private suspend fun loadAppNewVersion(appViewState: AppViewState) {
     uiState.value.curAppViewState = appViewState
     // 调用下载接口，然后弹出对话框
-    val path = FilesUtil.getLastUpdateContent(appViewState.bfsId)
+    val path = FilesUtil.getLastUpdateContent(appViewState.bfsId, APP_DIR_TYPE.RecommendApp)
     path?.let {
       JsonUtil.fromJson(AppVersion::class.java, it)?.let { appVersion ->
         dialogShowNewVersion(appVersion)
       }
     }
-    repository.loadAppNewVersion(appViewState.versionPath.value).collect { appVersion ->
+    repository.loadAppNewVersion(appViewState.versionPath.value).collectLatest { appVersion ->
       dialogShowNewVersion(appVersion)
     }
   }
@@ -169,7 +202,7 @@ class AppViewModel(private val repository: AppRepository = AppRepository()) : Vi
   private suspend fun dialogConfirm() {
     when (uiState.value.appDialogInfo.value.lastType) {
       AppDialogType.NewVersion, AppDialogType.ReDownLoad -> {
-        if (uiState.value.useMaskView) { // 在app上面显示遮罩
+        if (uiState.value.useMaskView.value) { // 在app上面显示遮罩
           uiState.value.curAppViewState?.let {
             it.maskViewState.value.show.value = true
           }
