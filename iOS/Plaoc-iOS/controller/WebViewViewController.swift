@@ -51,18 +51,11 @@ class WebViewViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-//        webView.openWebView(html: "iosqmkkx:/index.html")
+        jsManager = JSCoreManager.init(fileName: fileName, controller: self)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        let str = NSString(string: Bundle.main.bundlePath)
-        let path = str.appendingPathComponent("resource_3rd/assets/www")
-//        Schemehandler.setupHTMLCache(fromPath: path)
-        
-//        webView.recycleWebView()
-        
-//        webView.removeUserScripts()
         NotificationCenter.default.removeObserver(self)
     }
     
@@ -71,35 +64,29 @@ class WebViewViewController: UIViewController {
 
         self.view.backgroundColor = .white
         
-//        webView.openWebView(html: urlString)
+        
         //https://awqdeqwewe.dweb/
         
-//        webView.openWebView(html: "iosqmkkx:/index.html")
+        webView.openWebView(html: "iosqmkkx:/index.html") 
 //        if urlString.hasPrefix("http") || urlString.hasPrefix("https") {
 //            webView.openWebView(html: urlString)
 //        } else {
 //            webView.openLocalWebView(name: urlString)
 //        }
         
-        jsManager = JSCoreManager.init(fileName: fileName, controller: self)
+        
         
         NotificationCenter.default.addObserver(self, selector: #selector(interceptAction(noti:)), name: NSNotification.Name.interceptNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(observerShowKeyboard(noti:)), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(observerHiddenKeyboard(noti:)), name: UIResponder.keyboardWillHideNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(openDwebAction(noti:)), name: NSNotification.Name.openDwebNotification, object: nil)
         
-        testAction()
     }
     
-    func testAction() {
-        guard let entryPath = sysManager.fetchEntryPath() else { return }
-        
-        let plaoc = PlaocHandleModel()
-        plaoc.controller = self
-        plaoc.jsContext = jsContext
-        
-        jsContext?.setObject(plaoc, forKeyedSubscript: "PlaocJavascriptBridge" as NSCopying & NSObjectProtocol)
-        let content = try? String(contentsOfFile: entryPath)
-        jsContext?.evaluateScript(content)
+    @objc private func openDwebAction(noti: Notification) {
+        guard let info = noti.userInfo as? [String:String] else { return }
+        guard let urlString = info["param"] else { return }
+        webView.openWebView(html: urlString)
     }
     
     @objc private func interceptAction(noti: Notification) {

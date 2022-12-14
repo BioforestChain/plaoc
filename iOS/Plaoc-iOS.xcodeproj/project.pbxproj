@@ -81,6 +81,7 @@
 		F31B2BAA28F80E52008CDD5F /* AnimationVIew.swift in Sources */ = {isa = PBXBuildFile; fileRef = F31B2BA928F80E52008CDD5F /* AnimationVIew.swift */; };
 		F31B2BAC28F80E74008CDD5F /* recommend-app in Resources */ = {isa = PBXBuildFile; fileRef = F31B2BAB28F80E74008CDD5F /* recommend-app */; };
 		F31B2BAE28F80EC8008CDD5F /* FirstViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F31B2BAD28F80EC8008CDD5F /* FirstViewController.swift */; };
+		F3542D462949A1EA005D8170 /* NetworkMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3542D452949A1EA005D8170 /* NetworkMap.swift */; };
 		F380F6C628FE8C39001BC5C3 /* BatchScanManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F380F6C528FE8C39001BC5C3 /* BatchScanManager.swift */; };
 		F3872073290BB2C20018B8CC /* Snowflake.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3872072290BB2C20018B8CC /* Snowflake.swift */; };
 		F39535162919E4650071898A /* UIImage_extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F39535152919E4650071898A /* UIImage_extension.swift */; };
@@ -96,6 +97,7 @@
 		F39C2984291516650038EEBB /* JSCoreManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F39C2983291516650038EEBB /* JSCoreManager.swift */; };
 		F3B0946528F558150027CD06 /* NotificationName.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3B0946428F558150027CD06 /* NotificationName.swift */; };
 		F3B77B682909369A005A384D /* QueueManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3B77B672909369A005A384D /* QueueManager.swift */; };
+		F3BEA44C29484E7900CBA119 /* JSInjectManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3BEA44B29484E7900CBA119 /* JSInjectManager.swift */; };
 		F3DC28862926196300C8EDF0 /* sys in Resources */ = {isa = PBXBuildFile; fileRef = F3DC28852926196300C8EDF0 /* sys */; };
 		F3DC288829261A1600C8EDF0 /* SystemManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3DC288729261A1600C8EDF0 /* SystemManager.swift */; };
 /* End PBXBuildFile section */
@@ -203,6 +205,7 @@
 		F31B2BA928F80E52008CDD5F /* AnimationVIew.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnimationVIew.swift; sourceTree = "<group>"; };
 		F31B2BAB28F80E74008CDD5F /* recommend-app */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "recommend-app"; sourceTree = "<group>"; };
 		F31B2BAD28F80EC8008CDD5F /* FirstViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstViewController.swift; sourceTree = "<group>"; };
+		F3542D452949A1EA005D8170 /* NetworkMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkMap.swift; sourceTree = "<group>"; };
 		F37EA33E28F693B70068A66D /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
 		F380F6C528FE8C39001BC5C3 /* BatchScanManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatchScanManager.swift; sourceTree = "<group>"; };
 		F3872072290BB2C20018B8CC /* Snowflake.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Snowflake.swift; sourceTree = "<group>"; };
@@ -225,6 +228,7 @@
 		F39C2983291516650038EEBB /* JSCoreManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSCoreManager.swift; sourceTree = "<group>"; };
 		F3B0946428F558150027CD06 /* NotificationName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationName.swift; sourceTree = "<group>"; };
 		F3B77B672909369A005A384D /* QueueManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueManager.swift; sourceTree = "<group>"; };
+		F3BEA44B29484E7900CBA119 /* JSInjectManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSInjectManager.swift; sourceTree = "<group>"; };
 		F3DC28852926196300C8EDF0 /* sys */ = {isa = PBXFileReference; lastKnownFileType = folder; path = sys; sourceTree = "<group>"; };
 		F3DC288729261A1600C8EDF0 /* SystemManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemManager.swift; sourceTree = "<group>"; };
 		F406C3D95E45CC0D87A9E05A /* Pods_Plaoc_iOSTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Plaoc_iOSTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -461,6 +465,7 @@
 				F3B77B672909369A005A384D /* QueueManager.swift */,
 				F39C2981291513BE0038EEBB /* JSCoreEntities.swift */,
 				F39C2983291516650038EEBB /* JSCoreManager.swift */,
+				F3BEA44B29484E7900CBA119 /* JSInjectManager.swift */,
 			);
 			path = manager;
 			sourceTree = "<group>";
@@ -479,6 +484,7 @@
 		F31B2B9B28F80BD3008CDD5F /* network */ = {
 			isa = PBXGroup;
 			children = (
+				F3542D452949A1EA005D8170 /* NetworkMap.swift */,
 				F31B2B9C28F80BE5008CDD5F /* RefreshManager.swift */,
 				F31B2B9E28F80BFD008CDD5F /* BFSNetworkManager.swift */,
 			);
@@ -806,6 +812,7 @@
 				040E4D102872DAEC003569F1 /* UIButton_extension.swift in Sources */,
 				F39A941428F79C8800E82EB2 /* NVHTarFile.m in Sources */,
 				F31B2BA628F80D18008CDD5F /* BatchRecommendManager.swift in Sources */,
+				F3BEA44C29484E7900CBA119 /* JSInjectManager.swift in Sources */,
 				0419F1092860560400EF8DC2 /* CustomNaviViewController.swift in Sources */,
 				0404B058287414F5000BABE8 /* XXWebView.swift in Sources */,
 				04B2B7D6287E5B8100172109 /* NotificationManager.swift in Sources */,
@@ -844,6 +851,7 @@
 				F39A941128F79C8800E82EB2 /* NVHTarGzip.m in Sources */,
 				F39A941228F79C8800E82EB2 /* NSFileManager+NVHFileSize.m in Sources */,
 				F31B2B9A28F80A6B008CDD5F /* GlobalTimer.swift in Sources */,
+				F3542D462949A1EA005D8170 /* NetworkMap.swift in Sources */,
 				04560C872876E78E00638E2A /* CustomTabbarViewController.swift in Sources */,
 				04E6D8602884F269006ECB69 /* LocationManager.swift in Sources */,
 				04B555E4287594C600314C9F /* ChangeTools.swift in Sources */,
