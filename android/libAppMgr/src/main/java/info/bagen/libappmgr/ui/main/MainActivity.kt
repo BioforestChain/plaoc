@@ -13,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import info.bagen.libappmgr.data.PreferencesHelper
 import info.bagen.libappmgr.schedule.CoroutineUpdateTask
-import info.bagen.libappmgr.ui.app.AppInfoGridView
 import info.bagen.libappmgr.ui.app.AppViewIntent
 import info.bagen.libappmgr.ui.app.AppViewModel
 import info.bagen.libappmgr.ui.theme.AppMgrTheme
@@ -41,6 +40,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun Home(onOpenDWebview: ((appId: String, url: String) -> Unit)? = null) {
   val appViewModel = viewModel() as AppViewModel
+  val mainViewModel = viewModel() as MainViewModel
   LaunchedEffect(Unit) {
     if (PreferencesHelper.isFirstIn()) {
       FilesUtil.copyAssetsToRecommendAppDir()
@@ -53,5 +53,6 @@ fun Home(onOpenDWebview: ((appId: String, url: String) -> Unit)? = null) {
     CoroutineUpdateTask().scheduleUpdate(1000 * 60) // 轮询执行
   }
   //AppInfoGridView(appInfoList = AppContextUtil.appInfoList, downModeDialog = true, onOpenApp = onOpenDWebview)
-  AppInfoGridView(appViewModel, onOpenApp = onOpenDWebview)
+  //AppInfoGridView(appViewModel, onOpenApp = onOpenDWebview)
+  MainView(mainViewModel, appViewModel, onOpenDWebview)
 }

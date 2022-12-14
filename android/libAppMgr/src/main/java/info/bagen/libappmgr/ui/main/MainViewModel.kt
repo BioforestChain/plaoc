@@ -1,8 +1,17 @@
 package info.bagen.libappmgr.ui.main
 
 import android.util.Log
+import androidx.annotation.StringRes
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBox
+import androidx.compose.material.icons.filled.Call
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import info.bagen.libappmgr.R
 import info.bagen.libappmgr.entity.AppInfo
 import info.bagen.libappmgr.entity.AppVersion
 import info.bagen.libappmgr.network.ApiService
@@ -16,10 +25,42 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 
+data class MainUiState(
+  var selectIndex: Int = 0,
+)
+
+sealed class RouteScreen(val route: String, @StringRes val resourceId: Int,val image :ImageVector) {
+  object Home : RouteScreen("Home", R.string.navitem_home, Icons.Filled.Home)
+  object Contact : RouteScreen("Contact", R.string.navitem_contact, Icons.Filled.Call)
+  object Message : RouteScreen("Message", R.string.navitem_message, Icons.Filled.Email)
+  object Me : RouteScreen("Me", R.string.navitem_me, Icons.Filled.AccountBox)
+}
+
+
+sealed class MainViewIntent() {
+  object InitNav : MainViewIntent()
+}
+
 class MainViewModel : ViewModel() {
+  val uiState = mutableStateOf(MainUiState())
+  val navList = listOf(
+    RouteScreen.Home,
+    RouteScreen.Contact,
+    RouteScreen.Message,
+    RouteScreen.Me
+  )
+
+  fun handleIntent(action: MainViewIntent) {
+    when (action) {
+      is MainViewIntent.InitNav -> {
+      }
+    }
+  }
+
   fun getAppVersionAndSave(
     appInfo: AppInfo, apiResult: IApiResult<AppVersion>? = null
   ) {
+
     viewModelScope.launch {
       flow {
         emit(ApiResultData.prepare())

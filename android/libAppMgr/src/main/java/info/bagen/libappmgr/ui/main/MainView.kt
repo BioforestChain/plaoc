@@ -1,0 +1,231 @@
+package info.bagen.libappmgr.ui.main
+
+import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.Search
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import info.bagen.libappmgr.R
+import info.bagen.libappmgr.ui.app.AppInfoGridView
+import info.bagen.libappmgr.ui.app.AppViewModel
+import info.bagen.libappmgr.utils.AppContextUtil
+
+@Composable
+fun MainView(
+  mainViewModel: MainViewModel,
+  appViewModel: AppViewModel,
+  onOpenApp: ((appId: String, url: String) -> Unit)? = null
+) {
+  val navController = rememberNavController()
+  Scaffold(bottomBar = { MainBottomNav(navController, mainViewModel) }) { innerPading ->
+    NavHost(
+      navController = navController,
+      startDestination = RouteScreen.Home.route,
+      modifier = Modifier.padding(innerPading)
+    ) {
+      composable(RouteScreen.Home.route) {
+        MainHomeView(appViewModel, onOpenApp)
+      }
+
+      composable(RouteScreen.Contact.route) {
+        MainContactView()
+      }
+
+      composable(RouteScreen.Message.route) {
+        MainMessageView()
+      }
+
+      composable(RouteScreen.Me.route) {
+        MainMeView()
+      }
+    }
+  }
+}
+
+@Composable
+fun MainBottomNav(navController: NavHostController, mainViewModel: MainViewModel) {
+  BottomNavigation(backgroundColor = Color.White, elevation = 6.dp) {
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
+    mainViewModel.navList.forEach { screen ->
+      val selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true
+      BottomNavigationItem(icon = {
+        Icon(
+          imageVector = screen.image,
+          contentDescription = null,
+          tint = if (selected) Color.Blue else Color.Gray
+        )
+      }, label = { Text(stringResource(screen.resourceId)) }, selected = selected, onClick = {
+        navController.navigate(screen.route) {
+          // Pop up to the start destination of the graph to
+          // avoid building up a large stack of destinations
+          // on the back stack as users select items
+          popUpTo(navController.graph.findStartDestination().id) {
+            saveState = true
+          }
+          // Avoid multiple copies of the same destination when
+          // reselecting the same item
+          launchSingleTop = true
+          // Restore state when reselecting a previously selected item
+          restoreState = true
+        }
+      })
+    }
+  }
+}
+
+@OptIn(ExperimentalTextApi::class)
+@Composable
+fun MainHomeView(
+  appViewModel: AppViewModel, onOpenApp: ((appId: String, url: String) -> Unit)? = null
+) {
+  Column(modifier = Modifier.fillMaxSize()) {
+    Box(
+      modifier = Modifier
+        .weight(1f)
+        .fillMaxWidth()
+    ) {
+      Column(modifier = Modifier.fillMaxSize()) {
+        Box(
+          modifier = Modifier
+            .weight(1f)
+            .fillMaxWidth()
+        ) {
+
+          val gradient = listOf(
+            Color(0xFF71D78E), Color(0xFF548FE3)
+          )
+          Text(
+            text = "BFExplorer",
+            modifier = Modifier.align(Alignment.BottomCenter),
+            style = TextStyle(
+              brush = Brush.linearGradient(gradient),
+              fontSize = 50.sp
+            )
+          )
+        }
+        MainSearchView()
+      }
+    }
+
+    Box(
+      modifier = Modifier
+        .weight(1f)
+        .fillMaxWidth()
+    ) {
+      AppInfoGridView(appViewModel = appViewModel, onOpenApp)
+    }
+  }
+}
+
+@Composable
+fun MainContactView() {
+  Box(modifier = Modifier.fillMaxSize()) {
+    Text(text = "联系人列表界面", modifier = Modifier.align(Alignment.Center))
+  }
+}
+
+@Composable
+fun MainMessageView() {
+  Box(modifier = Modifier.fillMaxSize()) {
+    Text(text = "消息列表界面", modifier = Modifier.align(Alignment.Center))
+  }
+}
+
+@Composable
+fun MainMeView() {
+  Box(modifier = Modifier.fillMaxSize()) {
+    Text(text = "我的界面", modifier = Modifier.align(Alignment.Center))
+  }
+}
+
+@Composable
+fun MainSearchView(onSearch: ((String) -> Unit)? = null, openCamera: (() -> Unit)? = null) {
+  var inputText by remember { mutableStateOf("") }
+  BasicTextField(
+    value = inputText,
+    onValueChange = { inputText = it },
+    readOnly = false,
+    enabled = true,
+    modifier = Modifier
+      .fillMaxWidth()
+      .padding(36.dp, 36.dp, 36.dp, 24.dp),
+    singleLine = true,
+    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+    keyboardActions = KeyboardActions(onSearch = {
+      val url = "https://cn.bing.com/search?q=${inputText}"
+      onSearch?.let { it(url) }
+      Toast.makeText(AppContextUtil.sInstance, "搜索：$url", Toast.LENGTH_SHORT).show()
+    })
+  ) { innerTextField ->
+    Box {
+      Surface(
+        border = BorderStroke(2.dp, Color.Black),
+        shape = RoundedCornerShape(16.dp)
+      ) {
+        Row(
+          modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically
+        ) {
+          Icon(
+            imageVector = Icons.Outlined.Search, contentDescription = null, tint = Color(0x88000000)
+          )
+
+          Box(
+            modifier = Modifier
+              .weight(1f)
+              .padding(start = 4.dp, end = 4.dp)
+          ) {
+            if (inputText.isEmpty()) Text(text = "请输入必应搜索关键字", color = Color(0x88000000))
+            innerTextField()
+          }
+
+          if (inputText.isNotEmpty()) {
+            Icon(
+              imageVector = Icons.Outlined.Close,
+              contentDescription = null,
+              tint = Color(0x88000000),
+              modifier = Modifier.clickable { inputText = "" }
+            )
+          } else {
+            Icon(
+              imageVector = ImageVector.vectorResource(id = R.drawable.ic_photo_camera_24),
+              contentDescription = null,
+              tint = Color(0xFF000000),
+              modifier = Modifier.clickable {
+                Toast.makeText(AppContextUtil.sInstance, "打开扫码界面", Toast.LENGTH_SHORT).show()
+                openCamera?.let { it() }
+              }
+            )
+          }
+        }
+      }
+    }
+  }
+}

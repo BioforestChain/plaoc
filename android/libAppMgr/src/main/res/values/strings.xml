@@ -16,4 +16,9 @@
   <string name="permission_deny_sensor">Sensor permission is required to obtain sensor related health conditions</string>
   <string name="permission_deny_sms">SMS permission is required to read SMS and create/modify/delete/send information</string>
   <string name="permission_deny_device">Device permission is required to obtain information about the device</string>
+
+  <string name="navitem_home">Home</string>
+  <string name="navitem_contact">Contact</string>
+  <string name="navitem_message">Message</string>
+  <string name="navitem_me">Me</string>
 </resources>
