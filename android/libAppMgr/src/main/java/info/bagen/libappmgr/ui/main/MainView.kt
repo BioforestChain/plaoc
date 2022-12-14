@@ -171,6 +171,7 @@ fun MainMeView() {
   }
 }
 
+
 @Composable
 fun MainSearchView(onSearchAction: ((SearchAction, String) -> Unit)? = null) {
   var inputText by remember { mutableStateOf("") }
@@ -186,8 +187,13 @@ fun MainSearchView(onSearchAction: ((SearchAction, String) -> Unit)? = null) {
     singleLine = true,
     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
     keyboardActions = KeyboardActions(onSearch = {
+      if (inputText.isEmpty()) return@KeyboardActions
       focusManager.clearFocus() // 取消聚焦，就会间接的隐藏键盘
-      val url = "https://cn.bing.com/search?q=${inputText}"
+      val url = if (inputText.startsWith("http") || inputText.startsWith("https")) {
+        inputText
+      } else {
+        "https://cn.bing.com/search?q=${inputText}"
+      }
       onSearchAction?.let { it(SearchAction.Search, url) }
       Toast.makeText(AppContextUtil.sInstance, "搜索：$url", Toast.LENGTH_SHORT).show()
     })
