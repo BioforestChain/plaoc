@@ -44,7 +44,7 @@ fun MainView(
   mainViewModel: MainViewModel,
   appViewModel: AppViewModel,
   onSearchAction: ((SearchAction, String) -> Unit)? = null,
-  onOpenApp: ((appId: String, dAppInfo: DAppInfoUI) -> Unit)? = null
+  onOpenApp: ((appId: String, dAppInfo: DAppInfoUI?) -> Unit)? = null
 ) {
   val navController = rememberNavController()
   Scaffold(bottomBar = { MainBottomNav(navController, mainViewModel) }) { innerPadding ->
@@ -109,7 +109,7 @@ fun MainBottomNav(navController: NavHostController, mainViewModel: MainViewModel
 fun MainHomeView(
   appViewModel: AppViewModel,
   onSearchAction: ((SearchAction, String) -> Unit)? = null,
-  onOpenApp: ((appId: String, dAppInfo: DAppInfoUI) -> Unit)? = null
+  onOpenApp: ((appId: String, dAppInfo: DAppInfoUI?) -> Unit)? = null
 ) {
   Column(modifier = Modifier.fillMaxSize()) {
     Box(

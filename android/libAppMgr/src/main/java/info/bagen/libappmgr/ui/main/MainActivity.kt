@@ -49,7 +49,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun Home(
   onSearchAction: ((SearchAction, String) -> Unit)? = null,
-  onOpenDWebview: ((appId: String, dAppInfo: DAppInfoUI) -> Unit)? = null
+  onOpenDWebview: ((appId: String, dAppInfo: DAppInfoUI?) -> Unit)? = null
 ) {
   val appViewModel = viewModel() as AppViewModel
   val mainViewModel = viewModel() as MainViewModel

@@ -89,10 +89,12 @@ class MainActivity : AppCompatActivity() {
                 println("app pid = $pid")
                 dWebView_host = appId
                 LogUtils.d("启动了Ar 扫雷：$dWebView_host--$dAppInfo")
-                if (dAppInfo.isDWeb) {
-                  createWorker(WorkerNative.valueOf("DenoRuntime"), dAppInfo.dAppUrl)
-                } else {
-                  openDWebWindow(this@MainActivity, dAppInfo.url)
+                dAppInfo?.let { appInfo ->
+                  if (appInfo.isDWeb) {
+                    createWorker(WorkerNative.valueOf("DenoRuntime"), appInfo.dAppUrl)
+                  } else {
+                    openDWebWindow(this@MainActivity, appInfo.url)
+                  }
                 }
               }
             )
