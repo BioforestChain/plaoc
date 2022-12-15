@@ -88,7 +88,7 @@ class MainActivity : AppCompatActivity() {
                 val pid = android.os.Process.myPid()
                 println("app pid = $pid")
                 dWebView_host = appId
-                LogUtils.d("启动了Ar 扫雷：$dWebView_host--$dAppInfo")
+                LogUtils.d("启动了Ar 扫雷：$dWebView_host--$dAppInfo, isDWeb:${dAppInfo?.isDWeb}")
                 dAppInfo?.let { appInfo ->
                   if (appInfo.isDWeb) {
                     createWorker(WorkerNative.valueOf("DenoRuntime"), appInfo.dAppUrl)

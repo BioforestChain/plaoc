@@ -10,9 +10,21 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.work.*
 import info.bagen.rust.plaoc.system.callable_map
+import java.util.concurrent.ArrayBlockingQueue
+import java.util.concurrent.RejectedExecutionHandler
+import java.util.concurrent.ThreadPoolExecutor
+import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 
 private const val TAG = "DENO_WORKER"
+var TASK:Thread? = null;
+val threadPoolExecutor = ThreadPoolExecutor(
+  5, 10, 60,
+  TimeUnit.MINUTES,
+  ArrayBlockingQueue<Runnable>(100),
+  RejectedExecutionHandler { _, _ -> println("reject submit thread to thread pool") }
+)
+
 
 class DenoWorker(val appContext: Context, workerParams: WorkerParameters) :
   CoroutineWorker(appContext, workerParams) {
@@ -22,14 +34,13 @@ class DenoWorker(val appContext: Context, workerParams: WorkerParameters) :
     Log.i(TAG, "WorkerName=$funName,WorkerData=$data")
     if (funName !== null) {
       val calFn = ExportNative.valueOf(funName)
-      thread(name = funName)  {
-       println("kotlin#DenoWorker: ${this.id}")
+      threadPoolExecutor.execute {
         callable_map[calFn]?.let { it ->
           if (data != null) {
             it(data)
           }
         }
-      }
+       }
     }
     return Result.success()
   }
