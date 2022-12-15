@@ -4,6 +4,7 @@ import android.util.Log
 import info.bagen.rust.plaoc.*
 import info.bagen.rust.plaoc.system.file.*
 import info.bagen.libappmgr.utils.APP_DIR_TYPE
+import info.bagen.libappmgr.utils.ClipboardUtil
 import info.bagen.libappmgr.utils.FilesUtil
 import info.bagen.rust.plaoc.system.device.DeviceInfo
 import info.bagen.rust.plaoc.system.notification.NotificationMsgItem
@@ -134,6 +135,14 @@ fun splicingPath(bfsId:String, entry:String):String {
       bigText = message.msg_content,
       channelType = channelType,
     )
+  }
+
+  /** Clipboard */
+  callable_map[ExportNative.ReadClipboardContent] = {
+    createBytesFactory(ExportNative.ReadClipboardContent, ClipboardUtil.readFromClipboard(App.appContext) ?: "")
+  }
+  callable_map[ExportNative.WriteClipboardContent] = {
+    ClipboardUtil.writeToClipboard(App.appContext, it)
   }
 }
 

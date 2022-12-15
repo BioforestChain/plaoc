@@ -29,7 +29,9 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
 import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import info.bagen.rust.plaoc.ExportNative
+import info.bagen.rust.plaoc.TASK
 import info.bagen.rust.plaoc.createBytesFactory
+import info.bagen.rust.plaoc.threadPoolExecutor
 import info.bagen.rust.plaoc.ui.theme.RustApplicationTheme
 import info.bagen.rust.plaoc.webView.urlscheme.CustomUrlScheme
 import info.bagen.rust.plaoc.webView.urlscheme.requestHandlerFromAssets
@@ -47,9 +49,10 @@ class DWebViewActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         Log.i(TAG, "parentActivityIntent:${this.parentActivityIntent}")
-
         if (this.parentActivityIntent == null) {
-            super.onBackPressed()
+          println("shutdownNow:${TASK?.isAlive}") // 结束线程任务
+
+          super.onBackPressed()
         } else {
             this.startActivity(this.parentActivityIntent)
         }
