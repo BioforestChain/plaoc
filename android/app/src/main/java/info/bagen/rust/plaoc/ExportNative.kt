@@ -22,6 +22,8 @@ enum class ExportNative(val type: String) {
   ApplyPermissions("applyPermissions"),
   GetDeviceInfo("getDeviceInfo"),
   CreateNotificationMsg("createNotificationMsg"),
+  ReadClipboardContent("readClipboardContent"),
+  WriteClipboardContent("writeClipboardContent"),
 }
 
 /** worker */
