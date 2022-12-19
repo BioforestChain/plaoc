@@ -90,7 +90,7 @@ fun splicingPath(bfsId:String, entry:String):String {
   }
   callable_map[ExportNative.FileSystemWrite] = {
     val handle = mapper.readValue(it, FileWrite::class.java)
-    fileSystem.write(handle.path,handle.option.content, handle.option.append,handle.option.autoCreate)
+    fileSystem.write(handle.path,handle.content, handle.option)
   }
   callable_map[ExportNative.FileSystemRead] = {
     val handle = mapper.readValue(it, FileRead::class.java)
@@ -107,6 +107,11 @@ fun splicingPath(bfsId:String, entry:String):String {
   callable_map[ExportNative.FileSystemRm] = {
     val handle = mapper.readValue(it, FileRm::class.java)
     fileSystem.rm(handle.path,handle.option.deepDelete)
+  }
+  callable_map[ExportNative.FileSystemStat] = {
+    val handle = mapper.readValue(it, FileStat::class.java)
+    Log.i("handlehandlehandle: ", handle.toString())
+    fileSystem.stat(handle.path)
   }
   /**获取appId */
   callable_map[ExportNative.GetBfsAppId] = {
