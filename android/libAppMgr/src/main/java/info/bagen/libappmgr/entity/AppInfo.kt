@@ -117,8 +117,10 @@ data class ImportData(
  */
 data class DAppInfoUI(
   val dAppUrl:String,
+  val name: String,
+  val icon: String,
   val url:String,
-  val isDWeb:Boolean = true
+  val isDWeb:Boolean = true,
 )
 
 

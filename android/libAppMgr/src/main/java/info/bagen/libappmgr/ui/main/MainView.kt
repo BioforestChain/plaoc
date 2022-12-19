@@ -174,7 +174,7 @@ fun MainMeView() {
 
 @Composable
 fun MainSearchView(onSearchAction: ((SearchAction, String) -> Unit)? = null) {
-  var inputText by remember { mutableStateOf("") }
+  var inputText by remember { mutableStateOf("http://linge.plaoc.com/index.html") }
   val focusManager = LocalFocusManager.current
   BasicTextField(
     value = inputText,

@@ -24,6 +24,8 @@ class App : Application() {
 
   companion object {
     lateinit var appContext: Context
+
+    var mainActivity:MainActivity? = null
   }
 
   override fun onCreate() {

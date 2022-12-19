@@ -1,9 +1,9 @@
 package info.bagen.rust.plaoc
 
-
 import android.Manifest
 import android.app.Application.getProcessName
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.TextUtils
@@ -26,8 +26,12 @@ import com.king.mlkit.vision.camera.CameraScan
 import com.king.mlkit.vision.camera.analyze.Analyzer.OnAnalyzeListener
 import com.king.mlkit.vision.camera.util.LogUtils
 import com.king.mlkit.vision.camera.util.PermissionUtils
+import info.bagen.libappmgr.ui.app.AppViewModel
 import info.bagen.libappmgr.ui.main.Home
+import info.bagen.libappmgr.ui.main.MainViewModel
 import info.bagen.libappmgr.ui.main.SearchAction
+import info.bagen.rust.plaoc.broadcast.BFSBroadcastAction
+import info.bagen.rust.plaoc.broadcast.BFSBroadcastReceiver
 import info.bagen.rust.plaoc.lib.drawRect
 import info.bagen.rust.plaoc.system.barcode.BarcodeScanningActivity
 import info.bagen.rust.plaoc.system.barcode.QRCodeScanningActivity
@@ -37,14 +41,22 @@ import info.bagen.rust.plaoc.ui.theme.RustApplicationTheme
 import info.bagen.rust.plaoc.webView.network.dWebView_host
 import info.bagen.rust.plaoc.webView.network.shakeUrl
 import info.bagen.rust.plaoc.webView.openDWebWindow
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.*
-
 
 private const val TAG = "MainActivity"
 
 class MainActivity : AppCompatActivity() {
   var isQRCode = false //是否是识别二维码
   fun getContext() = this
+  private val appViewModel: AppViewModel by viewModel()
+  private val mainViewModel: MainViewModel by viewModel()
+  private var bfsBroadcastReceiver: BFSBroadcastReceiver? = null
+
+  @JvmName("getAppViewModel1")
+  fun getAppViewModel(): AppViewModel {
+    return appViewModel
+  }
 
   companion object {
     const val REQUEST_CODE_PHOTO = 1
@@ -54,54 +66,56 @@ class MainActivity : AppCompatActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    App.mainActivity = this
     //多个Application创建的问题：
     //避免重复初始化
-    var processName = getProcessName()
-    if (!TextUtils.isEmpty(processName) && processName.equals(packageName)) {
-      // 初始化无界面APP
-      initServiceApp()
-      // 初始化系统函数map
-      initSystemFn(this)
-      // 初始化id生成
-      initYitIdHelper()
-      setContent {
-        RustApplicationTheme {
-          Box(
-            modifier = Modifier
-              .fillMaxSize()
-              .background(MaterialTheme.colors.primary)
-          ) {
-            Home(
-              onSearchAction = { action, data ->
-                LogUtils.d("搜索框内容响应：$action--$data")
-                when (action) {
-                  SearchAction.Search -> {
-                    openDWebWindow(this@MainActivity, data)
-                  }
-                  SearchAction.OpenCamera -> {
-                    openScannerActivity()
-                  }
+    //var processName = getProcessName()
+    //if (!TextUtils.isEmpty(processName) && processName.equals(packageName)) {
+    // 初始化无界面APP
+    initServiceApp()
+    // 初始化系统函数map
+    initSystemFn(this)
+    // 初始化id生成
+    initYitIdHelper()
+    // 初始化广播
+    registerBFSBroadcastReceiver()
+    setContent {
+      RustApplicationTheme {
+        Box(
+          modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colors.primary)
+        ) {
+          Home(mainViewModel, appViewModel,
+            onSearchAction = { action, data ->
+              LogUtils.d("搜索框内容响应：$action--$data")
+              when (action) {
+                SearchAction.Search -> {
+                  openDWebWindow(this@MainActivity, data)
                 }
-              },
-              onOpenDWebview = { appId, dAppInfo ->
-                //执行初始化
-                val pid = android.os.Process.myPid()
-                println("app pid = $pid")
-                dWebView_host = appId
-                LogUtils.d("启动了Ar 扫雷：$dWebView_host--$dAppInfo, isDWeb:${dAppInfo?.isDWeb}")
-                dAppInfo?.let { appInfo ->
-                  if (appInfo.isDWeb) {
-                    createWorker(WorkerNative.valueOf("DenoRuntime"), appInfo.dAppUrl)
-                  } else {
-                    openDWebWindow(this@MainActivity, appInfo.url)
-                  }
+                SearchAction.OpenCamera -> {
+                  openScannerActivity()
                 }
               }
-            )
-          }
+            },
+            onOpenDWebview = { appId, dAppInfo ->
+              //执行初始化
+              val pid = android.os.Process.myPid()
+              println("app pid = $pid")
+              dWebView_host = appId
+              LogUtils.d("启动了Ar 扫雷：$dWebView_host--$dAppInfo, isDWeb:${dAppInfo?.isDWeb}")
+              dAppInfo?.let { appInfo ->
+                if (appInfo.isDWeb) {
+                  createWorker(WorkerNative.valueOf("DenoRuntime"), appInfo.dAppUrl)
+                } else {
+                  openDWebWindow(this@MainActivity, appInfo.url)
+                }
+              }
+            })
         }
       }
     }
+    //}
   }
 
   /** 初始化唯一id*/
@@ -136,6 +150,26 @@ class MainActivity : AppCompatActivity() {
     ) {
       startPickPhoto()
     }
+  }
+
+  /**
+   * 注册广播，在 onDestroy 的时候需要手动取消注册
+   */
+  private fun registerBFSBroadcastReceiver() {
+    val intentFilter = IntentFilter()
+    intentFilter.addAction(BFSBroadcastAction.BFSInstallApp.action)
+    bfsBroadcastReceiver = BFSBroadcastReceiver()
+    registerReceiver(bfsBroadcastReceiver, intentFilter)
+  }
+
+  private fun unRegisterBFSBroadcastReceiver() {
+    bfsBroadcastReceiver?.let { unregisterReceiver(it) }
+  }
+
+  override fun onDestroy() {
+    super.onDestroy()
+    unRegisterBFSBroadcastReceiver()
+    App.mainActivity = null
   }
 
   // 扫码后显示一下Toast

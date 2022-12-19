@@ -1,6 +1,7 @@
 package info.bagen.libappmgr.utils
 
 import android.app.Application
+import android.widget.Toast
 import androidx.compose.runtime.mutableStateListOf
 import info.bagen.libappmgr.entity.AppInfo
 
@@ -34,6 +35,13 @@ class AppContextUtil {
         e.printStackTrace()
       }
       return null
+    }
+
+    fun showShortToastMessage(msg: String) {
+      Toast.makeText(sInstance, msg, Toast.LENGTH_SHORT).show()
+    }
+    fun showLongToastMessage(msg: String) {
+      Toast.makeText(sInstance, msg, Toast.LENGTH_LONG).show()
     }
   }
 }
