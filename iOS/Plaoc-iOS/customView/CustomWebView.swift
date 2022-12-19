@@ -49,17 +49,19 @@ class CustomWebView: UIView {
     private lazy var webView: WKWebView = {
         
         let config = WKWebViewConfiguration()
-        config.userContentController = WKUserContentController()
-        if self.scripts != nil {
-            for script in self.scripts! {
-                config.userContentController.addUserScript(script)
-            }
-        }
-        let prefreen = WKPreferences()
-        prefreen.javaScriptCanOpenWindowsAutomatically = true
-        config.preferences = prefreen
-        config.setValue(true, forKey: "allowUniversalAccessFromFileURLs")
-        config.setURLSchemeHandler(Schemehandler(fileName: self.fileName), forURLScheme: schemeString)
+        config.limitsNavigationsToAppBoundDomains = true
+//        config.userContentController = WKUserContentController()
+//        if self.scripts != nil {
+//            for script in self.scripts! {
+//                config.userContentController.addUserScript(script)
+//            }
+//        }
+//        config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "InstallBFS")
+//        let prefreen = WKPreferences()
+//        prefreen.javaScriptCanOpenWindowsAutomatically = true
+//        config.preferences = prefreen
+//        config.setValue(true, forKey: "allowUniversalAccessFromFileURLs")
+//        config.setURLSchemeHandler(Schemehandler(fileName: self.fileName), forURLScheme: schemeString)
         let webView = WKWebView(frame: self.bounds, configuration: config)
         webView.navigationDelegate = self
         webView.uiDelegate = self
@@ -144,6 +146,19 @@ extension CustomWebView {
     
     func updateFrame(frame: CGRect) {
         webView.frame = CGRect(origin: .zero, size: frame.size)
+    }
+}
+
+extension CustomWebView:  WKScriptMessageHandler {
+    //通过js调取原生操作
+    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+        
+        if message.name == "InstallBFS" {
+            //点击网页按钮 开始加载
+            guard let bodyString = message.body as? String else { return }
+            BFSNetworkManager.shared.loadAutoUpdateInfo(urlString: bodyString)
+            //同时显示下载进度条
+        }
     }
 }
 
