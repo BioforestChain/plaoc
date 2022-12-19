@@ -11,7 +11,9 @@ import java.io.*
 import java.util.regex.PatternSyntaxException
 import kotlin.io.path.Path
 import kotlin.io.path.isSymbolicLink
-
+import android.system.Os
+import androidx.core.net.toUri
+import org.json.JSONObject
 
 class FileSystem {
 
@@ -137,16 +139,15 @@ class FileSystem {
   fun write(
     path: String,
     content: String,
-    append: Boolean = false,
-    autoCreate: Boolean = true
+    options: WriteOption
   ) {
     val file = getFileByPath(path)
-    if (!file.exists() && autoCreate) {
+    if (!file.exists() && options.autoCreate) {
       file.parentFile?.mkdirs()
     }
 //    LogUtils.d("write  file->${file.absolutePath}，content->$content，append->$append，autoCreate->$autoCreate")
     try {
-      val fileWriter = FileWriter(file,append)
+      val fileWriter = FileWriter(file, options.append)
       val bufferedWriter = BufferedWriter(fileWriter)
       bufferedWriter.write(content)
       bufferedWriter.close()
@@ -220,6 +221,30 @@ class FileSystem {
     }
     createBytesFactory(ExportNative.FileSystemRm, bool.toString())
   }
+
+  fun stat(path: String) {
+    val file = getFileByPath(path)
+    val statData = Os.stat(file.toString())
+    var data = JSONObject()
+
+    data.put("type", if(file.isDirectory) "directory" else "file")
+    data.put("size", statData.st_size)
+    data.put("mtime", statData.st_mtime)
+    data.put("uri", File(path).toUri().toString())
+    data.put("ctime", statData.st_ctime)
+    data.put("atime", statData.st_atime)
+    data.put("blksize", statData.st_blksize)
+    data.put("blocks", statData.st_blocks)
+    data.put("dev", statData.st_dev)
+    data.put("gid", statData.st_gid)
+    data.put("rdev", statData.st_rdev)
+    data.put("mode", statData.st_mode)
+    data.put("ino", statData.st_ino)
+    data.put("uid", statData.st_uid)
+    data.put("nlink", statData.st_nlink)
+
+    createBytesFactory(ExportNative.FileSystemStat, data.toString())
+  }
 }
 
 data class Fs(
@@ -250,18 +275,18 @@ data class LsFilter(
 )
 
 data class FileRead(
-  val path: String = "",
+  val path: String = ""
 )
 
 data class FileWrite(
   val path: String = "",
+  val content: String = "",
   val option: WriteOption = WriteOption()
 )
 
 data class WriteOption(
-  val content: String = "",
   val append: Boolean = false,
-  val autoCreate: Boolean = true
+  val autoCreate: Boolean = true,
 )
 
 data class FileRm(
@@ -276,4 +301,8 @@ data class FileRename(
 
 data class RmOption(
   val deepDelete: Boolean = true
+)
+
+data class FileStat(
+  val path: String = ""
 )
