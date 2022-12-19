@@ -214,9 +214,10 @@ fun createBytesFactory(callFun: ExportNative, message: String) {
   rust_call_map.remove(callFun)
   version_head_map.remove(headId)
   println("安卓返回数据:callFun:${callFun.type}---headViewId=> ${headId[0]},${headId[1]},message=> $message")
-  thread {
+ threadPoolExecutor.execute {
     denoService.backSystemDataToRust(result.array())
   }
+  println("threadPoolExecutor#size:${threadPoolExecutor.queue.size}")
 }
 
 // 填充数据返回
