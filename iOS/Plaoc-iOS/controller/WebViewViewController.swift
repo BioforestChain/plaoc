@@ -26,8 +26,6 @@ class WebViewViewController: UIViewController {
     
     private let jsContext = JSContext()
     
-    let sysManager: SystemManager = SystemManager()
-    
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return style
@@ -45,13 +43,13 @@ class WebViewViewController: UIViewController {
         self.view.addSubview(webView)
         self.view.addSubview(naviView)
         self.view.addSubview(statusView)
-        self.view.addSubview(bottomView)
+//        self.view.addSubview(bottomView)
         
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        jsManager = JSCoreManager.init(fileName: fileName, controller: self)
+//        jsManager = JSCoreManager.init(fileName: fileName, controller: self)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -67,7 +65,8 @@ class WebViewViewController: UIViewController {
         
         //https://awqdeqwewe.dweb/
         
-        webView.openWebView(html: "iosqmkkx:/index.html") 
+        webView.openWebView(html: urlString)
+        
 //        if urlString.hasPrefix("http") || urlString.hasPrefix("https") {
 //            webView.openWebView(html: urlString)
 //        } else {
@@ -277,7 +276,7 @@ class WebViewViewController: UIViewController {
     }()
     
     lazy private var webView: CustomWebView = {
-        let webView = CustomWebView(frame: CGRect(x: 0, y: self.naviView.frame.maxY, width: self.view.bounds.width, height: UIScreen.main.bounds.height - self.naviView.frame.maxY - 49 - UIDevice.current.tabbarSpaceHeight()), jsNames: ["Photo","DWebViewJS"], fileName: fileName)
+        let webView = CustomWebView(frame: CGRect(x: 0, y: self.naviView.frame.maxY, width: self.view.bounds.width, height: UIScreen.main.bounds.height - self.naviView.frame.maxY), jsNames: ["install"], fileName: fileName)
         webView.superVC = self
         webView.callback = { [weak self] title in
             guard let strongSelf = self else { return }
@@ -302,18 +301,17 @@ class WebViewViewController: UIViewController {
 extension WebViewViewController {
     //更新naviView的是否隐藏
     private func hiddenNavigationBar(isHidden: Bool) {
-        guard naviView.isHidden != isHidden else { return }
-        naviView.isHidden = isHidden
+        naviView.hiddenNavigationView(hidden: isHidden)
     }
     //返回naviView是否隐藏
     private func getNaviHiddenState() -> Bool {
-        return naviView.isHidden
+        return naviView.naviHiddenState()
     }
     
     //更新naviView的Overlay
     func updateNavigationBarOverlay(overlay: Bool) {
-        guard naviOverlay != overlay else { return }
-        naviOverlay = overlay
+        guard naviView.naviOverlay != overlay else { return }
+        naviView.updateNavigationBarOverlay(overlay: overlay)
         var frame = webView.frame
         if overlay {
             frame.origin.y = UIDevice.current.statusBarHeight() + 44
@@ -329,89 +327,55 @@ extension WebViewViewController {
     }
     //获取naviView的Overlay
     private func naviViewOverlay() -> String {
-        return naviOverlay ? "true" : "false"
+        return naviView.naviViewOverlay()
     }
     
     //更新naviView的背景色
     private func updateNavigationBarBackgroundColor(colorString: String) {
-        naviView.backgroundColor = UIColor(colorString)
- 
-//        self.navigationController?.navigationBar.backgroundColor = .orange
-//        let image = createImageWithColor(.orange, frame: CGRect(x: 0, y: 0.5, width: 1, height: 0.5))
-//        self.navigationController?.navigationBar.setBackgroundImage(image, for: .default)
-        
+        naviView.updateNavigationBarBackgroundColor(colorString: colorString)
     }
     //返回naviView的背景色
     private func naviViewBackgroundColor() -> String {
-        return naviView.backgroundColor?.hexString() ?? "#FFFFFFFF"
-    }
-    
-     //生成一个指定颜色的图片
-    private func createImageWithColor(_ color: UIColor, frame: CGRect) -> UIImage? {
-        // 开始绘图
-        UIGraphicsBeginImageContext(frame.size)
-         
-        // 获取绘图上下文
-        let context = UIGraphicsGetCurrentContext()
-        // 设置填充颜色
-        context?.setFillColor(color.cgColor)
-        // 使用填充颜色填充区域
-        context?.fill(frame)
-         
-        // 获取绘制的图像
-        let image = UIGraphicsGetImageFromCurrentImageContext()
-         
-        // 结束绘图
-        UIGraphicsEndImageContext()
-        return image
+        return naviView.backgroundColorString()
     }
     //更新naviView的前景色
     private func updateNavigationBarTintColor(colorString: String) {
-//        naviView.tineColor = colorString
+        naviView.updateNavigationBarTintColor(colorString: colorString)
     }
     //返回naviView的前景色
     private func naviViewForegroundColor() -> String {
-        return naviView.tineColor ?? ""
+        return naviView.foregroundColor()
     }
     
     //设置标题
     private func setNaviViewTitle(title: String?) {
-        naviView.titleString = title
+        naviView.setNaviViewTitle(title: title)
     }
     //返回naviView的标题
     private func titleString() -> String {
-        return naviView.titleString ?? ""
+        return naviView.titleContent()
     }
     //naviView的高度
     private func naviViewHeight() -> String {
-        return "44"
+        return naviView.viewHeight()
     }
     
     //naviView透明度
     private func naviViewAlpha() -> String {
-        return "\(naviView.alpha)"
+        return naviView.viewAlpha()
     }
     //设置naviView透明度
     private func setNaviViewAlpha(alpha: CGFloat) {
-        naviView.alpha = alpha
+        naviView.setNaviViewAlpha(alpha: alpha)
     }
     
     //设置naviView的按钮
     private func setNaviButtons(content: String) {
-        guard let array = ChangeTools.stringValueArray(content) else { return }
-        let list = JSON(array)
-        let buttons = list.arrayValue.map { ButtonModel(dict: $0) }
-        naviView.buttons = buttons
+        naviView.setNaviButtons(content: content)
     }
     //返回naviView的按钮
     private func naviActions() -> String {
-        guard let buttons = naviView.buttons else { return "" }
-        var array: [[String:Any]] = []
-        for button in buttons {
-            array.append(button.buttonDict)
-        }
-        let actionString = ChangeTools.arrayValueString(array) ?? ""
-        return actionString
+        return naviView.naviActions()
     }
 }
 

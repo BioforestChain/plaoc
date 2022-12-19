@@ -14,7 +14,6 @@ class JSCoreManager: NSObject {
     private let jsContext = JSContext()
     private var name: String = ""
     
-    let sysManager: SystemManager = SystemManager()
     
     init(fileName: String, controller: UIViewController?) {
         super.init()

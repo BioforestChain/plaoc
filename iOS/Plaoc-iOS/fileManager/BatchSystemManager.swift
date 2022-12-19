@@ -42,12 +42,26 @@ class BatchSystemManager: BatchReadManager {
         mateDict = ChangeTools.stringValueDic(content)
         return mateDict
     }
-    
+    //获取版本号
     func readMetadataVersion(fileName: String) -> String? {
         if mateDict == nil {
             _ = readBFSAMatedataContent(fileName: fileName)
         }
         return mateDict?["version"] as? String
+    }
+    //获取appType
+    func readAppType(fileName: String) -> String? {
+        if mateDict == nil {
+            _ = readBFSAMatedataContent(fileName: fileName)
+        }
+        return mateDict?["apptype"] as? String
+    }
+    //获取web类型的网页地址
+    func readWebAppURLString(fileName: String) -> String? {
+        if mateDict == nil {
+            _ = readBFSAMatedataContent(fileName: fileName)
+        }
+        return mateDict?["url"] as? String
     }
     
     

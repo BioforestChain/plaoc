@@ -7,6 +7,7 @@
 
 import UIKit
 import SDWebImage
+import SwiftyJSON
 
 typealias ClickViewCallback = (String) -> Void
 
@@ -27,6 +28,7 @@ class NaviView: UIView {
     }
     
     private var buttonList: [UIButton] = []
+    private(set) var naviOverlay: Bool = false
     
     var buttons: [ButtonModel]? {
         didSet {
@@ -139,5 +141,80 @@ extension NaviView {
         let code = model.onClickCode ?? ""
         guard code.count > 0 else { return }
         callback?(code)
+    }
+}
+
+extension NaviView {
+    
+    //更新naviView的是否隐藏
+    func hiddenNavigationView(hidden: Bool) {
+        self.isHidden = hidden
+    }
+    //返回naviView是否隐藏
+    func naviHiddenState() -> Bool {
+        return self.isHidden
+    }
+    //更新naviView的Overlay
+    func updateNavigationBarOverlay(overlay: Bool) {
+        self.naviOverlay = overlay
+    }
+    //获取naviView的Overlay
+    func naviViewOverlay() -> String {
+        return naviOverlay ? "true" : "false"
+    }
+    //更新naviView的背景色
+    func updateNavigationBarBackgroundColor(colorString: String) {
+        self.backgroundColor = UIColor(colorString)
+    }
+    //返回naviView的背景色
+    func backgroundColorString() -> String {
+        return self.backgroundColor?.hexString() ?? "#FFFFFFFF"
+    }
+    //设置标题
+    func setNaviViewTitle(title: String?) {
+        self.titleString = title
+    }
+    //更新naviView的前景色
+    func updateNavigationBarTintColor(colorString: String) {
+        self.tineColor = colorString
+    }
+    //返回naviView的前景色
+    func foregroundColor() -> String {
+        return self.tineColor ?? ""
+    }
+    //返回naviView的标题
+    func titleContent() -> String {
+        return self.titleString ?? ""
+    }
+    //naviView的高度
+    func viewHeight() -> String {
+        return "44"
+    }
+    
+    //naviView透明度
+    func viewAlpha() -> String {
+        return "\(self.alpha)"
+    }
+    //设置naviView透明度
+    func setNaviViewAlpha(alpha: CGFloat) {
+        self.alpha = alpha
+    }
+    
+    //设置naviView的按钮
+    func setNaviButtons(content: String) {
+        guard let array = ChangeTools.stringValueArray(content) else { return }
+        let list = JSON(array)
+        let buttons = list.arrayValue.map { ButtonModel(dict: $0) }
+        self.buttons = buttons
+    }
+    //返回naviView的按钮
+    func naviActions() -> String {
+        guard let buttons = self.buttons else { return "" }
+        var array: [[String:Any]] = []
+        for button in buttons {
+            array.append(button.buttonDict)
+        }
+        let actionString = ChangeTools.arrayValueString(array) ?? ""
+        return actionString
     }
 }
