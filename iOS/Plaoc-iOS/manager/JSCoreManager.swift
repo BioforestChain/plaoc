@@ -12,25 +12,46 @@ class JSCoreManager: NSObject {
     
     private var baseViewController: UIViewController?
     private let jsContext = JSContext()
+    private var name: String = ""
     
-    let sysManager: SystemManager = SystemManager()
     
     init(fileName: String, controller: UIViewController?) {
         super.init()
         baseViewController = controller
-//        guard let entryPath = BatchFileManager.shared.systemAPPEntryPath(fileName: fileName) else { return }
+        name = fileName
         
-        guard let entryPath = sysManager.fetchEntryPath() else { return }
-        
+        JSInjectManager.shared.registerInContext(jsContext!)
+        initJSCore()
+        loadAPPEntry(fileName: fileName)
+
+    }
+    
+    private func initJSCore() {
+//        let entryPath = "/Users/ui03/Desktop/Plaoc_IOS新/iOS/Plaoc-iOS/sys/HE74YAAL/sys/backend-HE74YAAL/index.js"
+        let entryPath = Bundle.main.bundlePath + "/sys/HE74YAAL/sys/backend-HE74YAAL/index.js"
         let plaoc = PlaocHandleModel()
-        plaoc.controller = controller
+        plaoc.controller = baseViewController
+        plaoc.jsContext = jsContext
+        plaoc.fileName = name
+        
+        jsContext?.setObject(plaoc, forKeyedSubscript: "PlaocJavascriptBridge" as NSCopying & NSObjectProtocol)
+        if let content = try? String(contentsOfFile: entryPath) {
+            jsContext?.evaluateScript("(async function(){\(content)})()")
+        }
+    }
+    
+    private func loadAPPEntry(fileName: String) {
+        
+        guard let entryPath = BatchFileManager.shared.systemAPPEntryPath(fileName: fileName) else { return }
+
+        let plaoc = PlaocHandleModel()
+        plaoc.controller = baseViewController
         plaoc.jsContext = jsContext
         
         jsContext?.setObject(plaoc, forKeyedSubscript: "PlaocJavascriptBridge" as NSCopying & NSObjectProtocol)
-        let content = try? String(contentsOfFile: entryPath)
-        jsContext?.evaluateScript(content)
-        
-//        let res = jsContext?.evaluateScript("start()")
+        if let content = try? String(contentsOfFile: entryPath) {
+            jsContext?.evaluateScript("(async function(){\(content)})()")
+        }
     }
     
     func callFunction<T>(functionName: String, withData dataObject: Codable, type: T.Type) -> JSValue? where T:Codable {

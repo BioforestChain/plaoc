@@ -130,7 +130,7 @@ private fun NavFun(activity: ComponentActivity) {
 }
 /** 打开DWebview*/
 fun openDWebWindow(activity: ComponentActivity, url: String) {
-    var intent = Intent(activity.applicationContext, DWebViewActivity::class.java).also {
+    val intent = Intent(activity.applicationContext, DWebViewActivity::class.java).also {
         it.data = Uri.parse("https://"+URLEncoder.encode(url, "UTF-8"))
     }
     activity.startActivity(intent)
@@ -140,10 +140,10 @@ fun openDWebWindow(activity: ComponentActivity, url: String) {
 fun sendToJavaScript(jsCode: String) {
   // 这里的消息需要等待serviceWorker启动再执行
     dWebView?.post(Runnable {
-        dWebView?.evaluateJavascript(jsCode,ValueCallback<String> { result ->
-//          Log.d(TAG, "sendToJavaScript 返回数据: $result,sendToJavaScript->:$jsCode")
+      println("kotlin#sendToJavaScript:$jsCode")
+      dWebView?.evaluateJavascript(jsCode,ValueCallback<String> { result ->
           if (result.isNotEmpty() && result != "null") {
-            println("kotlin#sendToJavaScript:$result")
+            println("kotlin#sendToJavaScript🌽返回的数据:$result")
             createBytesFactory(ExportNative.EvalJsRuntime, result)// 返回数据给后端
           }
         })

@@ -179,6 +179,16 @@ class BatchFileManager: NSObject {
         return sysManager.fetchEntryPath(fileName: fileName)
     }
     
+    //获取system-app的appType
+    func systemAPPType(fileName: String) -> String? {
+        return sysManager.readAppType(fileName: fileName)
+    }
+    
+    //获取system-app的web地址
+    func systemWebAPPURLString(fileName: String) -> String? {
+        return sysManager.readWebAppURLString(fileName: fileName)
+    }
+    
     //更新信息下载完后，重新下载项目文件,  可能不需要判断system-app 看最后system-app升级时的需求
     private func downloadNewFile(fileName: String) {
         

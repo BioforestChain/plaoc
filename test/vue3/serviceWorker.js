@@ -1,7 +1,438 @@
+/**
+ * @param value
+ * @returns
+ * @inline
+ */
+const isPromiseLike = (value) => {
+    return (value instanceof Object &&
+        typeof value.then === "function");
+};
+
+class PromiseOut {
+    constructor() {
+        Object.defineProperty(this, "promise", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
+        Object.defineProperty(this, "is_resolved", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: false
+        });
+        Object.defineProperty(this, "is_rejected", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: false
+        });
+        Object.defineProperty(this, "is_finished", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: false
+        });
+        Object.defineProperty(this, "value", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
+        Object.defineProperty(this, "reason", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
+        Object.defineProperty(this, "resolve", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
+        Object.defineProperty(this, "reject", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
+        Object.defineProperty(this, "_innerFinally", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
+        Object.defineProperty(this, "_innerFinallyArg", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
+        Object.defineProperty(this, "_innerThen", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
+        Object.defineProperty(this, "_innerCatch", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
+        this.promise = new Promise((resolve, reject) => {
+            this.resolve = (value) => {
+                try {
+                    if (isPromiseLike(value)) {
+                        value.then(this.resolve, this.reject);
+                    }
+                    else {
+                        this.is_resolved = true;
+                        this.is_finished = true;
+                        resolve((this.value = value));
+                        this._runThen();
+                        this._innerFinallyArg = Object.freeze({
+                            status: "resolved",
+                            result: this.value,
+                        });
+                        this._runFinally();
+                    }
+                }
+                catch (err) {
+                    this.reject(err);
+                }
+            };
+            this.reject = (reason) => {
+                this.is_rejected = true;
+                this.is_finished = true;
+                reject((this.reason = reason));
+                this._runCatch();
+                this._innerFinallyArg = Object.freeze({
+                    status: "rejected",
+                    reason: this.reason,
+                });
+                this._runFinally();
+            };
+        });
+    }
+    onSuccess(innerThen) {
+        if (this.is_resolved) {
+            this.__callInnerThen(innerThen);
+        }
+        else {
+            (this._innerThen || (this._innerThen = [])).push(innerThen);
+        }
+    }
+    onError(innerCatch) {
+        if (this.is_rejected) {
+            this.__callInnerCatch(innerCatch);
+        }
+        else {
+            (this._innerCatch || (this._innerCatch = [])).push(innerCatch);
+        }
+    }
+    onFinished(innerFinally) {
+        if (this.is_finished) {
+            this.__callInnerFinally(innerFinally);
+        }
+        else {
+            (this._innerFinally || (this._innerFinally = [])).push(innerFinally);
+        }
+    }
+    _runFinally() {
+        if (this._innerFinally) {
+            for (const innerFinally of this._innerFinally) {
+                this.__callInnerFinally(innerFinally);
+            }
+            this._innerFinally = undefined;
+        }
+    }
+    __callInnerFinally(innerFinally) {
+        queueMicrotask(async () => {
+            try {
+                await innerFinally(this._innerFinallyArg);
+            }
+            catch (err) {
+                console.error("Unhandled promise rejection when running onFinished", innerFinally, err);
+            }
+        });
+    }
+    _runThen() {
+        if (this._innerThen) {
+            for (const innerThen of this._innerThen) {
+                this.__callInnerThen(innerThen);
+            }
+            this._innerThen = undefined;
+        }
+    }
+    _runCatch() {
+        if (this._innerCatch) {
+            for (const innerCatch of this._innerCatch) {
+                this.__callInnerCatch(innerCatch);
+            }
+            this._innerCatch = undefined;
+        }
+    }
+    __callInnerThen(innerThen) {
+        queueMicrotask(async () => {
+            try {
+                await innerThen(this.value);
+            }
+            catch (err) {
+                console.error("Unhandled promise rejection when running onSuccess", innerThen, err);
+            }
+        });
+    }
+    __callInnerCatch(innerCatch) {
+        queueMicrotask(async () => {
+            try {
+                await innerCatch(this.value);
+            }
+            catch (err) {
+                console.error("Unhandled promise rejection when running onError", innerCatch, err);
+            }
+        });
+    }
+}
+
+class EasyMap extends Map {
+    // private _map: Map<F, V>;
+    constructor(creater, entries, transformKey = (v) => v, _afterDelete) {
+        super(entries);
+        Object.defineProperty(this, "creater", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: creater
+        });
+        Object.defineProperty(this, "transformKey", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: transformKey
+        });
+        Object.defineProperty(this, "_afterDelete", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: _afterDelete
+        });
+    }
+    static from(args) {
+        return new EasyMap(args.creater, args.entries, args.transformKey, args.afterDelete);
+    }
+    forceGet(key, creater = this.creater) {
+        const k = this.transformKey(key);
+        if (super.has(k)) {
+            return super.get(k);
+        }
+        const res = creater(key, k);
+        super.set(k, res);
+        return res;
+    }
+    tryGet(key) {
+        return this.get(this.transformKey(key));
+    }
+    trySet(key, val) {
+        return this.set(this.transformKey(key), val);
+    }
+    tryDelete(key) {
+        return this.delete(this.transformKey(key));
+    }
+    tryHas(key) {
+        return this.has(this.transformKey(key));
+    }
+    delete(key) {
+        const res = super.delete(key);
+        if (res && this._afterDelete) {
+            this._afterDelete(key);
+        }
+        return res;
+    }
+    get [Symbol.toStringTag]() {
+        return "EasyMap";
+    }
+    static call(_this, creater, entries, transformKey, _afterDelete) {
+        if (!(_this instanceof EasyMap)) {
+            throw new TypeError("please use new keyword to create EasyMap instance.");
+        }
+        const protoMap = new EasyMap(creater, entries, transformKey, _afterDelete);
+        const protoMap_PROTO = Object.getPrototypeOf(protoMap);
+        const protoMap_PROTO_PROTO = Object.getPrototypeOf(protoMap_PROTO);
+        const mapProps = Object.getOwnPropertyDescriptors(protoMap_PROTO_PROTO);
+        for (const key in mapProps) {
+            if (key !== "constructor") {
+                const propDes = mapProps[key];
+                if (typeof propDes.value === "function") {
+                    propDes.value = propDes.value.bind(protoMap);
+                }
+                else {
+                    if (typeof propDes.get === "function") {
+                        propDes.get = propDes.get.bind(protoMap);
+                    }
+                    if (typeof propDes.set === "function") {
+                        propDes.set = propDes.set.bind(protoMap);
+                    }
+                }
+                Object.defineProperty(_this, key, propDes);
+            }
+        }
+        const easymapProps = Object.getOwnPropertyDescriptors(protoMap_PROTO);
+        for (const key in easymapProps) {
+            if (key !== "constructor") {
+                const propDes = easymapProps[key];
+                if (typeof propDes.value === "function") {
+                    propDes.value = propDes.value.bind(protoMap);
+                }
+                else {
+                    if (typeof propDes.get === "function") {
+                        propDes.get = propDes.get.bind(protoMap);
+                    }
+                    if (typeof propDes.set === "function") {
+                        propDes.set = propDes.set.bind(protoMap);
+                    }
+                }
+                Object.defineProperty(_this, key, propDes);
+            }
+        }
+        const thisProps = Object.getOwnPropertyDescriptors(protoMap);
+        for (const key in thisProps) {
+            if (key !== "constructor")
+                Object.defineProperty(_this, key, {
+                    enumerable: true,
+                    configurable: true,
+                    get() {
+                        return Reflect.get(protoMap, key);
+                    },
+                    set(v) {
+                        Reflect.set(protoMap, key, v);
+                    },
+                });
+        }
+        return _this;
+    }
+}
+
+class EasyWeakMap extends WeakMap {
+    constructor(creater, entries, transformKey = (v) => v, _afterDelete) {
+        super(entries);
+        Object.defineProperty(this, "creater", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: creater
+        });
+        Object.defineProperty(this, "transformKey", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: transformKey
+        });
+        Object.defineProperty(this, "_afterDelete", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: _afterDelete
+        });
+    }
+    static from(args) {
+        return new EasyWeakMap(args.creater, args.entries, args.transformKey, args.afterDelete);
+    }
+    forceGet(key, creater = this.creater) {
+        const k = this.transformKey(key);
+        if (this.has(k)) {
+            return this.get(k);
+        }
+        const res = creater(key, k);
+        this.set(k, res);
+        return res;
+    }
+    tryGet(key) {
+        return this.get(this.transformKey(key));
+    }
+    trySet(key, val) {
+        return this.set(this.transformKey(key), val);
+    }
+    tryDelete(key) {
+        return this.delete(this.transformKey(key));
+    }
+    tryHas(key) {
+        return this.has(this.transformKey(key));
+    }
+    delete(key) {
+        const res = super.delete(key);
+        if (res && this._afterDelete) {
+            this._afterDelete(key);
+        }
+        return res;
+    }
+    get [Symbol.toStringTag]() {
+        return "EasyWeakMap";
+    }
+    static call(_this, creater, entries, transformKey, _afterDelete) {
+        if (!(_this instanceof EasyWeakMap)) {
+            throw new TypeError("please use new keyword to create EasyWeakMap instance.");
+        }
+        const protoMap = new EasyWeakMap(creater, entries, transformKey, _afterDelete);
+        const protoMap_PROTO = Object.getPrototypeOf(protoMap);
+        const protoMap_PROTO_PROTO = Object.getPrototypeOf(protoMap_PROTO);
+        const mapProps = Object.getOwnPropertyDescriptors(protoMap_PROTO_PROTO);
+        for (const key in mapProps) {
+            if (key !== "constructor") {
+                const propDes = mapProps[key];
+                if (typeof propDes.value === "function") {
+                    propDes.value = propDes.value.bind(protoMap);
+                }
+                else {
+                    if (typeof propDes.get === "function") {
+                        propDes.get = propDes.get.bind(protoMap);
+                    }
+                    if (typeof propDes.set === "function") {
+                        propDes.set = propDes.set.bind(protoMap);
+                    }
+                }
+                Object.defineProperty(_this, key, propDes);
+            }
+        }
+        const easymapProps = Object.getOwnPropertyDescriptors(protoMap_PROTO);
+        for (const key in easymapProps) {
+            if (key !== "constructor") {
+                const propDes = easymapProps[key];
+                if (typeof propDes.value === "function") {
+                    propDes.value = propDes.value.bind(protoMap);
+                }
+                else {
+                    if (typeof propDes.get === "function") {
+                        propDes.get = propDes.get.bind(protoMap);
+                    }
+                    if (typeof propDes.set === "function") {
+                        propDes.set = propDes.set.bind(protoMap);
+                    }
+                }
+                Object.defineProperty(_this, key, propDes);
+            }
+        }
+        const thisProps = Object.getOwnPropertyDescriptors(protoMap);
+        for (const key in thisProps) {
+            if (key !== "constructor")
+                Object.defineProperty(_this, key, {
+                    enumerable: true,
+                    configurable: true,
+                    get() {
+                        return Reflect.get(protoMap, key);
+                    },
+                    set(v) {
+                        Reflect.set(protoMap, key, v);
+                    },
+                });
+        }
+        return _this;
+    }
+}
+
 /// <reference lib="webworker" />
-import { PromiseOut } from "./deps/deno.land/x/bnqkl_util@1.1.1/packages/extends-promise-out/PromiseOut.js";
-import { EasyMap } from "./deps/deno.land/x/bnqkl_util@1.1.1/packages/extends-map/EasyMap.js";
-import { EasyWeakMap } from "./deps/deno.land/x/bnqkl_util@1.1.1/packages/extends-map/EasyWeakMap.js";
 ((self) => {
     const CLIENT_FETCH_CHANNEL_ID_WM = EasyWeakMap.from({
         creater(_client) {
@@ -48,14 +479,14 @@ import { EasyWeakMap } from "./deps/deno.land/x/bnqkl_util@1.1.1/packages/extend
     });
     // remember event.respondWith must sync call🐰
     self.addEventListener("fetch", (event) => {
-        const request = event.request;
+        const request = event.request.clone();
         const path = new URL(request.url).pathname;
         // 资源文件不处理
         if (path.lastIndexOf(".") !== -1) {
             return;
         }
         /// 开始向外发送数据，切片发送
-        console.log(`HttpRequestBuilder ${request.method},url: ${request.url}`);
+        console.log(`HttpRequestBuilder ${request.method},url: ${request.url},body:${request.body}`);
         event.respondWith((async () => {
             const client = await self.clients.get(event.clientId);
             if (client === undefined) {
@@ -106,9 +537,9 @@ import { EasyWeakMap } from "./deps/deno.land/x/bnqkl_util@1.1.1/packages/extend
             });
             // 传递headers
             yield contactToHex(uint16_to_binary(headersId), encoder.encode(JSON.stringify({ url: request.url, headers, method: request.method.toUpperCase() })), uint8_to_binary(0));
-            console.log("有body数据传递1", request.method, request.body !== null);
+            console.log("有body数据传递1：", request.body);
             // 如果body为空
-            if (request.body !== null) {
+            if (request.body) {
                 const reader = request.body.getReader();
                 do {
                     const { done, value } = await reader.read();
@@ -162,26 +593,6 @@ import { EasyWeakMap } from "./deps/deno.land/x/bnqkl_util@1.1.1/packages/extend
             fetchTask.responseBody.controller.close();
         }
     });
-    /**
-     *  创建ReadableStream
-     * @param arrayBuffer
-     * @param chunkSize 64 kib
-     * @returns
-     */
-    // deno-lint-ignore no-unused-vars
-    function createReadableStream(arrayBuffer, chunkSize = 64 * 1024) {
-        if (arrayBuffer.byteLength === 0)
-            return null;
-        return new ReadableStream({
-            start(controller) {
-                const bytes = new Uint8Array(arrayBuffer);
-                for (let readIndex = 0; readIndex < bytes.byteLength;) {
-                    controller.enqueue(bytes.subarray(readIndex, readIndex += chunkSize));
-                }
-                controller.close();
-            }
-        });
-    }
     const contact = (...arrs) => {
         const length = arrs.reduce((l, a) => l += a.length, 0);
         const r = new Uint8Array(length);

@@ -15,20 +15,21 @@ class BFSNetworkManager: NSObject {
     
     private var requestDict: [String: DownloadRequest] = [:]
 
-    func loadAutoUpdateInfo(fileName: String, urlString: String) {
-        
+    func loadAutoUpdateInfo(fileName: String? = nil, urlString: String) {
+        var name = fileName
         let request = AF.download(urlString).downloadProgress { progress in
             print(progress.fractionCompleted)  //进度值
-            NotificationCenter.default.post(name: NSNotification.Name.progressNotification, object: nil, userInfo: ["progress": "\(progress.fractionCompleted)", "fileName": fileName])
+            if name != nil {
+                NotificationCenter.default.post(name: NSNotification.Name.progressNotification, object: nil, userInfo: ["progress": "\(progress.fractionCompleted)", "fileName": name!])
+            }
         }.responseURL { response in
             print(response)
             switch response.result {
             case .success:
                 //下载后的文件路径
                 if response.fileURL != nil {
-                    
                     DispatchQueue.global().async {
-                        let path = Bundle.main.bundlePath + "/recommend-app/www.bfsa"
+                      //  let path = Bundle.main.bundlePath + "/recommend-app/www.bfsa"
                         
                         let filePath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first
                         
@@ -37,10 +38,15 @@ class BFSNetworkManager: NSObject {
                             DispatchQueue.main.async {
                                 NVHTarGzip.sharedInstance().unTarGzipFile(atPath: response.fileURL!.path, toPath: desPath) { error in
                                     if error == nil {
-                                        let schemePath = desPath + "/\(fileName)/sys"   //后面看返回数据修改
-                                        Schemehandler.setupHTMLCache(fileName: fileName, fromPath: schemePath)
-                                        RefreshManager.saveLastUpdateTime(fileName: fileName, time: Date().timeStamp)
-                                        NotificationCenter.default.post(name: NSNotification.Name.progressNotification, object: nil, userInfo: ["progress": "complete", "fileName": fileName])
+                                        if name == nil {
+                                            name = self.subFilePathNames(atPath: desPath).first
+                                        }
+                                        if name != nil {
+                                            let schemePath = desPath + "/\(name!)/sys"   //后面看返回数据修改
+                                            Schemehandler.setupHTMLCache(fileName: name!, fromPath: schemePath)
+                                            RefreshManager.saveLastUpdateTime(fileName: name!, time: Date().timeStamp)
+                                            NotificationCenter.default.post(name: NSNotification.Name.progressNotification, object: nil, userInfo: ["progress": "complete", "fileName": name!])
+                                        }
                                     }
                                 }
                             }
@@ -48,10 +54,12 @@ class BFSNetworkManager: NSObject {
                     }
                 }
             case .failure:
-                NotificationCenter.default.post(name: NSNotification.Name.progressNotification, object: nil, userInfo: ["progress": "fail", "fileName": fileName])
+                NotificationCenter.default.post(name: NSNotification.Name.progressNotification, object: nil, userInfo: ["progress": "fail", "fileName": name ?? ""])
             }
         }
-        self.requestDict[fileName] = request
+        if name != nil {
+            self.requestDict[name!] = request
+        }
     }
     
     func cancelNetworkRequest(urlString: String?) {
@@ -91,5 +99,26 @@ class BFSNetworkManager: NSObject {
         if let request = requestDict[fileName] {
             request.resume()
         }
+    }
+    
+    //读取文件夹下面的第一级文件夹
+    private func subFilePathNames(atPath path: String) -> [String] {
+        var fileList: [String] = []
+        guard let filePaths = FileManager.default.subpaths(atPath: path) else { return fileList }
+        for fileName in filePaths {
+            var isDir: ObjCBool = true
+            let fullPath = "\(path)/\(fileName)"
+            if FileManager.default.fileExists(atPath: fullPath, isDirectory: &isDir) {
+                if !isDir.boolValue {
+                    
+                } else {
+                    //后续是不需要判断.的，因为这是临时添加的，后续从网络获取
+                    if !fileName.contains("/"), !fileName.contains(".") {
+                        fileList.append(fileName)
+                    }
+                }
+            }
+        }
+        return fileList
     }
 }
