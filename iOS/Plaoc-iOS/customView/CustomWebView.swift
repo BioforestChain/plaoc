@@ -49,8 +49,30 @@ class CustomWebView: UIView {
     private lazy var webView: WKWebView = {
         
         let config = WKWebViewConfiguration()
+        
         config.limitsNavigationsToAppBoundDomains = true
+        
 //        config.userContentController = WKUserContentController()
+        
+        let userContentController = WKUserContentController()
+        /** region start  add console.log  */
+        let consoleJs = """
+                            console.log = (function(oriLogFunc){
+                                    return function(args){
+                                        oriLogFunc.call(console, ...args);
+                                        //这里，在执行自定义console.log的时候，将str传递出去。
+                                        window.webkit.messageHandlers.consoleLog.postMessage(args);
+                                    }
+                            })(console.log);
+                        """
+        let consoleScript = WKUserScript(source: consoleJs, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+        userContentController.addUserScript(consoleScript)
+        /** region end  */
+        
+        config.userContentController = userContentController
+        userContentController.add(self, name: "consoleLog")
+        
+        
 //        if self.scripts != nil {
 //            for script in self.scripts! {
 //                config.userContentController.addUserScript(script)
@@ -158,6 +180,8 @@ extension CustomWebView:  WKScriptMessageHandler {
             guard let bodyString = message.body as? String else { return }
             BFSNetworkManager.shared.loadAutoUpdateInfo(urlString: bodyString)
             //同时显示下载进度条
+        } else if message.name == "consoleLog" {
+            print(message.body)
         }
     }
 }
