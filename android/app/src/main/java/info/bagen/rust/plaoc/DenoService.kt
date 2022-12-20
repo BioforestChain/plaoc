@@ -155,6 +155,7 @@ fun mathInputType(cmd: ExportNative, handle: RustHandle, headId: ByteArray) {
     }
     return
   }
+  // 处理ui
   if (cmd === ExportNative.SetDWebViewUI) {
     handle.data.forEach { data ->
       println("kotlin#SetDWebViewUI:${PlaocToString.transHexString(data)}")
@@ -217,7 +218,6 @@ fun createBytesFactory(callFun: ExportNative, message: String) {
  threadPoolExecutor.execute {
     denoService.backSystemDataToRust(result.array())
   }
-  println("threadPoolExecutor#size:${threadPoolExecutor.queue.size}")
 }
 
 // 填充数据返回
