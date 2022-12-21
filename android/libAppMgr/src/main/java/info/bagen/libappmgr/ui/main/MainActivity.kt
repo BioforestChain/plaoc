@@ -48,11 +48,11 @@ class MainActivity : ComponentActivity() {
 @SuppressLint("UnrememberedMutableState")
 @Composable
 fun Home(
+  mainViewModel: MainViewModel = viewModel() as MainViewModel,
+  appViewModel: AppViewModel = viewModel() as AppViewModel,
   onSearchAction: ((SearchAction, String) -> Unit)? = null,
   onOpenDWebview: ((appId: String, dAppInfo: DAppInfoUI?) -> Unit)? = null
 ) {
-  val appViewModel = viewModel() as AppViewModel
-  val mainViewModel = viewModel() as MainViewModel
   LaunchedEffect(Unit) {
     if (PreferencesHelper.isFirstIn()) {
       FilesUtil.copyAssetsToRecommendAppDir()

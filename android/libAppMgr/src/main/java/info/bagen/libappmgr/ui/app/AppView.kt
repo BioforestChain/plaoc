@@ -169,6 +169,9 @@ fun AppInfoGridView(
       items(uiState.appViewStateList) { item ->
         AppInfoView(appViewModel, item) { onOpenApp?.let { it(item.bfsId, item.dAppUrl) } }
       }
+      items(uiState.downloadAppView) { item ->
+        AppInfoView(appViewModel, item) { onOpenApp?.let { it(item.bfsId, item.dAppUrl) } }
+      }
     }
   }
   AppDialogView(appViewModel = appViewModel, onOpenApp)

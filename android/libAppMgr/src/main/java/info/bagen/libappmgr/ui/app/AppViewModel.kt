@@ -24,6 +24,7 @@ data class AppViewUIState(
   val useMaskView: MutableState<Boolean> = mutableStateOf(true), // 表示使用app遮罩的方式下载
   val appDialogInfo: MutableState<AppDialogInfo> = mutableStateOf(AppDialogInfo()),
   val appViewStateList: ArrayList<AppViewState> = arrayListOf(),
+  val downloadAppView: ArrayList<AppViewState> = arrayListOf(),
   var curAppViewState: AppViewState? = null,
 )
 
@@ -38,6 +39,7 @@ data class AppViewState(
   var bfsId: String = "",
   var dAppUrl: DAppInfoUI? = null,
   var showPopView: MutableState<Boolean> = mutableStateOf(false),
+  var bfsDownloadPath: String? = null,
 )
 
 data class MaskProgressState(
@@ -93,9 +95,10 @@ sealed class AppViewIntent {
   object DialogHide : AppViewIntent()
   object DialogConfirm : AppViewIntent()
 
-  class PopAppMenu(val appViewState: AppViewState, val show:Boolean): AppViewIntent()
-  class ShareAppMenu(val appViewState: AppViewState): AppViewIntent()
-  class UninstallApp(val appViewState: AppViewState): AppViewIntent()
+  class PopAppMenu(val appViewState: AppViewState, val show: Boolean) : AppViewIntent()
+  class ShareAppMenu(val appViewState: AppViewState) : AppViewIntent()
+  class UninstallApp(val appViewState: AppViewState) : AppViewIntent()
+  class BFSInstallApp(val path: String) : AppViewIntent()
 }
 
 
@@ -148,9 +151,15 @@ class AppViewModel(private val repository: AppRepository = AppRepository()) : Vi
           // 卸载就是删除当前目录，然后重新捞取
           AppContextUtil.sInstance?.let {
             uiState.value.curAppViewState = null
-            val path = "${it.dataDir}/${APP_DIR_TYPE.SystemApp.rootName}/${action.appViewState.bfsId}"
+            val path =
+              "${it.dataDir}/${APP_DIR_TYPE.SystemApp.rootName}/${action.appViewState.bfsId}"
             FilesUtil.deleteQuietly(path)
             loadAppInfoList()
+          }
+        }
+        is AppViewIntent.BFSInstallApp -> { // 通过 JS 调用的下载操作
+          if (action.path.isNotEmpty()) {
+            newAppDownloadAndInstall(action.path)
           }
         }
       }
@@ -167,6 +176,7 @@ class AppViewModel(private val repository: AppRepository = AppRepository()) : Vi
       list.add(appViewState)
     }
     uiState.value = uiState.value.copy(appViewStateList = list)
+    Log.e("lin.huang", "AppViewModel::loadAppInfoList ${uiState.value.downloadAppView.size}")
   }
 
   private suspend fun loadAppNewVersion(appViewState: AppViewState) {
@@ -249,7 +259,11 @@ class AppViewModel(private val repository: AppRepository = AppRepository()) : Vi
       DownLoadState.COMPLETED -> {
         appViewState.showBadge.value = true
         appViewState.isSystemApp.value = true
-        appViewState.dAppUrl = repository.loadDAppUrl(appViewState.bfsId) // 跳转需要的地址
+        repository.loadDAppUrl(appViewState.bfsId)?.let { dAppInfoUI -> // 跳转需要的地址
+          appViewState.dAppUrl = dAppInfoUI
+          appViewState.name = mutableStateOf(dAppInfoUI.name)
+          appViewState.iconPath = mutableStateOf(dAppInfoUI.icon)
+        }
       }
       DownLoadState.FAILURE -> {
         Toast.makeText(AppContextUtil.sInstance!!, dialogInfo.text, Toast.LENGTH_SHORT).show()
@@ -259,5 +273,39 @@ class AppViewModel(private val repository: AppRepository = AppRepository()) : Vi
       }
     }
     appViewState.maskViewState.value.downLoadState.value = downLoadState
+  }
+
+  private suspend fun newAppDownloadAndInstall(path: String) {
+    // 添加新应用， 需要判断当前应用是否已存在
+    Log.e("lin.huang", "AppViewModel::newAppDownloadAndInstall enter path=$path")
+    var found = false
+    uiState.value.downloadAppView.forEach {
+      if (it.maskViewState.value.path == path) {
+        found = true
+      }
+    }
+    if (!found) {
+      AppContextUtil.showShortToastMessage("开始下载")
+      val list: ArrayList<AppViewState> = arrayListOf()
+      list.addAll(uiState.value.downloadAppView)
+      val appViewState = AppViewState(
+        name = mutableStateOf("开始下载"),
+        bfsDownloadPath = path,
+        maskViewState = mutableStateOf(
+          MaskProgressState(
+            show = mutableStateOf(true),
+            downLoadState = mutableStateOf(DownLoadState.LOADING),
+            path = path
+          )
+        )
+      )
+      list.add(appViewState)
+
+      uiState.value = uiState.value.copy(
+        downloadAppView = list, curAppViewState = appViewState
+      )
+    } else {
+      AppContextUtil.showShortToastMessage("正在下载中...")
+    }
   }
 }

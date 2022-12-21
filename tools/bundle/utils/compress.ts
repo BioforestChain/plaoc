@@ -11,8 +11,9 @@ export async function compressToSuffixesBfsa(dest: string, bfsAppId: string) {
 
   await tar.c(
     {
-      // gzip设为false，否则压缩完会多一层文件，无法访问内层目录
-      gzip: false,
+      // gzip设为false，否则压缩完会多一层文件，无法访问内层目录(是压缩软件打开问题，解压完没有问题)
+      // gzip: false,
+      gzip: true,
       preservePaths: false,
       // 设置工作目录，不设置的话，会在压缩包中带上绝对路径
       cwd: cwd,

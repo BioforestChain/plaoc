@@ -8,9 +8,9 @@ import info.bagen.libappmgr.utils.ClipboardUtil
 import info.bagen.libappmgr.utils.FilesUtil
 import info.bagen.rust.plaoc.system.device.DeviceInfo
 import info.bagen.rust.plaoc.system.notification.NotificationMsgItem
-import info.bagen.rust.plaoc.webView.sendToJavaScript
 import info.bagen.rust.plaoc.system.notification.NotifyManager
 import info.bagen.rust.plaoc.system.permission.PermissionManager
+import info.bagen.rust.plaoc.webView.jsutil.sendToJavaScript
 import info.bagen.rust.plaoc.webView.network.*
 
 val callable_map = mutableMapOf<ExportNative, (data: String) -> Unit>()
@@ -57,6 +57,10 @@ fun splicingPath(bfsId:String, entry:String):String {
   callable_map[ExportNative.OpenDWebView] = {
     activity.openDWebViewActivity(it)
   }
+  callable_map[ExportNative.ExitApp] = {
+    println("kotlin#app退出🏄🏼‍")
+    App.dwebViewActivity?.finish()
+  }
   // 初始化用户配置
   callable_map[ExportNative.InitMetaData] = {
     initMetaData(it)
@@ -90,7 +94,7 @@ fun splicingPath(bfsId:String, entry:String):String {
   }
   callable_map[ExportNative.FileSystemWrite] = {
     val handle = mapper.readValue(it, FileWrite::class.java)
-    fileSystem.write(handle.path,handle.option.content, handle.option.append,handle.option.autoCreate)
+    fileSystem.write(handle.path,handle.content, handle.option)
   }
   callable_map[ExportNative.FileSystemRead] = {
     val handle = mapper.readValue(it, FileRead::class.java)
@@ -107,6 +111,11 @@ fun splicingPath(bfsId:String, entry:String):String {
   callable_map[ExportNative.FileSystemRm] = {
     val handle = mapper.readValue(it, FileRm::class.java)
     fileSystem.rm(handle.path,handle.option.deepDelete)
+  }
+  callable_map[ExportNative.FileSystemStat] = {
+    val handle = mapper.readValue(it, FileStat::class.java)
+    Log.i("kotlin#FileSystemStat: ", handle.toString())
+    fileSystem.stat(handle.path)
   }
   /**获取appId */
   callable_map[ExportNative.GetBfsAppId] = {

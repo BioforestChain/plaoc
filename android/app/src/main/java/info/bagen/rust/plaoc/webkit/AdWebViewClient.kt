@@ -1,8 +1,10 @@
 package info.bagen.rust.plaoc.webkit
 
 import android.graphics.Bitmap
+import android.os.Build
 import android.util.Log
 import android.webkit.*
+import info.bagen.rust.plaoc.App
 
 /**
  * AccompanistWebViewClient
@@ -31,6 +33,12 @@ open class AdWebViewClient : WebViewClient() {
         state.loadingState = AdLoadingState.Finished
         navigator.canGoBack = view?.canGoBack() ?: false
         navigator.canGoForward = view?.canGoForward() ?: false
+//        view?.let { webView ->
+//          val inputStream = App.appContext.assets.open("bfs.js") // ����ע���js�ļ�
+//          val byteArray = inputStream.readBytes()
+//          val injectString = String(byteArray)
+//          webView.evaluateJavascript("javascript:$injectString") {}
+//        }
     }
 
     override fun doUpdateVisitedHistory(

@@ -21,6 +21,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import info.bagen.rust.plaoc.webView.api.BFSApi
 import info.bagen.rust.plaoc.webView.bottombar.BottomBarFFI
 import info.bagen.rust.plaoc.webView.bottombar.BottomBarState
 import info.bagen.rust.plaoc.webView.bottombar.DWebBottomBar
@@ -213,6 +214,7 @@ fun DWebView(
           // 初始化挂载Dialog函数
           initDialogFn(dialogFFI);
           onCreated(webView)
+          webView.addJavascriptInterface(BFSApi(), "bfs") // 注入bfs，js可以直接调用
         },
         chromeClient = remember {
           class MyWebChromeClient : AdWebChromeClient() {
@@ -357,11 +359,14 @@ fun DWebView(
 //                })
 //              }
               // 只加载资源文件 index.js index.html
-              if (request !== null && request.url.path?.lastIndexOf(".")  != -1) {
-                // 这里出来的url全部都用是小写，serviceWorker没办法一开始就注册，所以还会走一次这里
-                return interceptNetworkRequests(request, customUrlScheme);
+              request?.let { webResourceRequest ->
+                Log.e("lin.huang", "DWebView:: 111111111111111  ${webResourceRequest.url}---$dWebView_host ")
+                if (webResourceRequest.url.host == "$dWebView_host.dweb".lowercase()) {
+                  // 这里出来的url全部都用是小写，serviceWorker没办法一开始就注册，所以还会走一次这里
+                  return interceptNetworkRequests(request, customUrlScheme)
+                }
               }
-              return null
+              return super.shouldInterceptRequest(view, request)
             }
 
             override fun shouldOverrideUrlLoading(

@@ -11,6 +11,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import info.bagen.libappmgr.utils.ClipboardUtil
 import info.bagen.rust.plaoc.util.PlaocUtil
+import info.bagen.rust.plaoc.webView.DWebViewActivity
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidFileProperties
 import org.koin.android.ext.koin.androidLogger
@@ -24,6 +25,9 @@ class App : Application() {
 
   companion object {
     lateinit var appContext: Context
+
+    var mainActivity:MainActivity? = null
+    var dwebViewActivity:DWebViewActivity? = null
   }
 
   override fun onCreate() {

@@ -13,10 +13,10 @@ val libViewModelModule = module {
   viewModel { MainViewModel() }
   viewModel { AppViewModel(get()) }
   viewModel { DownLoadViewModel(get()) }
-  viewModel { DCIMViewModel() }
+  viewModel { DCIMViewModel(get()) }
 }
 
 val libRepositoryModule = module {
-  single { DownLoadRepository(get()) }
   single { AppRepository() }
+  single { DownLoadRepository() }
 }

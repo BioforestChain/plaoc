@@ -38,14 +38,19 @@ async function onPushFile(e: Event) {
   }
 }
 
-function InstallBFS() {
-  (window as any).installBFS("https://shop.plaoc.com/KEJPMHLA/KEJPMHLA.zip")
+function InstallBFS(type: string = "tar.gz") {
+  (window as any).BFSInstallApp(`https://shop.plaoc.com/KEJPMHLA/KEJPMHLA.${type}`)
 }
 
 </script>
 <template>
 
   <h1>{{ msg }}</h1>
+  <p class="read-the-docs">
+    <ion-button expand="block" fill="outline" @click="InstallBFS('tar.gz')">下载tar.gz应用</ion-button>
+    <ion-button expand="block" fill="outline" @click="InstallBFS('tar')">下载tar应用</ion-button>
+    <ion-button expand="block" fill="outline" @click="InstallBFS('bfsa')">下载bfsa应用</ion-button>
+  </p>
   <!-- 文件上传From形式 -->
   <ion-card>
     <ion-card-header>
@@ -76,9 +81,6 @@ function InstallBFS() {
     Install
     <a href="https://github.com/johnsoncodehk/volar" target="_blank">Volar</a>
     in your IDE for a better DX
-  </p>
-  <p class="read-the-docs">
-    <ion-button expand="block" fill="outline" @click="InstallBFS()">下载应用</ion-button>
   </p>
 </template>
 
