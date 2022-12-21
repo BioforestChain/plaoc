@@ -21,7 +21,6 @@ class BFSBroadcastReceiver : BroadcastReceiver() {
         BFSBroadcastAction.BFSInstallApp.action -> {
           App.mainActivity?.let { mainActivity ->
             val path = it.getStringExtra("path") ?: ""
-            Log.e("lin.huang", "BFSBroadcastReceiver::  path=$path")
             mainActivity.getAppViewModel().handleIntent(AppViewIntent.BFSInstallApp(path))
           }
         }
