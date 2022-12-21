@@ -10,7 +10,7 @@ import JavaScriptCore
 
 @objc protocol PlaocJSExport: JSExport {
     
-    func openDWebView(test: String, param: String) -> String
+    func callJavaScript(functionName: String, param: String) -> Any
     
 }
 
@@ -19,9 +19,11 @@ import JavaScriptCore
     
     var controller: UIViewController?
     var jsContext: JSContext?
+    var fileName: String = ""
     
-    func openDWebView(test: String, param: String) -> String {
-        switch test {
+    func callJavaScript(functionName: String, param: String) -> Any {
+        print(functionName)
+        switch functionName {
         case "OpenDWebView":
             return executiveOpenDWebView(param: param)
         case "OpenQrScanner":
@@ -55,8 +57,9 @@ import JavaScriptCore
 
 extension PlaocHandleModel {
     //打开DWebView
-    private func executiveOpenDWebView(param: String) -> String {
-        return ""
+    private func executiveOpenDWebView(param: String) -> Bool {
+        NotificationCenter.default.post(name: NSNotification.Name.openDwebNotification, object: nil, userInfo: ["param":"iosqmkkx:/\(param)"])
+        return true
     }
     //二维码
     private func executiveOpenQrScanner(param: String) -> String {
@@ -72,6 +75,7 @@ extension PlaocHandleModel {
     }
     //初始化app数据
     private func executiveInitMetaData(param: String) -> String {
+        NetworkMap.shared.metaData(metadata: param, fileName: fileName)
         return ""
     }
     //初始化运行时

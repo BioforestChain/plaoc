@@ -101,21 +101,28 @@ class FirstViewController: UIViewController {
         }
         
     }
-    
+    var manager: BrowserManager!
     @objc func tap(sender: UIButton) {
-
-        let name = appNames[sender.tag]
-        let type = BatchFileManager.shared.currentAppType(fileName: name)
-        if type == .system {
-            let second = WebViewViewController()
-            second.fileName = name
-            second.urlString = "iosqmkkx:/index.html"
-            self.navigationController?.pushViewController(second, animated: true)
-        } else if type == .recommend {
-            BatchFileManager.shared.clickRecommendAppAction(fileName: name)
-        } else if type == .scan {
-            BatchFileManager.shared.clickRecommendAppAction(fileName: name)
-        }
+      
+        
+        
+        let second = WebViewViewController()
+        second.fileName = "wallet"
+        second.urlString = "https://wallet.plaoc.com/"
+        self.navigationController?.pushViewController(second, animated: true)
+//        return
+//        let name = appNames[sender.tag]
+//        let type = BatchFileManager.shared.currentAppType(fileName: name)
+//        if type == .system {
+//            let second = WebViewViewController()
+//            second.fileName = name
+//            second.urlString = "iosqmkkx:/index.html"
+//            self.navigationController?.pushViewController(second, animated: true)
+//        } else if type == .recommend {
+//            BatchFileManager.shared.clickRecommendAppAction(fileName: name)
+//        } else if type == .scan {
+//            BatchFileManager.shared.clickRecommendAppAction(fileName: name)
+//        }
     }
     
     func addScanAppUI(name: String) {
@@ -139,3 +146,5 @@ class FirstViewController: UIViewController {
     }
 
 }
+
+

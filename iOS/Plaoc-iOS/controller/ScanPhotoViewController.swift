@@ -8,6 +8,7 @@
 import UIKit
 import AVFoundation
 import RxSwift
+import Photos
 
 class ScanPhotoViewController: UIViewController {
 
@@ -20,9 +21,11 @@ class ScanPhotoViewController: UIViewController {
     var callback: ThirdCallback?
     private let disposeBag = DisposeBag()
     
+    var animationIV = ScanNetAnimationImageView.instance()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         self.view.backgroundColor = .black
         self.view.addSubview(naviView)
         
@@ -37,6 +40,9 @@ class ScanPhotoViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         startScan()
+        
+        let image = UIImage(named: "qrcode_scan_part_net")
+        animationIV.startAnimatingWithRect(animationRect: self.scanRectView!.frame, parentView: self.view, image: image)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -97,8 +103,8 @@ class ScanPhotoViewController: UIViewController {
             
             self.scanRectView = UIView(frame: CGRect(x: 0, y: 0, width: scanSize.width, height: scanSize.height))
             self.scanRectView?.center = CGPoint(x: UIScreen.main.bounds.midX, y: UIScreen.main.bounds.midY)
-            self.scanRectView?.layer.borderColor = UIColor.green.cgColor
-            self.scanRectView?.layer.borderWidth = 1
+//            self.scanRectView?.layer.borderColor = UIColor.green.cgColor
+//            self.scanRectView?.layer.borderWidth = 1
             self.view.addSubview(self.scanRectView!)
             
             self.session?.startRunning()
@@ -140,6 +146,60 @@ class ScanPhotoViewController: UIViewController {
         alertVC.addAction(cancelAction)
         self.present(alertVC, animated: true)
     }
+    //停止扫描
+    private func stopScan() {
+        self.session?.stopRunning()
+        self.animationIV.stopStepAnimating()
+    }
+    //暂停扫描
+    private func pauseScanning() {
+        print("pause scanning")
+    }
+    //恢复扫描
+    private func resumeScanning() {
+        print("resume scanning")
+    }
+    //检查是否有摄像头权限，如果没有或者被拒绝，那么会强制请求打开权限（设置）
+    private func checkCameraPermission() -> Bool {
+        let authStatus = PHPhotoLibrary.authorizationStatus()
+        switch authStatus {
+        case .authorized:
+            return true
+        default:
+            return false
+        }
+    }
+    //跳转到设置界面
+    private func openAppSettings() {
+        guard let url = URL(string: UIApplication.openSettingsURLString) else {
+            return
+        }
+        if UIApplication.shared.canOpenURL(url) {
+            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+        }
+    }
+    //打开关闭手电筒
+    private func toggleTorch() {
+        guard let device = AVCaptureDevice.default(for: AVMediaType.video) else { return }
+        if device.hasTorch && device.isTorchAvailable {
+            try? device.lockForConfiguration()
+            device.torchMode = device.torchMode == .off ? .on : .off
+            device.unlockForConfiguration()
+        }
+    }
+    //手电筒状态
+    private func getTorchState() -> Bool {
+        guard let device = AVCaptureDevice.default(for: AVMediaType.video) else { return false }
+        return device.torchMode == .off ? false : true
+    }
+    //隐藏webview背景
+    private func hideBackground() {
+        print("hide background")
+    }
+    //显示webview背景
+    private func showBackground() {
+        print("show background")
+    }
     
 }
 
@@ -154,6 +214,6 @@ extension ScanPhotoViewController: AVCaptureMetadataOutputObjectsDelegate {
                 self.session?.stopRunning()
             }
         }
-        self.session?.stopRunning()
+        self.stopScan()
     }
 }

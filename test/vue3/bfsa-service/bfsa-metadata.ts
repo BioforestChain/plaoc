@@ -7,7 +7,7 @@ export default metaConfig({
     name: "ar扫码",
     icon: "/vite.svg", //或者 /icon/vite.svg ，/vite.svg , ./vite.svg , vite.svg
     appType: "web",
-    url: "https://shop.plaoc.com/KEJPMHLA/app/sys/",
+    url: "https://172.30.92.252:8080/#/mnemonic?__nav_id__=1",
     engines: {
       dwebview: "~1.0.0",
     },

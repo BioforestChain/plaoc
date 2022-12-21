@@ -54,7 +54,13 @@ class Schemehandler: NSObject, WKURLSchemeHandler {
             
         } else {
             if urlstring.hasPrefix(schemeString) {
-                urlstring = urlstring.replacingOccurrences(of: schemeString, with: "http")
+                if urlstring.contains("\(schemeString)://") {
+                    if let replaceURL = NetworkMap.shared.replaceDownloadUrlString(urlString: urlstring) {
+                        urlstring = replaceURL
+                    }
+                } else {
+                    urlstring = urlstring.replacingOccurrences(of: schemeString, with: "http")
+                }
             }
             guard let url = URL(string: urlstring) else { return }
             let request = URLRequest(url: url)
