@@ -6,7 +6,6 @@ import android.webkit.WebResourceResponse
 import com.fasterxml.jackson.databind.DeserializationFeature
 import info.bagen.rust.plaoc.mapper
 import info.bagen.libappmgr.utils.JsonUtil
-import info.bagen.rust.plaoc.webView.sendToJavaScript
 import info.bagen.rust.plaoc.webView.urlscheme.CustomUrlScheme
 import java.io.ByteArrayInputStream
 import java.net.URL

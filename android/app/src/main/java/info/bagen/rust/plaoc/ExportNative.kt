@@ -2,14 +2,17 @@ package info.bagen.rust.plaoc
 
 /** 系统调用函数*/
 enum class ExportNative(val type: String) {
-  OpenQrScanner("openQrScanner"),
-  BarcodeScanner("barcodeScanner"),
-  OpenDWebView("openDWebView"),
+  OpenQrScanner("openQrScanner"), // 打开扫码-二维码
+  BarcodeScanner("barcodeScanner"), // 打开扫码-条形码
+  ExitApp("ExitApp"), // 退出app
+  OpenDWebView("openDWebView"), // 打开DwebView
   InitMetaData("initMetaData"),
   SetDWebViewUI("setDWebViewUI"),
+
   DenoRuntime("denoRuntime"),
   ReadOnlyRuntime("readOnlyRuntime"),
   EvalJsRuntime("evalJsRuntime"),
+  // vfs
   FileSystemLs("fileSystemLs"),
   FileSystemList("fileSystemList"),
   FileSystemMkdir("fileSystemMkdir"),
@@ -19,12 +22,13 @@ enum class ExportNative(val type: String) {
   FileSystemRename("fileSystemRename"),
   FileSystemRm("fileSystemRm"),
   FileSystemStat("fileSystemStat"),
+
   GetBfsAppId("getBfsAppId"),
   ApplyPermissions("applyPermissions"),
   GetDeviceInfo("getDeviceInfo"),
-  CreateNotificationMsg("createNotificationMsg"),
-  ReadClipboardContent("readClipboardContent"),
-  WriteClipboardContent("writeClipboardContent"),
+  CreateNotificationMsg("createNotificationMsg"), // 创建通知消息
+  ReadClipboardContent("readClipboardContent"), // 读取剪切板
+  WriteClipboardContent("writeClipboardContent"), // 写入剪切板
 }
 
 /** worker */

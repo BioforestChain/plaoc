@@ -8,9 +8,9 @@ import info.bagen.libappmgr.utils.ClipboardUtil
 import info.bagen.libappmgr.utils.FilesUtil
 import info.bagen.rust.plaoc.system.device.DeviceInfo
 import info.bagen.rust.plaoc.system.notification.NotificationMsgItem
-import info.bagen.rust.plaoc.webView.sendToJavaScript
 import info.bagen.rust.plaoc.system.notification.NotifyManager
 import info.bagen.rust.plaoc.system.permission.PermissionManager
+import info.bagen.rust.plaoc.webView.jsutil.sendToJavaScript
 import info.bagen.rust.plaoc.webView.network.*
 
 val callable_map = mutableMapOf<ExportNative, (data: String) -> Unit>()
@@ -56,6 +56,10 @@ fun splicingPath(bfsId:String, entry:String):String {
   callable_map[ExportNative.BarcodeScanner] = { activity.openBarCodeScannerActivity() }
   callable_map[ExportNative.OpenDWebView] = {
     activity.openDWebViewActivity(it)
+  }
+  callable_map[ExportNative.ExitApp] = {
+    println("kotlin#app退出🏄🏼‍")
+    App.dwebViewActivity?.finish()
   }
   // 初始化用户配置
   callable_map[ExportNative.InitMetaData] = {
@@ -110,7 +114,7 @@ fun splicingPath(bfsId:String, entry:String):String {
   }
   callable_map[ExportNative.FileSystemStat] = {
     val handle = mapper.readValue(it, FileStat::class.java)
-    Log.i("handlehandlehandle: ", handle.toString())
+    Log.i("kotlin#FileSystemStat: ", handle.toString())
     fileSystem.stat(handle.path)
   }
   /**获取appId */

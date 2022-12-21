@@ -5,7 +5,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import android.webkit.ValueCallback
 import android.webkit.WebView
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -28,11 +27,11 @@ import androidx.navigation.navDeepLink
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
 import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
-import info.bagen.rust.plaoc.ExportNative
+import info.bagen.rust.plaoc.App
+import info.bagen.rust.plaoc.App.Companion.dwebViewActivity
 import info.bagen.rust.plaoc.TASK
-import info.bagen.rust.plaoc.createBytesFactory
-import info.bagen.rust.plaoc.threadPoolExecutor
 import info.bagen.rust.plaoc.ui.theme.RustApplicationTheme
+import info.bagen.rust.plaoc.webView.jsutil.emitListenBackButton
 import info.bagen.rust.plaoc.webView.urlscheme.CustomUrlScheme
 import info.bagen.rust.plaoc.webView.urlscheme.requestHandlerFromAssets
 import info.bagen.rust.plaoc.webkit.AdAndroidWebView
@@ -49,28 +48,35 @@ class DWebViewActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         Log.i(TAG, "parentActivityIntent:${this.parentActivityIntent}")
+        // 触发回调监听事件
+        emitListenBackButton()
+
         if (this.parentActivityIntent == null) {
           println("shutdownNow:${TASK?.isAlive}") // 结束线程任务
-
           super.onBackPressed()
         } else {
             this.startActivity(this.parentActivityIntent)
         }
     }
 
+  override fun onDestroy() {
+    super.onDestroy()
+    dwebViewActivity = null
+  }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WebView.setWebContentsDebuggingEnabled(true)// 开启调试
         // 设置装饰视图是否应适合WindowInsetsCompat(Describes a set of insets for window content.)
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        val activity = this
+        dwebViewActivity = this
         setContent {
             RustApplicationTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background,
                 ) {
-                    NavFun(activity)
+                    NavFun(this)
                 }
             }
 
@@ -133,23 +139,9 @@ fun openDWebWindow(activity: ComponentActivity, url: String) {
     val intent = Intent(activity.applicationContext, DWebViewActivity::class.java).also {
         it.data = Uri.parse("https://"+URLEncoder.encode(url, "UTF-8"))
     }
-    activity.startActivity(intent)
+     activity.startActivity(intent)
 }
 
-/** 传递参数给前端*/
-fun sendToJavaScript(jsCode: String) {
-  // 这里的消息需要等待serviceWorker启动再执行
-    dWebView?.post(Runnable {
-      println("kotlin#sendToJavaScript:$jsCode")
-      dWebView?.evaluateJavascript(jsCode,ValueCallback<String> { result ->
-          if (result.isNotEmpty() && result != "null") {
-            println("kotlin#sendToJavaScript🌽返回的数据:$result")
-            createBytesFactory(ExportNative.EvalJsRuntime, result)// 返回数据给后端
-          }
-        })
-    })
-
-}
 
 
 

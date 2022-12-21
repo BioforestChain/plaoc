@@ -33,16 +33,12 @@ open class AdWebViewClient : WebViewClient() {
         state.loadingState = AdLoadingState.Finished
         navigator.canGoBack = view?.canGoBack() ?: false
         navigator.canGoForward = view?.canGoForward() ?: false
-        view?.let { webView ->
-          val inputStream = App.appContext.assets.open("bfs.js") // ÓÃÓÚ×¢ÈëµÄjsÎÄ¼þ
-          val byteArray = inputStream.readBytes()
-          val injectString = String(byteArray)
-          if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT) {
-            webView.loadUrl("javascript:$injectString")
-          } else {
-            webView.evaluateJavascript("javascript:$injectString") {}
-          }
-        }
+//        view?.let { webView ->
+//          val inputStream = App.appContext.assets.open("bfs.js") // ï¿½ï¿½ï¿½ï¿½×¢ï¿½ï¿½ï¿½jsï¿½Ä¼ï¿½
+//          val byteArray = inputStream.readBytes()
+//          val injectString = String(byteArray)
+//          webView.evaluateJavascript("javascript:$injectString") {}
+//        }
     }
 
     override fun doUpdateVisitedHistory(
