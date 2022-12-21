@@ -49,6 +49,7 @@ class CustomWebView: UIView {
     private lazy var webView: WKWebView = {
         
         let config = WKWebViewConfiguration()
+        
         config.limitsNavigationsToAppBoundDomains = true
         config.userContentController = WKUserContentController()
         if self.scripts != nil {
@@ -62,6 +63,39 @@ class CustomWebView: UIView {
         config.preferences = prefreen
         config.setValue(true, forKey: "allowUniversalAccessFromFileURLs")
         config.setURLSchemeHandler(Schemehandler(fileName: self.fileName), forURLScheme: schemeString)
+        
+//        config.userContentController = WKUserContentController()
+        
+        let userContentController = WKUserContentController()
+        /** region start  add console.log  */
+        let consoleJs = """
+                            console.log = (function(oriLogFunc){
+                                    return function(args){
+                                        oriLogFunc.call(console, ...args);
+                                        //这里，在执行自定义console.log的时候，将str传递出去。
+                                        window.webkit.messageHandlers.consoleLog.postMessage(args);
+                                    }
+                            })(console.log);
+                        """
+        let consoleScript = WKUserScript(source: consoleJs, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+        userContentController.addUserScript(consoleScript)
+        /** region end  */
+        
+        config.userContentController = userContentController
+        userContentController.add(self, name: "consoleLog")
+        
+        
+//        if self.scripts != nil {
+//            for script in self.scripts! {
+//                config.userContentController.addUserScript(script)
+//            }
+//        }
+//        config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "InstallBFS")
+//        let prefreen = WKPreferences()
+//        prefreen.javaScriptCanOpenWindowsAutomatically = true
+//        config.preferences = prefreen
+//        config.setValue(true, forKey: "allowUniversalAccessFromFileURLs")
+//        config.setURLSchemeHandler(Schemehandler(fileName: self.fileName), forURLScheme: schemeString)
         let webView = WKWebView(frame: self.bounds, configuration: config)
         webView.navigationDelegate = self
         webView.uiDelegate = self
@@ -160,6 +194,8 @@ extension CustomWebView:  WKScriptMessageHandler {
             guard let path = bodyDict["path"] else { return }
             BFSNetworkManager.shared.loadAutoUpdateInfo(urlString: path)
             //同时显示下载进度条
+        } else if message.name == "consoleLog" {
+            print(message.body)
         }
     }
 }

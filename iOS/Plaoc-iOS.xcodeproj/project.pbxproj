@@ -110,7 +110,6 @@
 		F3B0946528F558150027CD06 /* NotificationName.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3B0946428F558150027CD06 /* NotificationName.swift */; };
 		F3B77B682909369A005A384D /* QueueManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3B77B672909369A005A384D /* QueueManager.swift */; };
 		F3BEA44C29484E7900CBA119 /* JSInjectManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3BEA44B29484E7900CBA119 /* JSInjectManager.swift */; };
-		F3DC28862926196300C8EDF0 /* sys in Resources */ = {isa = PBXBuildFile; fileRef = F3DC28852926196300C8EDF0 /* sys */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -252,7 +251,6 @@
 		F3B0946428F558150027CD06 /* NotificationName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationName.swift; sourceTree = "<group>"; };
 		F3B77B672909369A005A384D /* QueueManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueManager.swift; sourceTree = "<group>"; };
 		F3BEA44B29484E7900CBA119 /* JSInjectManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSInjectManager.swift; sourceTree = "<group>"; };
-		F3DC28852926196300C8EDF0 /* sys */ = {isa = PBXFileReference; lastKnownFileType = folder; path = sys; sourceTree = "<group>"; };
 		F406C3D95E45CC0D87A9E05A /* Pods_Plaoc_iOSTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Plaoc_iOSTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -683,7 +681,6 @@
 				F31B2BAC28F80E74008CDD5F /* recommend-app in Resources */,
 				04BC49A628587590003FE6D9 /* LaunchScreen.storyboard in Resources */,
 				040E4D0C2872D9CF003569F1 /* coil_logo_colored.svg in Resources */,
-				F3DC28862926196300C8EDF0 /* sys in Resources */,
 				F3542D482949C312005D8170 /* install.js in Resources */,
 				04BC49A328587590003FE6D9 /* Assets.xcassets in Resources */,
 				040E4D0D2872D9CF003569F1 /* angle_nft.png in Resources */,
