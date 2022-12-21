@@ -88,13 +88,14 @@ extension PlaocHandleModel {
     }
     //传递给前端消息
     private func executiveEvalJsRuntime(param: String) -> String {
+//        return jsContext?.evaluateScript(param)
         return ""
     }
     //获取设备信息
     private func executiveGetDeviceInfo(param: String) -> String {
         return ""
     }
-    //发送消息
+    //发送消息  调用系统通知
     private func executiveSendNotification(param: String) -> String {
         return ""
     }
@@ -104,6 +105,10 @@ extension PlaocHandleModel {
     }
     //申请权限
     private func executiveApplyPermissions(param: String) -> String {
+        let permission = PermissionManager()
+        permission.startPermissionAuthenticate(type: .bluetooth) { result in
+            
+        }
         return ""
     }
     //

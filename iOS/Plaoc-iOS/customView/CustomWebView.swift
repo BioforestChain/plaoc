@@ -51,6 +51,18 @@ class CustomWebView: UIView {
         let config = WKWebViewConfiguration()
         
         config.limitsNavigationsToAppBoundDomains = true
+        config.userContentController = WKUserContentController()
+        if self.scripts != nil {
+            for script in self.scripts! {
+                config.userContentController.addUserScript(script)
+            }
+        }
+        config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "InstallBFS")
+        let prefreen = WKPreferences()
+        prefreen.javaScriptCanOpenWindowsAutomatically = true
+        config.preferences = prefreen
+        config.setValue(true, forKey: "allowUniversalAccessFromFileURLs")
+        config.setURLSchemeHandler(Schemehandler(fileName: self.fileName), forURLScheme: schemeString)
         
 //        config.userContentController = WKUserContentController()
         
@@ -127,8 +139,8 @@ extension CustomWebView {
     
     func openWebView(html: String) {
         if let url = URL(string: html) {
-//            let request = URLRequest(url: url)
-            let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData, timeoutInterval: 30)
+            let request = URLRequest(url: url)
+//            let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData, timeoutInterval: 30)
             self.webView.load(request)
         }
     }
@@ -176,9 +188,11 @@ extension CustomWebView:  WKScriptMessageHandler {
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         
         if message.name == "InstallBFS" {
+            print(message.body)
             //点击网页按钮 开始加载
-            guard let bodyString = message.body as? String else { return }
-            BFSNetworkManager.shared.loadAutoUpdateInfo(urlString: bodyString)
+            guard let bodyDict = message.body as? [String:String] else { return }
+            guard let path = bodyDict["path"] else { return }
+            BFSNetworkManager.shared.loadAutoUpdateInfo(urlString: path)
             //同时显示下载进度条
         } else if message.name == "consoleLog" {
             print(message.body)

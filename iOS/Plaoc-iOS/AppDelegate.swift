@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import MagicalRecord
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -23,16 +24,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         window?.makeKeyAndVisible()
         
-//        notiManager.registerNotificationCategory()
-//        UNUserNotificationCenter.current().delegate = notiManager
-//        permissionManager.startPermissionAuthenticate(type: .notification, isSet: true) { result in
-//            if result {
-//                notiManager.sendLocalNotification()
-//            }
-//        }
-        
-       
+//        MagicalRecord.setupCoreDataStack(withAutoMigratingSqliteStoreNamed: "Plaoc")
+        BatchTempManager().readTempMetadata(name: "KEJPMHLA")
         return true
+    }
+    
+    func applicationWillTerminate(_ application: UIApplication) {
+//        MagicalRecord.cleanUp()
     }
     
 }

@@ -15,6 +15,7 @@ target 'Plaoc-iOS' do
   pod 'SSZipArchive'
   pod 'SDWebImage'
   pod 'ZLPhotoBrowser'
+  pod 'MagicalRecord'
   # Pods for Plaoc-iOS
 
 
