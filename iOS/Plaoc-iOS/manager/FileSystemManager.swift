@@ -64,10 +64,107 @@ class FileSystemManager: NSObject {
             let fileHandle = try FileHandle.init(forWritingTo: fileUrl)
             var writeData: Data?
             if encoding {
-//                guard let userData = data
+                guard let userData = data.data(using: .utf8) else { throw FilesystemError.failEncode }
+                writeData = userData
+            } else {
+                if let base64Data = Data(base64Encoded: data) {
+                    writeData = base64Data
+                } else {
+                    throw FilesystemError.noAppend
+                }
             }
+            defer {
+                fileHandle.closeFile()
+            }
+            fileHandle.seekToEndOfFile()
+            fileHandle.write(writeData!)
         } else {
             _ = try writeFile(at: fileUrl, with: data, recursive: recursive, encoding: encoding)
+        }
+    }
+    
+    static func deleteFile(at fileUrl: URL) throws {
+        if FileManager.default.fileExists(atPath: fileUrl.path) {
+            try FileManager.default.removeItem(atPath: fileUrl.path)
+        }
+    }
+    
+    static func mkdir(at fileUrl: URL, recursive: Bool) throws {
+        try FileManager.default.createDirectory(at: fileUrl, withIntermediateDirectories: recursive)
+    }
+    
+    static func rmdir(at fileUrl: URL, recursive: Bool) throws {
+        let directoryContents = try FileManager.default.contentsOfDirectory(at: fileUrl, includingPropertiesForKeys: nil, options: [])
+        if directoryContents.count != 0 && !recursive {
+            throw FilesystemError.notEmpty
+        }
+        try FileManager.default.removeItem(at: fileUrl)
+    }
+    
+    static func readdir(at fileUrl: URL) throws -> [URL] {
+        return try FileManager.default.contentsOfDirectory(at: fileUrl, includingPropertiesForKeys: nil, options: [])
+    }
+    
+    static func stat(at fileUrl: URL) throws -> [FileAttributeKey:Any] {
+        return try FileManager.default.attributesOfItem(atPath: fileUrl.path)
+    }
+    
+    static func getType(from attr: [FileAttributeKey:Any]) -> String {
+        let fileType = attr[.type] as? String ?? ""
+        if fileType == "NSFileTypeDirectory" {
+            return "directory"
+        } else {
+            return "file"
+        }
+    }
+    
+    static func rename(at srcURL: URL, to dstURL: URL) throws {
+        try privateCopy(at: srcURL, to: dstURL, doRename: true)
+    }
+    
+    static func copy(at srcURL: URL, to dstURL: URL) throws {
+        try privateCopy(at: srcURL, to: dstURL, doRename: false)
+    }
+    
+    static private func privateCopy(at srcURL: URL, to dstURL: URL, doRename: Bool) throws {
+        if srcURL == dstURL {
+            return
+        }
+        var isDir: ObjCBool = false
+        if FileManager.default.fileExists(atPath: dstURL.path, isDirectory: &isDir) {
+            if !isDir.boolValue {
+                try? FileManager.default.removeItem(at: dstURL)
+            }
+        }
+        if doRename {
+            try FileManager.default.moveItem(at: srcURL, to: dstURL)
+        } else {
+            try FileManager.default.copyItem(at: srcURL, to: dstURL)
+        }
+    }
+    
+    static func getDirectory(directory: String?) -> FileManager.SearchPathDirectory? {
+     
+        guard directory != nil else { return nil }
+        switch directory! {
+        case "CACHE":
+            return .cachesDirectory
+        case "LIBRARY":
+            return .libraryDirectory
+        default:
+            return .documentDirectory
+        }
+    }
+    
+    static func getFileUrl(at path: String, in directory: String?) -> URL? {
+        if let directory = getDirectory(directory: directory) {
+            guard let dir = FileManager.default.urls(for: directory, in: .userDomainMask).first else { return nil }
+            if !path.isEmpty {
+                return dir.appendingPathComponent(path)
+            }
+            return dir
+        } else {
+            return URL(string: path)
         }
     }
 }

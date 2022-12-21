@@ -276,7 +276,7 @@ class WebViewViewController: UIViewController {
     }()
     
     lazy private var webView: CustomWebView = {
-        let webView = CustomWebView(frame: CGRect(x: 0, y: self.naviView.frame.maxY, width: self.view.bounds.width, height: UIScreen.main.bounds.height - self.naviView.frame.maxY), jsNames: ["install"], fileName: fileName)
+        let webView = CustomWebView(frame: CGRect(x: 0, y: 44, width: self.view.bounds.width, height: UIScreen.main.bounds.height - 44), jsNames: ["install"], fileName: fileName)
         webView.superVC = self
         webView.callback = { [weak self] title in
             guard let strongSelf = self else { return }

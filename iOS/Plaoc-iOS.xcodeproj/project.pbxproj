@@ -91,9 +91,11 @@
 		F38125E0294B0FF2006FB3A8 /* qrcode_scan_full_net.png in Resources */ = {isa = PBXBuildFile; fileRef = F38125DF294B0FF2006FB3A8 /* qrcode_scan_full_net.png */; };
 		F38125E2294B14BA006FB3A8 /* qrcode_scan_part_net.png in Resources */ = {isa = PBXBuildFile; fileRef = F38125E1294B14BA006FB3A8 /* qrcode_scan_part_net.png */; };
 		F3872073290BB2C20018B8CC /* Snowflake.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3872072290BB2C20018B8CC /* Snowflake.swift */; };
+		F38C1D3E295161EC0059DE57 /* Plaoc-iOS.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = F38C1D3C295161EC0059DE57 /* Plaoc-iOS.xcdatamodeld */; };
+		F38C1D40295187D60059DE57 /* UserDefaultManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F38C1D3F295187D60059DE57 /* UserDefaultManager.swift */; };
 		F38CD8BF294FF3AA00963F8A /* ClipboardManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F38CD8BE294FF3AA00963F8A /* ClipboardManager.swift */; };
 		F38CD8C1295004EE00963F8A /* FileSystemManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F38CD8C0295004EE00963F8A /* FileSystemManager.swift */; };
-		F38CD8C329500DE600963F8A /* wallet in Resources */ = {isa = PBXBuildFile; fileRef = F38CD8C229500DE600963F8A /* wallet */; };
+		F39377962952A8F400F65B6A /* BatchTempManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F39377952952A8F400F65B6A /* BatchTempManager.swift */; };
 		F39535162919E4650071898A /* UIImage_extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F39535152919E4650071898A /* UIImage_extension.swift */; };
 		F39930022900E9D50017D721 /* StreamFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F39930012900E9D50017D721 /* StreamFileManager.swift */; };
 		F39930042900F4760017D721 /* FileModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F39930032900F4760017D721 /* FileModel.swift */; };
@@ -225,9 +227,11 @@
 		F38125DF294B0FF2006FB3A8 /* qrcode_scan_full_net.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = qrcode_scan_full_net.png; sourceTree = "<group>"; };
 		F38125E1294B14BA006FB3A8 /* qrcode_scan_part_net.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = qrcode_scan_part_net.png; sourceTree = "<group>"; };
 		F3872072290BB2C20018B8CC /* Snowflake.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Snowflake.swift; sourceTree = "<group>"; };
+		F38C1D3D295161EC0059DE57 /* Plaoc-iOS.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Plaoc-iOS.xcdatamodel"; sourceTree = "<group>"; };
+		F38C1D3F295187D60059DE57 /* UserDefaultManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultManager.swift; sourceTree = "<group>"; };
 		F38CD8BE294FF3AA00963F8A /* ClipboardManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardManager.swift; sourceTree = "<group>"; };
 		F38CD8C0295004EE00963F8A /* FileSystemManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileSystemManager.swift; sourceTree = "<group>"; };
-		F38CD8C229500DE600963F8A /* wallet */ = {isa = PBXFileReference; lastKnownFileType = folder; path = wallet; sourceTree = "<group>"; };
+		F39377952952A8F400F65B6A /* BatchTempManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatchTempManager.swift; sourceTree = "<group>"; };
 		F39535152919E4650071898A /* UIImage_extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImage_extension.swift; sourceTree = "<group>"; };
 		F39930012900E9D50017D721 /* StreamFileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamFileManager.swift; sourceTree = "<group>"; };
 		F39930032900F4760017D721 /* FileModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileModel.swift; sourceTree = "<group>"; };
@@ -374,7 +378,6 @@
 		04BC49982858758E003FE6D9 /* Plaoc-iOS */ = {
 			isa = PBXGroup;
 			children = (
-				F38CD8C229500DE600963F8A /* wallet */,
 				F3DC28852926196300C8EDF0 /* sys */,
 				F31B2B9228F80743008CDD5F /* controller */,
 				F31B2BAB28F80E74008CDD5F /* recommend-app */,
@@ -393,6 +396,7 @@
 				04BC49A428587590003FE6D9 /* LaunchScreen.storyboard */,
 				04BC49A728587590003FE6D9 /* Info.plist */,
 				041D0FFC2862AEE500AEFE7D /* Plaoc-iOS-Bridging-Header.h */,
+				F38C1D3C295161EC0059DE57 /* Plaoc-iOS.xcdatamodeld */,
 			);
 			path = "Plaoc-iOS";
 			sourceTree = "<group>";
@@ -491,6 +495,7 @@
 				F37C73FA294C5D89004CA380 /* BrowserManager.swift */,
 				F37C73FC294C781B004CA380 /* FeedbackGenerator.swift */,
 				F38CD8BE294FF3AA00963F8A /* ClipboardManager.swift */,
+				F38C1D3F295187D60059DE57 /* UserDefaultManager.swift */,
 			);
 			path = manager;
 			sourceTree = "<group>";
@@ -524,6 +529,7 @@
 				F31B2BA228F80D17008CDD5F /* BatchRecommendManager.swift */,
 				F31B2BA328F80D17008CDD5F /* BatchSystemManager.swift */,
 				F380F6C528FE8C39001BC5C3 /* BatchScanManager.swift */,
+				F39377952952A8F400F65B6A /* BatchTempManager.swift */,
 			);
 			path = fileManager;
 			sourceTree = "<group>";
@@ -679,7 +685,6 @@
 				040E4D0C2872D9CF003569F1 /* coil_logo_colored.svg in Resources */,
 				F3DC28862926196300C8EDF0 /* sys in Resources */,
 				F3542D482949C312005D8170 /* install.js in Resources */,
-				F38CD8C329500DE600963F8A /* wallet in Resources */,
 				04BC49A328587590003FE6D9 /* Assets.xcassets in Resources */,
 				040E4D0D2872D9CF003569F1 /* angle_nft.png in Resources */,
 				F38125E0294B0FF2006FB3A8 /* qrcode_scan_full_net.png in Resources */,
@@ -823,6 +828,7 @@
 				04BC49CD2858768E003FE6D9 /* LeadScriptHandle.swift in Sources */,
 				04C0243528801027008E32C8 /* String_extension.swift in Sources */,
 				F31B2BAA28F80E52008CDD5F /* AnimationVIew.swift in Sources */,
+				F39377962952A8F400F65B6A /* BatchTempManager.swift in Sources */,
 				F31B2B9D28F80BE5008CDD5F /* RefreshManager.swift in Sources */,
 				0406F5062865B3F9006F4F6F /* Schemehandler.swift in Sources */,
 				04DCE25328869859001BE6B1 /* SecondViewController.swift in Sources */,
@@ -847,6 +853,7 @@
 				F31B2BA628F80D18008CDD5F /* BatchRecommendManager.swift in Sources */,
 				F3BEA44C29484E7900CBA119 /* JSInjectManager.swift in Sources */,
 				0419F1092860560400EF8DC2 /* CustomNaviViewController.swift in Sources */,
+				F38C1D40295187D60059DE57 /* UserDefaultManager.swift in Sources */,
 				F37C73FD294C781B004CA380 /* FeedbackGenerator.swift in Sources */,
 				0404B058287414F5000BABE8 /* XXWebView.swift in Sources */,
 				04B2B7D6287E5B8100172109 /* NotificationManager.swift in Sources */,
@@ -866,6 +873,7 @@
 				0443FCDE28640B70003425CD /* BottomBarModel.swift in Sources */,
 				04002FA928976D0F00D03CB0 /* CacheManager.swift in Sources */,
 				0419F107286051F500EF8DC2 /* UIDevice_extension.swift in Sources */,
+				F38C1D3E295161EC0059DE57 /* Plaoc-iOS.xcdatamodeld in Sources */,
 				F31B2B9728F80A1D008CDD5F /* ProgressAnimationView.swift in Sources */,
 				04C02432287FF3EA008E32C8 /* BluetoothManager.swift in Sources */,
 				0443FCE32864615D003425CD /* CustomBasePopView.swift in Sources */,
@@ -1260,6 +1268,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		F38C1D3C295161EC0059DE57 /* Plaoc-iOS.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				F38C1D3D295161EC0059DE57 /* Plaoc-iOS.xcdatamodel */,
+			);
+			currentVersion = F38C1D3D295161EC0059DE57 /* Plaoc-iOS.xcdatamodel */;
+			path = "Plaoc-iOS.xcdatamodeld";
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 04BC498E2858758E003FE6D9 /* Project object */;
 }
