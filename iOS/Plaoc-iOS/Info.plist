@@ -4,6 +4,7 @@
 <dict>
 	<key>WKAppBoundDomains</key>
 	<array>
+		<string>waterbang.top</string>
 		<string>plaoc.com</string>
 	</array>
 	<key>NSBluetoothAlwaysUsageDescription</key>

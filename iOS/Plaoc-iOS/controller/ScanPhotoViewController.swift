@@ -211,7 +211,6 @@ extension ScanPhotoViewController: AVCaptureMetadataOutputObjectsDelegate {
             if result != nil {
                 let refreshManager = RefreshManager()
                 refreshManager.loadUpdateRequestInfo(fileName: nil, urlString: result, isCompare: false)
-                self.session?.stopRunning()
             }
         }
         self.stopScan()

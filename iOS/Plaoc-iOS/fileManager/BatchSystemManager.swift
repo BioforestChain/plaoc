@@ -47,22 +47,35 @@ class BatchSystemManager: BatchReadManager {
         if mateDict == nil {
             _ = readBFSAMatedataContent(fileName: fileName)
         }
-        return mateDict?["version"] as? String
+        guard let dict = mateDict?["manifest"] as? [String:Any] else { return nil }
+        return dict["version"] as? String
     }
     //获取appType
     func readAppType(fileName: String) -> String? {
         if mateDict == nil {
             _ = readBFSAMatedataContent(fileName: fileName)
         }
-        return mateDict?["apptype"] as? String
+        guard let dict = mateDict?["manifest"] as? [String:Any] else { return nil }
+        return dict["appType"] as? String
     }
     //获取web类型的网页地址
     func readWebAppURLString(fileName: String) -> String? {
         if mateDict == nil {
             _ = readBFSAMatedataContent(fileName: fileName)
         }
-        return mateDict?["url"] as? String
+        guard let dict = mateDict?["manifest"] as? [String:Any] else { return nil }
+        print(dict)
+        return dict["url"] as? String
     }
     
-    
+    func isExitSameFile(fileName: String) -> Bool {
+        let path = filePath() + "/\(fileName)"
+        if FileManager.default.fileExists(atPath: path) {
+            let oldVersion = readMetadataVersion(fileName: fileName)
+            
+            return true
+        } else {
+            return false
+        }
+    }
 }
