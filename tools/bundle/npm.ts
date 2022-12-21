@@ -43,7 +43,7 @@ export const buildOptions: BuildOptions = {
       "@types/tar": "^6.1.3",
       "@types/inquirer": "^9.0.2",
       "@bfsx/typings": "^0.0.7",
-      "@bfsx/metadata": "^0.0.7",
+      "@bfsx/metadata": "^0.2.5",
     },
   },
 };
