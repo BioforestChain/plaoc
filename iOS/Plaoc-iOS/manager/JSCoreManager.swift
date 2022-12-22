@@ -5,6 +5,7 @@
 //  Created by ui03 on 2022/11/4.
 //
 
+import UIKit
 import Foundation
 import JavaScriptCore
 
@@ -28,7 +29,8 @@ class JSCoreManager: NSObject {
     
     private func initJSCore() {
 //        let entryPath = "/Users/ui03/Desktop/Plaoc_IOS新/iOS/Plaoc-iOS/sys/HE74YAAL/sys/backend-HE74YAAL/index.js"
-        let entryPath = Bundle.main.bundlePath + "/sys/HE74YAAL/sys/backend-HE74YAAL/index.js"
+//        let entryPath = Bundle.main.bundlePath + "/sys/HE74YAAL/sys/backend-HE74YAAL/index.js"
+        let entryPath = Bundle.main.bundlePath + "/sdk/backend-KEJPMHLA/index.js"
         let plaoc = PlaocHandleModel()
         plaoc.controller = baseViewController
         plaoc.jsContext = jsContext

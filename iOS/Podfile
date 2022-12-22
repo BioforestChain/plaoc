@@ -13,7 +13,7 @@ target 'Plaoc-iOS' do
   pod 'RxSwift'
   pod 'Moya'
   pod 'SSZipArchive'
-  pod 'SDWebImage'
+  pod 'NVHTarGzip'
   pod 'ZLPhotoBrowser'
   pod 'MagicalRecord'
   # Pods for Plaoc-iOS
