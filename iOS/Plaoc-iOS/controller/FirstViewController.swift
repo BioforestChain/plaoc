@@ -125,6 +125,7 @@ class FirstViewController: UIViewController {
             } else {
                 second.urlString = "iosqmkkx:/index.html"
             }
+            second.webType = type ?? ""
             self.navigationController?.pushViewController(second, animated: true)
         } else if type == .recommend {
             BatchFileManager.shared.clickRecommendAppAction(fileName: name)

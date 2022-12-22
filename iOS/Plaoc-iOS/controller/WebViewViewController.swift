@@ -15,6 +15,7 @@ class WebViewViewController: UIViewController {
 
     var urlString: String = ""
     var fileName: String = ""
+    var webType: String = ""
     private var isNaviHidden: Bool = false
     private var isStatusHidden: Bool = false
     private var naviOverlay: Bool = true
@@ -49,7 +50,7 @@ class WebViewViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-//        jsManager = JSCoreManager.init(fileName: fileName, controller: self)
+        jsManager = JSCoreManager.init(fileName: fileName, controller: self)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
