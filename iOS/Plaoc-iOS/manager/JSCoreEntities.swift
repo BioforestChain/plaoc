@@ -166,7 +166,7 @@ import SwiftyJSON
 extension PlaocHandleModel {
     //打开DWebView
     private func executiveOpenDWebView(param: String) -> Bool {
-        NotificationCenter.default.post(name: NSNotification.Name.openDwebNotification, object: nil, userInfo: ["param":"iosqmkkx:/\(param)"])
+        NotificationCenter.default.post(name: NSNotification.Name.openDwebNotification, object: nil, userInfo: ["param":param])
         return true
     }
     //二维码

@@ -66,7 +66,7 @@ class WebViewViewController: UIViewController {
         
         //https://awqdeqwewe.dweb/
         
-        webView.openWebView(html: urlString)
+//        webView.openWebView(html: urlString)
         
 //        if urlString.hasPrefix("http") || urlString.hasPrefix("https") {
 //            webView.openWebView(html: urlString)

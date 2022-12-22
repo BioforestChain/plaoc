@@ -52,7 +52,7 @@ var metaData = metaConfig({
         homepage: "docs.plaoc.com",
         // 应用入口，可以配置多个，其中index为缺省名称。
         // 外部可以使用 DWEB_ID.bfchain (等价同于index.DWEB_ID.bfchain)、admin.DWEB_ID.bfchain 来启动其它页面
-        enters: ["index.html", "https://objectjson.waterbang.top"],
+        enters: ["index.html"],
         //本次发布的信息，一般存放更新信息
         releaseNotes: "xxx",
         //  本次发布的标题，用于展示更新信息时的标题
@@ -2172,7 +2172,12 @@ class DWebView extends MapEventEmitter {
      * @param entry // DwebView入口
      */
     activity(entry) {
-        network.syncSendMsgNative(callNative.openDWebView, entry);
+        // 判断在不在入口文件内
+        if (this.entrys.toString().match(RegExp(`${entry}`))) {
+            network.syncSendMsgNative(callNative.openDWebView, entry);
+            return;
+        }
+        throw new Error("您传递的入口不在配置的入口内，需要在配置文件里配置入口");
     }
 }
 
