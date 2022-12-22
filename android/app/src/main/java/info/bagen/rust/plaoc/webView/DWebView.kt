@@ -360,7 +360,6 @@ fun DWebView(
 //              }
               // 只加载资源文件 index.js index.html
               request?.let { webResourceRequest ->
-                Log.e("lin.huang", "DWebView:: 111111111111111  ${webResourceRequest.url}---$dWebView_host ")
                 if (webResourceRequest.url.host == "$dWebView_host.dweb".lowercase()) {
                   // 这里出来的url全部都用是小写，serviceWorker没办法一开始就注册，所以还会走一次这里
                   return interceptNetworkRequests(request, customUrlScheme)
