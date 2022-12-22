@@ -130,13 +130,13 @@ class FirstViewController: UIViewController {
     @objc func tap(sender: UIButton) {
       
         
-        if sender.tag == 2 {
-            let second = WebViewViewController()
-            second.fileName = "wallet"
-            second.urlString = "https://objectjson.waterbang.top"  //"https://wallet.plaoc.com/"
-            self.navigationController?.pushViewController(second, animated: true)
-            return
-        }
+//        if sender.tag == 2 {
+//            let second = WebViewViewController()
+//            second.fileName = "wallet"
+//            second.urlString = "https://objectjson.waterbang.top"  //"https://wallet.plaoc.com/"
+//            self.navigationController?.pushViewController(second, animated: true)
+//            return
+//        }
         let name = appNames[sender.tag]
         let type = BatchFileManager.shared.currentAppType(fileName: name)
         if type == .system {

@@ -24,6 +24,11 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
+		<key>NVHTarGzip.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
 		<key>Pods-Plaoc-iOS-Plaoc-iOSUITests.xcscheme</key>
 		<dict>
 			<key>isShown</key>

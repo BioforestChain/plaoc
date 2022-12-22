@@ -15,6 +15,7 @@ class WebViewViewController: UIViewController {
 
     var urlString: String = ""
     var fileName: String = ""
+    var webType: String = ""
     private var isNaviHidden: Bool = false
     private var isStatusHidden: Bool = false
     private var naviOverlay: Bool = true
