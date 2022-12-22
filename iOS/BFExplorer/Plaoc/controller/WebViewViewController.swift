@@ -49,7 +49,8 @@ class WebViewViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-//        jsManager = JSCoreManager.init(fileName: fileName, controller: self)
+        jsManager = JSCoreManager.init(fileName: fileName, controller: self)
+        webView.jsManager = jsManager
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -61,19 +62,6 @@ class WebViewViewController: UIViewController {
         super.viewDidLoad()
 
         self.view.backgroundColor = .white
-        
-        
-        //https://awqdeqwewe.dweb/
-        
-        webView.openWebView(html: urlString)
-        
-//        if urlString.hasPrefix("http") || urlString.hasPrefix("https") {
-//            webView.openWebView(html: urlString)
-//        } else {
-//            webView.openLocalWebView(name: urlString)
-//        }
-        
-        
         
         NotificationCenter.default.addObserver(self, selector: #selector(interceptAction(noti:)), name: NSNotification.Name.interceptNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(observerShowKeyboard(noti:)), name: UIResponder.keyboardWillShowNotification, object: nil)

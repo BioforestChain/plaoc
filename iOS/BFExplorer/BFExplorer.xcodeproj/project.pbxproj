@@ -167,13 +167,13 @@
 		F091CBCF2951B93B00FCE565 /* LeadReplyHandle.swift in Sources */ = {isa = PBXBuildFile; fileRef = F091CBC52951B93B00FCE565 /* LeadReplyHandle.swift */; };
 		F091CBD02951B93B00FCE565 /* ChangeTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = F091CBC62951B93B00FCE565 /* ChangeTools.swift */; };
 		F091CBD12951B93B00FCE565 /* LeadScriptHandle.swift in Sources */ = {isa = PBXBuildFile; fileRef = F091CBC72951B93B00FCE565 /* LeadScriptHandle.swift */; };
-		F091CBE32952E6BD00FCE565 /* sys in Resources */ = {isa = PBXBuildFile; fileRef = F091CBE12952E6BD00FCE565 /* sys */; };
 		F091CBE42952E6BD00FCE565 /* recommend-app in Resources */ = {isa = PBXBuildFile; fileRef = F091CBE22952E6BD00FCE565 /* recommend-app */; };
 		F091CBE62952FD1E00FCE565 /* BatchTempManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F091CBE52952FD1E00FCE565 /* BatchTempManager.swift */; };
 		F091CC5A28E6994800B2D6CD /* HoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F091CC5928E6994800B2D6CD /* HoverView.swift */; };
 		F0A3C3DA2953FA3B00C78D1A /* WKWebViewJavascriptBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0A3C3D52953FA3B00C78D1A /* WKWebViewJavascriptBridge.swift */; };
 		F0A3C3DB2953FA3B00C78D1A /* WKWebViewJavascriptBridgeJS.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0A3C3D62953FA3B00C78D1A /* WKWebViewJavascriptBridgeJS.swift */; };
 		F0A3C3DC2953FA3B00C78D1A /* WKWebViewJavascriptBridgeBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0A3C3D72953FA3B00C78D1A /* WKWebViewJavascriptBridgeBase.swift */; };
+		F3AA03E72954581F000BD38F /* sdk in Resources */ = {isa = PBXBuildFile; fileRef = F3AA03E62954581F000BD38F /* sdk */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -352,7 +352,6 @@
 		F091CBC62951B93B00FCE565 /* ChangeTools.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChangeTools.swift; sourceTree = "<group>"; };
 		F091CBC72951B93B00FCE565 /* LeadScriptHandle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LeadScriptHandle.swift; sourceTree = "<group>"; };
 		F091CBDC2951BC4700FCE565 /* BFExplorer-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "BFExplorer-Bridging-Header.h"; sourceTree = "<group>"; };
-		F091CBE12952E6BD00FCE565 /* sys */ = {isa = PBXFileReference; lastKnownFileType = folder; path = sys; sourceTree = "<group>"; };
 		F091CBE22952E6BD00FCE565 /* recommend-app */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "recommend-app"; sourceTree = "<group>"; };
 		F091CBE52952FD1E00FCE565 /* BatchTempManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BatchTempManager.swift; sourceTree = "<group>"; };
 		F091CC5928E6994800B2D6CD /* HoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoverView.swift; sourceTree = "<group>"; };
@@ -360,6 +359,7 @@
 		F0A3C3D62953FA3B00C78D1A /* WKWebViewJavascriptBridgeJS.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WKWebViewJavascriptBridgeJS.swift; sourceTree = "<group>"; };
 		F0A3C3D72953FA3B00C78D1A /* WKWebViewJavascriptBridgeBase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WKWebViewJavascriptBridgeBase.swift; sourceTree = "<group>"; };
 		F0A3C3D92953FA3B00C78D1A /* WKWebViewJavascriptBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WKWebViewJavascriptBridge.h; sourceTree = "<group>"; };
+		F3AA03E62954581F000BD38F /* sdk */ = {isa = PBXFileReference; lastKnownFileType = folder; path = sdk; sourceTree = "<group>"; };
 		F8B3D3FE33C722A8EE17302A /* Pods-BFExplorer-BFExplorerUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BFExplorer-BFExplorerUITests.release.xcconfig"; path = "Target Support Files/Pods-BFExplorer-BFExplorerUITests/Pods-BFExplorer-BFExplorerUITests.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -576,8 +576,8 @@
 		F05C41F42907F0E30082CC75 /* Plaoc */ = {
 			isa = PBXGroup;
 			children = (
+				F3AA03E62954581F000BD38F /* sdk */,
 				F091CBE22952E6BD00FCE565 /* recommend-app */,
-				F091CBE12952E6BD00FCE565 /* sys */,
 				F091CBDC2951BC4700FCE565 /* BFExplorer-Bridging-Header.h */,
 				F05C43262907F3410082CC75 /* brige.m */,
 				F091CBBD2951B93B00FCE565 /* Tools */,
@@ -866,10 +866,10 @@
 				F01ABAE928D2C7AC0038AF9C /* SourceHanSansCN-Normal.otf in Resources */,
 				F091CB372951B8EE00FCE565 /* qrcode_scan_part_net.png in Resources */,
 				F091CB602951B91200FCE565 /* method_photo.svg in Resources */,
-				F091CBE32952E6BD00FCE565 /* sys in Resources */,
 				F091CB662951B91200FCE565 /* angle_nft.png in Resources */,
 				1903642426EB427E00B82B1C /* LaunchScreen.storyboard in Resources */,
 				F091CB362951B8EE00FCE565 /* qrcode_scan_full_net.png in Resources */,
+				F3AA03E72954581F000BD38F /* sdk in Resources */,
 				1903642126EB427E00B82B1C /* Assets.xcassets in Resources */,
 				F01ABAEB28D2C7AC0038AF9C /* SourceHanSansCN-ExtraLight.otf in Resources */,
 				F091CBE42952E6BD00FCE565 /* recommend-app in Resources */,

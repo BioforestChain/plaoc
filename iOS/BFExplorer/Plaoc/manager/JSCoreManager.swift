@@ -27,8 +27,8 @@ class JSCoreManager: NSObject {
     }
     
     private func initJSCore() {
-//        let entryPath = "/Users/ui03/Desktop/Plaoc_IOS新/iOS/Plaoc-iOS/sys/HE74YAAL/sys/backend-HE74YAAL/index.js"
-        let entryPath = Bundle.main.bundlePath + "/sys/HE74YAAL/sys/backend-HE74YAAL/index.js"
+
+        let entryPath = Bundle.main.bundlePath + "/sdk/HE74YAAL/boot/index.js"
         let plaoc = PlaocHandleModel()
         plaoc.controller = baseViewController
         plaoc.jsContext = jsContext
@@ -36,7 +36,7 @@ class JSCoreManager: NSObject {
         
         jsContext?.setObject(plaoc, forKeyedSubscript: "PlaocJavascriptBridge" as NSCopying & NSObjectProtocol)
         if let content = try? String(contentsOfFile: entryPath) {
-            jsContext?.evaluateScript("(async function(){\(content)})()")
+            jsContext?.evaluateScript(content)
         }
     }
     
@@ -63,6 +63,13 @@ class JSCoreManager: NSObject {
         let result = jsContext?.evaluateScript(functionString)
         return result
     }
+    
+    func handleEvaluateScript(jsString: String) {
+        let functionString = "webView.dwebviewToDeno" + "(\(jsString)"
+        let result = jsContext?.evaluateScript(functionString)
+        print(result?.toString())
+    }
+    
 }
 
 extension JSCoreManager {
@@ -74,4 +81,6 @@ extension JSCoreManager {
               let string = String(data: data, encoding: .utf8) else { return nil }
         return string
     }
+    
+    
 }

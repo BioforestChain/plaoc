@@ -18,6 +18,7 @@ enum KeyboardType {
 
 class CustomWebView: UIView {
 
+    var jsManager: JSCoreManager!
     var callback: UpdateTitleCallback?
     var superVC: UIViewController?
     private var scripts: [WKUserScript]?
@@ -66,9 +67,6 @@ class CustomWebView: UIView {
         config.setValue(true, forKey: "allowUniversalAccessFromFileURLs")
         config.setURLSchemeHandler(Schemehandler(fileName: self.fileName), forURLScheme: schemeString)
         
-//        config.userContentController = WKUserContentController()
-        
-        let userContentController = WKUserContentController()
         /** region start  add console.log  */
         let consoleJs = """
                             console.log = (function(oriLogFunc){
@@ -80,24 +78,11 @@ class CustomWebView: UIView {
                             })(console.log);
                         """
         let consoleScript = WKUserScript(source: consoleJs, injectionTime: .atDocumentStart, forMainFrameOnly: false)
-        userContentController.addUserScript(consoleScript)
+        config.userContentController.addUserScript(consoleScript)
         /** region end  */
+        config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "consoleLog")
         
-        config.userContentController = userContentController
-        userContentController.add(self, name: "consoleLog")
-        
-        
-//        if self.scripts != nil {
-//            for script in self.scripts! {
-//                config.userContentController.addUserScript(script)
-//            }
-//        }
-//        config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "InstallBFS")
-//        let prefreen = WKPreferences()
-//        prefreen.javaScriptCanOpenWindowsAutomatically = true
-//        config.preferences = prefreen
-//        config.setValue(true, forKey: "allowUniversalAccessFromFileURLs")
-//        config.setURLSchemeHandler(Schemehandler(fileName: self.fileName), forURLScheme: schemeString)
+
         let webView = WKWebView(frame: self.bounds, configuration: config)
         webView.navigationDelegate = self
         webView.uiDelegate = self
@@ -202,6 +187,9 @@ extension CustomWebView:  WKScriptMessageHandler {
             print(message.body)
         } else if message.name == "getConnectChannel" {
             print(message.body)
+            guard let bodyDict = message.body as? [String:String] else { return }
+            guard let param = bodyDict["param"] else { return }
+            jsManager.handleEvaluateScript(jsString: param)
         }
     }
 }
