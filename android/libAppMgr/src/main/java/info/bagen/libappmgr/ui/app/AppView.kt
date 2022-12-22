@@ -37,12 +37,12 @@ import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.decode.SvgDecoder
 import info.bagen.libappmgr.R
+import info.bagen.libappmgr.entity.AppInfo
 import info.bagen.libappmgr.entity.DAppInfoUI
 import info.bagen.libappmgr.ui.download.DownLoadState
 import info.bagen.libappmgr.ui.download.DownloadAppMaskView
 import info.bagen.libappmgr.ui.download.DownloadDialogView
 import info.bagen.libappmgr.ui.view.DialogView
-import info.bagen.libappmgr.utils.AppContextUtil
 
 @Composable
 private fun BoxScope.AppIcon(appViewState: AppViewState) {
@@ -84,13 +84,6 @@ private fun BoxScope.AppName(appViewState: AppViewState) {
       .align(Alignment.BottomCenter)
   )
 }
-
-private fun Modifier.longClick(onLongClick: (Offset) -> Unit): Modifier =
-  pointerInput(this) {
-    detectTapGestures(
-      onLongPress = onLongClick
-    )
-  }
 
 /**
  * AppView 只存放App的信息，包括图标，字段
@@ -142,18 +135,76 @@ fun AppInfoView(appViewModel: AppViewModel, appViewState: AppViewState, onOpenAp
   ) {
     AppInfoItem(appViewModel, appViewState, onOpenApp)
     if (appViewState.maskViewState.value.show.value) {
-      DownloadAppMaskView(path = appViewState.maskViewState.value.path, //"https://shop.plaoc.com/KEJPMHLA/KEJPMHLA.bfsa"
+      DownloadAppMaskView(
+        path = appViewState.maskViewState.value.path,
         modifier = Modifier
           .size(50.dp)
           //.clip(RoundedCornerShape(12.dp))
           .clip(CircleShape)
           .align(Alignment.TopCenter)
           .background(Color.Black.copy(alpha = 0.6f))
-          .padding(6.dp), callbackState = { state, dInfo ->
+          .padding(6.dp),
+        callbackState = { state, dInfo ->
           appViewModel.handleIntent(AppViewIntent.MaskDownloadCallback(state, dInfo, appViewState))
+        },
+        checkInstallOrOverride = { appInfo, zipFile ->
+          compareDownloadApp(appViewModel, appViewState, appInfo, zipFile)
         })
     }
   }
+}
+
+private fun compareDownloadApp(
+  appViewModel: AppViewModel, appViewState: AppViewState, appInfo: AppInfo?, zipFile: String
+): NewAppUnzipType {
+  Log.e("lin.huang", "AppView::compareDownloadApp $appInfo==$zipFile")
+  var ret = NewAppUnzipType.INSTALL
+  if (appViewState.bfsDownloadPath != null && appInfo != null) {
+    run OutSide@{
+      appViewModel.uiState.value.appViewStateList.forEach { tempAppViewState ->
+        if (tempAppViewState.bfsId == appInfo.bfsAppId) {
+          if (compareAppVersionHigh(tempAppViewState.version, appInfo.version)) {
+            ret = NewAppUnzipType.OVERRIDE
+            appViewModel.handleIntent(
+              AppViewIntent.OverrideDownloadApp(appViewState, appInfo, zipFile)
+            )
+          } else {
+            ret = NewAppUnzipType.LOW_VERSION
+            appViewModel.handleIntent(AppViewIntent.RemoveDownloadApp(appViewState))
+          }
+          return@OutSide
+        }
+      }
+    }
+    if (ret == NewAppUnzipType.INSTALL) {
+      appViewModel.handleIntent(AppViewIntent.UpdateDownloadApp(appViewState, appInfo, zipFile))
+    }
+  }
+  return ret
+}
+
+private fun compareAppVersionHigh(localVersion: String, compareVersion: String): Boolean {
+  Log.e("AppView", "compareAppVersionHigh issue -> $localVersion, $compareVersion")
+  var localSplit = localVersion.split(".")
+  val compareSplit = compareVersion.split(".")
+  var tempLocalVersion = localVersion
+  if (localSplit.size < compareSplit.size) {
+    val cha = compareSplit.size - localSplit.size
+    for (i in 0 until cha) {
+      tempLocalVersion += ".0"
+    }
+    localSplit = tempLocalVersion.split(".")
+  }
+  try {
+    for (i in compareSplit.indices) {
+      val local = Integer.parseInt(localSplit[i])
+      val compare = Integer.parseInt(compareSplit[i])
+      if (compare > local) return true
+    }
+  } catch (e: Exception) {
+    Log.e("AppViewModel", "compareAppVersionHigh issue -> $localVersion, $compareVersion")
+  }
+  return false
 }
 
 @Composable

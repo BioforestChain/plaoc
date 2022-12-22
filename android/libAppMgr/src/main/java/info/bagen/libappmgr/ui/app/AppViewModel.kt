@@ -13,10 +13,7 @@ import info.bagen.libappmgr.entity.DAppInfoUI
 import info.bagen.libappmgr.ui.download.DownLoadState
 import info.bagen.libappmgr.ui.view.DialogInfo
 import info.bagen.libappmgr.ui.view.DialogType
-import info.bagen.libappmgr.utils.APP_DIR_TYPE
-import info.bagen.libappmgr.utils.AppContextUtil
-import info.bagen.libappmgr.utils.FilesUtil
-import info.bagen.libappmgr.utils.JsonUtil
+import info.bagen.libappmgr.utils.*
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -36,6 +33,7 @@ data class AppViewState(
   var versionPath: MutableState<String> = mutableStateOf(""),
   var maskViewState: MutableState<MaskProgressState> = mutableStateOf(MaskProgressState()),
   // var maskDownLoadState: MutableState<DownLoadState> = mutableStateOf(DownLoadState.IDLE),
+  var version: String = "",
   var bfsId: String = "",
   var dAppUrl: DAppInfoUI? = null,
   var showPopView: MutableState<Boolean> = mutableStateOf(false),
@@ -55,6 +53,7 @@ private fun AppInfo.createAppViewState(
   name: String? = null,
   versionPath: String? = null,
   bfsId: String? = null,
+  version: String? = null,
   dAppUrl: DAppInfoUI? = null,
 ): AppViewState {
   return AppViewState(
@@ -64,12 +63,17 @@ private fun AppInfo.createAppViewState(
     isSystemApp = isSystemApp?.let { mutableStateOf(it) } ?: mutableStateOf(this.isSystemApp),
     versionPath = versionPath?.let { mutableStateOf(it) } ?: mutableStateOf(this.autoUpdate.url),
     bfsId = bfsId ?: this.bfsAppId,
+    version = version ?: this.version,
     dAppUrl = dAppUrl,
   )
 }
 
 enum class AppDialogType {
   NewVersion, ReDownLoad, DownLoading, DownLoadCompleted, OpenDApp, Other
+}
+
+enum class NewAppUnzipType {
+  INSTALL, OVERRIDE, LOW_VERSION
 }
 
 data class AppDialogInfo(
@@ -99,6 +103,14 @@ sealed class AppViewIntent {
   class ShareAppMenu(val appViewState: AppViewState) : AppViewIntent()
   class UninstallApp(val appViewState: AppViewState) : AppViewIntent()
   class BFSInstallApp(val path: String) : AppViewIntent()
+  class RemoveDownloadApp(val appViewState: AppViewState) : AppViewIntent()
+  class OverrideDownloadApp(
+    val appViewState: AppViewState, val appInfo: AppInfo, val downloadFile: String
+  ) : AppViewIntent()
+
+  class UpdateDownloadApp(
+    val appViewState: AppViewState, val appInfo: AppInfo, val downloadFile: String
+  ) : AppViewIntent()
 }
 
 
@@ -149,17 +161,47 @@ class AppViewModel(private val repository: AppRepository = AppRepository()) : Vi
         }
         is AppViewIntent.UninstallApp -> {
           // 卸载就是删除当前目录，然后重新捞取
-          AppContextUtil.sInstance?.let {
+          AppContextUtil.sInstance?.let { context ->
             uiState.value.curAppViewState = null
             val path =
-              "${it.dataDir}/${APP_DIR_TYPE.SystemApp.rootName}/${action.appViewState.bfsId}"
+              "${context.dataDir}/${APP_DIR_TYPE.SystemApp.rootName}/${action.appViewState.bfsId}"
             FilesUtil.deleteQuietly(path)
+            // 如果是下载的应用被删卸载，那么直接从列表中移除
+            action.appViewState.bfsDownloadPath?.let {
+              uiState.value.downloadAppView.remove(action.appViewState)
+            }
             loadAppInfoList()
           }
         }
         is AppViewIntent.BFSInstallApp -> { // 通过 JS 调用的下载操作
           if (action.path.isNotEmpty()) {
             newAppDownloadAndInstall(action.path)
+          }
+        }
+        is AppViewIntent.RemoveDownloadApp -> { // 删除当前的下载的应用，弹出提示框，版本太低
+          Log.e("lin.huang", "AppViewModel::handleIntent->AppViewIntent.RemoveDownloadApp")
+          uiState.value.downloadAppView.remove(action.appViewState)
+          val dialogInfo = DialogInfo(
+            DialogType.CUSTOM,
+            title = "异常提示",
+            text = "安装失败! 下载的应用版本太低，无法安装!",
+            confirmText = "重新下载"
+          )
+          handleIntent(
+            AppViewIntent.MaskDownloadCallback(DownLoadState.FAILURE, dialogInfo, action.appViewState)
+          )
+          loadAppInfoList()
+        }
+        is AppViewIntent.OverrideDownloadApp -> { // 解压并且跟已存在的app绑定，显示小红点，最后移除下载
+          Log.e("lin.huang", "AppViewModel::handleIntent->AppViewIntent.OverrideDownloadApp")
+          overrideDownloadApp(action.appViewState, action.appInfo, action.downloadFile)
+          loadAppInfoList()
+        }
+        is AppViewIntent.UpdateDownloadApp -> { // 如果当前下载app是正常的app，那么就需要自动解压，并且
+          Log.e("lin.huang", "AppViewModel::handleIntent->AppViewIntent.UpdateDownloadApp")
+          action.appViewState.apply {
+            bfsId = action.appInfo.bfsAppId
+            name.value = action.appInfo.name
           }
         }
       }
@@ -176,7 +218,6 @@ class AppViewModel(private val repository: AppRepository = AppRepository()) : Vi
       list.add(appViewState)
     }
     uiState.value = uiState.value.copy(appViewStateList = list)
-    Log.e("lin.huang", "AppViewModel::loadAppInfoList ${uiState.value.downloadAppView.size}")
   }
 
   private suspend fun loadAppNewVersion(appViewState: AppViewState) {
@@ -241,7 +282,10 @@ class AppViewModel(private val repository: AppRepository = AppRepository()) : Vi
       DownLoadState.COMPLETED -> {
         appViewState.showBadge.value = true
         appViewState.isSystemApp.value = true
-        appViewState.dAppUrl = repository.loadDAppUrl(appViewState.bfsId) // 跳转需要的地址
+        repository.loadDAppUrl(appViewState.bfsId)?.let { dAppInfoUI -> // 跳转需要的地址
+          appViewState.dAppUrl = dAppInfoUI
+          appViewState.iconPath.value = dAppInfoUI.icon
+        }
         AppDialogType.DownLoadCompleted
       }
       DownLoadState.FAILURE -> AppDialogType.ReDownLoad
@@ -257,6 +301,7 @@ class AppViewModel(private val repository: AppRepository = AppRepository()) : Vi
   ) {
     when (downLoadState) {
       DownLoadState.COMPLETED -> {
+        Log.e("lin.huang", "AppViewModel::maskDownloadCallback -> $appViewState,$downLoadState")
         appViewState.showBadge.value = true
         appViewState.isSystemApp.value = true
         repository.loadDAppUrl(appViewState.bfsId)?.let { dAppInfoUI -> // 跳转需要的地址
@@ -277,7 +322,6 @@ class AppViewModel(private val repository: AppRepository = AppRepository()) : Vi
 
   private suspend fun newAppDownloadAndInstall(path: String) {
     // 添加新应用， 需要判断当前应用是否已存在
-    Log.e("lin.huang", "AppViewModel::newAppDownloadAndInstall enter path=$path")
     var found = false
     uiState.value.downloadAppView.forEach {
       if (it.maskViewState.value.path == path) {
@@ -289,9 +333,7 @@ class AppViewModel(private val repository: AppRepository = AppRepository()) : Vi
       val list: ArrayList<AppViewState> = arrayListOf()
       list.addAll(uiState.value.downloadAppView)
       val appViewState = AppViewState(
-        name = mutableStateOf("开始下载"),
-        bfsDownloadPath = path,
-        maskViewState = mutableStateOf(
+        name = mutableStateOf("开始下载"), bfsDownloadPath = path, maskViewState = mutableStateOf(
           MaskProgressState(
             show = mutableStateOf(true),
             downLoadState = mutableStateOf(DownLoadState.LOADING),
@@ -306,6 +348,36 @@ class AppViewModel(private val repository: AppRepository = AppRepository()) : Vi
       )
     } else {
       AppContextUtil.showShortToastMessage("正在下载中...")
+    }
+  }
+
+  private fun overrideDownloadApp(
+    appViewState: AppViewState, appInfo: AppInfo, downloadFile: String
+  ) {
+    uiState.value.downloadAppView.remove(appViewState)
+    val unzip = ZipUtil.decompress(downloadFile, FilesUtil.getAppUnzipPath())
+    if (unzip) {
+      uiState.value.appViewStateList.forEach { item ->
+        if (item.bfsId == appInfo.bfsAppId) {
+          handleIntent(
+            AppViewIntent.MaskDownloadCallback(DownLoadState.COMPLETED, DialogInfo(), item)
+          )
+        }
+      }
+    } else {
+      uiState.value.appViewStateList.forEach { item ->
+        if (item.bfsId == appInfo.bfsAppId) {
+          val dialogInfo = DialogInfo(
+            DialogType.CUSTOM,
+            title = "异常提示",
+            text = "安装失败! 下载的应用无法正常安装，请联系管理员!",
+            confirmText = "重新下载"
+          )
+          handleIntent(
+            AppViewIntent.MaskDownloadCallback(DownLoadState.FAILURE, dialogInfo, item)
+          )
+        }
+      }
     }
   }
 }

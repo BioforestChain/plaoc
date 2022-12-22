@@ -120,6 +120,7 @@ data class DAppInfoUI(
   val name: String,
   val icon: String,
   val url:String,
+  val version:String,
   val isDWeb:Boolean = true,
 )
 

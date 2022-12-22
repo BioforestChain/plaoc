@@ -1,6 +1,8 @@
 package info.bagen.libappmgr.utils
 
+import android.net.Uri
 import android.os.Build
+import android.util.Log
 import info.bagen.libappmgr.entity.AppInfo
 import info.bagen.libappmgr.entity.DAppInfo
 import info.bagen.libappmgr.system.media.MediaInfo
@@ -70,8 +72,18 @@ object FilesUtil {
   /**
    * 获取应用的缓存路径
    */
-  fun getAppDownloadPath(): String {
-    return getAppCacheDirectory() + File.separator + simpleDateFormat.format(Date()) + ".bfsa"
+  fun getAppDownloadPath(path: String? = null): String {
+    val fileName = path?.let { url ->
+      val uri = Uri.parse(url)
+      uri.lastPathSegment
+    }
+    var filePath = getAppCacheDirectory() + File.separator + fileName //simpleDateFormat.format(Date()) + ".bfsa"
+    var count = 0
+    while (File(filePath).exists()) {
+      count++
+      filePath = getAppCacheDirectory() + File.separator + "${count}_" + fileName
+    }
+    return filePath
   }
 
   /**
