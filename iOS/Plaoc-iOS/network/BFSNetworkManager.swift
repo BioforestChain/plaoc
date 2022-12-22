@@ -17,11 +17,11 @@ class BFSNetworkManager: NSObject {
 
     func loadAutoUpdateInfo(fileName: String? = nil, urlString: String) {
         var name = fileName
+        let timeStamp = "\(Date().milliStamp)"
+        
         let request = AF.download(urlString).downloadProgress { progress in
             print(progress.fractionCompleted)  //进度值
-            if name != nil {
-                NotificationCenter.default.post(name: NSNotification.Name.progressNotification, object: nil, userInfo: ["progress": "\(progress.fractionCompleted)", "fileName": name!])
-            }
+            NotificationCenter.default.post(name: NSNotification.Name.progressNotification, object: nil, userInfo: ["progress": "\(progress.fractionCompleted)", "fileName": name ?? timeStamp])
         }.responseURL { response in
             print(response)
             switch response.result {
@@ -37,7 +37,6 @@ class BFSNetworkManager: NSObject {
                             var desPath = filePath! + "/system-app"
                             if name == nil {
                                 desPath = NSTemporaryDirectory()
-                                print(desPath)
                             }
                             DispatchQueue.main.async {
                                 NVHTarGzip.sharedInstance().unTarGzipFile(atPath: response.fileURL!.path, toPath: desPath) { error in
@@ -58,8 +57,8 @@ class BFSNetworkManager: NSObject {
                                         if name != nil {
                                             Schemehandler.setupHTMLCache(fileName: name!, fromPath: schemePath)
                                             RefreshManager.saveLastUpdateTime(fileName: name!, time: Date().timeStamp)
-                                            NotificationCenter.default.post(name: NSNotification.Name.progressNotification, object: nil, userInfo: ["progress": "complete", "fileName": name!])
                                         }
+                                        NotificationCenter.default.post(name: NSNotification.Name.progressNotification, object: nil, userInfo: ["progress": "complete", "fileName": fileName ?? timeStamp, "realName": name ?? ""])
                                     }
                                 }
                             }
@@ -67,7 +66,7 @@ class BFSNetworkManager: NSObject {
                     }
                 }
             case .failure:
-                NotificationCenter.default.post(name: NSNotification.Name.progressNotification, object: nil, userInfo: ["progress": "fail", "fileName": name ?? ""])
+                NotificationCenter.default.post(name: NSNotification.Name.progressNotification, object: nil, userInfo: ["progress": "fail", "fileName": fileName ?? ""])
             }
         }
         if name != nil {
@@ -157,13 +156,11 @@ class BFSNetworkManager: NSObject {
         guard let filePath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first else { return }
         let desPath = filePath + "/system-app/\(name)"
         let tmpPath = NSTemporaryDirectory() + name
-//        try? FileManager.default.copyItem(atPath: tmpPath, toPath: desPath)
         do {
             if !FileManager.default.fileExists(atPath: desPath) {
                 try FileSystemManager.mkdir(at: URL(fileURLWithPath: filePath + "/system-app/"), recursive: true)
-                try FileManager.default.copyItem(atPath: tmpPath, toPath: desPath)
             }
-            
+            try FileManager.default.copyItem(atPath: tmpPath, toPath: desPath)
         } catch {
             print(error.localizedDescription)
         }

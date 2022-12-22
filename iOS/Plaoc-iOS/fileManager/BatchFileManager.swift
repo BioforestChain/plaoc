@@ -192,6 +192,17 @@ class BatchFileManager: NSObject {
     func systemAPPVersion(fileName: String) -> String {
         return sysManager.readMetadataVersion(fileName: fileName) ?? ""
     }
+    //是否本地已经保存了文件
+    func isReplaceSameFile(fileName: String) -> Bool {
+        let sysVersion = systemAPPVersion(fileName: fileName)
+        let tmpManager = BatchTempManager()
+        let tmpVersion = tmpManager.tempAppVersion(name: fileName)
+        let result = tmpVersion.versionCompare(oldVersion: sysVersion)
+        if result == .orderedAscending {
+            return true
+        }
+        return false
+    }
     
     //更新信息下载完后，重新下载项目文件,  可能不需要判断system-app 看最后system-app升级时的需求
     private func downloadNewFile(fileName: String) {

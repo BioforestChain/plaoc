@@ -32,6 +32,7 @@ class FirstViewController: UIViewController {
                 button.setTitleColor(.black, for: .normal)
                 button.tag = i
                 self.view.addSubview(button)
+                buttons.append(button)
             } else {
                 let name = appNames[i]
                 let button = UIButton(frame: CGRect(x: 30 + i * 90, y: 200, width: 60, height: 60))
@@ -72,14 +73,38 @@ class FirstViewController: UIViewController {
     }
     
     @objc func update(noti: Notification) {
+        print("download")
         guard let infoDict = noti.userInfo else { return }
         guard let type = infoDict["progress"] as? String else { return }
         let fileName = infoDict["fileName"] as? String
+        let realName = infoDict["realName"] as? String
+        //判断 如果包含 是既有的，如果没有新增
+        if self.appNames.contains(fileName!) {
+            
+        } else {
+            //新增iconApp
+            self.appNames.append(fileName!)
+            DispatchQueue.main.async {
+                self.addScanAppUI()
+                let button = self.view.viewWithTag(3) as! UIButton
+                button.setupForAppleReveal()
+            }
+        }
         DispatchQueue.main.async {
             if type == "complete" {
                 if fileName != nil {
-                    BatchFileManager.shared.updateFileType(fileName: fileName!)
-                    if let index = self.appNames.firstIndex(of: fileName!) {
+                    var name = fileName
+                    if fileName != realName {
+                        name = realName
+                        if self.appNames.contains(realName!) {
+                            //1、删除刚下载的icon APP
+                            if BatchFileManager.shared.isReplaceSameFile(fileName: realName!) {
+                                //2、在旧的上面添加红点
+                            }
+                        }
+                    }
+                    BatchFileManager.shared.updateFileType(fileName: name!)
+                    if let index = self.appNames.firstIndex(of: name!) {
                         let button = self.buttons[index]
                         button.setImage(BatchFileManager.shared.currentAppImage(fileName: fileName!), for: .normal)
                         button.startExpandAnimation()
@@ -133,10 +158,11 @@ class FirstViewController: UIViewController {
         }
     }
     
-    func addScanAppUI(name: String) {
+    func addScanAppUI() {
         let button = UIButton(frame: CGRect(x: 30 + 3 * 90, y: 200, width: 60, height: 60))
 //                button.addTarget(self, action: #selector(tap(sender:)), for: .touchUpInside)
-        button.setTitle(name, for: .normal)
+        button.setTitle("", for: .normal)
+        button.backgroundColor = .red
         button.setTitleColor(.black, for: .normal)
         button.tag = 3
         button.layer.cornerRadius = 10
