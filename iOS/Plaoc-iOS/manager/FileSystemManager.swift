@@ -109,6 +109,10 @@ class FileSystemManager: NSObject {
         return try FileManager.default.attributesOfItem(atPath: fileUrl.path)
     }
     
+    static func ls(at fileUrl: URL, with data: String, recursive: Bool) {
+        print("TODO: 未实现ls方法")
+    }
+    
     static func getType(from attr: [FileAttributeKey:Any]) -> String {
         let fileType = attr[.type] as? String ?? ""
         if fileType == "NSFileTypeDirectory" {

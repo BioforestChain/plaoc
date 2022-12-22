@@ -5,8 +5,10 @@
 //  Created by ui03 on 2022/11/4.
 //
 
+import UIKit
 import Foundation
 import JavaScriptCore
+import SwiftyJSON
 
 @objc protocol PlaocJSExport: JSExport {
     
@@ -48,6 +50,20 @@ import JavaScriptCore
             return executiveApplyPermissions(param: param)
         case "isDenoRuntime":
             return executiveIsDenoRuntime(param: param)
+        case "FileSystemLs":
+            return executiveFileSystemLs(param: param)
+        case "FileSystemMkdir":
+            return executiveFileSystemMkdir(param: param)
+        case "FileSystemRm":
+            return executiveFileSystemRm(param: param)
+        case "FileSystemRead":
+            return executiveFileSystemRead(param: param)
+        case "FileSystemWrite":
+            return executiveFileSystemWrite(param: param)
+        case "FileSystemStat":
+            return executiveFileSystemStat(param: param)
+        case "FileSystemList":
+            return executiveFileSystemList(param: param)
         default:
             return ""
         }
@@ -114,5 +130,52 @@ extension PlaocHandleModel {
     //
     private func executiveIsDenoRuntime(param: String) -> String {
         return "true"
+    }
+    
+    // 获取指定文件系统目录下的内容
+    private func executiveFileSystemLs(param: String) -> String {
+//        print("executiveFileSystemLs")
+//        print(param)
+        let _ = JSON.init(parseJSON: param)
+//        FileSystemManager.ls(at: <#T##URL#>, with: <#T##String#>, recursive: <#T##Bool#>)
+        
+        return ""
+    }
+    
+    // 在指定文件系统目录下创建目录
+    private func executiveFileSystemMkdir(param: String) -> String {
+        print("executiveFileSystemMkdir")
+        print(param)
+        let data = JSON.init(parseJSON: param)
+        if let url = URL(string: data["path"].stringValue) {
+            try? FileSystemManager.mkdir(at: url, recursive: data["option"]["recursive"].boolValue)
+        }
+        
+        return ""
+    }
+    
+    // 删除指定文件系统某个目录或文件
+    private func executiveFileSystemRm(param: String) -> String {
+        return ""
+    }
+    
+    // 读取指定文件系统内容
+    private func executiveFileSystemRead(param: String) -> String {
+        return ""
+    }
+    
+    // 在指定文件系统下写入内容
+    private func executiveFileSystemWrite(param: String) -> String {
+        return ""
+    }
+    
+    // 获取指定文件系统目录或文件详细信息
+    private func executiveFileSystemStat(param: String) -> String {
+        return ""
+    }
+    
+    // 获取指定文件系统目录或文件构造信息
+    private func executiveFileSystemList(param: String) -> String {
+        return ""
     }
 }

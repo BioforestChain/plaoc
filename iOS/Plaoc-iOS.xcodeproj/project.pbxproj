@@ -81,6 +81,7 @@
 		F31B2BAA28F80E52008CDD5F /* AnimationVIew.swift in Sources */ = {isa = PBXBuildFile; fileRef = F31B2BA928F80E52008CDD5F /* AnimationVIew.swift */; };
 		F31B2BAC28F80E74008CDD5F /* recommend-app in Resources */ = {isa = PBXBuildFile; fileRef = F31B2BAB28F80E74008CDD5F /* recommend-app */; };
 		F31B2BAE28F80EC8008CDD5F /* FirstViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F31B2BAD28F80EC8008CDD5F /* FirstViewController.swift */; };
+		F33804332952FD1C00EA0CAC /* sdk in Resources */ = {isa = PBXBuildFile; fileRef = F33804322952FD1C00EA0CAC /* sdk */; };
 		F3542D462949A1EA005D8170 /* NetworkMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3542D452949A1EA005D8170 /* NetworkMap.swift */; };
 		F3542D482949C312005D8170 /* install.js in Resources */ = {isa = PBXBuildFile; fileRef = F3542D472949C312005D8170 /* install.js */; };
 		F3542D4A2949CBB5005D8170 /* ReachabilityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3542D492949CBB5005D8170 /* ReachabilityManager.swift */; };
@@ -215,6 +216,7 @@
 		F31B2BA928F80E52008CDD5F /* AnimationVIew.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnimationVIew.swift; sourceTree = "<group>"; };
 		F31B2BAB28F80E74008CDD5F /* recommend-app */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "recommend-app"; sourceTree = "<group>"; };
 		F31B2BAD28F80EC8008CDD5F /* FirstViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstViewController.swift; sourceTree = "<group>"; };
+		F33804322952FD1C00EA0CAC /* sdk */ = {isa = PBXFileReference; lastKnownFileType = folder; path = sdk; sourceTree = "<group>"; };
 		F3542D452949A1EA005D8170 /* NetworkMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkMap.swift; sourceTree = "<group>"; };
 		F3542D472949C312005D8170 /* install.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = install.js; sourceTree = "<group>"; };
 		F3542D492949CBB5005D8170 /* ReachabilityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReachabilityManager.swift; sourceTree = "<group>"; };
@@ -376,7 +378,7 @@
 		04BC49982858758E003FE6D9 /* Plaoc-iOS */ = {
 			isa = PBXGroup;
 			children = (
-				F3DC28852926196300C8EDF0 /* sys */,
+				F33804322952FD1C00EA0CAC /* sdk */,
 				F31B2B9228F80743008CDD5F /* controller */,
 				F31B2BAB28F80E74008CDD5F /* recommend-app */,
 				F31B2BA028F80D04008CDD5F /* fileManager */,
@@ -680,6 +682,7 @@
 				04376B59286C36730007B444 /* example.html in Resources */,
 				F31B2BAC28F80E74008CDD5F /* recommend-app in Resources */,
 				04BC49A628587590003FE6D9 /* LaunchScreen.storyboard in Resources */,
+				F33804332952FD1C00EA0CAC /* sdk in Resources */,
 				040E4D0C2872D9CF003569F1 /* coil_logo_colored.svg in Resources */,
 				F3542D482949C312005D8170 /* install.js in Resources */,
 				04BC49A328587590003FE6D9 /* Assets.xcassets in Resources */,
