@@ -9,9 +9,9 @@ PODS:
   - Moya/Core (15.0.0):
     - Alamofire (~> 5.0)
   - RxSwift (6.5.0)
-  - SDWebImage (5.13.4):
-    - SDWebImage/Core (= 5.13.4)
-  - SDWebImage/Core (5.13.4)
+  - SDWebImage (5.13.2):
+    - SDWebImage/Core (= 5.13.2)
+  - SDWebImage/Core (5.13.2)
   - SnapKit (5.6.0)
   - SSZipArchive (2.4.3)
   - SVGKit (3.0.0):
@@ -20,9 +20,9 @@ PODS:
   - SwiftyJSON (5.0.1)
   - Toast-Swift (5.0.1)
   - UIColor_Hex_Swift (5.1.7)
-  - ZLPhotoBrowser (4.3.8):
-    - ZLPhotoBrowser/Core (= 4.3.8)
-  - ZLPhotoBrowser/Core (4.3.8)
+  - ZLPhotoBrowser (4.3.7):
+    - ZLPhotoBrowser/Core (= 4.3.7)
+  - ZLPhotoBrowser/Core (4.3.7)
 
 DEPENDENCIES:
   - EmptyDataSet-Swift
@@ -61,7 +61,7 @@ SPEC CHECKSUMS:
   EmptyDataSet-Swift: eb382c0c87a2d9c678077385a595cec52da38171
   Moya: 138f0573e53411fb3dc17016add0b748dfbd78ee
   RxSwift: 5710a9e6b17f3c3d6e40d6e559b9fa1e813b2ef8
-  SDWebImage: e5cc87bf736e60f49592f307bdf9e157189298a3
+  SDWebImage: 72f86271a6f3139cc7e4a89220946489d4b9a866
   SnapKit: e01d52ebb8ddbc333eefe2132acf85c8227d9c25
   SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
   SVGKit: 1ad7513f8c74d9652f94ed64ddecda1a23864dea
@@ -69,8 +69,8 @@ SPEC CHECKSUMS:
   SwiftyJSON: 2f33a42c6fbc52764d96f13368585094bfd8aa5e
   Toast-Swift: 9b6a70f28b3bf0b96c40d46c0c4b9d6639846711
   UIColor_Hex_Swift: 31cd3e47440f07a20d2503a36bb0437a445b3c29
-  ZLPhotoBrowser: a36e618898b781c225672115938ed861a11b2121
+  ZLPhotoBrowser: f571bdaec6d0b64ae94a29787e4c7cbd8900d10f
 
-PODFILE CHECKSUM: 5c0c0d365c799602bcbdb7d4394b00f7a9a91291
+PODFILE CHECKSUM: ddc359a260d6c563deb8e43abfc29e1f0f3cc486
 
 COCOAPODS: 1.11.3

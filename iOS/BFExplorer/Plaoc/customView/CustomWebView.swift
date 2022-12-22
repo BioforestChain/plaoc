@@ -58,6 +58,8 @@ class CustomWebView: UIView {
             }
         }
         config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "InstallBFS")
+        config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "getConnectChannel")
+        config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "postConnectChannel")
         let prefreen = WKPreferences()
         prefreen.javaScriptCanOpenWindowsAutomatically = true
         config.preferences = prefreen
@@ -195,6 +197,10 @@ extension CustomWebView:  WKScriptMessageHandler {
             BFSNetworkManager.shared.loadAutoUpdateInfo(urlString: path)
             //同时显示下载进度条
         } else if message.name == "consoleLog" {
+            print(message.body)
+        } else if message.name == "postConnectChannel" {
+            print(message.body)
+        } else if message.name == "getConnectChannel" {
             print(message.body)
         }
     }

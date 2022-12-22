@@ -33,6 +33,7 @@
 		19F17A1926F3F2B500D4F9DE /* KeyboardManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19F17A1826F3F2B500D4F9DE /* KeyboardManager.swift */; };
 		19F17A1B26F3F59800D4F9DE /* NSNotification+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19F17A1A26F3F59800D4F9DE /* NSNotification+Helpers.swift */; };
 		19F17A1D26F695B200D4F9DE /* BrowserContainerViewController+Keyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19F17A1C26F695B200D4F9DE /* BrowserContainerViewController+Keyboard.swift */; };
+		B6A3356BB3FB7C863EFA040A /* Pods_BFExplorer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5599DDF2F520CAEF3EE0F585 /* Pods_BFExplorer.framework */; };
 		F01ABAC328D020690038AF9C /* String+md5.swift in Sources */ = {isa = PBXBuildFile; fileRef = F01ABAC228D020690038AF9C /* String+md5.swift */; };
 		F01ABAC528D020BA0038AF9C /* Date+Famatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F01ABAC428D020BA0038AF9C /* Date+Famatter.swift */; };
 		F01ABACE28D07AE30038AF9C /* LinkListPageVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F01ABACA28D07AE30038AF9C /* LinkListPageVC.swift */; };
@@ -205,6 +206,7 @@
 		19F17A1A26F3F59800D4F9DE /* NSNotification+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSNotification+Helpers.swift"; sourceTree = "<group>"; };
 		19F17A1C26F695B200D4F9DE /* BrowserContainerViewController+Keyboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrowserContainerViewController+Keyboard.swift"; sourceTree = "<group>"; };
 		2E37C84267E78E46626917E0 /* Pods-BFExplorer-BFExplorerUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BFExplorer-BFExplorerUITests.debug.xcconfig"; path = "Target Support Files/Pods-BFExplorer-BFExplorerUITests/Pods-BFExplorer-BFExplorerUITests.debug.xcconfig"; sourceTree = "<group>"; };
+		5599DDF2F520CAEF3EE0F585 /* Pods_BFExplorer.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_BFExplorer.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		74C660797C25FF4E3F13EA3F /* Pods-BFExplorerTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BFExplorerTests.debug.xcconfig"; path = "Target Support Files/Pods-BFExplorerTests/Pods-BFExplorerTests.debug.xcconfig"; sourceTree = "<group>"; };
 		83115F8F24472E3793A77D81 /* Pods-BFExplorer.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BFExplorer.release.xcconfig"; path = "Target Support Files/Pods-BFExplorer/Pods-BFExplorer.release.xcconfig"; sourceTree = "<group>"; };
 		B08BAD783BC200B00487330D /* Pods-BFExplorerTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BFExplorerTests.release.xcconfig"; path = "Target Support Files/Pods-BFExplorerTests/Pods-BFExplorerTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -366,6 +368,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B6A3356BB3FB7C863EFA040A /* Pods_BFExplorer.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -380,6 +383,7 @@
 				1903641626EB427D00B82B1C /* BFExplorer */,
 				1903641526EB427D00B82B1C /* Products */,
 				B4F24E845099ED18035E77C9 /* Pods */,
+				CBBADE850C0C82B4E8D232B3 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -493,6 +497,14 @@
 				B08BAD783BC200B00487330D /* Pods-BFExplorerTests.release.xcconfig */,
 			);
 			path = Pods;
+			sourceTree = "<group>";
+		};
+		CBBADE850C0C82B4E8D232B3 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				5599DDF2F520CAEF3EE0F585 /* Pods_BFExplorer.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		F01ABAC828D07ABC0038AF9C /* HistoryList */ = {
@@ -803,8 +815,6 @@
 			dependencies = (
 			);
 			name = BFExplorer;
-			packageProductDependencies = (
-			);
 			productName = OrionUI;
 			productReference = 1903641426EB427D00B82B1C /* BFExplorer.app */;
 			productType = "com.apple.product-type.application";
@@ -833,8 +843,6 @@
 				Base,
 			);
 			mainGroup = 1903640B26EB427D00B82B1C;
-			packageReferences = (
-			);
 			productRefGroup = 1903641526EB427D00B82B1C /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
