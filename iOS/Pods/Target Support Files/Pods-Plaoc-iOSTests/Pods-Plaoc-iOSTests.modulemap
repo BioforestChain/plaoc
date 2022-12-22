@@ -1,6 +1,0 @@
-framework module Pods_Plaoc_iOSTests {
-  umbrella header "Pods-Plaoc-iOSTests-umbrella.h"
-
-  export *
-  module * { export * }
-}
