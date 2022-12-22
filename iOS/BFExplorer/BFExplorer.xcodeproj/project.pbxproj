@@ -376,7 +376,6 @@
 			isa = PBXGroup;
 			children = (
 				1903641726EB427D00B82B1C /* AppDelegate.swift */,
-				1903642526EB427E00B82B1C /* Info.plist */,
 				F05C41F42907F0E30082CC75 /* Plaoc */,
 				1903641626EB427D00B82B1C /* BFExplorer */,
 				1903641526EB427D00B82B1C /* Products */,
@@ -395,6 +394,7 @@
 		1903641626EB427D00B82B1C /* BFExplorer */ = {
 			isa = PBXGroup;
 			children = (
+				1903642526EB427E00B82B1C /* Info.plist */,
 				F0A3C3D42953FA3B00C78D1A /* WKWebViewJavascriptBridge */,
 				F01ABAC828D07ABC0038AF9C /* HistoryList */,
 				F03301E028C73E1700BC0266 /* Extensions2 */,
@@ -1212,7 +1212,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = F9M4UWUYYN;
-				INFOPLIST_FILE = BFExplorer/Other/Info.plist;
+				INFOPLIST_FILE = BFExplorer/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = BFExplorer;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1242,7 +1242,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = F9M4UWUYYN;
-				INFOPLIST_FILE = BFExplorer/Other/Info.plist;
+				INFOPLIST_FILE = BFExplorer/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = BFExplorer;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
