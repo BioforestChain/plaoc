@@ -43,7 +43,7 @@ class WebViewViewController: UIViewController {
         self.view.addSubview(webView)
         self.view.addSubview(naviView)
         self.view.addSubview(statusView)
-//        self.view.addSubview(bottomView)
+        self.view.addSubview(bottomView)
         
     }
     
