@@ -19,9 +19,11 @@ class CoroutineUpdateTask : UpdateTask {
         try {
           // Todo 开始执行轮询操作
           FilesUtil.getScheduleAppList().forEach { appInfo ->
-            if (count % appInfo.autoUpdate.maxAge == 0) {
-              var mainViewModel = MainViewModel()
-              mainViewModel.getAppVersionAndSave(appInfo)
+            appInfo.autoUpdate?.let { autoUpdateInfo ->
+              if (count % autoUpdateInfo.maxAge == 0) {
+                val mainViewModel = MainViewModel()
+                mainViewModel.getAppVersionAndSave(appInfo)
+              }
             }
           }
         } catch (e: Exception) {

@@ -1,6 +1,5 @@
 package info.bagen.libappmgr.ui.download
 
-import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -66,6 +65,7 @@ private fun DownLoadProgress.copy(downLoadProgress: DownLoadProgress) {
  * MIV中的Intent部分
  */
 sealed class DownLoadIntent {
+  class LoadDownLoadStateAndDownLoad(val path: String) : DownLoadIntent()
   object DownLoadAndSave : DownLoadIntent()
   object BreakpointDownLoadAndSave : DownLoadIntent()
   object ShowDownLoadState : DownLoadIntent()
@@ -75,11 +75,11 @@ sealed class DownLoadIntent {
 }
 
 class DownLoadViewModel(
-  private val path: String, private val repository: DownLoadRepository = DownLoadRepository()
+  private val repository: DownLoadRepository = DownLoadRepository()
 ) : ViewModel() {
   // val channel = Channel<DownLoadIntent>(2) // 表示最多两个buffer，超过后挂起
   val uiState = mutableStateOf(DownLoadUIState())
-  val mDownLoadProgress = DownLoadProgress(downloadUrl = path)
+  val mDownLoadProgress = DownLoadProgress()
   private var mDownLoadState = DownLoadState.IDLE
 
   init {/*
@@ -87,7 +87,7 @@ class DownLoadViewModel(
     viewModelScope.launch {
       channel.consumeAsFlow().collect { TODO("这功能是持续监听channel信道的内容，有收到就做处理") }
     }*/
-    viewModelScope.launch {
+    /*viewModelScope.launch {
       loadDownloadState() // 加载存储的下载进度
       when (mDownLoadState) {
         DownLoadState.IDLE -> handleIntent(DownLoadIntent.DownLoadAndSave)
@@ -95,24 +95,33 @@ class DownLoadViewModel(
         DownLoadState.PAUSE -> handleIntent(DownLoadIntent.ShowDownLoadState)
         else -> {}
       }
-    }
+    }*/
   }
 
   fun handleIntent(action: DownLoadIntent) {
     viewModelScope.launch {
       /* channel.send(action) // 进行发送操作，可以根据传参进行发送 */
       when (action) {
-        DownLoadIntent.DownLoadAndSave -> {
+        is DownLoadIntent.LoadDownLoadStateAndDownLoad -> {
+          loadDownloadState(action.path) // 加载存储的下载进度
+          when (mDownLoadState) {
+            DownLoadState.IDLE -> handleIntent(DownLoadIntent.DownLoadAndSave)
+            DownLoadState.STOP -> handleIntent(DownLoadIntent.BreakpointDownLoadAndSave)
+            DownLoadState.PAUSE -> handleIntent(DownLoadIntent.ShowDownLoadState)
+            else -> {}
+          }
+        }
+        is DownLoadIntent.DownLoadAndSave -> {
           uiState.value.downLoadState.value = DownLoadState.LOADING
           downLoadAndSave(mDownLoadProgress.downloadUrl, mDownLoadProgress.downloadFile)
         }
-        DownLoadIntent.BreakpointDownLoadAndSave -> {
+        is DownLoadIntent.BreakpointDownLoadAndSave -> {
           uiState.value.downLoadState.value = DownLoadState.LOADING
           breakpointDownLoadAndSave(
             mDownLoadProgress.downloadUrl, mDownLoadProgress.downloadFile, mDownLoadProgress.total
           )
         }
-        DownLoadIntent.DownLoadPauseStateChanged -> {
+        is DownLoadIntent.DownLoadPauseStateChanged -> {
           when (uiState.value.downLoadState.value) {
             DownLoadState.PAUSE -> {
               handleIntent(DownLoadIntent.BreakpointDownLoadAndSave)
@@ -122,7 +131,7 @@ class DownLoadViewModel(
             }
           }
         }
-        DownLoadIntent.DownLoadSaveState -> {
+        is DownLoadIntent.DownLoadSaveState -> {
           when (uiState.value.downLoadState.value) {
             DownLoadState.LOADING -> {
               uiState.value.downLoadState.value = DownLoadState.STOP
@@ -134,11 +143,11 @@ class DownLoadViewModel(
             else -> {}
           }
         }
-        DownLoadIntent.ShowDownLoadState -> {
+        is DownLoadIntent.ShowDownLoadState -> {
           uiState.value.downLoadState.value = DownLoadState.PAUSE
           uiState.value.downLoadProgress.value = mDownLoadProgress.progress
         }
-        DownLoadIntent.DecompressFile -> {
+        is DownLoadIntent.DecompressFile -> {
           decompressFile()
         }
       }
@@ -217,7 +226,7 @@ class DownLoadViewModel(
     repository.saveDownloadState(uiState.value.downLoadState.value, mDownLoadProgress)
   }
 
-  private suspend fun loadDownloadState() {
+  private suspend fun loadDownloadState(path: String) {
     repository.loadDownloadState(path) { downLoadState, downLoadProgress ->
       mDownLoadProgress.copy(downLoadProgress)
       if (mDownLoadProgress.downloadFile.isEmpty()) {

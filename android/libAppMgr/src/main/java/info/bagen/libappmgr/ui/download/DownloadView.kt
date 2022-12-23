@@ -1,6 +1,5 @@
 package info.bagen.libappmgr.ui.download
 
-import android.util.Log
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -30,7 +29,8 @@ import info.bagen.libappmgr.ui.view.DialogView
  */
 @Composable
 fun DownloadDialogView(path: String, callbackState: (DownLoadState, DialogInfo) -> Unit) {
-  val downLoadViewModel = DownLoadViewModel(path)
+  val downLoadViewModel = DownLoadViewModel()
+  downLoadViewModel.handleIntent(DownLoadIntent.LoadDownLoadStateAndDownLoad(path))
   DownloadDialogProgressView(
     downLoadViewModel = downLoadViewModel, callbackState = callbackState
   )
@@ -50,8 +50,23 @@ fun DownloadAppMaskView(
   callbackState: (DownLoadState, DialogInfo) -> Unit,
   checkInstallOrOverride: (AppInfo?, String) -> NewAppUnzipType
 ) {
-  Log.e("lin.huang", "DownloadView::DownloadAppMaskView path=$path")
-  val downLoadViewModel = DownLoadViewModel(path)
+  val downLoadViewModel = DownLoadViewModel()
+  downLoadViewModel.handleIntent(DownLoadIntent.LoadDownLoadStateAndDownLoad(path))
+  DownloadAppProgressView(
+    downLoadViewModel = downLoadViewModel,
+    modifier = modifier,
+    callbackState = callbackState,
+    checkInstallOrOverride = checkInstallOrOverride
+  )
+}
+
+@Composable
+fun DownloadAppMaskView(
+  downLoadViewModel: DownLoadViewModel,
+  modifier: Modifier = Modifier,
+  callbackState: (DownLoadState, DialogInfo) -> Unit,
+  checkInstallOrOverride: (AppInfo?, String) -> NewAppUnzipType
+) {
   DownloadAppProgressView(
     downLoadViewModel = downLoadViewModel,
     modifier = modifier,
@@ -67,7 +82,6 @@ private fun DownloadAppProgressView(
   callbackState: (DownLoadState, DialogInfo) -> Unit,
   checkInstallOrOverride: (AppInfo?, String) -> NewAppUnzipType
 ) {
-  Log.e("lin.huang", "DownloadView::DownloadAppProgressView enter")
   val dialogInfo = DialogInfo(
     type = DialogType.PROGRESS, progress = downLoadViewModel.uiState.value.downLoadProgress.value
   )
