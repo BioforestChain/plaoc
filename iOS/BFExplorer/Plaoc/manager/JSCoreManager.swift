@@ -12,6 +12,7 @@ class JSCoreManager: NSObject {
     
     private var baseViewController: UIViewController?
     private let jsContext = JSContext()
+    private var plaoc = PlaocHandleModel()
     private var name: String = ""
     
     
@@ -19,6 +20,10 @@ class JSCoreManager: NSObject {
         super.init()
         baseViewController = controller
         name = fileName
+        
+        plaoc.controller = baseViewController
+        plaoc.jsContext = jsContext
+        plaoc.fileName = name
         
         JSInjectManager.shared.registerInContext(jsContext!)
         initJSCore()
@@ -29,10 +34,6 @@ class JSCoreManager: NSObject {
     private func initJSCore() {
 
         let entryPath = Bundle.main.bundlePath + "/sdk/HE74YAAL/boot/index.js"
-        let plaoc = PlaocHandleModel()
-        plaoc.controller = baseViewController
-        plaoc.jsContext = jsContext
-        plaoc.fileName = name
         
         jsContext?.setObject(plaoc, forKeyedSubscript: "PlaocJavascriptBridge" as NSCopying & NSObjectProtocol)
         if let content = try? String(contentsOfFile: entryPath) {
@@ -43,11 +44,6 @@ class JSCoreManager: NSObject {
     private func loadAPPEntry(fileName: String) {
         
         guard let entryPath = BatchFileManager.shared.systemAPPEntryPath(fileName: fileName) else { return }
-
-        let plaoc = PlaocHandleModel()
-        plaoc.controller = baseViewController
-        plaoc.jsContext = jsContext
-        plaoc.fileName = name
         
         jsContext?.setObject(plaoc, forKeyedSubscript: "PlaocJavascriptBridge" as NSCopying & NSObjectProtocol)
         if let content = try? String(contentsOfFile: entryPath) {
