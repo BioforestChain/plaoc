@@ -7,16 +7,16 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "5772258E-A555-4402-85B7-3EDE887F8D6A"
+            uuid = "CF400E4E-0B9C-4580-92DD-CD0C87BE93A1"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Plaoc/manager/JSCoreManager.swift"
+            filePath = "Plaoc/network/BFSNetworkManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "70"
-            endingLineNumber = "70"
-            landmarkName = "handleEvaluateScript(jsString:)"
+            startingLineNumber = "44"
+            endingLineNumber = "44"
+            landmarkName = "loadAutoUpdateInfo(fileName:urlString:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
