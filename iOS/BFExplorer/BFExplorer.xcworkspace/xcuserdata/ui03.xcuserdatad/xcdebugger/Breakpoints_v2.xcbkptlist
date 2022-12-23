@@ -7,15 +7,15 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "CF400E4E-0B9C-4580-92DD-CD0C87BE93A1"
+            uuid = "5FDC2B4C-FE2C-497C-949A-6928259B4FFA"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Plaoc/network/BFSNetworkManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "44"
-            endingLineNumber = "44"
+            startingLineNumber = "53"
+            endingLineNumber = "53"
             landmarkName = "loadAutoUpdateInfo(fileName:urlString:)"
             landmarkType = "7">
          </BreakpointContent>
