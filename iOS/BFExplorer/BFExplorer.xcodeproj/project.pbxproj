@@ -33,6 +33,7 @@
 		19F17A1926F3F2B500D4F9DE /* KeyboardManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19F17A1826F3F2B500D4F9DE /* KeyboardManager.swift */; };
 		19F17A1B26F3F59800D4F9DE /* NSNotification+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19F17A1A26F3F59800D4F9DE /* NSNotification+Helpers.swift */; };
 		19F17A1D26F695B200D4F9DE /* BrowserContainerViewController+Keyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19F17A1C26F695B200D4F9DE /* BrowserContainerViewController+Keyboard.swift */; };
+		A95784E17034B1A6095B4719 /* Pods_BFExplorer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 14DDFD700ECB4E7A499BECFE /* Pods_BFExplorer.framework */; };
 		F01ABAC328D020690038AF9C /* String+md5.swift in Sources */ = {isa = PBXBuildFile; fileRef = F01ABAC228D020690038AF9C /* String+md5.swift */; };
 		F01ABAC528D020BA0038AF9C /* Date+Famatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F01ABAC428D020BA0038AF9C /* Date+Famatter.swift */; };
 		F01ABACE28D07AE30038AF9C /* LinkListPageVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F01ABACA28D07AE30038AF9C /* LinkListPageVC.swift */; };
@@ -176,6 +177,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		14DDFD700ECB4E7A499BECFE /* Pods_BFExplorer.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_BFExplorer.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		182EF45D28B37D67001E039E /* UIButton+Image.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIButton+Image.swift"; sourceTree = "<group>"; };
 		182EF46228B62DE4001E039E /* UIImage+Text.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+Text.swift"; sourceTree = "<group>"; };
 		1891945328895E34009242B9 /* BrowserTabViewController+CollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrowserTabViewController+CollectionView.swift"; sourceTree = "<group>"; };
@@ -362,6 +364,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A95784E17034B1A6095B4719 /* Pods_BFExplorer.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -376,6 +379,7 @@
 				1903641626EB427D00B82B1C /* BFExplorer */,
 				1903641526EB427D00B82B1C /* Products */,
 				B4F24E845099ED18035E77C9 /* Pods */,
+				758011D9AAB0E53FEE376296 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -476,6 +480,14 @@
 				182EF46228B62DE4001E039E /* UIImage+Text.swift */,
 			);
 			path = Helpers;
+			sourceTree = "<group>";
+		};
+		758011D9AAB0E53FEE376296 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				14DDFD700ECB4E7A499BECFE /* Pods_BFExplorer.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		B4F24E845099ED18035E77C9 /* Pods */ = {
