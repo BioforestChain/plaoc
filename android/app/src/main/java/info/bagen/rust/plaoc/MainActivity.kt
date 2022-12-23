@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Application.getProcessName
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.res.Resources.NotFoundException
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.TextUtils
@@ -273,10 +274,13 @@ class MainActivity : AppCompatActivity() {
   fun openDWebViewActivity(path: String) {
     // 存储一下host，用来判断是远程的还是本地的
     if (dWebView_host == "") {
-      return
+       throw NotFoundException("app host not found!")
     }
-    val url =
-      "https://${dWebView_host.lowercase(Locale.ROOT)}.dweb${shakeUrl(path)}?_=${Date().time}"
+    val url = if (path.startsWith("http")) {
+        path
+    } else {
+       "https://${dWebView_host.lowercase(Locale.ROOT)}.dweb${shakeUrl(path)}?_=${Date().time}"
+    }
     LogUtils.d("启动了DWebView:$url")
     openDWebWindow(
       activity = getContext(),
