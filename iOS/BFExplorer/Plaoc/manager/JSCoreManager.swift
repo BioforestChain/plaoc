@@ -27,7 +27,7 @@ class JSCoreManager: NSObject {
         
         JSInjectManager.shared.registerInContext(jsContext!)
         initJSCore()
-        loadAPPEntry(fileName: fileName)
+//        loadAPPEntry(fileName: fileName)
 
     }
     
