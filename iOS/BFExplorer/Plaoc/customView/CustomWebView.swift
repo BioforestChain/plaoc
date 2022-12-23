@@ -69,19 +69,33 @@ class CustomWebView: UIView {
         
         /** region start  add console.log  */
         let consoleJs = """
-                            console.log = (function(oriLogFunc){
-                                    return function(args){
-                                        oriLogFunc.call(console, ...args);
-                                        //这里，在执行自定义console.log的时候，将str传递出去。
-                                        window.webkit.messageHandlers.consoleLog.postMessage(args);
-                                    }
-                            })(console.log);
-                        """
+            function log(emoji, type, args) {
+              window.webkit.messageHandlers.logging.postMessage(
+                `${emoji} JS ${type}: ${Object.values(args)
+                  .map(v => typeof(v) === "undefined" ? "undefined" : typeof(v) === "object" ? JSON.stringify(v) : v.toString())
+                  .map(v => v.substring(0, 3000)) // Limit msg to 3000 chars
+                  .join(", ")}`
+              )
+            }
+
+            let originalLog = console.log
+            let originalWarn = console.warn
+            let originalError = console.error
+            let originalDebug = console.debug
+
+            console.log = function() { log("📗", "log", arguments); originalLog.apply(null, arguments) }
+            console.warn = function() { log("📙", "warning", arguments); originalWarn.apply(null, arguments) }
+            console.error = function() { log("📕", "error", arguments); originalError.apply(null, arguments) }
+            console.debug = function() { log("📘", "debug", arguments); originalDebug.apply(null, arguments) }
+
+            window.addEventListener("error", function(e) {
+               log("💥", "Uncaught", [`${e.message} at ${e.filename}:${e.lineno}:${e.colno}`])
+            })
+        """
         let consoleScript = WKUserScript(source: consoleJs, injectionTime: .atDocumentStart, forMainFrameOnly: false)
         config.userContentController.addUserScript(consoleScript)
+        config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "logging")
         /** region end  */
-        config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "consoleLog")
-        
 
         let webView = WKWebView(frame: self.bounds, configuration: config)
         webView.navigationDelegate = self
@@ -181,7 +195,7 @@ extension CustomWebView:  WKScriptMessageHandler {
             guard let path = bodyDict["path"] else { return }
             BFSNetworkManager.shared.loadAutoUpdateInfo(urlString: path)
             //同时显示下载进度条
-        } else if message.name == "consoleLog" {
+        } else if message.name == "logging" {
             print(message.body)
         } else if message.name == "postConnectChannel" {
             print(message.body)
