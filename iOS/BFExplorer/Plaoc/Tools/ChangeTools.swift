@@ -21,6 +21,12 @@ class ChangeTools: NSObject {
         return str
     }
     
+    static func arrayValueString(_ array:[Any]) -> String? {
+        let data = try? JSONSerialization.data(withJSONObject: array, options: [])
+        let str = String(data: data!, encoding: String.Encoding.utf8)
+        return str
+    }
+    
     static func stringValueDic(_ str: String) -> [String : Any]? {
         let data = str.data(using: String.Encoding.utf8)
         if let dict = try? JSONSerialization.jsonObject(with: data!,

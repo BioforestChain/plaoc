@@ -47,6 +47,7 @@ class JSCoreManager: NSObject {
         let plaoc = PlaocHandleModel()
         plaoc.controller = baseViewController
         plaoc.jsContext = jsContext
+        plaoc.fileName = name
         
         jsContext?.setObject(plaoc, forKeyedSubscript: "PlaocJavascriptBridge" as NSCopying & NSObjectProtocol)
         if let content = try? String(contentsOfFile: entryPath) {
