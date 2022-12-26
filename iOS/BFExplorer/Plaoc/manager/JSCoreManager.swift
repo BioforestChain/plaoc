@@ -10,13 +10,13 @@ import JavaScriptCore
 
 class JSCoreManager: NSObject {
     
-    private var baseViewController: UIViewController?
+    private var baseViewController: WebViewViewController?
     private let jsContext = JSContext()
     private var plaoc = PlaocHandleModel()
     private var name: String = ""
     
     
-    init(fileName: String, controller: UIViewController?) {
+    init(fileName: String, controller: WebViewViewController?) {
         super.init()
         baseViewController = controller
         name = fileName
@@ -47,7 +47,7 @@ class JSCoreManager: NSObject {
         
         jsContext?.setObject(plaoc, forKeyedSubscript: "PlaocJavascriptBridge" as NSCopying & NSObjectProtocol)
         if let content = try? String(contentsOfFile: entryPath) {
-            jsContext?.evaluateScript("(async function(){\(content)})()")
+            jsContext?.evaluateScript(content)
         }
     }
     

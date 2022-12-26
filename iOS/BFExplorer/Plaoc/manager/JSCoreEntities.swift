@@ -11,18 +11,18 @@ import JavaScriptCore
 
 @objc protocol PlaocJSExport: JSExport {
     
-    func callJavaScript(functionName: String, param: String) -> Any
+    func callJavaScript(functionName: String, param: Any) -> Any
     
 }
 
 
 @objc class PlaocHandleModel: NSObject, PlaocJSExport {
     
-    var controller: UIViewController?
+    var controller: WebViewViewController?
     var jsContext: JSContext?
     var fileName: String = ""
     
-    func callJavaScript(functionName: String, param: String) -> Any {
+    func callJavaScript(functionName: String, param: Any) -> Any {
         print(functionName)
         switch functionName {
         case "OpenDWebView":
@@ -124,9 +124,9 @@ import JavaScriptCore
         case "SetTopBarForegroundColor":
             return updateTopBarForegroundColor(param: param)
         case "GetBottomBarEnabled":
-            return bottomBarEnabled(param: param)
+            return bottomBarShow(param: param)
         case "SetBottomBarEnabled":
-            return updateBottomBarEnabled(param: param)
+            return updateBottomBarShow(param: param)
         case "GetBottomBarAlpha":
             return bottomBarAlpha(param: param)
         case "SetBottomBarAlpha":
@@ -164,54 +164,55 @@ import JavaScriptCore
 
 extension PlaocHandleModel {
     //打开DWebView
-    private func executiveOpenDWebView(param: String) -> Bool {
+    private func executiveOpenDWebView(param: Any) -> Bool {
         NotificationCenter.default.post(name: NSNotification.Name.openDwebNotification, object: nil, userInfo: ["param":param])
         return true
     }
     //二维码
-    private func executiveOpenQrScanner(param: String) -> String {
+    private func executiveOpenQrScanner(param: Any) -> String {
         let scanVC = ScanPhotoViewController()
         controller?.navigationController?.pushViewController(scanVC, animated: true)
         return ""
     }
     //条形码
-    private func executiveOpenBarcodeScanner(param: String) -> String {
+    private func executiveOpenBarcodeScanner(param: Any) -> String {
         let scanVC = ScanPhotoViewController()
         controller?.navigationController?.pushViewController(scanVC, animated: true)
         return ""
     }
     //初始化app数据
-    private func executiveInitMetaData(param: String) -> String {
+    private func executiveInitMetaData(param: Any) -> String {
+        guard let param = param as? String else { return "" }
         NetworkMap.shared.metaData(metadata: param, fileName: fileName)
         return ""
     }
     //初始化运行时
-    private func executiveDenoRuntime(param: String) -> String {
+    private func executiveDenoRuntime(param: Any) -> String {
         return ""
     }
     //获取appID
-    private func executiveGetBfsAppId(param: String) -> String {
+    private func executiveGetBfsAppId(param: Any) -> String {
         return ""
     }
     //传递给前端消息
-    private func executiveEvalJsRuntime(param: String) -> String {
+    private func executiveEvalJsRuntime(param: Any) -> String {
 //        return jsContext?.evaluateScript(param)
         return ""
     }
     //获取设备信息
-    private func executiveGetDeviceInfo(param: String) -> String {
+    private func executiveGetDeviceInfo(param: Any) -> String {
         return ""
     }
     //发送消息  调用系统通知
-    private func executiveSendNotification(param: String) -> String {
+    private func executiveSendNotification(param: Any) -> String {
         return ""
     }
     //获取推送消息列表
-    private func executiveGetNotification(param: String) -> String {
+    private func executiveGetNotification(param: Any) -> String {
         return ""
     }
     //申请权限
-    private func executiveApplyPermissions(param: String) -> String {
+    private func executiveApplyPermissions(param: Any) -> String {
         let permission = PermissionManager()
         permission.startPermissionAuthenticate(type: .bluetooth) { result in
             
@@ -219,7 +220,8 @@ extension PlaocHandleModel {
         return ""
     }
     //
-    private func executiveIsDenoRuntime(param: String) -> String {
+    private func executiveIsDenoRuntime(param: Any) -> String {
         return "true"
     }
 }
+

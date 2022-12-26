@@ -4,8 +4,8 @@
 <dict>
 	<key>WKAppBoundDomains</key>
 	<array>
-		<string>plaoc.com</string>
 		<string>waterbang.top</string>
+		<string>plaoc.com</string>
 	</array>
 	<key>CFBundleGetInfoString</key>
 	<string></string>

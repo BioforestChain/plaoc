@@ -9,19 +9,19 @@ import Foundation
 
 extension PlaocHandleModel {
     //alert弹框
-    func OpenDialogAlert(param: String) -> String {
+    func OpenDialogAlert(param: Any) -> String {
         return ""
     }
     //prompt弹框
-    func OpenDialogPrompt(param: String) -> String {
+    func OpenDialogPrompt(param: Any) -> String {
         return ""
     }
     //firm弹框
-    func OpenDialogConfirm(param: String) -> String {
+    func OpenDialogConfirm(param: Any) -> String {
         return ""
     }
     //warning弹框
-    func OpenDialogWarning(param: String) -> String {
+    func OpenDialogWarning(param: Any) -> String {
         return ""
     }
 }

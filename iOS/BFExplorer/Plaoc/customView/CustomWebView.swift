@@ -26,11 +26,13 @@ class CustomWebView: UIView {
     private var isKeyboardOverlay: Bool = false
     private var keyHeight:CGFloat = 0
     private var fileName: String = ""
+    private var loadingUrlString: String = ""
     
-    init(frame: CGRect, jsNames: [String], fileName: String) {
+    init(frame: CGRect, jsNames: [String], fileName: String, urlString: String) {
         super.init(frame: frame)
         scripts = addUserScript(jsNames: jsNames)
         self.fileName = fileName
+        self.loadingUrlString = urlString
         self.addSubview(webView)
     }
     
@@ -58,6 +60,8 @@ class CustomWebView: UIView {
                 config.userContentController.addUserScript(script)
             }
         }
+        //true 可以下载  
+        config.limitsNavigationsToAppBoundDomains = self.openAppBoundDomains(urlString: self.loadingUrlString)
         config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "InstallBFS")
         config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "getConnectChannel")
         config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "postConnectChannel")
@@ -205,6 +209,16 @@ extension CustomWebView:  WKScriptMessageHandler {
             guard let param = bodyDict["param"] else { return }
             jsManager.handleEvaluateScript(jsString: param)
         }
+    }
+    
+    private func openAppBoundDomains(urlString: String) -> Bool {
+        let domains = ["waterbang.top","plaoc.com"]
+        for domain in domains {
+            if urlString.contains(domain) {
+                return true
+            }
+        }
+        return false
     }
 }
 

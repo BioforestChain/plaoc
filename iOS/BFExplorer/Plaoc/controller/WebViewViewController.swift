@@ -73,7 +73,7 @@ class WebViewViewController: UIViewController {
     @objc private func openDwebAction(noti: Notification) {
         guard let info = noti.userInfo as? [String:String] else { return }
         guard let urlString = info["param"] else { return }
-        webView.openWebView(html: urlString)
+        webView.openWebView(html: "http://www.baidu.com")
     }
     
     @objc private func interceptAction(noti: Notification) {
@@ -156,16 +156,16 @@ class WebViewViewController: UIViewController {
             hiddenBottomView(isHidden: param)
         case "GetBottomBarEnabled":
             let visible = bottombarHidden()
-            rewriteUrlSchemeTaskResponse(info: info, content: visible)
+            rewriteUrlSchemeTaskResponse(info: info, content: visible ? "true" : "false")
         case "SetBottomBarOverlay":
             guard let param = info?["param"] as? Bool else { return }
             updateBottomViewOverlay(overlay: param)
         case "GetBottomBarOverlay":
             let overlay = bottombarOverlay()
-            rewriteUrlSchemeTaskResponse(info: info, content: overlay)
+            rewriteUrlSchemeTaskResponse(info: info, content: overlay ? "true":"false")
         case "GetBottomBarAlpha":
             let alpha = bottomViewAlpha()
-            rewriteUrlSchemeTaskResponse(info: info, content: alpha)
+            rewriteUrlSchemeTaskResponse(info: info, content: "\(alpha)")
         case "SetBottomBarAlpha":
             guard let param = info?["param"] as? Double else { return }
             setBottomViewAlpha(alpha: param)
@@ -174,7 +174,7 @@ class WebViewViewController: UIViewController {
             updateBottomViewHeight(height: param)
         case "GetBottomBarHeight":
             let height = bottomViewHeight()
-            rewriteUrlSchemeTaskResponse(info: info, content: height)
+            rewriteUrlSchemeTaskResponse(info: info, content: "\(height)")
         case "SetBottomBarActions":
             guard let param = info?["param"] as? String else { return }
             fetchBottomButtons(content: param)
@@ -249,12 +249,12 @@ class WebViewViewController: UIViewController {
         urlSchemeTask.didFinish()
     }
 
-    lazy private var statusView: StatusView = {
+    lazy var statusView: StatusView = {
         let statusView = StatusView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIDevice.current.statusBarHeight()))
         return statusView
     }()
     
-    lazy private var naviView: NaviView = {
+    lazy var naviView: NaviView = {
         let naviView = NaviView(frame: CGRect(x: 0, y: self.statusView.frame.maxY, width: UIScreen.main.bounds.width, height: 44))
         naviView.callback = { [weak self] code in
             guard let strongSelf = self else { return }
@@ -264,7 +264,7 @@ class WebViewViewController: UIViewController {
     }()
     
     lazy private var webView: CustomWebView = {
-        let webView = CustomWebView(frame: CGRect(x: 0, y: 44, width: self.view.bounds.width, height: UIScreen.main.bounds.height - 44), jsNames: ["install"], fileName: fileName)
+        let webView = CustomWebView(frame: CGRect(x: 0, y: 44, width: self.view.bounds.width, height: UIScreen.main.bounds.height - 44), jsNames: ["install"], fileName: fileName, urlString: self.urlString)
         webView.superVC = self
         webView.callback = { [weak self] title in
             guard let strongSelf = self else { return }
@@ -273,7 +273,7 @@ class WebViewViewController: UIViewController {
         return webView
     }()
     
-    lazy private var bottomView: BottomView = {
+    lazy var bottomView: BottomView = {
         let bottomView = BottomView(frame: CGRect(x: 0, y: UIScreen.main.bounds.height - 49 - UIDevice.current.tabbarSpaceHeight(), width: UIScreen.main.bounds.width, height: 49 + UIDevice.current.tabbarSpaceHeight()))
 //        bottomView.isHidden = true
         bottomView.callback = { [weak self] code in
@@ -436,18 +436,17 @@ extension WebViewViewController {
 extension WebViewViewController {
     //隐藏底部
     private func hiddenBottomView(isHidden: Bool) {
-        guard bottomView.isHidden != isHidden else { return }
-        bottomView.isHidden = isHidden
+        bottomView.hiddenBottomView(hidden: isHidden)
     }
     //返回底部是否隐藏
-    private func bottombarHidden() -> String {
-        return bottomView.isHidden ? "true" : "false"
+    private func bottombarHidden() -> Bool {
+        return bottomView.bottomHiddenState()
     }
     
     //更新底部overlay
     private func updateBottomViewOverlay(overlay: Bool) {
-        guard bottomOverlay != overlay else { return }
-        bottomOverlay = overlay
+        guard bottomView.bottomViewOverlay() != overlay else { return }
+        bottomView.updateBottomViewOverlay(overlay: overlay)
         
         var frame = webView.frame
         
@@ -464,39 +463,38 @@ extension WebViewViewController {
         }
     }
     //返回底部overlay
-    private func bottombarOverlay() -> String {
-        return bottomOverlay ? "true" : "false"
+    private func bottombarOverlay() -> Bool {
+        return bottomView.bottomViewOverlay()
     }
     //设置底部alpha
     private func setBottomViewAlpha(alpha: CGFloat) {
-        bottomView.alpha = alpha
+        bottomView.updaterBottomViewAlpha(alpha: alpha)
     }
     //返回底部alpha
-    private func bottomViewAlpha() -> String {
-        return "\(bottomView.alpha)"
+    private func bottomViewAlpha() -> CGFloat {
+        return bottomView.bottomViewAlpha()
     }
     
     //更新底部背景色
     private func updateBottomViewBackgroundColor(colorString: String) {
-        bottomView.backgroundColor = UIColor(colorString)
+        bottomView.updateBottomViewBackgroundColor(colorString: colorString)
     }
     //返回底部背景颜色
     private func bottomBarBackgroundColor() -> String {
-        return bottomView.backgroundColor?.hexString() ?? "#FFFFFFFF"
+        return bottomView.bottomBarBackgroundColor()
     }
     
     //更新底部颜色
     private func updateBottomViewforegroundColor(colorString: String) {
-        //TODO
+        bottomView.updateBottomViewforegroundColor(colorString: colorString)
     }
     //返回底部颜色
     private func bottomBarForegroundColor() -> String {
-        //TODO
-        return "#FFFFFFFF"
+        return bottomView.bottomBarForegroundColor()
     }
     
     //更新底部高度
-    private func updateBottomViewHeight(height: CGFloat) {
+    func updateBottomViewHeight(height: CGFloat) {
         var frame = bottomView.frame
         frame.size.height = height
         frame.origin.y = UIScreen.main.bounds.height - height
@@ -506,33 +504,23 @@ extension WebViewViewController {
         }
     }
     //返回底部高度
-    private func bottomViewHeight() -> String {
-        return "\(bottomView.frame.height)"
+    private func bottomViewHeight() -> CGFloat {
+        return bottomView.bottomViewHeight()
     }
     
     //隐藏底部按钮
-    private func hiddenBottomViewButton(hiddenString: String) {
-        bottomView.hiddenBtn = hiddenString == "1" ? false : true
+    private func hiddenBottomViewButton(hidden: Bool) {
+        bottomView.hiddenBottomViewButton(hidden: hidden)
     }
     
     //获取底部按钮
     private func fetchBottomButtons(content: String) {
-        guard let array = ChangeTools.stringValueArray(content) else { return }
-        let list = JSON(array)
-        let buttons = list.arrayValue.map { BottomBarModel(dict: $0) }
-        bottomView.buttons = buttons
+        bottomView.fetchBottomButtons(content: content)
     }
     //返回底部按钮数组
     private func bottomActions() -> String {
-        guard let buttons = bottomView.buttons else { return "" }
-        var array: [[String:Any]] = []
-        for button in buttons {
-            array.append(button.buttonDict)
-        }
-        let actionString = ChangeTools.arrayValueString(array) ?? ""
-        return actionString
+        return bottomView.bottomActions()
     }
-    
 }
 
 extension WebViewViewController {

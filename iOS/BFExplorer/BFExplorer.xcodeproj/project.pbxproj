@@ -179,6 +179,7 @@
 		F383C6BA295538CD00BD4FE5 /* TopBarEntites.swift in Sources */ = {isa = PBXBuildFile; fileRef = F383C6B9295538CD00BD4FE5 /* TopBarEntites.swift */; };
 		F383C6BC2955391000BD4FE5 /* BottomBarEntites.swift in Sources */ = {isa = PBXBuildFile; fileRef = F383C6BB2955391000BD4FE5 /* BottomBarEntites.swift */; };
 		F383C6BE2955393200BD4FE5 /* KeyboardEntites.swift in Sources */ = {isa = PBXBuildFile; fileRef = F383C6BD2955393200BD4FE5 /* KeyboardEntites.swift */; };
+		F383C6C029557B0D00BD4FE5 /* AdapterHandle.swift in Sources */ = {isa = PBXBuildFile; fileRef = F383C6BF29557B0D00BD4FE5 /* AdapterHandle.swift */; };
 		F3AA03E72954581F000BD38F /* sdk in Resources */ = {isa = PBXBuildFile; fileRef = F3AA03E62954581F000BD38F /* sdk */; };
 /* End PBXBuildFile section */
 
@@ -368,6 +369,7 @@
 		F383C6B9295538CD00BD4FE5 /* TopBarEntites.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopBarEntites.swift; sourceTree = "<group>"; };
 		F383C6BB2955391000BD4FE5 /* BottomBarEntites.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomBarEntites.swift; sourceTree = "<group>"; };
 		F383C6BD2955393200BD4FE5 /* KeyboardEntites.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardEntites.swift; sourceTree = "<group>"; };
+		F383C6BF29557B0D00BD4FE5 /* AdapterHandle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdapterHandle.swift; sourceTree = "<group>"; };
 		F3AA03E62954581F000BD38F /* sdk */ = {isa = PBXFileReference; lastKnownFileType = folder; path = sdk; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -715,6 +717,7 @@
 				F383C6BB2955391000BD4FE5 /* BottomBarEntites.swift */,
 				F383C6B7295538A400BD4FE5 /* AlertEntites.swift */,
 				F383C6B5295537B700BD4FE5 /* StatusBarEntites.swift */,
+				F383C6BF29557B0D00BD4FE5 /* AdapterHandle.swift */,
 				F383C6B9295538CD00BD4FE5 /* TopBarEntites.swift */,
 				F383C6B32955378800BD4FE5 /* FileEntites.swift */,
 				F091CB772951B91900FCE565 /* PermissionManager.swift */,
@@ -1053,6 +1056,7 @@
 				F383C6BE2955393200BD4FE5 /* KeyboardEntites.swift in Sources */,
 				F0A3C3DC2953FA3B00C78D1A /* WKWebViewJavascriptBridgeBase.swift in Sources */,
 				F091CB382951B8EE00FCE565 /* AnimationVIew.swift in Sources */,
+				F383C6C029557B0D00BD4FE5 /* AdapterHandle.swift in Sources */,
 				F033022D28C73E1800BC0266 /* UIImage+PKExtensions.swift in Sources */,
 				F091CB4A2951B90200FCE565 /* UIDevice_extension.swift in Sources */,
 				F091CB862951B91900FCE565 /* DocumentManager.swift in Sources */,

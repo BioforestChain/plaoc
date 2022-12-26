@@ -17,7 +17,8 @@ extension PlaocHandleModel {
     }
     
     // 获取指定文件系统目录下的内容
-    func executiveFileSystemLs(param: String) -> String {
+    func executiveFileSystemLs(param: Any) -> String {
+        guard let param = param as? String else { return "" }
         let data = JSON.init(parseJSON: param)
         let homePath = getDwebAppPath()
         
@@ -41,8 +42,8 @@ extension PlaocHandleModel {
     }
     
     // 在指定文件系统目录下创建目录
-    func executiveFileSystemMkdir(param: String) -> Bool {
-       
+    func executiveFileSystemMkdir(param: Any) -> Bool {
+        guard let param = param as? String else { return false }
         let data = JSON.init(parseJSON: param)
         let homePath = getDwebAppPath()
         
@@ -60,7 +61,8 @@ extension PlaocHandleModel {
     }
     
     // 删除指定文件系统某个目录或文件
-    func executiveFileSystemRm(param: String) -> Bool {
+    func executiveFileSystemRm(param: Any) -> Bool {
+        guard let param = param as? String else { return false }
         let data = JSON.init(parseJSON: param)
         let homePath = getDwebAppPath()
         
@@ -86,7 +88,8 @@ extension PlaocHandleModel {
     }
     
     // 读取指定文件系统内容
-    func executiveFileSystemRead(param: String) -> String {
+    func executiveFileSystemRead(param: Any) -> String {
+        guard let param = param as? String else { return "" }
         let data = JSON.init(parseJSON: param)
         let homePath = getDwebAppPath()
         
@@ -104,7 +107,8 @@ extension PlaocHandleModel {
     }
     
     // 在指定文件系统下写入内容
-    func executiveFileSystemWrite(param: String) -> Bool {
+    func executiveFileSystemWrite(param: Any) -> Bool {
+        guard let param = param as? String else { return false }
         let data = JSON.init(parseJSON: param)
         let homePath = getDwebAppPath()
         
@@ -126,7 +130,8 @@ extension PlaocHandleModel {
     }
     
     // 获取指定文件系统目录或文件详细信息
-    func executiveFileSystemStat(param: String) -> String {
+    func executiveFileSystemStat(param: Any) -> String {
+        guard let param = param as? String else { return "" }
         let data = JSON.init(parseJSON: param)
         let homePath = getDwebAppPath()
         
@@ -156,7 +161,7 @@ extension PlaocHandleModel {
     }
     
     // 获取指定文件系统目录信息
-    func executiveFileSystemList(param: String) -> String {
+    func executiveFileSystemList(param: Any) -> String {
         return ""
     }
 }

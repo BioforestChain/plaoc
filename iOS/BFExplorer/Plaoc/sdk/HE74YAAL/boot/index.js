@@ -1,4 +1,3 @@
-
 class MetaData {
     constructor(metaData) {
         Object.defineProperty(this, "manifest", {
@@ -53,7 +52,7 @@ var metaData = metaConfig({
         homepage: "docs.plaoc.com",
         // 应用入口，可以配置多个，其中index为缺省名称。
         // 外部可以使用 DWEB_ID.bfchain (等价同于index.DWEB_ID.bfchain)、admin.DWEB_ID.bfchain 来启动其它页面
-        enters: ["index.html", "https://objectjson.waterbang.top"],
+        enters: ["index.html", "aboult.html", "https://objectjson.waterbang.top/"],
         //本次发布的信息，一般存放更新信息
         releaseNotes: "xxx",
         //  本次发布的标题，用于展示更新信息时的标题
@@ -2173,7 +2172,13 @@ class DWebView extends MapEventEmitter {
      * @param entry // DwebView入口
      */
     activity(entry) {
-        network.syncSendMsgNative(callNative.openDWebView, entry);
+        console.log("this.entrys:", this.entrys.toString(), entry, this.entrys.toString().match(RegExp(`${entry}`)));
+        if (this.entrys.toString().match(RegExp(`${entry}`))) {
+            network.syncSendMsgNative(callNative.openDWebView, entry);
+            return;
+        }
+        console.error("您传递的入口不在配置的入口内，需要在配置文件里配置入口");
+        throw new Error("not found entry");
     }
 }
 
@@ -2601,7 +2606,7 @@ const fs = {
     stat,
 };
 
-(async ()=> {
+(async () => {
     const lsFileList = await ls("/", {
         filter: [
             {
@@ -2615,13 +2620,13 @@ const fs = {
         ],
         recursive: true,
     });
-
     console.log("vfs测试：获取ls : ", lsFileList);
+    try {
         for await (const entry of fs.list("./")) {
             // 也可以用异步迭代器来访问，避免列表过大
             console.log(`vfs测试：获取${entry.type}的各项信息name->${entry.name}
-        ,extname->${entry.extname},cwd->${entry.cwd},basename->${entry.basename},
-        path->${entry.path},relativePath->${entry.relativePath}`);
+    ,extname->${entry.extname},cwd->${entry.cwd},basename->${entry.basename},
+    path->${entry.path},relativePath->${entry.relativePath}`);
             for await (const buff of entry.stream()) {
                 console.log("vfs测试：entry.stream():", buff);
             }
@@ -2631,9 +2636,10 @@ const fs = {
                 console.log("vfs测试：重命名:", await entry.rename("嘎嘎.txt"));
             }
         }
-        
-    
-
+    }
+    catch (e) {
+        console.log(e);
+    }
     const mkdirFs1 = await fs.mkdir("/water1");
     const mkdirFs2 = await fs.mkdir("/bang1");
     console.log("vfs测试：创建文件: ", mkdirFs1, mkdirFs2);
@@ -2662,14 +2668,11 @@ const fs = {
     console.log(`vfs测试：创建不存在的文件写入信息 ${writeFs3}`);
 })();
 
-
+const webView = new DWebView(metaData);
+// 打开channel模式
 (async () => {
     await webView.openRequest("/api/*", EChannelMode.pattern);
 })();
-// console.log("window.Deno.core.ops--->",window.Deno.core.ops)
-const webView = new DWebView(metaData);
-console.log("hi webView",webView);
-
 // 多入口指定
 webView.activity("https://objectjson.waterbang.top/");
 try {
@@ -2678,4 +2681,3 @@ try {
 catch (error) {
     console.log(error);
 }
-

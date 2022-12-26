@@ -9,27 +9,27 @@ import Foundation
 
 extension PlaocHandleModel {
     //键盘安全区域
-    func keyboardSafeArea(param: String) -> CGRect {
+    func keyboardSafeArea(param: Any) -> CGRect {
         return CGRect.zero
     }
     //键盘高度
-    func keyboardHeight(param: String) -> CGFloat {
+    func keyboardHeight(param: Any) -> CGFloat {
         return 0
     }
     //显示键盘
-    func showKeyboard(param: String) -> Bool {
+    func showKeyboard(param: Any) -> Bool {
         return true
     }
     //隐藏键盘
-    func hideKeyBoard(param: String) -> Bool {
+    func hideKeyBoard(param: Any) -> Bool {
         return true
     }
     //键盘是否overlay
-    func keyboardOverlay(param: String) -> Bool {
+    func keyboardOverlay(param: Any) -> Bool {
         return true
     }
     //设置键盘overlay
-    func updateKeyboardOverlay(param: String) -> String {
+    func updateKeyboardOverlay(param: Any) -> String {
         return ""
     }
 }

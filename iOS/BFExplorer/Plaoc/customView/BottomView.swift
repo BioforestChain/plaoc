@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SwiftyJSON
 
 class BottomView: UIView {
 
@@ -67,6 +68,7 @@ class BottomView: UIView {
     }
     
     private var buttonList: [UIButton] = []
+    private(set) var bottomOverlay: Bool = false
     var callback: ClickViewCallback?
     
     override init(frame: CGRect) {
@@ -149,5 +151,73 @@ class BottomView: UIView {
     }
 }
 
-
+extension BottomView {
+    //隐藏底部
+    func hiddenBottomView(hidden: Bool) {
+        self.isHidden = hidden
+    }
+    //返回底部是否隐藏
+    func bottomHiddenState() -> Bool {
+        return self.isHidden
+    }
+    //更新底部overlay
+    func updateBottomViewOverlay(overlay: Bool) {
+        self.bottomOverlay = overlay
+    }
+    //返回底部overlay
+    func bottomViewOverlay() -> Bool {
+        return bottomOverlay
+    }
+    //设置底部alpha
+    func updaterBottomViewAlpha(alpha: CGFloat) {
+        self.alpha = alpha
+    }
+    //返回底部alpha
+    func bottomViewAlpha() -> CGFloat {
+        return self.alpha
+    }
+    //更新底部背景色
+    func updateBottomViewBackgroundColor(colorString: String) {
+        self.backgroundColor = UIColor(colorString)
+    }
+    //返回底部背景颜色
+    func bottomBarBackgroundColor() -> String {
+        return self.backgroundColor?.hexString() ?? "#FFFFFFFF"
+    }
+    //更新底部颜色
+    func updateBottomViewforegroundColor(colorString: String) {
+        //TODO
+    }
+    //返回底部颜色
+    func bottomBarForegroundColor() -> String {
+        //TODO
+        return "#FFFFFFFF"
+    }
+    //返回底部高度
+    func bottomViewHeight() -> CGFloat {
+        return self.frame.height
+    }
+    //隐藏底部按钮
+    func hiddenBottomViewButton(hidden: Bool) {
+        self.hiddenBtn = hidden
+    }
+    
+    //获取底部按钮
+    func fetchBottomButtons(content: String) {
+        guard let array = ChangeTools.stringValueArray(content) else { return }
+        let list = JSON(array)
+        let buttons = list.arrayValue.map { BottomBarModel(dict: $0) }
+        self.buttons = buttons
+    }
+    //返回底部按钮数组
+    func bottomActions() -> String {
+        guard let buttons = self.buttons else { return "" }
+        var array: [[String:Any]] = []
+        for button in buttons {
+            array.append(button.buttonDict)
+        }
+        let actionString = ChangeTools.arrayValueString(array) ?? ""
+        return actionString
+    }
+}
 
