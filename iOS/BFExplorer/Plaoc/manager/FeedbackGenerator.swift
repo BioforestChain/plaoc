@@ -54,3 +54,21 @@ class FeedbackGenerator: NSObject {
         }
     }
 }
+
+extension PlaocHandleModel {
+    // 触碰轻质量物体
+    func hapticsImpactLight(param: String) -> Void {
+        FeedbackGenerator.impactFeedbackGenerator(style: UIImpactFeedbackGenerator.FeedbackStyle.light)
+    }
+    
+    // 警告分隔的振动通知
+    func hapticsNotificationWarning(param: String) -> Void {
+        FeedbackGenerator.notificationFeedbackGenerator(style: UINotificationFeedbackGenerator.FeedbackType.warning)
+    }
+    
+    // 反馈振动
+    func hapticsVibrate(param: String) -> Void {
+        // 默认单击
+        FeedbackGenerator.vibrate(Double(param) ?? 1)
+    }
+}

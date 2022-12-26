@@ -54,3 +54,23 @@ class ReachabilityManager: NSObject {
         monitor.cancel()
     }
 }
+
+
+extension PlaocHandleModel {
+    // 获取网络状态
+    func getNetworkStatus(param: String) -> String {
+        let currentNetworkType: NWInterface.InterfaceType = ReachabilityManager.shared.currentType ?? NWInterface.InterfaceType.other
+        var networkTypeString = ""
+        
+        switch(currentNetworkType) {
+        case .cellular:
+            networkTypeString = "cellular"
+        case .wifi:
+            networkTypeString = "wifi"
+        default:
+            networkTypeString = "unknown"
+        }
+        
+        return networkTypeString
+    }
+}
