@@ -196,7 +196,6 @@ extension PlaocHandleModel {
     }
     //传递给前端消息
     private func executiveEvalJsRuntime(param: Any) -> String {
-//        return jsContext?.evaluateScript(param)
         return ""
     }
     //获取设备信息
