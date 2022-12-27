@@ -37,11 +37,11 @@ import JavaScriptCore
         case "DenoRuntime":
             return executiveDenoRuntime(param: param)
         case "GetBfsAppId":
-            return executiveGetBfsAppId(param: param as! String)
+            return executiveGetBfsAppId(param: param)
         case "EvalJsRuntime":
             return executiveEvalJsRuntime(param: param)
         case "GetDeviceInfo":
-            return executiveGetDeviceInfo(param: param as! String)
+            return executiveGetDeviceInfo(param: param)
         case "SendNotification":
             return executiveSendNotification(param: param)
         case "GetNotification":
@@ -49,7 +49,7 @@ import JavaScriptCore
         case "ApplyPermissions":
             return executiveApplyPermissions(param: param)
         case "isDenoRuntime":
-            return executiveIsDenoRuntime(param: param as! String)
+            return executiveIsDenoRuntime(param: param)
         case "FileSystemLs":
             return executiveFileSystemLs(param: param)
         case "FileSystemMkdir":
