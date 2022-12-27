@@ -37,11 +37,11 @@ import JavaScriptCore
         case "DenoRuntime":
             return executiveDenoRuntime(param: param)
         case "GetBfsAppId":
-            return executiveGetBfsAppId(param: param)
+            return executiveGetBfsAppId(param: param as! String)
         case "EvalJsRuntime":
             return executiveEvalJsRuntime(param: param)
         case "GetDeviceInfo":
-            return executiveGetDeviceInfo(param: param)
+            return executiveGetDeviceInfo(param: param as! String)
         case "SendNotification":
             return executiveSendNotification(param: param)
         case "GetNotification":
@@ -49,7 +49,7 @@ import JavaScriptCore
         case "ApplyPermissions":
             return executiveApplyPermissions(param: param)
         case "isDenoRuntime":
-            return executiveIsDenoRuntime(param: param)
+            return executiveIsDenoRuntime(param: param as! String)
         case "FileSystemLs":
             return executiveFileSystemLs(param: param)
         case "FileSystemMkdir":
@@ -157,13 +157,13 @@ import JavaScriptCore
         case "OpenDialogWarning":
             return OpenDialogWarning(param: param)
         case "GetNetworkStatus":
-            return getNetworkStatus(param: param)
+            return getNetworkStatus(param: param as! String)
         case "HapticsImpactLight":
-            return hapticsImpactLight(param: param)
+            return hapticsImpactLight(param: param as! String)
         case "HapticsNotificationWarning":
-            return hapticsNotificationWarning(param: param)
+            return hapticsNotificationWarning(param: param as! String)
         case "HapticsVibrate":
-            return hapticsVibrate(param: param)
+            return hapticsVibrate(param: param as! String)
         default:
             return ""
         }
