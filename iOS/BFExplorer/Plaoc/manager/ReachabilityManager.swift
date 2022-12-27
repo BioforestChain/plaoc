@@ -53,16 +53,11 @@ class ReachabilityManager: NSObject {
     func stopMonitoring() {
         monitor.cancel()
     }
-}
-
-
-extension PlaocHandleModel {
-    // 获取网络状态
-    func getNetworkStatus(param: String) -> String {
-        let currentNetworkType: NWInterface.InterfaceType = ReachabilityManager.shared.currentType ?? NWInterface.InterfaceType.other
+    
+    func getNetworkStatus() -> String {
         var networkTypeString = ""
         
-        switch(currentNetworkType) {
+        switch(self.currentType) {
         case .cellular:
             networkTypeString = "cellular"
         case .wifi:
@@ -74,3 +69,4 @@ extension PlaocHandleModel {
         return networkTypeString
     }
 }
+

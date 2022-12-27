@@ -157,13 +157,13 @@ import JavaScriptCore
         case "OpenDialogWarning":
             return OpenDialogWarning(param: param)
         case "GetNetworkStatus":
-            return getNetworkStatus(param: param as! String)
+            return ReachabilityManager.shared.getNetworkStatus()
         case "HapticsImpactLight":
-            return hapticsImpactLight(param: param as! String)
+            return FeedbackGenerator.impactFeedbackGenerator(style: .light)
         case "HapticsNotificationWarning":
-            return hapticsNotificationWarning(param: param as! String)
+            return FeedbackGenerator.notificationFeedbackGenerator(style: .warning)
         case "HapticsVibrate":
-            return hapticsVibrate(param: param as! String)
+            return hapticsVibrate(param: param)
         default:
             return ""
         }
@@ -190,17 +190,16 @@ extension PlaocHandleModel {
         return ""
     }
     //初始化app数据
-    private func executiveInitMetaData(param: Any) -> String {
-        guard let param = param as? String else { return "" }
+    private func executiveInitMetaData(param: Any) -> Void {
+        guard let param = param as? String else { return }
         NetworkMap.shared.metaData(metadata: param, fileName: fileName)
-        return ""
     }
     //初始化运行时
     private func executiveDenoRuntime(param: Any) -> String {
         return ""
     }
     //获取appID
-    private func executiveGetBfsAppId(param: String) -> String {
+    private func executiveGetBfsAppId(param: Any) -> String {
         return fileName
     }
     //传递给前端消息
@@ -208,7 +207,7 @@ extension PlaocHandleModel {
         return ""
     }
     //获取设备信息
-    private func executiveGetDeviceInfo(param: String) -> String {
+    private func executiveGetDeviceInfo(param: Any) -> String {
 //        UIDevice.current.
         var dict : [String: Any] = [:]
         
@@ -234,8 +233,13 @@ extension PlaocHandleModel {
         return ""
     }
     //
-    private func executiveIsDenoRuntime(param: String) -> String {
+    private func executiveIsDenoRuntime(param: Any) -> String {
         return "false"
+    }
+    
+    private func hapticsVibrate(param: Any) -> Void {
+        guard let param = param as? String, Float(param) != nil else { return }
+        FeedbackGenerator.vibrate(Double(Float(param)!))
     }
 }
 
