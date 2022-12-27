@@ -25,7 +25,7 @@ var network_whitelist = "http://127.0.0.1"
 fun interceptNetworkRequests(
   request: WebResourceRequest,
   customUrlScheme: CustomUrlScheme
-): WebResourceResponse {
+): WebResourceResponse? {
   val url = request.url.toString()
   val path = request.url.path
 
@@ -48,6 +48,9 @@ fun interceptNetworkRequests(
       )
     }
     if (jumpWhitelist(url)) {
+      if (request.url.lastPathSegment == null) {
+        return null
+      }
       // 拦截视图文件
       if (request.url.lastPathSegment!!.endsWith(".html")) {
         return viewGateWay(customUrlScheme, request)
@@ -59,11 +62,12 @@ fun interceptNetworkRequests(
       }
     }
   }
-  return WebResourceResponse(
-    "application/json",
-    "utf-8",
-    ByteArrayInputStream(JsonUtil.toJson(Response(false)).toByteArray())
-  )
+  return null
+//  return WebResourceResponse(
+//    "application/json",
+//    "utf-8",
+//    ByteArrayInputStream(JsonUtil.toJson(Response(false)).toByteArray())
+//  )
 }
 
 

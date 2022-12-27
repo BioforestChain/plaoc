@@ -14,15 +14,9 @@ object JsonUtil {
    */
   fun getAppInfoFromLinkJson(content: String, type: APP_DIR_TYPE): AppInfo? {
     try {
-      var appInfo: AppInfo = Gson().fromJson(content, AppInfo::class.java)
-      appInfo.isSystemApp = when (type) {
-        APP_DIR_TYPE.SystemApp -> true
-        else -> false
-      }
-      appInfo.iconPath = FilesUtil.getAppIconPathName(
-        appInfo.bfsAppId, appInfo.icon.parseFilePath(), type
-      )
-      Log.d(TAG, "getAppInfoFromLinkJson ${appInfo.iconPath}")
+      val appInfo: AppInfo = Gson().fromJson(content, AppInfo::class.java)
+      appInfo.appDirType = type
+      appInfo.iconPath = FilesUtil.getAppIconPathName(appInfo)
       return appInfo
     } catch (e: Exception) {
       Log.d(TAG, "getAppInfoFromLinkJson e->$e")
@@ -38,8 +32,8 @@ object JsonUtil {
       var appInfos: List<AppInfo> =
         Gson().fromJson(content, object : TypeToken<List<AppInfo>>() {}.type)
       appInfos.forEach {
-        it.isSystemApp = when (type) {
-          APP_DIR_TYPE.SystemApp -> true
+        it.isRecommendApp = when (type) {
+          APP_DIR_TYPE.RecommendApp -> true
           else -> false
         }
       }

@@ -44,4 +44,13 @@ object PermissionManager {
     PermissionManager(fragment)
       .requestPermissions(PermissionUtil.getActualPermissions(permission), callback)
   }
+
+  fun onRequestPermissionsResult(
+    requestCode: Int,
+    permissions: Array<out String>,
+    grantResults: IntArray,
+    activity: Activity
+  ) {
+    PermissionManager(activity).onRequestPermissionsResult(requestCode,permissions,grantResults)
+  }
 }

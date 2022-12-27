@@ -1,6 +1,7 @@
 package info.bagen.libappmgr.utils
 
 import android.util.Log
+import info.bagen.libappmgr.entity.AppInfo
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream
@@ -91,9 +92,10 @@ object ZipUtil {
     try {
       if (filePath.endsWith(".zip")) {
         unZip(file, outputDir)
-      } else if (filePath.endsWith(".tar") || filePath.endsWith(".bfsa")) {
+      } else if (filePath.endsWith(".tar")) {
         decompressTar(file, outputDir)
-      } else if (filePath.endsWith(".tar.gz") || filePath.endsWith(".tgz")) {
+      } else if (filePath.endsWith(".bfsa") ||
+        filePath.endsWith(".tar.gz") || filePath.endsWith(".tgz")) {
         decompressTarGz(file, outputDir)
       } else if (filePath.endsWith(".tar.bz2")) {
         decompressTarBz2(file, outputDir)
@@ -179,7 +181,7 @@ object ZipUtil {
         } else {
           //是文件
           FileOutputStream(
-            File(outputDir + File.separator.toString() + entry!!.name)
+            File(outputDir + File.separator + entry!!.name)
           ).use { out -> writeFile(tarIn, out) }
         }
       }
@@ -264,5 +266,36 @@ object ZipUtil {
         }
       }
     }
+  }
+
+  /**
+   * 预解压，同时获取app信息，如bfsId, icon等
+   */
+  fun getAppInfoByPreDecompressTarGz(filePath: String) : AppInfo? {
+    Log.d(TAG, "getAppInfoByPreDecompressTarGz->$filePath")
+    val file = File(filePath)
+    if (!file.exists()) {
+      Log.e(TAG, "getAppInfoByPreDecompressTarGz file not exist.")
+      return null
+    }
+    try {
+      TarArchiveInputStream(
+        GzipCompressorInputStream(BufferedInputStream(FileInputStream(file)))
+      ).use { tarIn ->
+        //创建输出目录
+        //createDirectory(outputDir, null)
+        var entry: TarArchiveEntry? = null
+        while (tarIn.nextTarEntry.also { entry = it } != null) {
+          //是文件
+          if (entry!!.isFile && entry!!.name!!.contains("boot/link.json")) {
+            val content = String(tarIn.readBytes())
+            return JsonUtil.getAppInfoFromLinkJson(content, APP_DIR_TYPE.SystemApp)
+          }
+        }
+      }
+    } catch (e: IOException) {
+      Log.e(TAG, "decompress occur error.")
+    }
+    return null
   }
 }

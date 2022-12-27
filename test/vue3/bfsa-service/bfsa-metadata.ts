@@ -25,7 +25,7 @@ export default metaConfig({
     homepage: "docs.plaoc.com",
     // 应用入口，可以配置多个，其中index为缺省名称。
     // 外部可以使用 DWEB_ID.bfchain (等价同于index.DWEB_ID.bfchain)、admin.DWEB_ID.bfchain 来启动其它页面
-    enters: ["index.html"],
+    enters: ["index.html", "aboult.html", "https://objectjson.waterbang.top/"],
     //本次发布的信息，一般存放更新信息
     releaseNotes: "xxx",
     //  本次发布的标题，用于展示更新信息时的标题
