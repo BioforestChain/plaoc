@@ -31,6 +31,5 @@ android/app/src/main/assets/*
 rust_lib/assets/rusty_v8_mirror/
 
 # ios
-iOS/Plaoc-iOS.xcodeproj/xcuserdata
-iOS/Plaoc-iOS.xcworkspace/xcuserdata
+iOS/Plaoc-iOS.xcworkspace
 
