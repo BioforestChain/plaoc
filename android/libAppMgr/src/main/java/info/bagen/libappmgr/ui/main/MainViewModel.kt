@@ -51,8 +51,7 @@ class MainViewModel : ViewModel() {
       flow {
         emit(ApiResultData.prepare())
         try {
-          emit(ApiService.instance.getAppVersion(appInfo.autoUpdate.url))
-          // emit(ApiService.instance.getAppVersion(AppVersionPath))
+          emit(ApiService.instance.getAppVersion(appInfo.autoUpdate?.url ?: ""))
         } catch (e: Exception) {
           emit(ApiResultData.failure(e))
         }

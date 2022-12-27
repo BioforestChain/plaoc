@@ -30,6 +30,7 @@ import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import info.bagen.rust.plaoc.App
 import info.bagen.rust.plaoc.App.Companion.dwebViewActivity
 import info.bagen.rust.plaoc.TASK
+import info.bagen.rust.plaoc.system.permission.PermissionManager
 import info.bagen.rust.plaoc.ui.theme.RustApplicationTheme
 import info.bagen.rust.plaoc.webView.jsutil.emitListenBackButton
 import info.bagen.rust.plaoc.webView.urlscheme.CustomUrlScheme
@@ -62,6 +63,15 @@ class DWebViewActivity : AppCompatActivity() {
   override fun onDestroy() {
     super.onDestroy()
     dwebViewActivity = null
+  }
+  // 权限回调
+  override fun onRequestPermissionsResult(
+    requestCode: Int,
+    permissions: Array<out String>,
+    grantResults: IntArray
+  ) {
+    super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    PermissionManager.onRequestPermissionsResult(requestCode,permissions, grantResults,this)
   }
 
     override fun onCreate(savedInstanceState: Bundle?) {

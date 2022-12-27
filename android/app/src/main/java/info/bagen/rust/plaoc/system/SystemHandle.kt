@@ -58,7 +58,6 @@ fun splicingPath(bfsId:String, entry:String):String {
     activity.openDWebViewActivity(it)
   }
   callable_map[ExportNative.ExitApp] = {
-    println("kotlin#app退出🏄🏼‍")
     App.dwebViewActivity?.finish()
   }
   // 初始化用户配置
@@ -146,10 +145,11 @@ fun splicingPath(bfsId:String, entry:String):String {
     )
   }
 
-  /** Clipboard */
+  /** 读取剪切板 */
   callable_map[ExportNative.ReadClipboardContent] = {
     createBytesFactory(ExportNative.ReadClipboardContent, ClipboardUtil.readFromClipboard(App.appContext) ?: "")
   }
+  /** 写入剪切板*/
   callable_map[ExportNative.WriteClipboardContent] = {
     ClipboardUtil.writeToClipboard(App.appContext, it)
   }

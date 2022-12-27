@@ -336,7 +336,11 @@ fun DWebView(
           swController.setServiceWorkerClient(object : ServiceWorkerClient() {
             override fun shouldInterceptRequest(request: WebResourceRequest): WebResourceResponse? {
               // 拦截serviceWorker的网络请求
-              return interceptNetworkRequests(request, customUrlScheme);
+              val result =  interceptNetworkRequests(request, customUrlScheme);
+              if (result != null) {
+                return result
+              }
+              return super.shouldInterceptRequest(request)
             }
           })
           swController.serviceWorkerWebSettings.allowContentAccess = true
@@ -360,13 +364,14 @@ fun DWebView(
 //              }
               // 只加载资源文件 index.js index.html
               request?.let { webResourceRequest ->
-                Log.e("lin.huang", "DWebView:: 111111111111111  ${webResourceRequest.url}---$dWebView_host ")
-                if (webResourceRequest.url.host == "$dWebView_host.dweb".lowercase()) {
+                val url = webResourceRequest.url;
+                val path = url.path.toString()
+                if (url.host == "$dWebView_host.dweb".lowercase() && path.lastIndexOf(".")!= -1) {
                   // 这里出来的url全部都用是小写，serviceWorker没办法一开始就注册，所以还会走一次这里
                   return interceptNetworkRequests(request, customUrlScheme)
                 }
               }
-              return super.shouldInterceptRequest(view, request)
+              return null
             }
 
             override fun shouldOverrideUrlLoading(

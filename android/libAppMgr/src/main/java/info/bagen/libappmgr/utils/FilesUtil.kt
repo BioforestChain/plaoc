@@ -1,5 +1,6 @@
 package info.bagen.libappmgr.utils
 
+import android.net.Uri
 import android.os.Build
 import info.bagen.libappmgr.entity.AppInfo
 import info.bagen.libappmgr.entity.DAppInfo
@@ -54,13 +55,6 @@ object FilesUtil {
   }
 
   /**
-   * 获取应用的根路径
-   */
-  private fun getAppRootDirectory(appType: APP_DIR_TYPE): String {
-    return getAndroidRootDirectory() + File.separator + appType.rootName
-  }
-
-  /**
    * 获取应用的缓存路径
    */
   fun getAppCacheDirectory(): String {
@@ -68,45 +62,50 @@ object FilesUtil {
   }
 
   /**
+   * 获取应用的根路径
+   */
+  fun getAppRootDirectory(appInfo: AppInfo): String {
+    return getAndroidRootDirectory() + File.separator + appInfo.appDirType.rootName + File.separator + appInfo.bfsAppId
+  }
+
+  /**
    * 获取应用的缓存路径
    */
-  fun getAppDownloadPath(): String {
-    return getAppCacheDirectory() + File.separator + simpleDateFormat.format(Date()) + ".bfsa"
+  fun getAppDownloadPath(path: String? = null): String {
+    val fileName = path?.let { url ->
+      val uri = Uri.parse(url)
+      uri.lastPathSegment
+    }
+    var filePath =
+      getAppCacheDirectory() + File.separator + fileName //simpleDateFormat.format(Date()) + ".bfsa"
+    var count = 0
+    while (File(filePath).exists()) {
+      count++
+      filePath = getAppCacheDirectory() + File.separator + "${count}_" + fileName
+    }
+    return filePath
   }
 
   /**
    * 获取应用的解压路径
    */
   fun getAppUnzipPath(appInfo: AppInfo? = null): String {
-    return getAppRootDirectory(APP_DIR_TYPE.SystemApp) + File.separator //+ appInfo.bfsAppId
+    return getAndroidRootDirectory() + File.separator + (appInfo?.appDirType
+      ?: APP_DIR_TYPE.SystemApp).rootName + File.separator
   }
 
   /**
    * 获取程序运行路径
    */
   fun getAppLauncherPath(appInfo: AppInfo): String {
-    return getAppLauncherPath(appInfo.bfsAppId)
-  }
-
-  /**
-   * 获取程序运行路径
-   */
-  fun getAppLauncherPath(appName: String): String {
-    return getAppRootDirectory(APP_DIR_TYPE.SystemApp) + File.separator + appName + File.separator + DIR_SYS
+    return getAppRootDirectory(appInfo) + File.separator + DIR_SYS
   }
 
   /**
    * 获取程序运行路径
    */
   fun getAppDenoUrl(appInfo: AppInfo, dAppInfo: DAppInfo): String {
-    return getAppDenoUrl(appInfo.bfsAppId, dAppInfo.manifest.bfsaEntry)
-  }
-
-  /**
-   * 获取程序运行路径
-   */
-  fun getAppDenoUrl(bfsAppId: String, bfsaEntry: String): String {
-    return getAppRootDirectory(APP_DIR_TYPE.SystemApp) + File.separator + bfsAppId + File.separator + bfsaEntry
+    return getAppRootDirectory(appInfo) + File.separator + dAppInfo.manifest.bfsaEntry
   }
 
   /**
@@ -120,15 +119,7 @@ object FilesUtil {
    * 获取应用更新路径
    */
   private fun getAppUpdateDirectory(appInfo: AppInfo): String {
-    return getAppRootDirectory(getAppType(appInfo)) + File.separator + appInfo.bfsAppId + File.separator + DIR_AUTO_UPDATE
-  }
-
-  private fun getAppType(appInfo: AppInfo): APP_DIR_TYPE {
-    return if (appInfo.isSystemApp) {
-      APP_DIR_TYPE.SystemApp
-    } else {
-      APP_DIR_TYPE.RecommendApp
-    }
+    return getAppRootDirectory(appInfo) + File.separator + DIR_AUTO_UPDATE
   }
 
   /**
@@ -139,21 +130,7 @@ object FilesUtil {
     val file = File(directory)
     if (file.exists()) {
       val files = file.listFiles()
-      return if (files.isNotEmpty()) {
-        getFileContent(files.last().absolutePath)
-      } else {
-        null
-      }
-    }
-    return null
-  }
-
-  fun getLastUpdateContent(bfsAppId: String, type: APP_DIR_TYPE = APP_DIR_TYPE.SystemApp): String? {
-    val directory = getAppRootDirectory(type) + File.separator + bfsAppId + File.separator + DIR_AUTO_UPDATE
-    val file = File(directory)
-    if (file.exists()) {
-      val files = file.listFiles()
-      return if (files.isNotEmpty()) {
+      return if (files != null && files.isNotEmpty()) {
         getFileContent(files.last().absolutePath)
       } else {
         null
@@ -165,15 +142,16 @@ object FilesUtil {
   /**
    * 获取当前目录子目录列表
    */
-  fun getChildrenDirectoryList(rootPath: String): Map<String, String>? {
-    // Log.d(TAG, "getChildrenDirectoryList $rootPath")
-    return getChildrenDirectoryList(File(rootPath))
+  private fun getChildrenDirectoryList(appDirType: APP_DIR_TYPE): Map<String, String>? {
+    return getChildrenDirectoryList(
+      File(getAndroidRootDirectory() + File.separator + appDirType.rootName)
+    )
   }
 
   /**
    * 获取当前目录子目录列表
    */
-  fun getChildrenDirectoryList(file: File): Map<String, String>? {
+  private fun getChildrenDirectoryList(file: File): Map<String, String>? {
     if (file.exists()) {
       /*if (!file.exists()) {
         file.mkdirs()
@@ -195,8 +173,8 @@ object FilesUtil {
   /**
    * 获取相应应用的图标, link.json中的icon路径进行修改，直接默认要求默认在sys目录
    */
-  fun getAppIconPathName(appName: String, iconName: String, type: APP_DIR_TYPE): String {
-    return getAppRootDirectory(type) + File.separator + appName + File.separator + DIR_SYS + File.separator + iconName
+  fun getAppIconPathName(appInfo: AppInfo): String {
+    return getAppRootDirectory(appInfo) + File.separator + DIR_SYS + File.separator + appInfo.icon.parseFilePath()
   }
 
   /**
@@ -278,12 +256,10 @@ object FilesUtil {
    * 将assert目录下的文件拷贝到app目录remember-app目录下
    */
   fun copyAssetsToRecommendAppDir() {
-    var rootPath = getAppRootDirectory(APP_DIR_TYPE.RecommendApp)
-    var file = File(rootPath)
-    file.delete() // 第一次运行程序时，recommend-app
-    copyFilesFassets(
-      APP_DIR_TYPE.RecommendApp.rootName, getAppRootDirectory(APP_DIR_TYPE.RecommendApp)
-    )
+    val rootPath = getAndroidRootDirectory() + File.separator + APP_DIR_TYPE.RecommendApp.rootName
+    val file = File(rootPath)
+    file.deleteRecursively() // 第一次运行程序时，recommend-app
+    copyFilesFassets(APP_DIR_TYPE.RecommendApp.rootName, rootPath)
   }
 
   /**
@@ -329,8 +305,8 @@ object FilesUtil {
     // 1.从system-app/boot/bfs-app-id/boot/link.json取值，将获取到内容保存到appInfo中
     // 2.将system-app中到bfs-app-id信息保存到map里面，用于后续交验
     // 3.从remember-app/boot/bfs-app-id/boot/link.json取值，补充到列表中
-    val systemAppMap = getChildrenDirectoryList(getAppRootDirectory(APP_DIR_TYPE.SystemApp))
-    val recommendAppMap = getChildrenDirectoryList(getAppRootDirectory(APP_DIR_TYPE.RecommendApp))
+    val systemAppMap = getChildrenDirectoryList(APP_DIR_TYPE.SystemApp)
+    val recommendAppMap = getChildrenDirectoryList(APP_DIR_TYPE.RecommendApp)
     val appInfoList = ArrayList<AppInfo>()
     val systemAppExist = HashMap<String, String>()
     // Log.d(TAG, "$systemAppMap , $recommendAppMap")
@@ -341,10 +317,20 @@ object FilesUtil {
         JsonUtil.getAppInfoFromLinkJson(it1, APP_DIR_TYPE.SystemApp)
       }
       // Log.d(TAG, "getAppInfoList system-app $appInfo")
-      if (appInfo != null) {
-        getDAppInfo(bfsAppId = appInfo.bfsAppId, )
+      appInfo?.apply {
+        getDAppInfo(appInfo)?.let { dAppInfo ->
+          dAppUrl = getAppDenoUrl(appInfo, dAppInfo)
+        }
         appInfoList.add(appInfo)
         systemAppExist[it.key] = it.value
+      }
+    }
+    // 将 system 目录下的所有app进行校验是否是 recommend 的
+    appInfoList.forEach { appInfo ->
+      recommendAppMap?.let { map ->
+        if (map.containsKey(appInfo.bfsAppId)) {
+          appInfo.isRecommendApp = true
+        }
       }
     }
     recommendAppMap?.forEach {
@@ -354,9 +340,9 @@ object FilesUtil {
         )?.let { it1 ->
           JsonUtil.getAppInfoFromLinkJson(it1, APP_DIR_TYPE.RecommendApp)
         }
-        // Log.d(TAG, "getAppInfoList recommend-app appInfo=$appInfo")
-        if (appInfo != null) {
-          appInfoList.add(appInfo)
+        appInfo?.apply {
+          this.isRecommendApp = true
+          appInfoList.add(this)
         }
       }
     }
@@ -374,25 +360,26 @@ object FilesUtil {
    * 根据bfsAppId获取DAppInfo的版本信息
    */
   fun getDAppInfo(appInfo: AppInfo): DAppInfo? {
-    return getDAppInfo(appInfo.bfsAppId)
+    val content = when (appInfo.appDirType) {
+      APP_DIR_TYPE.AssetsApp -> {
+        AppContextUtil.sInstance!!.assets.open("${appInfo.bfsAppId}/$DIR_BOOT/$FILE_BFSA_META_JSON")
+          .bufferedReader().use { it.readText() }
+      }
+      else -> {
+        val path = getAppRootDirectory(appInfo) + File.separator + DIR_BOOT + File.separator + FILE_BFSA_META_JSON
+        getFileContent(path)
+      }
+    }
+    return JsonUtil.getDAppInfoFromBFSA(content)
   }
 
   /**
    * 获取DAppInfo的版本信息
    */
   fun getDAppInfo(bfsAppId: String, appType: APP_DIR_TYPE = APP_DIR_TYPE.SystemApp): DAppInfo? {
-    val content = when (appType) {
-      APP_DIR_TYPE.AssetsApp -> {
-        AppContextUtil.sInstance!!.assets.open("$bfsAppId/$DIR_BOOT/$FILE_BFSA_META_JSON")
-          .bufferedReader().use { it.readText() }
-      }
-      else -> {
-        val path =
-          getAppRootDirectory(appType) + File.separator + bfsAppId + File.separator + DIR_BOOT + File.separator + FILE_BFSA_META_JSON
-        getFileContent(path)
-      }
-    }
-    return JsonUtil.getDAppInfoFromBFSA(content)
+    return getDAppInfo(
+      AppInfo(version = "", bfsAppId = bfsAppId, name = "", appDirType = appType, icon = "")
+    )
   }
 
   /**

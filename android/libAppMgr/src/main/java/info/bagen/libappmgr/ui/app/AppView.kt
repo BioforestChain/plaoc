@@ -21,7 +21,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
@@ -37,12 +36,12 @@ import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.decode.SvgDecoder
 import info.bagen.libappmgr.R
+import info.bagen.libappmgr.entity.AppInfo
 import info.bagen.libappmgr.entity.DAppInfoUI
 import info.bagen.libappmgr.ui.download.DownLoadState
 import info.bagen.libappmgr.ui.download.DownloadAppMaskView
 import info.bagen.libappmgr.ui.download.DownloadDialogView
 import info.bagen.libappmgr.ui.view.DialogView
-import info.bagen.libappmgr.utils.AppContextUtil
 
 @Composable
 private fun BoxScope.AppIcon(appViewState: AppViewState) {
@@ -58,14 +57,14 @@ private fun BoxScope.AppIcon(appViewState: AppViewState) {
       //.clip(RoundedCornerShape(12.dp)),
       .clip(CircleShape),
     contentScale = ContentScale.FillWidth,
-    placeholder = BitmapPainter(image = ImageBitmap.imageResource(id = R.drawable.ic_launcher)),
+    // placeholder = BitmapPainter(image = ImageBitmap.imageResource(id = R.drawable.ic_launcher)),
     error = BitmapPainter(image = ImageBitmap.imageResource(id = R.drawable.ic_launcher))
   )
 }
 
 @Composable
 private fun BoxScope.AppName(appViewState: AppViewState) {
-  val name = when (appViewState.maskViewState.value.downLoadState.value) {
+  val name = when (appViewState.maskViewState.downLoadState.value) {
     DownLoadState.LOADING -> "下载中"
     DownLoadState.PAUSE -> "暂停"
     DownLoadState.INSTALL -> "正在安装"
@@ -85,13 +84,6 @@ private fun BoxScope.AppName(appViewState: AppViewState) {
   )
 }
 
-private fun Modifier.longClick(onLongClick: (Offset) -> Unit): Modifier =
-  pointerInput(this) {
-    detectTapGestures(
-      onLongPress = onLongClick
-    )
-  }
-
 /**
  * AppView 只存放App的信息，包括图标，字段
  */
@@ -107,9 +99,9 @@ fun BoxScope.AppInfoItem(
     .pointerInput(appViewState) {
       detectTapGestures(onPress = {}, // 触摸事件
         onTap = { // 点击事件
-          if (appViewState.isSystemApp.value) {
+          appViewState.appInfo?.dAppUrl?.let {
             onOpenApp?.let { it() }
-          } else {
+          } ?: run {
             appViewModel.handleIntent(AppViewIntent.LoadAppNewVersion(appViewState))
           }
         }, onDoubleTap = {}, // 双击事件
@@ -141,36 +133,90 @@ fun AppInfoView(appViewModel: AppViewModel, appViewState: AppViewState, onOpenAp
       .height(86.dp)
   ) {
     AppInfoItem(appViewModel, appViewState, onOpenApp)
-    if (appViewState.maskViewState.value.show.value) {
-      DownloadAppMaskView(path = appViewState.maskViewState.value.path, //"https://shop.plaoc.com/KEJPMHLA/KEJPMHLA.bfsa"
+    if (appViewState.maskViewState.show.value) {
+      DownloadAppMaskView(
+        downLoadViewModel = appViewState.maskViewState.downLoadViewModel,
         modifier = Modifier
           .size(50.dp)
           //.clip(RoundedCornerShape(12.dp))
           .clip(CircleShape)
           .align(Alignment.TopCenter)
           .background(Color.Black.copy(alpha = 0.6f))
-          .padding(6.dp), callbackState = { state, dInfo ->
+          .padding(6.dp),
+        callbackState = { state, dInfo ->
           appViewModel.handleIntent(AppViewIntent.MaskDownloadCallback(state, dInfo, appViewState))
+        },
+        checkInstallOrOverride = { appInfo, zipFile ->
+          compareDownloadApp(appViewModel, appViewState, appInfo, zipFile)
         })
     }
   }
+}
+
+private fun compareDownloadApp(
+  appViewModel: AppViewModel, appViewState: AppViewState, appInfo: AppInfo?, zipFile: String
+): NewAppUnzipType {
+  var ret = NewAppUnzipType.INSTALL
+  if (appViewState.bfsDownloadPath != null && appInfo != null) {
+    run OutSide@{
+      appViewModel.uiState.appViewStateList.forEach { tempAppViewState ->
+        if (tempAppViewState.appInfo?.bfsAppId == appInfo.bfsAppId) {
+          if (compareAppVersionHigh(tempAppViewState.appInfo!!.version, appInfo.version)) {
+            ret = NewAppUnzipType.OVERRIDE
+            appViewModel.handleIntent(
+              AppViewIntent.OverrideDownloadApp(appViewState, appInfo, zipFile)
+            )
+          } else {
+            ret = NewAppUnzipType.LOW_VERSION
+            appViewModel.handleIntent(AppViewIntent.RemoveDownloadApp(appViewState))
+          }
+          return@OutSide
+        }
+      }
+    }
+    if (ret == NewAppUnzipType.INSTALL) {
+      appViewModel.handleIntent(AppViewIntent.UpdateDownloadApp(appViewState, appInfo, zipFile))
+    }
+  }
+  return ret
+}
+
+private fun compareAppVersionHigh(localVersion: String, compareVersion: String): Boolean {
+  var localSplit = localVersion.split(".")
+  val compareSplit = compareVersion.split(".")
+  var tempLocalVersion = localVersion
+  if (localSplit.size < compareSplit.size) {
+    val cha = compareSplit.size - localSplit.size
+    for (i in 0 until cha) {
+      tempLocalVersion += ".0"
+    }
+    localSplit = tempLocalVersion.split(".")
+  }
+  try {
+    for (i in compareSplit.indices) {
+      val local = Integer.parseInt(localSplit[i])
+      val compare = Integer.parseInt(compareSplit[i])
+      if (compare > local) return true
+    }
+  } catch (e: Exception) {
+    Log.e("AppViewModel", "compareAppVersionHigh issue -> $localVersion, $compareVersion")
+  }
+  return false
 }
 
 @Composable
 fun AppInfoGridView(
   appViewModel: AppViewModel, onOpenApp: ((appId: String, url: DAppInfoUI?) -> Unit)? = null
 ) {
-  val uiState = appViewModel.uiState.value
   Box(modifier = Modifier.fillMaxSize()) {
     LazyVerticalGrid(
       columns = GridCells.Fixed(5),//GridCells.Adaptive(minSize = 60.dp), // 一行五个，或者指定大小
       contentPadding = PaddingValues(24.dp, 0.dp)
     ) {
-      items(uiState.appViewStateList) { item ->
-        AppInfoView(appViewModel, item) { onOpenApp?.let { it(item.bfsId, item.dAppUrl) } }
-      }
-      items(uiState.downloadAppView) { item ->
-        AppInfoView(appViewModel, item) { onOpenApp?.let { it(item.bfsId, item.dAppUrl) } }
+      items(appViewModel.uiState.appViewStateList) { item ->
+        AppInfoView(appViewModel, item) {
+          onOpenApp?.let { it(item.appInfo?.bfsAppId ?: "", item.dAppInfoUI) }
+        }
       }
     }
   }
@@ -181,11 +227,11 @@ fun AppInfoGridView(
 fun AppDialogView(
   appViewModel: AppViewModel, onOpenApp: ((appId: String, url: DAppInfoUI?) -> Unit)? = null
 ) {
-  when (appViewModel.uiState.value.appDialogInfo.value.lastType) {
+  when (appViewModel.uiState.appDialogInfo.value.lastType) {
     AppDialogType.DownLoading -> {
-      val appViewState = appViewModel.uiState.value.curAppViewState
+      val appViewState = appViewModel.uiState.curAppViewState
       DownloadDialogView(
-        path = appViewModel.uiState.value.appDialogInfo.value.data as String
+        path = appViewModel.uiState.appDialogInfo.value.data as String
       ) { state, dialogInfo ->
         when (state) {
           DownLoadState.COMPLETED, DownLoadState.FAILURE -> {
@@ -193,18 +239,21 @@ fun AppDialogView(
               AppViewIntent.DialogDownloadCallback(state, dialogInfo, appViewState!!)
             )
           }
+          else -> {}
         }
       }
     }
     AppDialogType.OpenDApp -> {
-      appViewModel.uiState.value.curAppViewState?.let { appViewState ->
+      appViewModel.uiState.curAppViewState?.let { appViewState ->
         appViewModel.handleIntent(AppViewIntent.ShowAppViewBadge(appViewState, false))
-        onOpenApp?.let { open -> open(appViewState.bfsId, appViewState.dAppUrl) }
+        onOpenApp?.let { open ->
+          open(appViewState.appInfo?.bfsAppId ?: "", appViewState.dAppInfoUI)
+        }
       }
       appViewModel.handleIntent(AppViewIntent.DialogHide)
     }
     else -> {
-      DialogView(appViewModel.uiState.value.appDialogInfo.value.dialogInfo,
+      DialogView(appViewModel.uiState.appDialogInfo.value.dialogInfo,
         onConfirm = { appViewModel.handleIntent(AppViewIntent.DialogConfirm) },
         onCancel = { appViewModel.handleIntent(AppViewIntent.DialogHide) })
     }
@@ -237,7 +286,7 @@ fun AppDropdownMenu(appViewModel: AppViewModel, appViewState: AppViewState) {
           fontWeight = FontWeight.Normal
         )
       }
-      if (appViewState.isSystemApp.value) {
+      if (appViewState.dAppInfoUI != null) {
         Column(modifier = Modifier
           .clickable {
             appViewModel.handleIntent(AppViewIntent.PopAppMenu(appViewState, show = false))

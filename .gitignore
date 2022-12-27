@@ -3,7 +3,9 @@
 .vscode
 .idea
 */node_modules
+./deno/third_party
 
+/test/vue3/yarn.lock
 /local.properties
 /.idea/caches
 /.idea/libraries
@@ -27,4 +29,7 @@ Pods
 android/app/src/main/assets/*
 
 rust_lib/assets/rusty_v8_mirror/
+
+# ios
+iOS/Plaoc-iOS.xcworkspace
 
