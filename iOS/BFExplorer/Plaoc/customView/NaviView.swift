@@ -159,8 +159,8 @@ extension NaviView {
         self.naviOverlay = overlay
     }
     //获取naviView的Overlay
-    func naviViewOverlay() -> String {
-        return naviOverlay ? "true" : "false"
+    func naviViewOverlay() -> Bool {
+        return naviOverlay
     }
     //更新naviView的背景色
     func updateNavigationBarBackgroundColor(colorString: String) {
@@ -186,14 +186,18 @@ extension NaviView {
     func titleContent() -> String {
         return self.titleString ?? ""
     }
+    //naviView是否有title
+    func isTitleExit() -> Bool {
+        return self.titleString != nil
+    }
     //naviView的高度
-    func viewHeight() -> String {
-        return "44"
+    func viewHeight() -> CGFloat {
+        return 44
     }
     
     //naviView透明度
-    func viewAlpha() -> String {
-        return "\(self.alpha)"
+    func viewAlpha() -> CGFloat {
+        return self.alpha
     }
     //设置naviView透明度
     func setNaviViewAlpha(alpha: CGFloat) {

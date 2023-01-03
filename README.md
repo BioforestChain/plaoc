@@ -2,13 +2,15 @@
 
 ## 目标
 
-1、为了解决现代单页应用（SPA）性能不足的问题。
-2、为开发者提供android、ios、桌面应用开发。
+1. 为了解决现代单页应用（SPA）性能不足的问题。
+
+2. 为开发者提供android、ios、桌面应用开发。
+
 3. 为BFS资产的面向角色的编程和开发做准备，为区块链开发搭建社区基础设施。
 
 ## 快速开始
 
-见文档：<https://bioforestchain.github.io/plaoc-docs/>,<https://docs.plaoc.com>
+见文档：<https://docs.plaoc.com>
 
 ### 项目流程
 
@@ -31,7 +33,7 @@
 docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
 docker buildx create --name multiarch --driver docker-container --use
 docker buildx inspect --bootstrap
-```  
+```
 
 #### docker编译so
 
