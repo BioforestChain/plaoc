@@ -1,13 +1,11 @@
 package info.bagen.rust.plaoc
 
 import android.Manifest
-import android.app.Application.getProcessName
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.res.Resources.NotFoundException
 import android.os.Bundle
 import android.provider.MediaStore
-import android.text.TextUtils
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.compose.setContent
@@ -17,8 +15,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.ui.Modifier
-import com.github.yitter.contract.IdGeneratorOptions
-import com.github.yitter.idgen.YitIdHelper
 import com.google.mlkit.vision.barcode.Barcode
 import com.king.app.dialog.AppDialog
 import com.king.app.dialog.AppDialogConfig
@@ -76,8 +72,6 @@ class MainActivity : AppCompatActivity() {
     initServiceApp()
     // 初始化系统函数map
     initSystemFn(this)
-    // 初始化id生成
-    initYitIdHelper()
     // 初始化广播
     registerBFSBroadcastReceiver()
     setContent {
@@ -104,13 +98,9 @@ class MainActivity : AppCompatActivity() {
               val pid = android.os.Process.myPid()
               println("app pid = $pid")
               dWebView_host = appId
-              LogUtils.d("启动了Ar 扫雷：$dWebView_host--$dAppInfo, isDWeb:${dAppInfo?.isDWeb}")
+              LogUtils.d("启动了Ar 扫雷：isDWeb:${dAppInfo?.isDWeb}，$dWebView_host--$dAppInfo ")
               dAppInfo?.let { appInfo ->
-                if (appInfo.isDWeb) {
                   createWorker(WorkerNative.valueOf("DenoRuntime"), appInfo.dAppUrl)
-                } else {
-                  openDWebWindow(this@MainActivity, appInfo.url)
-                }
               }
             })
         }
@@ -118,13 +108,6 @@ class MainActivity : AppCompatActivity() {
     }
     //}
   }
-
-  /** 初始化唯一id*/
-  private fun initYitIdHelper() {
-    val options = IdGeneratorOptions()
-    YitIdHelper.setIdGenerator(options)
-  }
-
 
   // 选择图片后回调到这
   override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

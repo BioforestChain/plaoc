@@ -4,7 +4,6 @@ import android.util.Log
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import com.fasterxml.jackson.core.JsonParser
-import com.github.yitter.idgen.YitIdHelper
 import info.bagen.rust.plaoc.*
 import info.bagen.libappmgr.utils.JsonUtil
 import info.bagen.rust.plaoc.webView.urlscheme.CustomUrlScheme
@@ -97,14 +96,3 @@ fun viewGateWay(
   )
 }
 
-
-/** 注册channelId*/
-fun registerChannelId(): WebResourceResponse {
-  val newId = YitIdHelper.nextId()
-//  println("TightUUID: ${newId}")
-  return WebResourceResponse(
-    "application/json",
-    "utf-8",
-    ByteArrayInputStream(newId.toString().toByteArray())
-  )
-}
