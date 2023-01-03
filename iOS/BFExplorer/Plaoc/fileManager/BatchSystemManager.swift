@@ -28,7 +28,7 @@ class BatchSystemManager: BatchReadManager {
         guard let dict = readBFSAMatedataContent(fileName: fileName) else { return nil }
         guard let maniDict = dict["manifest"] as? [String:Any] else { return nil }
         guard var entryPath = maniDict["bfsaEntry"] as? String else { return nil }
-        entryPath = entryPath.regexReplacePattern(pattern: "^(./|/|../)")
+        entryPath = entryPath.regexReplacePattern(pattern: "^(./|/|../)", replaceString: "")
         let path = filePath() + "/\(fileName)/" + entryPath
         return path
     }
