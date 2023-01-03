@@ -80,13 +80,3 @@ class ClipboardManager: NSObject {
     }
 }
 
-// JSCore clipboard
-extension PlaocHandleModel {
-    func readClipboardContent() -> String {
-        return ClipboardManager.read(type: ClipboardManager.ContentType.string) as! String
-    }
-    
-    func writeClipboardContent(param: String) -> Void {
-        ClipboardManager.write(content: param, ofType: ClipboardManager.ContentType.string)
-    }
-}

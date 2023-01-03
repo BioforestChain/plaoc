@@ -28,17 +28,12 @@ fun interceptNetworkRequests(
 ): WebResourceResponse? {
   val url = request.url.toString()
   val path = request.url.path
-
-//  println("interceptNetworkRequests:$url")
   // 防止卡住请求为空而崩溃
   if (!url.isNullOrEmpty() && !path.isNullOrEmpty()) {
     val temp = url.substring(url.lastIndexOf("/") + 1)
-    // 注册channelId
-    if (path == "/channel/registry") {
-      return registerChannelId()
-    }
+//    println("interceptNetworkRequests:$temp")
     // 解析接收数据
-    if (temp.startsWith("chunk")) {
+    if (temp.startsWith("chunk")|| temp.startsWith("registryChannelId")) {
       //拦截转发到后端的事件
       messageGateWay(path)
       return WebResourceResponse(

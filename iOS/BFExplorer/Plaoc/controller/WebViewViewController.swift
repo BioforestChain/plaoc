@@ -15,12 +15,14 @@ class WebViewViewController: UIViewController {
 
     var urlString: String = ""
     var fileName: String = ""
-    private var isNaviHidden: Bool = false
     private var isStatusHidden: Bool = false
-    private var naviOverlay: Bool = true
     private var statusOverlay: Bool = true
-    private var bottomOverlay: Bool = true
+    private var keyboardOverlay: Bool = false
     private var style: UIStatusBarStyle = .default
+    var isKeyboardShow: Bool = false
+    var keyboardHeight: CGFloat = 0
+    var keyboardSafeArea: UIEdgeInsets = .zero
+    
     var jsManager: JSCoreManager!
     
     
@@ -81,7 +83,7 @@ class WebViewViewController: UIViewController {
     @objc private func interceptAction(noti: Notification) {
         let info = noti.userInfo as? [String:Any]
         let function = info?["function"] as? String
-
+/*
         switch function {
         case "getTopBarShow":
             let isShowString = getNaviHiddenState() ? "true" : "false"
@@ -215,29 +217,10 @@ class WebViewViewController: UIViewController {
             self.navigationController?.pushViewController(scanVC, animated: true)
         default:
             break
-        }
+        }*/
     }
     
-    @objc private func observerShowKeyboard(noti: Notification) {
-        
-        guard let keyboardBound = noti.userInfo?["UIKeyboardFrameEndUserInfoKey"] as? CGRect else { return }
-        
-        let safeArea = UIEdgeInsets(top: 0, left: 0, bottom: keyboardBound.height, right: 0)
-        
-        /**
-         ([AnyHashable("UIKeyboardAnimationCurveUserInfoKey"): 7,
-         AnyHashable("UIKeyboardBoundsUserInfoKey"): NSRect: {{0, 0}, {375, 380}},
-         AnyHashable("UIKeyboardCenterBeginUserInfoKey"): NSPoint: {187.5, 1002},
-         AnyHashable("UIKeyboardIsLocalUserInfoKey"): 1,
-         AnyHashable("UIKeyboardFrameEndUserInfoKey"): NSRect: {{0, 432}, {375, 380}},
-         AnyHashable("UIKeyboardFrameBeginUserInfoKey"): NSRect: {{0, 812}, {375, 380}},
-         AnyHashable("UIKeyboardAnimationDurationUserInfoKey"): 0.25,
-         AnyHashable("UIKeyboardCenterEndUserInfoKey"): NSPoint: {187.5, 622}])
-         */
-    }
-    @objc private func observerHiddenKeyboard(noti: Notification) {
-        
-    }
+    
     
     //拦截后，重新把数据写入请求
     private func rewriteUrlSchemeTaskResponse(info: [String:Any]?, content: String) {
@@ -256,7 +239,7 @@ class WebViewViewController: UIViewController {
         return statusView
     }()
     
-    lazy var naviView: NaviView = {
+    lazy private var naviView: NaviView = {
         let naviView = NaviView(frame: CGRect(x: 0, y: self.statusView.frame.maxY, width: UIScreen.main.bounds.width, height: 44))
         naviView.callback = { [weak self] code in
             guard let strongSelf = self else { return }
@@ -275,7 +258,7 @@ class WebViewViewController: UIViewController {
         return webView
     }()
     
-    lazy var bottomView: BottomView = {
+    lazy private var bottomView: BottomView = {
         let bottomView = BottomView(frame: CGRect(x: 0, y: UIScreen.main.bounds.height - 49 - UIDevice.current.tabbarSpaceHeight(), width: UIScreen.main.bounds.width, height: 49 + UIDevice.current.tabbarSpaceHeight()))
 //        bottomView.isHidden = true
         bottomView.callback = { [weak self] code in
@@ -287,14 +270,21 @@ class WebViewViewController: UIViewController {
 
 }
 
+extension WebViewViewController {
+    
+    func evaluateJavaScript(jsString: String) {
+        webView.handleJavascriptString(inputJS: jsString)
+    }
+}
+
 // naviBar和js的交互
 extension WebViewViewController {
     //更新naviView的是否隐藏
-    private func hiddenNavigationBar(isHidden: Bool) {
+    func hiddenNavigationBar(isHidden: Bool) {
         naviView.hiddenNavigationView(hidden: isHidden)
     }
     //返回naviView是否隐藏
-    private func getNaviHiddenState() -> Bool {
+    func getNaviHiddenState() -> Bool {
         return naviView.naviHiddenState()
     }
     
@@ -316,55 +306,59 @@ extension WebViewViewController {
         }
     }
     //获取naviView的Overlay
-    private func naviViewOverlay() -> String {
+    func naviViewOverlay() -> Bool {
         return naviView.naviViewOverlay()
     }
     
     //更新naviView的背景色
-    private func updateNavigationBarBackgroundColor(colorString: String) {
+    func updateNavigationBarBackgroundColor(colorString: String) {
         naviView.updateNavigationBarBackgroundColor(colorString: colorString)
     }
     //返回naviView的背景色
-    private func naviViewBackgroundColor() -> String {
+    func naviViewBackgroundColor() -> String {
         return naviView.backgroundColorString()
     }
     //更新naviView的前景色
-    private func updateNavigationBarTintColor(colorString: String) {
+    func updateNavigationBarTintColor(colorString: String) {
         naviView.updateNavigationBarTintColor(colorString: colorString)
     }
     //返回naviView的前景色
-    private func naviViewForegroundColor() -> String {
+    func naviViewForegroundColor() -> String {
         return naviView.foregroundColor()
     }
     
     //设置标题
-    private func setNaviViewTitle(title: String?) {
+    func setNaviViewTitle(title: String?) {
         naviView.setNaviViewTitle(title: title)
     }
     //返回naviView的标题
-    private func titleString() -> String {
+    func titleString() -> String {
         return naviView.titleContent()
     }
+    //naviView是否有title
+    func isNaviTitleExit() -> Bool {
+        return naviView.isTitleExit()
+    }
     //naviView的高度
-    private func naviViewHeight() -> String {
+    func naviViewHeight() -> CGFloat {
         return naviView.viewHeight()
     }
     
     //naviView透明度
-    private func naviViewAlpha() -> String {
+    func naviViewAlpha() -> CGFloat {
         return naviView.viewAlpha()
     }
     //设置naviView透明度
-    private func setNaviViewAlpha(alpha: CGFloat) {
+    func setNaviViewAlpha(alpha: CGFloat) {
         naviView.setNaviViewAlpha(alpha: alpha)
     }
     
     //设置naviView的按钮
-    private func setNaviButtons(content: String) {
+    func setNaviButtons(content: String) {
         naviView.setNaviButtons(content: content)
     }
     //返回naviView的按钮
-    private func naviActions() -> String {
+    func naviActions() -> String {
         return naviView.naviActions()
     }
 }
@@ -372,16 +366,16 @@ extension WebViewViewController {
 // statusBar和js的交互
 extension WebViewViewController {
     //更新状态栏背景色
-    private func updateStatusBackgroundColor(colorString: String) {
+    func updateStatusBackgroundColor(colorString: String) {
         statusView.backgroundColor = UIColor(colorString)
     }
     //状态栏背景色
-    private func statusBackgroundColor() -> String {
+    func statusBackgroundColor() -> String {
         return statusView.backgroundColor?.hexString() ?? "#FFFFFFFF"
     }
     
     //更新状态栏状态
-    private func updateStatusStyle(style: String) {
+    func updateStatusStyle(style: String) {
         if style == "default" {
             self.style = .default
         } else {
@@ -390,7 +384,7 @@ extension WebViewViewController {
         setNeedsStatusBarAppearanceUpdate()
     }
     //返回状态栏状态
-    private func statusBarStyle() -> String {
+    func statusBarStyle() -> String {
         if style == .default {
             return "true"
         } else {
@@ -399,17 +393,17 @@ extension WebViewViewController {
     }
     
     //状态栏是否隐藏
-    private func updateStatusHidden(isHidden: Bool) {
+    func updateStatusHidden(isHidden: Bool) {
         isStatusHidden = isHidden
         setNeedsStatusBarAppearanceUpdate()
     }
     //返回状态栏是否隐藏
-    private func statusBarVisible() -> String {
-        return isStatusHidden ? "true" : "false"
+    func statusBarVisible() -> Bool {
+        return isStatusHidden
     }
     
     //更新状态栏Overlay
-    private func updateStatusBarOverlay(overlay: Bool) {
+    func updateStatusBarOverlay(overlay: Bool) {
         guard statusOverlay != overlay else { return }
         statusOverlay = overlay
         var naviFrame = naviView.frame
@@ -430,23 +424,23 @@ extension WebViewViewController {
     }
     
     //返回状态栏Overlay
-    private func statusBarOverlay() -> String {
-        return statusOverlay ? "true" : "false"
+    func statusBarOverlay() -> Bool {
+        return statusOverlay
     }
 }
 // bottomBar和js的交互
 extension WebViewViewController {
     //隐藏底部
-    private func hiddenBottomView(isHidden: Bool) {
+    func hiddenBottomView(isHidden: Bool) {
         bottomView.hiddenBottomView(hidden: isHidden)
     }
     //返回底部是否隐藏
-    private func bottombarHidden() -> Bool {
+    func bottombarHidden() -> Bool {
         return bottomView.bottomHiddenState()
     }
     
     //更新底部overlay
-    private func updateBottomViewOverlay(overlay: Bool) {
+    func updateBottomViewOverlay(overlay: Bool) {
         guard bottomView.bottomViewOverlay() != overlay else { return }
         bottomView.updateBottomViewOverlay(overlay: overlay)
         
@@ -465,33 +459,33 @@ extension WebViewViewController {
         }
     }
     //返回底部overlay
-    private func bottombarOverlay() -> Bool {
+    func bottombarOverlay() -> Bool {
         return bottomView.bottomViewOverlay()
     }
     //设置底部alpha
-    private func setBottomViewAlpha(alpha: CGFloat) {
+    func setBottomViewAlpha(alpha: CGFloat) {
         bottomView.updaterBottomViewAlpha(alpha: alpha)
     }
     //返回底部alpha
-    private func bottomViewAlpha() -> CGFloat {
+    func bottomViewAlpha() -> CGFloat {
         return bottomView.bottomViewAlpha()
     }
     
     //更新底部背景色
-    private func updateBottomViewBackgroundColor(colorString: String) {
+    func updateBottomViewBackgroundColor(colorString: String) {
         bottomView.updateBottomViewBackgroundColor(colorString: colorString)
     }
     //返回底部背景颜色
-    private func bottomBarBackgroundColor() -> String {
+    func bottomBarBackgroundColor() -> String {
         return bottomView.bottomBarBackgroundColor()
     }
     
     //更新底部颜色
-    private func updateBottomViewforegroundColor(colorString: String) {
+    func updateBottomViewforegroundColor(colorString: String) {
         bottomView.updateBottomViewforegroundColor(colorString: colorString)
     }
     //返回底部颜色
-    private func bottomBarForegroundColor() -> String {
+    func bottomBarForegroundColor() -> String {
         return bottomView.bottomBarForegroundColor()
     }
     
@@ -506,90 +500,61 @@ extension WebViewViewController {
         }
     }
     //返回底部高度
-    private func bottomViewHeight() -> CGFloat {
+    func bottomViewHeight() -> CGFloat {
         return bottomView.bottomViewHeight()
     }
     
     //隐藏底部按钮
-    private func hiddenBottomViewButton(hidden: Bool) {
+    func hiddenBottomViewButton(hidden: Bool) {
         bottomView.hiddenBottomViewButton(hidden: hidden)
     }
     
     //获取底部按钮
-    private func fetchBottomButtons(content: String) {
+    func fetchBottomButtons(content: String) {
         bottomView.fetchBottomButtons(content: content)
     }
     //返回底部按钮数组
-    private func bottomActions() -> String {
+    func bottomActions() -> String {
         return bottomView.bottomActions()
     }
 }
 
 extension WebViewViewController {
     
-    private func openAlertAction(info: [String:Any]?, content: String) {
-        guard let bodyDict = ChangeTools.stringValueDic(content) else { return }
-        let configString = bodyDict["config"] as? String
-        let cbString = bodyDict["cb"] as? String
-        let configDict = ChangeTools.stringValueDic(configString ?? "")
-        let alertModel = AlertConfiguration(dict: JSON(configDict))
-        let alertView = CustomAlertPopView(frame: CGRect(x: 0, y: 0, width: screen_width, height: screen_height))
-        alertView.alertModel = alertModel
-        alertView.callback = { [weak self] type in
-            guard let strongSelf = self else { return }
-            guard cbString != nil, cbString!.count > 0 else { return }
-            let jsString = cbString! + "(\(true))"
-            guard jsString.count > 0 else { return }
-            strongSelf.webView.handleJavascriptString(inputJS: jsString)
-        }
-        alertView.show()
+    @objc private func observerShowKeyboard(noti: Notification) {
+        
+        guard let keyboardBound = noti.userInfo?["UIKeyboardFrameEndUserInfoKey"] as? CGRect else { return }
+        isKeyboardShow = true
+        keyboardHeight = keyboardBound.size.height
+        keyboardSafeArea = UIEdgeInsets(top: 0, left: 0, bottom: keyboardBound.height, right: 0)
+        
+        /**
+         ([AnyHashable("UIKeyboardAnimationCurveUserInfoKey"): 7,
+         AnyHashable("UIKeyboardBoundsUserInfoKey"): NSRect: {{0, 0}, {375, 380}},
+         AnyHashable("UIKeyboardCenterBeginUserInfoKey"): NSPoint: {187.5, 1002},
+         AnyHashable("UIKeyboardIsLocalUserInfoKey"): 1,
+         AnyHashable("UIKeyboardFrameEndUserInfoKey"): NSRect: {{0, 432}, {375, 380}},
+         AnyHashable("UIKeyboardFrameBeginUserInfoKey"): NSRect: {{0, 812}, {375, 380}},
+         AnyHashable("UIKeyboardAnimationDurationUserInfoKey"): 0.25,
+         AnyHashable("UIKeyboardCenterEndUserInfoKey"): NSPoint: {187.5, 622}])
+         */
+    }
+    @objc private func observerHiddenKeyboard(noti: Notification) {
+        isKeyboardShow = false
+        keyboardHeight = 0
+        keyboardSafeArea = .zero
     }
     
-    private func openPromptAction(info: [String:Any]?, content: String) {
-        guard let bodyDict = ChangeTools.stringValueDic(content) else { return }
-        let configString = bodyDict["config"] as? String
-        let cbString = bodyDict["cb"] as? String
-        let configDict = ChangeTools.stringValueDic(configString ?? "")
-        let promptModel = PromptConfiguration(dict: JSON(configDict))
-        let alertView = CustomPromptPopView(frame: CGRect(x: 0, y: 0, width: screen_width, height: screen_height))
-        alertView.promptModel = promptModel
-        alertView.callback = { [weak self] type in
-            guard let strongSelf = self else { return }
-            guard cbString != nil, cbString!.count > 0 else { return }
-            var jsString: String = ""
-            if type == .confirm {
-                jsString = cbString! + "(\"\(alertView.textField.text ?? "")\")"
-            } else if type == .cancel {
-                jsString = cbString! + "(\(false))"
-            }
-            guard jsString.count > 0 else { return }
-            strongSelf.webView.handleJavascriptString(inputJS: jsString)
-        }
-        alertView.show()
+    func setKeyboardOverlay(overlay: Bool) {
+        keyboardOverlay = overlay
     }
     
-    private func openConfirmAction(info: [String:Any]?, content: String) {
-        guard let bodyDict = ChangeTools.stringValueDic(content) else { return }
-        let configString = bodyDict["config"] as? String
-        let cbString = bodyDict["cb"] as? String
-        let configDict = ChangeTools.stringValueDic(configString ?? "")
-        let confirmModel = ConfirmConfiguration(dict: JSON(configDict))
-        let alertView = CustomConfirmPopView(frame: CGRect(x: 0, y: 0, width: screen_width, height: screen_height))
-        alertView.confirmModel = confirmModel
-        alertView.callback = { [weak self] type in
-            guard let strongSelf = self else { return }
-            guard cbString != nil, cbString!.count > 0 else { return }
-            var jsString: String = ""
-            if type == .confirm {
-                jsString = cbString! + "(\(true))"
-            } else if type == .cancel {
-                jsString = cbString! + "(\(false))"
-            }
-            guard jsString.count > 0 else { return }
-            strongSelf.webView.handleJavascriptString(inputJS: jsString)
-        }
-        alertView.show()
+    func isKeyboardOverlay() -> Bool {
+        return keyboardOverlay
     }
+}
+
+extension WebViewViewController {
     
     private func openBeforeUnloadAction(info: [String:Any]?, content: String) {
         guard let bodyDict = ChangeTools.stringValueDic(content) else { return }

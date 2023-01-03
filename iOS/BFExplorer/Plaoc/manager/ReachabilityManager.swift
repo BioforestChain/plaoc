@@ -53,4 +53,20 @@ class ReachabilityManager: NSObject {
     func stopMonitoring() {
         monitor.cancel()
     }
+    
+    func getNetworkStatus() -> String {
+        var networkTypeString = ""
+        
+        switch(self.currentType) {
+        case .cellular:
+            networkTypeString = "cellular"
+        case .wifi:
+            networkTypeString = "wifi"
+        default:
+            networkTypeString = "unknown"
+        }
+        
+        return networkTypeString
+    }
 }
+

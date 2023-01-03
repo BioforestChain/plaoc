@@ -209,8 +209,8 @@ extension ScanPhotoViewController: AVCaptureMetadataOutputObjectsDelegate {
         if let metadataObj = metadataObjects.first as? AVMetadataMachineReadableCodeObject {
             let result = metadataObj.stringValue  //扫描结果
             if result != nil {
-                let refreshManager = RefreshManager()
-                refreshManager.loadUpdateRequestInfo(fileName: nil, urlString: result, isCompare: false)
+//                let refreshManager = RefreshManager()
+//                refreshManager.loadUpdateRequestInfo(fileName: nil, urlString: result, isCompare: false)
             }
         }
         self.stopScan()
