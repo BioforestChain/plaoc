@@ -137,8 +137,6 @@ class BrowserTabViewController: UIViewController {
         }
     }
     
-    
-    
     //    override var preferredStatusBarStyle: UIStatusBarStyle {
     //        return .lightContent // .default
     //    }

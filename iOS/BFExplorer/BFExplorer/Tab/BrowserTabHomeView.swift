@@ -300,8 +300,9 @@ let HoverViewTag = 10013
     @objc func newsClicked(sender:UIButton){
         
         guard let index = clickables?.firstIndex(of: sender) else { return }
-        let news = sharedCachesMgr.cachedNewsData[index]
-        guard let link = news["link"] as? String, link.count > 10 else { return }
+        guard let item = sharedCachesMgr.fetchNews()?[index] else { return }
+//        guard index < news.count, let item = news[index] else { return }
+        guard let link = item["link"] as? String, link.count > 10 else { return }
         NotificationCenter.default.post(name: newsLinkClickedNotification, object: link)
     }
     
