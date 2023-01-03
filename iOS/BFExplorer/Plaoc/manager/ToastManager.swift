@@ -18,7 +18,7 @@ class ToastManager: NSObject {
     static func showToast(in viewController: UIViewController, text: String, duration: Int = 2000, position: Position = .bottom, completion: ((Bool) -> Void)? = nil) {
         
         DispatchQueue.main.async {
-            let maxSizeTitle: CGSize = CGSize(width: viewController.view.width - 64, height: viewController.view.height)
+            let maxSizeTitle: CGSize = CGSize(width: viewController.view.width - 64, height: viewController.view.height - 100)
             
             let label = ToastLabel()
             label.backgroundColor = UIColor.black.withAlphaComponent(0.6)

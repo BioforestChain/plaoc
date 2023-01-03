@@ -16,7 +16,7 @@ extension PlaocHandleModel {
         return filePath + "/system-app/\(fileName)/home"
     }
     
-    // 获取指定文件系统目录下的内容
+    // 获取指定文件系统目录下的目录
     func executiveFileSystemLs(param: Any) -> String {
         guard let param = param as? String else { return "" }
         let data = JSON.init(parseJSON: param)
@@ -30,7 +30,9 @@ extension PlaocHandleModel {
             let urls = try FileSystemManager.readdir(at: url)
             
             if urls.count > 0 {
-                let str = ChangeTools.arrayValueString(urls)
+                
+                let urlPaths = urls.map { $0.path }
+                let str = ChangeTools.arrayValueString(urlPaths)
                 
                 return str ?? ""
             } else {
