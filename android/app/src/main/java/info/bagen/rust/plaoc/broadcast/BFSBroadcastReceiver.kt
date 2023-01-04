@@ -17,6 +17,7 @@ class BFSBroadcastReceiver : BroadcastReceiver() {
   override fun onReceive(context: Context, intent: Intent?) {
     super.onReceive(context, intent)
     intent?.let {
+      Log.d("BFSBroadcastReceiver", "onReceive action=${it.action}")
       when (it.action) {
         BFSBroadcastAction.BFSInstallApp.action -> {
           App.mainActivity?.let { mainActivity ->
@@ -24,7 +25,7 @@ class BFSBroadcastReceiver : BroadcastReceiver() {
             mainActivity.getAppViewModel().handleIntent(AppViewIntent.BFSInstallApp(path))
           }
         }
-        else -> "Nothing to do "
+        else -> {}
       }
     }
   }

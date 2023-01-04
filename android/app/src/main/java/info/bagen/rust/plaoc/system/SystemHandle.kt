@@ -126,7 +126,8 @@ fun splicingPath(bfsId:String, entry:String):String {
   }
   /**申请应用权限 */
   callable_map[ExportNative.ApplyPermissions] = {
-    PermissionManager.requestPermissions(activity, it)
+    println("kotlin#ApplyPermissions: $it")
+    App.dwebViewActivity?.let { it1 -> PermissionManager.requestPermissions(it1, it) }
   }
   /** Notification */
   callable_map[ExportNative.CreateNotificationMsg] = {

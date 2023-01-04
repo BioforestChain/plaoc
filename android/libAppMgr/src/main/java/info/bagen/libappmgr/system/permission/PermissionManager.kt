@@ -15,7 +15,7 @@ class PermissionManager {
   private var activity: Activity? = null
   private var fragment: Fragment? = null
 
-  private lateinit var permissionCallback: PermissionCallback
+  private  var permissionCallback: PermissionCallback? = null
 
   // private var permission: String? = null
   private var permissions = ArrayList<String>()
@@ -105,14 +105,14 @@ class PermissionManager {
               } else {
                 hasStarted = false
                 // 用户在解释后仍拒绝了该权限。 调用了拒绝的回调
-                permissionCallback.onPermissionDismissed(permissions[i - 1])
+                permissionCallback?.onPermissionDismissed(permissions[i - 1])
                 return
               }
             }
           }
         }
         hasStarted = false
-        permissionCallback.onPermissionGranted(permissions, grantResults)
+        permissionCallback?.onPermissionGranted(permissions, grantResults)
       }
     }
   }
@@ -128,7 +128,7 @@ class PermissionManager {
       .setCancelable(denyCancellable) // 自定义对话框是否可被取消
       .setPositiveButton(denyPosBtnTxt) { dialog, which ->
         dialog.dismiss()
-        permissionCallback.onPositiveButtonClicked(dialog, which)
+        permissionCallback?.onPositiveButtonClicked(dialog, which)
       } // 自定义对话框确认按钮的响应
       .setOnDismissListener {
         hasStarted = false
@@ -138,7 +138,7 @@ class PermissionManager {
     if (showNegBtn) {
       alertDialogBuilder.setNegativeButton(denyNegBtnTxt) { dialog, which ->
         dialog.dismiss()
-        permissionCallback.onNegativeButtonClicked(dialog, which)
+        permissionCallback?.onNegativeButtonClicked(dialog, which)
       }
     }
 

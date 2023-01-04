@@ -21,6 +21,12 @@ const router = useRouter();
 
 let scannerData = ref("DwebView-js ♻️ Deno-js");
 
+
+onBeforeMount(() => {
+  router.push({ path: `/`, query: { scannerData: `${scannerData.value}` } })
+})
+
+
 async function openQrScanner() {
   const scanner = document.querySelector<OpenScanner>('dweb-scanner')!;
   const iter = await scanner.openQrCodeScanner()
@@ -34,10 +40,6 @@ async function openBarScanner() {
   console.log("scannerData.value = await scanner.openBarCodeScanner() -->", JSON.stringify(iter))
   scannerData.value = iter
 }
-
-onBeforeMount(() => {
-  router.push({ path: `/main/${scannerData.value}` })
-})
 
 onMounted(async () => {
   const topBar = document.querySelector<BfcsTopBar>('dweb-top-bar')!;
