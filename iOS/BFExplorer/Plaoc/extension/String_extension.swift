@@ -75,11 +75,11 @@ extension String {
     }
     
     //正则替换
-    func regexReplacePattern(pattern: String) -> String {
+    func regexReplacePattern(pattern: String, replaceString: String) -> String {
         
         do {
             let regex = try NSRegularExpression(pattern: pattern, options: .caseInsensitive)
-            let finalStr = regex.stringByReplacingMatches(in: self, options: NSRegularExpression.MatchingOptions(rawValue: 0), range: NSMakeRange(0, self.count), withTemplate: "")
+            let finalStr = regex.stringByReplacingMatches(in: self, options: NSRegularExpression.MatchingOptions(rawValue: 0), range: NSMakeRange(0, self.count), withTemplate: replaceString)
             return finalStr
         } catch {
             print(error)
