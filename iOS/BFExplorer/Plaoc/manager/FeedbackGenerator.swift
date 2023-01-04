@@ -54,3 +54,4 @@ class FeedbackGenerator: NSObject {
         }
     }
 }
+

@@ -3,6 +3,7 @@ function BFSInstallApp (path) {
 }
 
 function getConnectChannel(data) {
+    console.log("swift#getConnectChannel:",data)
     window.webkit.messageHandlers.getConnectChannel.postMessage({param:data});
 }
 

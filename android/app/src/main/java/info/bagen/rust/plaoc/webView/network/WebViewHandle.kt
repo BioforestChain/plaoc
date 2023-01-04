@@ -11,7 +11,6 @@ import info.bagen.rust.plaoc.webView.systemui.SystemUiFFI
 import info.bagen.rust.plaoc.webView.topbar.TopBarFFI
 
 val call_ui_map = mutableMapOf<ExportNativeUi, (data: String) -> Any>()
-private const val TAG = "systemHandle"
 /**
  * 初始化操作ui的请求
  */

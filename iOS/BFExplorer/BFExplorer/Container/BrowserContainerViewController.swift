@@ -143,6 +143,15 @@ class BrowserContainerViewController: UIViewController,  OverlayShareViewDelegat
         }
         sharedCachesMgr.addObserver(self, forKeyPath: #keyPath(CachesManager.cachedNewsData), options: .new, context: nil)
         
+        NotificationCenter.default.addObserver(forName: NSNotification.Name.progressNotification, object: nil, queue: .main) { notify in
+            self.tabViewControllers.map { vc in
+                vc.contentView.homePageView.installingProgressUpdate(notify)
+            }
+            
+//            self.progressUpdateNotify(noti: notify)
+        }
+        
+        
         automaticallyAdjustsScrollViewInsets = false
         extendedLayoutIncludesOpaqueBars = true
     }

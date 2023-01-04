@@ -106,10 +106,20 @@ class FirstViewController: UIViewController {
       
         
         if sender.tag == 2 {
-            let second = WebViewViewController()
-            second.fileName = "wallet"
-            second.urlString = "https://objectjson.waterbang.top"  //"https://wallet.plaoc.com/"
-            self.navigationController?.pushViewController(second, animated: true)
+            var config = SplashScreenConfig()
+            config.backgroundColor = .red
+            config.spinnerStyle = .large
+            config.spinnerColor = .blue
+            
+            let setting = SplashScreenSettings()
+            let splashScreen = SplashScreenManager(parentView: self.view, config: config)
+            splashScreen.show(settings: setting) {
+                
+            }
+//            let second = WebViewViewController()
+//            second.fileName = "wallet"
+//            second.urlString = "https://objectjson.waterbang.top"  //"https://wallet.plaoc.com/"
+//            self.navigationController?.pushViewController(second, animated: true)
             return
         }
         let name = appNames[sender.tag]

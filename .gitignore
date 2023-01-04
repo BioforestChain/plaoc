@@ -32,4 +32,6 @@ rust_lib/assets/rusty_v8_mirror/
 
 # ios
 iOS/Plaoc-iOS.xcworkspace
+iOS/BFExplorer/BFExplorer.xcworkspace
+iOS/Plaoc-iOS/Plaoc-iOS.xcworkspace
 

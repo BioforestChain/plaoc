@@ -42,6 +42,10 @@ let ItemHorzGap = CGFloat( 10)
 
 let lineGap = CGFloat( 20)
 
+var appNames: [String]?{
+    BatchFileManager.shared.appFilePaths
+}
+
 public enum Category: Int {
     case hotSite, bookmark, apps
 }
@@ -50,8 +54,7 @@ class CategoryView: UIView{
     public let titleLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 150, height: TitleHeight))
     public var clickables : [TouchView]? = nil
     var type: Category = .hotSite
-    var appNames: [String]?
-    
+
     let bg = DisposeBag()
     
     init(frame:CGRect, type: Category){
@@ -76,58 +79,21 @@ class CategoryView: UIView{
             clickables?.append(btn)
             addSubview(btn)
             btn.tag = index
-            let selector = (type == .apps) ? #selector (tap) : #selector (clickedNews)
+            let selector = (type == .apps) ? #selector (iconClicked) : #selector (clickedNews)
             btn.addTarget(self, action: selector, for: .touchUpInside)
         }
         if type == .apps{
-//            BatchFileManager.shared.initBatchFile()
-            
-            self.appNames = BatchFileManager.shared.appFilePaths
-            
-            NotificationCenter.default.addObserver(self, selector: #selector(update(noti:)), name: NSNotification.Name.progressNotification, object: nil)
-            
             operateMonitor.startAnimationMonitor.subscribe(onNext: { [weak self] fileName in
                 guard let strongSelf = self else { return }
                 DispatchQueue.main.async {
                     print("-----******in Homeview startAnimationMonitor")
 
-                    guard let index = strongSelf.appNames?.firstIndex(of: fileName) else {return}
+                    guard let index = appNames?.firstIndex(of: fileName) else {return}
                     strongSelf.clickables![index].realImageView.setupForAppleReveal()
                 }
             }).disposed(by: bg)
         }
-        
-    }
-    
-    @objc func update(noti: Notification) {
-        guard let infoDict = noti.userInfo else { return }
-        guard let type = infoDict["progress"] as? String else { return }
-        if let fileName = infoDict["fileName"] as? String{
-            DispatchQueue.main.async { [self] in
-                print("-----******in Homeview update")
 
-                if type == "complete" {
-                    BatchFileManager.shared.updateFileType(fileName: fileName)
-                    guard let index = self.appNames?.firstIndex(of: fileName) else {return}
-                    self.clickables![index].realImageView.startExpandAnimation()
-                    self.clickables![index].realImageView.image = BatchFileManager.shared.currentAppImage(fileName: fileName)
-                    self.clickables![index].realTitleLabel.text = BatchFileManager.shared.currentAppName(fileName: fileName)
-                }
-            }
-            
-            if Double(type) != nil {
-                
-                var count = Double(type)!
-                if count >= 0.98 {
-                    count = 0.98
-                }
-                let button = clickables?.filter({ touchView in
-                    touchView.realTitleLabel.text == BatchFileManager.shared.currentAppName(fileName: fileName)
-                }).first
-                button!.realImageView.startProgressAnimation(progress: 1.0 - count)
-            }
-        }
-        
     }
     
     @objc private  func clickedNews(sender: TouchView){
@@ -193,7 +159,7 @@ class CategoryView: UIView{
         }
     }
     
-    @objc func tap(sender: UIButton) {
+    @objc func iconClicked(sender: UIButton) {
         
         let info = sharedCachesMgr.readAvailableApps()[sender.tag]
         print(sender.tag)
@@ -300,8 +266,9 @@ let HoverViewTag = 10013
     @objc func newsClicked(sender:UIButton){
         
         guard let index = clickables?.firstIndex(of: sender) else { return }
-        let news = sharedCachesMgr.cachedNewsData[index]
-        guard let link = news["link"] as? String, link.count > 10 else { return }
+        guard let item = sharedCachesMgr.fetchNews()?[index] else { return }
+//        guard index < news.count, let item = news[index] else { return }
+        guard let link = item["link"] as? String, link.count > 10 else { return }
         NotificationCenter.default.post(name: newsLinkClickedNotification, object: link)
     }
     
@@ -353,16 +320,13 @@ class BrowserTabHomeView: UIView, UIScrollViewDelegate {
     }
     
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        
         if !hasHandledScrolling{
             hasHandledScrolling = true
             shouldHideHomePage = false
-            
             NotificationCenter.default.post(name: hideKeyboardAfterScrollviewDidScrolled, object: nil)
-            
         }
-        
     }
+    
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let verticalOffset = scrollview.contentOffset.y
         if verticalOffset > 2 {
@@ -411,6 +375,43 @@ class BrowserTabHomeView: UIView, UIScrollViewDelegate {
         appsContainerView.updateAppContainerView(list)
     }
     
+    func appendTemporaryApp(){
+         
+        guard let image = PKImageExtensions.image(with: .cyan,size: CGSize(width: 120, height: 120)) else { return }
+        let appInfo = AppInfo(appName: "TEMPORARY_APPNAME", appKey: "TEMPORARY_APPKEY")
+        var list = sharedCachesMgr.readAvailableApps()
+        list.append(appInfo)
+        appsContainerView.updateAppContainerView(list)
+
+    }
+    
+    func installingProgressUpdate(_ notify: Notification){
+        guard let infoDict = notify.userInfo,
+                let progress = infoDict["progress"] as? String else { return }
+        if let fileName = infoDict["fileName"] as? String{
+            if fileName.hasPrefix("UnKnownApp"){
+                self.appendTemporaryApp()
+            }else{
+                print("-----******in Homeview update")
+                let clickables = self.appsContainerView.clickables
+                if progress == "complete" {
+                    BatchFileManager.shared.updateFileType(fileName: fileName)
+                    guard let index = appNames?.firstIndex(of: fileName) else {return}
+                    clickables![index].realImageView.startExpandAnimation()
+                    clickables![index].realImageView.image = BatchFileManager.shared.currentAppImage(fileName: fileName)
+                    clickables![index].realTitleLabel.text = BatchFileManager.shared.currentAppName(fileName: fileName)
+                }
+                
+                guard var progress = Double(progress) else { return }
+                progress = progress < 0.98 ? progress : 0.98
+                let button = clickables?.filter({ touchView in
+                    touchView.realTitleLabel.text == BatchFileManager.shared.currentAppName(fileName: fileName)
+                }).first
+                button!.realImageView.startProgressAnimation(progress: 1.0 - progress)
+            }
+        }
+    }
+        
 }
 
 // MARK: Helper methods
