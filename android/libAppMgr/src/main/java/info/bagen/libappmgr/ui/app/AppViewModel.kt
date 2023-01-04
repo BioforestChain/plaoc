@@ -152,7 +152,6 @@ class AppViewModel(private val repository: AppRepository = AppRepository()) : Vi
         }
         is AppViewIntent.UninstallApp -> {
           // 卸载就是删除当前目录，然后重新捞取
-          Log.e("lin.huang", "AppViewModel::handleIntent->AppViewIntent.UninstallApp")
           uiState.curAppViewState = null
           action.appViewState.showBadge.value = false
           val path = FilesUtil.getAppRootDirectory(action.appViewState.appInfo!!)
@@ -172,7 +171,6 @@ class AppViewModel(private val repository: AppRepository = AppRepository()) : Vi
           }
         }
         is AppViewIntent.RemoveDownloadApp -> { // 删除当前的下载的应用，弹出提示框，版本太低
-          Log.e("lin.huang", "AppViewModel::handleIntent->AppViewIntent.RemoveDownloadApp")
           uiState.appViewStateList.remove(action.appViewState)
           val dialogInfo = DialogInfo(
             DialogType.CUSTOM, title = "异常提示", text = "安装失败! 下载的应用版本太低，无法安装!", confirmText = "重新下载"
@@ -184,11 +182,9 @@ class AppViewModel(private val repository: AppRepository = AppRepository()) : Vi
           )
         }
         is AppViewIntent.OverrideDownloadApp -> { // 解压并且跟已存在的app绑定，显示小红点，最后移除下载
-          Log.e("lin.huang", "AppViewModel::handleIntent->AppViewIntent.OverrideDownloadApp")
           overrideDownloadApp(action.appViewState, action.appInfo, action.downloadFile)
         }
         is AppViewIntent.UpdateDownloadApp -> { // 如果当前下载app是正常的app，那么就需要自动解压，并且
-          Log.e("lin.huang", "AppViewModel::handleIntent->AppViewIntent.UpdateDownloadApp")
           action.appViewState.appInfo = action.appInfo
         }
       }
@@ -315,7 +311,6 @@ class AppViewModel(private val repository: AppRepository = AppRepository()) : Vi
 
   private suspend fun newAppDownloadAndInstall(path: String) {
     // 添加新应用， 需要判断当前应用是否已存在
-    Log.e("lin.huang", "AppViewModel::newAppDownloadAndInstall -> $path")
     var found = false
     uiState.appViewStateList.forEach {
       if (it.maskViewState.path == path) {
