@@ -37,6 +37,33 @@ class StreamFileManager: NSObject {
         }
     }
     
+    func list(fileName: String, filePath: String) -> [FileModel] {
+"""
+        "/home/user/haha/test.txt"
+        name = "test.txt"
+        extname = "txt"
+        path = "/home/user/haha/test.txt"
+        cwd = "/"
+        type = "?"
+        isLink = false
+        relativePath = "/home/user/haha"
+"""
+        let rootPath = rootFilePath(fileName: fileName)
+        let manager = FileManager.default
+        guard manager.fileExists(atPath: filePath) else { return [] }
+        var currentFile = createCurrentFileModel(path: filePath)
+        let subFiles = try? manager.contentsOfDirectory(atPath: filePath)
+        if subFiles == nil { //文件
+            currentFile.type = "file"
+            return [currentFile]
+        } else { //文件夹
+            currentFile.type = "directory"
+            var subModels = createSubFileModels(path: filePath, rootPath: rootPath)
+//            subModels.insert(currentFile, at: 0)
+            return subModels
+        }
+    }
+    
     //得到当前的文件对象
     private func createCurrentFileModel(path: String) -> FileModel {
         var fileModel = FileModel()
@@ -101,6 +128,37 @@ class StreamFileManager: NSObject {
         return fileArray
     }
     
+    //得到当前文件夹及其子文件对象，递归遍历
+    private func createSubFileModels(path: String, rootPath: String) -> [FileModel] {
+        let manager = FileManager.default
+        // 获取应用根目录url，方便之后得到无/结尾的路径地址
+        let rootUrl = URL(fileURLWithPath: rootPath, isDirectory: true)
+        // 获取当前路径的相对于应用根目录的绝对路径地址
+        let cwd = path.replacingOccurrences(of: rootUrl.path, with: "") != "" ? path.replacingOccurrences(of: rootUrl.path, with: "") : "/"
+        // 获取当前路径的完整路径地址
+        let cwdPath = URL(fileURLWithPath: rootUrl.path + cwd).path
+        guard let enumeratorPaths = try? manager.contentsOfDirectory(atPath: path) else { return [] }
+        var fileArray: [FileModel] = []
+        for subPath in enumeratorPaths {
+            let totalPath = path + "/" + subPath
+            var fileModel = FileModel()
+            fileModel.name = URL(fileURLWithPath: totalPath).lastPathComponent
+            fileModel.extname = URL(fileURLWithPath: totalPath).pathExtension
+            fileModel.path = URL(fileURLWithPath: totalPath, relativeTo: rootUrl).path.replacingOccurrences(of: rootUrl.path, with: "")
+            fileModel.cwd = cwd
+            fileModel.isLink = try? FileWrapper(url: URL(fileURLWithPath: totalPath)).isSymbolicLink
+            fileModel.relativePath = "." + URL(fileURLWithPath: totalPath).path.replacingOccurrences(of: cwdPath, with: "")
+            let subFiles = try? manager.contentsOfDirectory(atPath: totalPath)
+            if subFiles == nil { //文件
+                fileModel.type = "file"
+            } else { //文件夹
+                fileModel.type = "directory"
+            }
+            fileArray.append(fileModel)
+        }
+        return fileArray
+    }
+    
     //创建文件夹
     func mkdir(fileName: String, path: String) -> Bool {
         let filePath = rootFilePath(fileName: fileName) + path
@@ -115,6 +173,28 @@ class StreamFileManager: NSObject {
     //读取数据返回二进制
     func readFileData(fileName: String, path: String) -> Data? {
         let filePath = rootFilePath(fileName: fileName) + path
+        guard FileManager.default.fileExists(atPath: filePath) else { return nil }
+        let stream = InputStream(fileAtPath: filePath)
+        stream?.open()
+        defer {
+            stream?.close()
+        }
+        
+        let bufferSize = 1024
+        let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: bufferSize)
+        defer {
+            buffer.deallocate()
+        }
+        var resultData = Data()
+        while stream!.hasBytesAvailable {
+            let length = stream!.read(buffer, maxLength: bufferSize)
+            let data = Data(bytes: buffer, count: length)
+            resultData.append(data)
+        }
+        return resultData
+    }
+    
+    func readFileData(filePath: String) -> Data? {
         guard FileManager.default.fileExists(atPath: filePath) else { return nil }
         let stream = InputStream(fileAtPath: filePath)
         stream?.open()

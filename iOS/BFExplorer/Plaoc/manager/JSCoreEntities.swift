@@ -8,6 +8,7 @@
 import UIKit
 import Foundation
 import JavaScriptCore
+import SwiftyJSON
 
 
 @objc protocol PlaocJSExport: JSExport {
@@ -64,6 +65,10 @@ import JavaScriptCore
             return executiveFileSystemStat(param: param)
         case "FileSystemList":
             return executiveFileSystemList(param: param)
+        case "FileSystemRename":
+            return executiveFileSystemRename(param: param)
+        case "FileSystemReadBuffer":
+            return executiveFileSystemReadBuffer(param: param)
         case "SetStatusBarColor":
             return updateStatusBarColor(param: param)
         case "GetStatusBarColor":
@@ -164,6 +169,10 @@ import JavaScriptCore
             return FeedbackGenerator.notificationFeedbackGenerator(style: .warning)
         case "HapticsVibrate":
             return hapticsVibrate(param: param)
+        case "ShowToast":
+            return showToast(param: param)
+        case "SystemShare":
+            return systemShare(param: param)
         default:
             return ""
         }
@@ -240,6 +249,39 @@ extension PlaocHandleModel {
     private func hapticsVibrate(param: Any) -> Void {
         guard let param = param as? String, Float(param) != nil else { return }
         FeedbackGenerator.vibrate(Double(Float(param)!))
+    }
+    
+    // 显示提示
+    private func showToast(param: Any) {
+        guard let param = param as? String else { return }
+        let data = JSON.init(parseJSON: param)
+        
+        if controller != nil {
+            let position = data["position"].exists() ? data["position"].stringValue : "bottom"
+            let durationStr = data["duration"].exists() ? data["duration"].stringValue : "short"
+            
+            // short: 2000
+            // long:  3500
+            var duration = 2000
+            if durationStr == "long" {
+                duration = 3500
+            }
+            
+            ToastManager.showToast(in: controller!, text: data["text"].stringValue, duration: duration, position: ToastManager.Position(rawValue: position) ?? ToastManager.Position.bottom)
+        }
+    }
+    
+    // 系统分享
+    private func systemShare(param: Any) {
+        guard let param = param as? String else { return }
+        let data = JSON.init(parseJSON: param)
+        var files: [String]?
+        
+        if data["files"].arrayValue is Array<String>, data["files"].count > 0 {
+            files = data["files"].arrayValue as? [String]
+        }
+        
+        ShareManager.loadSystemShare(title: data["title"].stringValue, text: data["text"].stringValue, url: data["url"].stringValue, files: files)
     }
 }
 
