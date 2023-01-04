@@ -53,7 +53,6 @@ class CustomWebView: UIView {
         
         let config = WKWebViewConfiguration()
         
-        config.limitsNavigationsToAppBoundDomains = true
         config.userContentController = WKUserContentController()
         if self.scripts != nil {
             for script in self.scripts! {

@@ -13,6 +13,7 @@ class BFSNetworkManager: NSObject {
     func loadAutoUpdateInfo(fileName: String? = nil, urlString: String) {
         var name = fileName
         let timeStamp = "\(Date().milliStamp)"
+        operateMonitor.startAnimationMonitor.onNext(name ?? timeStamp)
         
         let request = AF.download(urlString).downloadProgress { progress in
             print(progress.fractionCompleted)  //进度值
