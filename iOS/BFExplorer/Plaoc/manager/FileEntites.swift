@@ -19,20 +19,15 @@ extension PlaocHandleModel {
     func pathPrefixReplace(_ path: String) -> String {
         return path.regexReplacePattern(pattern: "^[.]+", replaceString: "")
     }
-    
+    	
     // 获取指定文件系统目录下的内容
     func executiveFileSystemLs(param: Any) -> String {
         guard let param = param as? String else { return "" }
         let data = JSON.init(parseJSON: param)
         let homePath = getDwebAppPath()
-        
-        guard let url = URL(string: homePath + pathPrefixReplace(data["path"].stringValue)) else {
-            return ""
-        }
-        
+
         do {
-            let path = pathPrefixReplace(data["path"].stringValue)
-            let urls = try FileSystemManager.readdir(at: url)
+            let urls = try FileSystemManager.readdir(at: URL(fileURLWithPath: homePath + pathPrefixReplace(data["path"].stringValue)))
             
             if urls.count > 0 {
                 
@@ -55,12 +50,8 @@ extension PlaocHandleModel {
         let data = JSON.init(parseJSON: param)
         let homePath = getDwebAppPath()
         
-        guard let url = URL(string: homePath + pathPrefixReplace(data["path"].stringValue)) else {
-            return false
-        }
-        
         do {
-            try FileSystemManager.mkdir(at: URL(fileURLWithPath: url.path), recursive: data["option"]["recursive"].boolValue)
+            try FileSystemManager.mkdir(at: URL(fileURLWithPath: homePath + pathPrefixReplace(data["path"].stringValue)), recursive: data["option"]["recursive"].boolValue)
             
             return true
         } catch {
@@ -80,14 +71,15 @@ extension PlaocHandleModel {
         }
         
         do {
+            let url = URL(fileURLWithPath: homePath + pathPrefixReplace(data["path"].stringValue))
             // 获取文件类型
-            let fileAttr = try FileSystemManager.stat(at: URL(fileURLWithPath: url.path))
+            let fileAttr = try FileSystemManager.stat(at: url)
             let fileType = FileSystemManager.getType(from: fileAttr)
             
             print("fileType: \(fileType)")
             
             if fileType == "file" {
-                try FileSystemManager.deleteFile(at: URL(fileURLWithPath: url.path))
+                try FileSystemManager.deleteFile(at: url)
             } else {
                 var recursive = true
                 
@@ -95,7 +87,7 @@ extension PlaocHandleModel {
                     recursive = data["option"]["deepDelete"].boolValue
                 }
                 
-                try FileSystemManager.rmdir(at: URL(fileURLWithPath: url.path), recursive: recursive)
+                try FileSystemManager.rmdir(at: url, recursive: recursive)
             }
             
             return true
@@ -111,12 +103,8 @@ extension PlaocHandleModel {
         let data = JSON.init(parseJSON: param)
         let homePath = getDwebAppPath()
         
-        guard let url = URL(string: homePath + pathPrefixReplace(data["path"].stringValue)) else {
-            return ""
-        }
-        
         do {
-            let result = try FileSystemManager.readFile(at: URL(fileURLWithPath: url.path), with: true)
+            let result = try FileSystemManager.readFile(at: URL(fileURLWithPath: homePath + pathPrefixReplace(data["path"].stringValue)), with: true)
             
             return result
         } catch {
@@ -131,15 +119,12 @@ extension PlaocHandleModel {
         let data = JSON.init(parseJSON: param)
         let homePath = getDwebAppPath()
         
-        guard let url = URL(string: homePath + pathPrefixReplace(data["path"].stringValue)) else {
-            return false
-        }
-        
         do {
+            let url = URL(fileURLWithPath: homePath + pathPrefixReplace(data["path"].stringValue))
             if data["option"]["append"].boolValue {
-                try FileSystemManager.appendFile(at: URL(fileURLWithPath: url.path), with: data["content"].stringValue, recursive: data["option"]["autoCreate"].boolValue, with: true)
+                try FileSystemManager.appendFile(at: url, with: data["content"].stringValue, recursive: data["option"]["autoCreate"].boolValue, with: true)
             } else {
-                try FileSystemManager.writeFile(at: URL(fileURLWithPath: url.path), with: data["content"].stringValue, recursive: data["option"]["autoCreate"].boolValue, encoding: true)
+                try FileSystemManager.writeFile(at: url, with: data["content"].stringValue, recursive: data["option"]["autoCreate"].boolValue, encoding: true)
             }
             
             return true
@@ -155,13 +140,9 @@ extension PlaocHandleModel {
         let data = JSON.init(parseJSON: param)
         let homePath = getDwebAppPath()
         
-        guard let url = URL(string: homePath + pathPrefixReplace(data["path"].stringValue)) else {
-            return ""
-        }
-        
         do {
             // 获取文件类型
-            let fileAttr = try FileSystemManager.stat(at: URL(fileURLWithPath: url.path))
+            let fileAttr = try FileSystemManager.stat(at: URL(fileURLWithPath: homePath + pathPrefixReplace(data["path"].stringValue)))
             let fileType = FileSystemManager.getType(from: fileAttr)
             
             var dict: [String:Any] = [:]
@@ -187,11 +168,8 @@ extension PlaocHandleModel {
         let data = JSON.init(parseJSON: param)
         let homePath = getDwebAppPath()
         
-        guard let url = URL(string: homePath + pathPrefixReplace(data["path"].stringValue)) else {
-            return ""
-        }
-        
         do {
+            let url = URL(fileURLWithPath: homePath + pathPrefixReplace(data["path"].stringValue))
             let result = StreamFileManager().list(fileName: fileName, filePath: url.path)
             let jsonEncoder = JSONEncoder()
             let jsonData = try jsonEncoder.encode(result)
@@ -213,12 +191,8 @@ extension PlaocHandleModel {
         let data = JSON.init(parseJSON: param)
         let homePath = getDwebAppPath()
         
-        guard let url = URL(string: homePath + pathPrefixReplace(data["path"].stringValue)) else {
-            return false
-        }
-        
         do {
-            try FileSystemManager.rename(at: URL(fileURLWithPath: url.path), to: URL(fileURLWithPath: homePath + pathPrefixReplace(data["newPath"].stringValue)))
+            try FileSystemManager.rename(at: URL(fileURLWithPath: homePath + pathPrefixReplace(data["path"].stringValue)), to: URL(fileURLWithPath: homePath + pathPrefixReplace(data["newPath"].stringValue)))
             
             return true
         } catch {
@@ -235,13 +209,8 @@ extension PlaocHandleModel {
         
         let data = JSON.init(parseJSON: param)
         let homePath = getDwebAppPath()
-        
-        guard let url = URL(string: homePath + pathPrefixReplace(data["path"].stringValue)) else {
-            return nil
-        }
-        
+        let url = URL(fileURLWithPath: homePath + pathPrefixReplace(data["path"].stringValue))
         let result = StreamFileManager().readFileData(filePath: url.path)
-        
         
         if result != nil {
             return [UInt8](result!)
