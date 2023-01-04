@@ -5,10 +5,10 @@ import permissionsView from "../view/permissions.vue";
 
 const routes = [
   {
-    path: '/main/:scannerData',
+    path: '/',
     name: 'home',
     component: homeView,
-    props: true
+    props: route => ({ scannerData: route.query.scannerData })
   },
   {
     path: '/permissions',
