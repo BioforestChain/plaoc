@@ -66,10 +66,6 @@ extension PlaocHandleModel {
         let data = JSON.init(parseJSON: param)
         let homePath = getDwebAppPath()
         
-        guard let url = URL(string: homePath + pathPrefixReplace(data["path"].stringValue)) else {
-            return false
-        }
-        
         do {
             let url = URL(fileURLWithPath: homePath + pathPrefixReplace(data["path"].stringValue))
             // 获取文件类型
@@ -134,7 +130,7 @@ extension PlaocHandleModel {
         }
     }
     
-    // 获取指定文件系统目录或文件详细信息
+    // 获取指定文件详细信息
     func executiveFileSystemStat(param: Any) -> String {
         guard let param = param as? String else { return "" }
         let data = JSON.init(parseJSON: param)
@@ -150,8 +146,8 @@ extension PlaocHandleModel {
             dict["type"] = fileType
             dict["size"] = fileAttr[.size]
             dict["uri"] = pathPrefixReplace(data["path"].stringValue)
-            dict["mtime"] = (fileAttr[.modificationDate] as! NSDate).description
-            dict["ctime"] = (fileAttr[.creationDate] as! NSDate).description
+            dict["mtime"] = (fileAttr[.modificationDate] as? Date)?.description
+            dict["ctime"] = (fileAttr[.creationDate] as? Date)?.description
 
             let str = ChangeTools.dicValueString(dict)
             

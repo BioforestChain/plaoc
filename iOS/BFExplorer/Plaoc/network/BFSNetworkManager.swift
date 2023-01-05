@@ -13,7 +13,6 @@ class BFSNetworkManager: NSObject {
     func loadAutoUpdateInfo(fileName: String? = nil, urlString: String) {
         var name = fileName
         let timeStamp = "\(Date().milliStamp)"
-        operateMonitor.startAnimationMonitor.onNext(name ?? timeStamp)
         
         let request = AF.download(urlString).downloadProgress { progress in
             print(progress.fractionCompleted)  //进度值
@@ -50,10 +49,12 @@ class BFSNetworkManager: NSObject {
                                             }
                                         } else {
                                             schemePath = desPath + "/\(name!)/sys"
+                                            isReplace = true
                                         }
                                         if name != nil {
                                             if isReplace {
                                                 Schemehandler.setupHTMLCache(fileName: name!, fromPath: schemePath)
+                                                BatchFileManager.shared.updateRedHot(fileName: name!, statue: true)
                                             }
                                             RefreshManager.saveLastUpdateTime(fileName: name!, time: Date().timeStamp)
                                         }

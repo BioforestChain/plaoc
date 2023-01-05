@@ -8,36 +8,8 @@
 import UIKit
 
 class StreamFileManager: NSObject {
-
-    func list(fileName: String, path: String) -> [FileModel] {
-"""
-        "/home/user/haha/test.txt"
-        name = "/home/user/haha/test.txt"
-        extname = "txt"
-        path = "/home/user/haha/test.txt"
-        cwd = "/home/user/haha"
-        type = "?"
-        isLink = false
-        relativePath = "/home/user/haha"
-"""
-        
-        let filePath = rootFilePath(fileName: fileName) + path
-        let manager = FileManager.default
-        guard manager.fileExists(atPath: filePath) else { return [] }
-        var currentFile = createCurrentFileModel(path: filePath)
-        let subFiles = try? manager.contentsOfDirectory(atPath: filePath)
-        if subFiles == nil { //文件
-            currentFile.type = "file"
-            return [currentFile]
-        } else { //文件夹
-            currentFile.type = "directory"
-            var subModels = createSubFileModels(path: path)
-            subModels.insert(currentFile, at: 0)
-            return subModels
-        }
-    }
     
-    func list(fileName: String, filePath: String) -> [FileModel] {
+    func list(fileName: String, filePath: String, isContainFile: Bool = false) -> [FileModel] {
 """
         "/home/user/haha/test.txt"
         name = "test.txt"
@@ -59,7 +31,9 @@ class StreamFileManager: NSObject {
         } else { //文件夹
             currentFile.type = "directory"
             var subModels = createSubFileModels(path: filePath, rootPath: rootPath)
-//            subModels.insert(currentFile, at: 0)
+            if isContainFile {
+                subModels.insert(currentFile, at: 0)
+            }
             return subModels
         }
     }
@@ -81,6 +55,11 @@ class StreamFileManager: NSObject {
         var pathLists: [String] = []
         let manager = FileManager.default
         guard let paths = try? manager.contentsOfDirectory(atPath: path) else { return [] }
+        for subPath in paths {
+            pathLists.append(path + "/" + subPath)
+        }
+        guard isRecursive else { return pathLists }
+        guard let recursivePaths = manager.enumerator(atPath: path)?.allObjects as? [String] else { return [] }
         if filter != nil {
             //TODO 过滤一些条件路径
             /**
@@ -88,44 +67,11 @@ class StreamFileManager: NSObject {
              print(attri![FileAttributeKey(rawValue: FileAttributeKey.type.rawValue)])  //文件类型: NSFileTypeRegular 文件  NSFileTypeDirectory 文件夹
              */
         }
-        for subPath in paths {
-            pathLists.append(path + "/" + subPath)
-        }
-        guard isRecursive else { return pathLists }
-        guard let recursivePaths = try? manager.enumerator(atPath: path)?.allObjects as? [String] else { return [] }
-        if filter != nil {
-            //TODO 过滤一些条件路径
-        }
         pathLists.removeAll()
         for subPath in recursivePaths {
             pathLists.append(path + "/" + subPath)
         }
         return pathLists
-    }
-    
-    //得到当前文件夹及其子文件对象，递归遍历
-    private func createSubFileModels(path: String) -> [FileModel] {
-        let manager = FileManager.default
-        guard let enumeratorPaths = try? manager.contentsOfDirectory(atPath: path) else { return [] }
-        var fileArray: [FileModel] = []
-        for subPath in enumeratorPaths {
-            let totalPath = path + "/" + subPath
-            var fileModel = FileModel()
-            fileModel.name = totalPath
-            fileModel.extname = URL(fileURLWithPath: totalPath).pathExtension
-            fileModel.path = totalPath
-            fileModel.cwd = URL(fileURLWithPath: totalPath).deletingLastPathComponent().absoluteString
-            fileModel.isLink = false
-            fileModel.relativePath = URL(fileURLWithPath: totalPath).relativeString
-            let subFiles = try? manager.contentsOfDirectory(atPath: totalPath)
-            if subFiles == nil { //文件
-                fileModel.type = "file"
-            } else { //文件夹
-                fileModel.type = "directory"
-            }
-            fileArray.append(fileModel)
-        }
-        return fileArray
     }
     
     //得到当前文件夹及其子文件对象，递归遍历

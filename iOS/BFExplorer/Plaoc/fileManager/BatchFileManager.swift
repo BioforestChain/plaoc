@@ -25,6 +25,7 @@ class BatchFileManager: NSObject {
     private var appNames: [String:String] = [:]
     private var appImages: [String:UIImage?] = [:]
     private var fileLinkDict: [String:String] = [:]
+    private var redDict: [String: Bool] = [:]
     
     private(set) var appFilePaths: [String] = []
     
@@ -150,6 +151,7 @@ class BatchFileManager: NSObject {
         //system-app升级操作
         //1、点击升级，退回到桌面界面
         //2、开始动画，下载文件
+        operateMonitor.startAnimationMonitor.onNext(fileName)
         BFSNetworkManager.shared.loadAutoUpdateInfo(fileName: fileName, urlString: urlString)
         
     }
@@ -211,6 +213,7 @@ class BatchFileManager: NSObject {
         guard let newURLString = refreshInfoFromCacheInfo(fileName: fileName) else { return }
         let currentURLString = fileLinkDict[fileName]
         if currentURLString == nil {
+            operateMonitor.startAnimationMonitor.onNext(fileName)
             BFSNetworkManager.shared.loadAutoUpdateInfo(fileName: fileName, urlString: newURLString)
         } else {
             //5、重新下载
@@ -261,6 +264,7 @@ class BatchFileManager: NSObject {
     private func reloadUpdateFile(fileName: String, cancelUrlString: String?, urlString: String?) {
         BFSNetworkManager.shared.cancelNetworkRequest(urlString: cancelUrlString)
         if urlString != nil {
+            operateMonitor.startAnimationMonitor.onNext(fileName)
             BFSNetworkManager.shared.loadAutoUpdateInfo(fileName: fileName, urlString: urlString!)
         }
     }
@@ -378,6 +382,7 @@ class BatchFileManager: NSObject {
         let alertVC = UIAlertController(title: "确认下载更新吗？", message: nil, preferredStyle: .alert)
         let sureAction = UIAlertAction(title: "确认", style: .default) { action in
             if urlstring != nil {
+                operateMonitor.startAnimationMonitor.onNext(fileName)
                 BFSNetworkManager.shared.loadAutoUpdateInfo(fileName: fileName, urlString: urlstring!)
             }
             let type = self.currentAppType(fileName: fileName)
@@ -404,5 +409,28 @@ class BatchFileManager: NSObject {
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         let controller = appDelegate.window?.rootViewController
         controller?.present(alertVC, animated: true)
+    }
+}
+
+extension BatchFileManager {
+    
+    //更新新版本红点
+    func updateRedHot(fileName: String, statue: Bool) {
+        redDict[fileName] = statue
+    }
+    //得到红点状态
+    func redHot(fileName: String) -> Bool {
+        return redDict[fileName] ?? false
+    }
+    
+    //更新本地文件数据
+    func updateLocalSystemAPPData(fileName: String) {
+        
+        if !appFilePaths.contains(fileName) {
+            appFilePaths.append(fileName)
+        }
+        fileType[fileName] = .system
+        appNames[fileName] = sysManager.appName(fileName: fileName)
+        appImages[fileName] = sysManager.appIcon(fileName: fileName)
     }
 }
