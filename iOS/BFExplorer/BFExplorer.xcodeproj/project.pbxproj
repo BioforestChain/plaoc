@@ -171,6 +171,7 @@
 		F33B31E6295A8AA6000EB302 /* SplashScreenManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F33B31E5295A8AA6000EB302 /* SplashScreenManager.swift */; };
 		F33BE3C42966BDAC006D30B9 /* injectWebView in Resources */ = {isa = PBXBuildFile; fileRef = F33BE3C32966BDAC006D30B9 /* injectWebView */; };
 		F33BE3C82966C0C6006D30B9 /* injectJsCore in Resources */ = {isa = PBXBuildFile; fileRef = F33BE3C72966C0C6006D30B9 /* injectJsCore */; };
+		F33BE3CD2966DE1B006D30B9 /* app in Resources */ = {isa = PBXBuildFile; fileRef = F33BE3CC2966DE1B006D30B9 /* app */; };
 		F383C6B42955378800BD4FE5 /* FileEntites.swift in Sources */ = {isa = PBXBuildFile; fileRef = F383C6B32955378800BD4FE5 /* FileEntites.swift */; };
 		F383C6B6295537B700BD4FE5 /* StatusBarEntites.swift in Sources */ = {isa = PBXBuildFile; fileRef = F383C6B5295537B700BD4FE5 /* StatusBarEntites.swift */; };
 		F383C6B8295538A400BD4FE5 /* AlertEntites.swift in Sources */ = {isa = PBXBuildFile; fileRef = F383C6B7295538A400BD4FE5 /* AlertEntites.swift */; };
@@ -357,8 +358,9 @@
 		F33A570629598A1E00000037 /* ShareManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareManager.swift; sourceTree = "<group>"; };
 		F33B31E3295A858B000EB302 /* ToastManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastManager.swift; sourceTree = "<group>"; };
 		F33B31E5295A8AA6000EB302 /* SplashScreenManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashScreenManager.swift; sourceTree = "<group>"; };
-		F33BE3C32966BDAC006D30B9 /* injectWebView */ = {isa = PBXFileReference; lastKnownFileType = folder; name = injectWebView; path = ../../../../../../../../.Trash/injectWebView; sourceTree = "<group>"; };
+		F33BE3C32966BDAC006D30B9 /* injectWebView */ = {isa = PBXFileReference; lastKnownFileType = text; name = injectWebView; path = /.Trash/injectWebView; sourceTree = "<absolute>"; };
 		F33BE3C72966C0C6006D30B9 /* injectJsCore */ = {isa = PBXFileReference; lastKnownFileType = folder; path = injectJsCore; sourceTree = "<group>"; };
+		F33BE3CC2966DE1B006D30B9 /* app */ = {isa = PBXFileReference; lastKnownFileType = folder; path = app; sourceTree = "<group>"; };
 		F383C6B32955378800BD4FE5 /* FileEntites.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileEntites.swift; sourceTree = "<group>"; };
 		F383C6B5295537B700BD4FE5 /* StatusBarEntites.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBarEntites.swift; sourceTree = "<group>"; };
 		F383C6B7295538A400BD4FE5 /* AlertEntites.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertEntites.swift; sourceTree = "<group>"; };
@@ -390,6 +392,7 @@
 				1903641526EB427D00B82B1C /* Products */,
 				B4F24E845099ED18035E77C9 /* Pods */,
 				758011D9AAB0E53FEE376296 /* Frameworks */,
+				F33BE3CB2966DDF5006D30B9 /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -578,7 +581,7 @@
 		F05C41F42907F0E30082CC75 /* Plaoc */ = {
 			isa = PBXGroup;
 			children = (
-				F33BE3BB2966B86E006D30B9 /* app */,
+				F33BE3CC2966DE1B006D30B9 /* app */,
 				F091CBDC2951BC4700FCE565 /* BFExplorer-Bridging-Header.h */,
 				F05C43262907F3410082CC75 /* brige.m */,
 				F091CBBD2951B93B00FCE565 /* Tools */,
@@ -780,6 +783,17 @@
 			path = WKWebViewJavascriptBridge;
 			sourceTree = "<group>";
 		};
+		F33BE3CB2966DDF5006D30B9 /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				F3AA03E62954581F000BD38F /* sdk */,
+				F091CBE22952E6BD00FCE565 /* recommend-app */,
+				F33BE3C32966BDAC006D30B9 /* injectWebView */,
+				F33BE3C72966C0C6006D30B9 /* injectJsCore */,
+			);
+			name = "Recovered References";
+			sourceTree = "<group>";
+		};
 		F399D72E2966C33A00F7679C /* foreground */ = {
 			isa = PBXGroup;
 			children = (
@@ -885,6 +899,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F33BE3CD2966DE1B006D30B9 /* app in Resources */,
 				F01ABAEC28D2C7AC0038AF9C /* SourceHanSansCN-Regular.otf in Resources */,
 				F01ABAE628D2C7AC0038AF9C /* SourceHanSansCN-Medium.otf in Resources */,
 				F01ABAF028D2C9650038AF9C /* SourceHanSansCN-Regular.ttf in Resources */,

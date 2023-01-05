@@ -1559,7 +1559,6 @@ var callDVebView;
 function sendJsCoreNotification(data) {
     return jscore.callJavaScriptWithFunctionNameParam(callNative.sendNotification, data);
 }
-
 function netCallNativeService(fn, data = "") {
     console.log("🥳deno#netCallNativeService:", fn, data);
     const uint8 = jscore.callJavaScriptWithFunctionNameParam(fn, data);
