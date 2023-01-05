@@ -63,42 +63,14 @@ class CustomWebView: UIView {
         config.limitsNavigationsToAppBoundDomains = self.openAppBoundDomains(urlString: self.loadingUrlString)
         config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "InstallBFS")
         config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "getConnectChannel")
+        config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "logging")
         let prefreen = WKPreferences()
         prefreen.javaScriptCanOpenWindowsAutomatically = true
         config.preferences = prefreen
         config.setValue(true, forKey: "allowUniversalAccessFromFileURLs")
         config.setURLSchemeHandler(Schemehandler(fileName: self.fileName), forURLScheme: schemeString)
         
-        /** region start  add console.log  */
-        let consoleJs = """
-            function log(emoji, type, args) {
-              window.webkit.messageHandlers.logging.postMessage(
-                `${emoji} JS ${type}: ${Object.values(args)
-                  .map(v => typeof(v) === "undefined" ? "undefined" : typeof(v) === "object" ? JSON.stringify(v) : v.toString())
-                  .map(v => v.substring(0, 3000)) // Limit msg to 3000 chars
-                  .join(", ")}`
-              )
-            }
-
-            let originalLog = console.log
-            let originalWarn = console.warn
-            let originalError = console.error
-            let originalDebug = console.debug
-
-            console.log = function() { log("📗", "log", arguments); originalLog.apply(null, arguments) }
-            console.warn = function() { log("📙", "warning", arguments); originalWarn.apply(null, arguments) }
-            console.error = function() { log("📕", "error", arguments); originalError.apply(null, arguments) }
-            console.debug = function() { log("📘", "debug", arguments); originalDebug.apply(null, arguments) }
-
-            window.addEventListener("error", function(e) {
-               log("💥", "Uncaught", [`${e.message} at ${e.filename}:${e.lineno}:${e.colno}`])
-            })
-        """
-        let consoleScript = WKUserScript(source: consoleJs, injectionTime: .atDocumentStart, forMainFrameOnly: false)
-        config.userContentController.addUserScript(consoleScript)
-        config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "logging")
-        /** region end  */
-
+        
         let webView = WKWebView(frame: self.bounds, configuration: config)
         webView.navigationDelegate = self
         webView.uiDelegate = self
@@ -126,14 +98,13 @@ extension CustomWebView {
         guard jsNames.count > 0 else { return nil }
         var scripts: [WKUserScript] = []
         for jsName in jsNames {
-            if let path = Bundle.main.path(forResource: jsName, ofType: "js") {
-                let url = URL(fileURLWithPath: path)
-                let data = try? Data(contentsOf: url)
-                if data != nil {
-                    if let jsString = String(data: data!, encoding: .utf8) {
-                        let script = WKUserScript(source: jsString, injectionTime: .atDocumentStart, forMainFrameOnly: true)
-                        scripts.append(script)
-                    }
+          let path = Bundle.main.bundlePath + "/injectWebView/" +  jsName + ".js"
+            let url = URL(fileURLWithPath: path)
+            let data = try? Data(contentsOf: url)
+            if data != nil {
+                if let jsString = String(data: data!, encoding: .utf8) {
+                    let script = WKUserScript(source: jsString, injectionTime: .atDocumentStart, forMainFrameOnly: true)
+                    scripts.append(script)
                 }
             }
         }

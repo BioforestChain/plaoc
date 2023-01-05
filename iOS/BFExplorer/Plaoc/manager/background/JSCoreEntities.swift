@@ -25,7 +25,7 @@ import SwiftyJSON
     var fileName: String = ""
     
     func callJavaScript(functionName: String, param: Any) -> Any {
-        print(functionName)
+        print("swift#callJavaScript:",functionName)
         switch functionName {
         case "OpenDWebView":
             return executiveOpenDWebView(param: param)
