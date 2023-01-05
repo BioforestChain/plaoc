@@ -59,6 +59,8 @@ class BFSNetworkManager: NSObject {
                                             RefreshManager.saveLastUpdateTime(fileName: name!, time: Date().timeStamp)
                                         }
                                         NotificationCenter.default.post(name: NSNotification.Name.progressNotification, object: nil, userInfo: ["progress": "complete", "fileName": fileName ?? timeStamp, "realName": name ?? ""])
+                                    } else {
+                                        NotificationCenter.default.post(name: NSNotification.Name.progressNotification, object: nil, userInfo: ["progress": "fail", "fileName": fileName ?? timeStamp])
                                     }
                                 }
                             }

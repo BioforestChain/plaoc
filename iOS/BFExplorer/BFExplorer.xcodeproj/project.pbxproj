@@ -704,34 +704,21 @@
 		F091CB672951B91900FCE565 /* manager */ = {
 			isa = PBXGroup;
 			children = (
-				F091CB682951B91900FCE565 /* CacheManager.swift */,
+				F399D7312966C9C200F7679C /* cache */,
+				F399D7302966C96100F7679C /* File */,
+				F399D72F2966C34200F7679C /* background */,
+				F399D72E2966C33A00F7679C /* foreground */,
 				F091CB692951B91900FCE565 /* ReachabilityManager.swift */,
 				F091CB6A2951B91900FCE565 /* BluetoothManager.swift */,
-				F091CB6B2951B91900FCE565 /* MemoryManager.swift */,
-				F091CB6C2951B91900FCE565 /* DiskManager.swift */,
-				F091CB6D2951B91900FCE565 /* JSCoreManager.swift */,
 				F091CB6E2951B91900FCE565 /* NotificationManager.swift */,
 				F091CB6F2951B91900FCE565 /* BrowserManager.swift */,
 				F091CB702951B91900FCE565 /* QueueManager.swift */,
-				F091CB712951B91900FCE565 /* DocumentManager.swift */,
 				F091CB722951B91900FCE565 /* FeedbackGenerator.swift */,
 				F091CB732951B91900FCE565 /* ClipboardManager.swift */,
-				F091CB742951B91900FCE565 /* JSInjectManager.swift */,
-				F091CB752951B91900FCE565 /* PathFileManager.swift */,
-				F091CB762951B91900FCE565 /* JSCoreEntities.swift */,
-				F383C6BD2955393200BD4FE5 /* KeyboardEntites.swift */,
-				F383C6BB2955391000BD4FE5 /* BottomBarEntites.swift */,
-				F383C6B7295538A400BD4FE5 /* AlertEntites.swift */,
-				F383C6B5295537B700BD4FE5 /* StatusBarEntites.swift */,
 				F383C6BF29557B0D00BD4FE5 /* AdapterHandle.swift */,
-				F383C6B9295538CD00BD4FE5 /* TopBarEntites.swift */,
-				F383C6B32955378800BD4FE5 /* FileEntites.swift */,
 				F091CB772951B91900FCE565 /* PermissionManager.swift */,
 				F091CB782951B91900FCE565 /* LocationManager.swift */,
-				F091CB792951B91900FCE565 /* DatabaseManager.swift */,
-				F091CB7A2951B91900FCE565 /* FileSystemManager.swift */,
 				F091CB7B2951B91900FCE565 /* PhotoManager.swift */,
-				F091CB7C2951B91900FCE565 /* StreamFileManager.swift */,
 				F33A570629598A1E00000037 /* ShareManager.swift */,
 				F33B31E3295A858B000EB302 /* ToastManager.swift */,
 				F33B31E5295A8AA6000EB302 /* SplashScreenManager.swift */,
@@ -817,6 +804,51 @@
 				F0A3C3D92953FA3B00C78D1A /* WKWebViewJavascriptBridge.h */,
 			);
 			path = WKWebViewJavascriptBridge;
+			sourceTree = "<group>";
+		};
+		F399D72E2966C33A00F7679C /* foreground */ = {
+			isa = PBXGroup;
+			children = (
+				F383C6B5295537B700BD4FE5 /* StatusBarEntites.swift */,
+				F383C6B7295538A400BD4FE5 /* AlertEntites.swift */,
+				F383C6BD2955393200BD4FE5 /* KeyboardEntites.swift */,
+				F383C6B9295538CD00BD4FE5 /* TopBarEntites.swift */,
+				F383C6BB2955391000BD4FE5 /* BottomBarEntites.swift */,
+			);
+			path = foreground;
+			sourceTree = "<group>";
+		};
+		F399D72F2966C34200F7679C /* background */ = {
+			isa = PBXGroup;
+			children = (
+				F091CB6D2951B91900FCE565 /* JSCoreManager.swift */,
+				F091CB762951B91900FCE565 /* JSCoreEntities.swift */,
+				F091CB742951B91900FCE565 /* JSInjectManager.swift */,
+			);
+			path = background;
+			sourceTree = "<group>";
+		};
+		F399D7302966C96100F7679C /* File */ = {
+			isa = PBXGroup;
+			children = (
+				F383C6B32955378800BD4FE5 /* FileEntites.swift */,
+				F091CB752951B91900FCE565 /* PathFileManager.swift */,
+				F091CB7A2951B91900FCE565 /* FileSystemManager.swift */,
+				F091CB7C2951B91900FCE565 /* StreamFileManager.swift */,
+				F091CB712951B91900FCE565 /* DocumentManager.swift */,
+			);
+			path = File;
+			sourceTree = "<group>";
+		};
+		F399D7312966C9C200F7679C /* cache */ = {
+			isa = PBXGroup;
+			children = (
+				F091CB6B2951B91900FCE565 /* MemoryManager.swift */,
+				F091CB682951B91900FCE565 /* CacheManager.swift */,
+				F091CB6C2951B91900FCE565 /* DiskManager.swift */,
+				F091CB792951B91900FCE565 /* DatabaseManager.swift */,
+			);
+			path = cache;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

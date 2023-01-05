@@ -38,6 +38,8 @@ class BatchFileManager: NSObject {
     
     private func initBatchFile() {
         
+        totalRedHotContent()
+        
         let recommendFiles = recommendManager.readAppSubFile()
         let systemFiles = sysManager.readAppSubFile()
         let scanFiles = scanManager.readAppSubFile()
@@ -51,19 +53,6 @@ class BatchFileManager: NSObject {
             guard let strongSelf = self else { return }
             strongSelf.downloadNewFile(fileName: fileName)
         }).disposed(by: disposeBag)
-    }
-    
-    //根据文件名获取app名称
-    func currentAppName(fileName: String) -> String {
-        return appNames[fileName] ?? ""
-    }
-    //根据文件名获取app图片
-    func currentAppImage(fileName: String) -> UIImage? {
-        return appImages[fileName] ?? nil
-    }
-    //根据文件名获取app类型
-    func currentAppType(fileName: String) -> FilePathType {
-        return fileType[fileName] ?? .none
     }
     
     //点击recommend文件
@@ -89,11 +78,7 @@ class BatchFileManager: NSObject {
     
     //更新文件状态为已下载
     func updateFileType(fileName: String) {
-        if fileType[fileName] != nil {
-            fileType[fileName] = .system
-            appNames[fileName] = sysManager.appName(fileName: fileName)
-            appImages[fileName] = sysManager.appIcon(fileName: fileName)
-        }
+        updateLocalSystemAPPData(fileName: fileName)
     }
     //更新文件状态为扫码
     func updateScanType(fileName: String) {
@@ -324,21 +309,6 @@ class BatchFileManager: NSObject {
     private func fetchFileTypes(recommendFiles: [String], systemFiles: [String], scanFiles: [String]) {
         
         guard recommendFiles.count > 0 || systemFiles.count > 0 || scanFiles.count > 0 else { return }
-//        if recommendFiles.count == 0 {
-//            for fileName in systemFiles {
-//                fileType[fileName] = .system
-//            }
-//            appFilePaths = systemFiles
-//            return
-//        }
-//
-//        if systemFiles.count == 0 {
-//            for fileName in recommendFiles {
-//                fileType[fileName] = .recommend
-//            }
-//            appFilePaths = recommendFiles
-//            return
-//        }
         
         let array = recommendFiles + systemFiles + scanFiles
         let setList = Set(array)
@@ -351,28 +321,6 @@ class BatchFileManager: NSObject {
                 fileType[fileName] = .scan
             } else {
                 fileType[fileName] = .recommend
-            }
-        }
-    }
-    //获取所有的icon名称
-    private func fetchAppNames() {
-        for (key,type) in fileType {
-            if type == .system {
-                appNames[key] = sysManager.appName(fileName: key)
-            } else if type == .recommend {
-                appNames[key] = recommendManager.appName(fileName: key)
-            } else if type == .scan {
-                appNames[key] = scanManager.appName(fileName: key)
-            }
-        }
-    }
-    //获取所有的icon图片
-    private func fetchAppIcons() {
-        for (key,type) in fileType {
-            if type == .system {
-                appImages[key] = sysManager.appIcon(fileName: key)
-            } else if type == .recommend {
-                appImages[key] = recommendManager.appIcon(fileName: key)
             }
         }
     }
@@ -412,11 +360,63 @@ class BatchFileManager: NSObject {
     }
 }
 
+//MARK: 获取app信息
 extension BatchFileManager {
+    
+    //根据文件名获取app名称
+    func currentAppName(fileName: String) -> String {
+        return appNames[fileName] ?? ""
+    }
+    //根据文件名获取app图片
+    func currentAppImage(fileName: String) -> UIImage? {
+        return appImages[fileName] ?? nil
+    }
+    //根据文件名获取app类型
+    func currentAppType(fileName: String) -> FilePathType {
+        return fileType[fileName] ?? .none
+    }
+    
+    //获取所有的icon名称
+    private func fetchAppNames() {
+        for (key,type) in fileType {
+            if type == .system {
+                appNames[key] = sysManager.appName(fileName: key)
+            } else if type == .recommend {
+                appNames[key] = recommendManager.appName(fileName: key)
+            } else if type == .scan {
+                appNames[key] = scanManager.appName(fileName: key)
+            }
+        }
+    }
+    //获取所有的icon图片
+    private func fetchAppIcons() {
+        for (key,type) in fileType {
+            if type == .system {
+                appImages[key] = sysManager.appIcon(fileName: key)
+            } else if type == .recommend {
+                appImages[key] = recommendManager.appIcon(fileName: key)
+            }
+        }
+    }
+}
+
+//MARK: 更新app下载后的信息
+extension BatchFileManager {
+    
+    //获取app红点信息
+    private func totalRedHotContent() {
+        let path = redHotFilePath()
+        guard let content = try? FileSystemManager.readFile(at: URL(fileURLWithPath: path), with: true) else { return }
+        redDict = ChangeTools.stringValueDic(content) as? [String:Bool] ?? [:]
+    }
     
     //更新新版本红点
     func updateRedHot(fileName: String, statue: Bool) {
         redDict[fileName] = statue
+        
+        guard let redString = ChangeTools.dicValueString(redDict) else { return }
+        let path = redHotFilePath()
+        _ = try? FileSystemManager.writeFile(at: URL(fileURLWithPath: path), with: redString, recursive: true, encoding: true)
     }
     //得到红点状态
     func redHot(fileName: String) -> Bool {
@@ -432,5 +432,10 @@ extension BatchFileManager {
         fileType[fileName] = .system
         appNames[fileName] = sysManager.appName(fileName: fileName)
         appImages[fileName] = sysManager.appIcon(fileName: fileName)
+    }
+    
+    private func redHotFilePath() -> String {
+        guard let filePath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first else { return "" }
+        return filePath + "/redHot"
     }
 }
