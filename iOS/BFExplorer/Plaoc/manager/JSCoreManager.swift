@@ -32,9 +32,12 @@ class JSCoreManager: NSObject {
     }
     /**初始化 sdk*/
     private func initJSCore() {
-        // inject TextDe	code
+        // inject TextDecode
         injectJsContext("/injectJsCore/encoding-indexes.js");
         injectJsContext("/injectJsCore/encoding.js");
+        
+        injectJsContext("/injectJsCore/URL.js");
+        
         injectJsContext("/sdk/HE74YAAL/boot/index.js");
     }
     /**注入javascriptCore*/

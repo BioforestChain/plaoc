@@ -1559,7 +1559,9 @@ var callDVebView;
 function sendJsCoreNotification(data) {
     return jscore.callJavaScriptWithFunctionNameParam(callNative.sendNotification, data);
 }
+
 function netCallNativeService(fn, data = "") {
+    console.log("🥳deno#netCallNativeService:", fn, data);
     const uint8 = jscore.callJavaScriptWithFunctionNameParam(fn, data);
     if (!uint8)
         return new Uint8Array(0);
@@ -2454,7 +2456,7 @@ class Channels {
  */
 async function iosRequestFanctory(url, buffer) {
     const pathname = url.pathname;
-    console.log("deno#iosRequestFanctory:", pathname);
+    // console.log("deno#iosRequestFanctory:", pathname)
     if (pathname.endsWith("/setUi")) {
         return setIosUiHandle(url, buffer); // 处理 system ui
     }
@@ -2488,7 +2490,7 @@ async function setIosUiHandle(url, hexBuffer) {
  */
 function setIosPollHandle(url, hexBuffer) {
     const bufferData = url.searchParams.get("data");
-    console.log("deno#setIosUiHandle:", bufferData, hexBuffer);
+    console.log("deno#setIosPollHandle:", bufferData, hexBuffer);
     let buffer;
     // 如果是get
     if (bufferData) {
@@ -2579,8 +2581,8 @@ class DWebView extends MapEventEmitter {
     getIosMessage(strPath, buffer) {
         if (!strPath)
             return;
-        const url = new URL(strPath);
-        console.log(`deno#iosRequestFanctory url:${url}`);
+        const url = new URL(`https://a${strPath}`);
+        // console.log(`deno#getIosMessage url:${url}`)
         iosRequestFanctory(url, buffer);
     }
     /**
@@ -3162,8 +3164,8 @@ const webView = new DWebView(metaData);
     await webView.openRequest("/api/*", EChannelMode.pattern);
 })();
 // 多入口指定
-webView.activity("https://objectjson.waterbang.top/");
-// webView.activity("index.html");
+// webView.activity("https://objectjson.waterbang.top/");
+webView.activity("index.html");
 try {
     sendNotification({ title: "消息头", body: "今晚打老虎", priority: 1 });
 }

@@ -63,21 +63,14 @@ class CustomWebView: UIView {
         config.limitsNavigationsToAppBoundDomains = self.openAppBoundDomains(urlString: self.loadingUrlString)
         config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "InstallBFS")
         config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "getConnectChannel")
+        config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "logging")
         let prefreen = WKPreferences()
         prefreen.javaScriptCanOpenWindowsAutomatically = true
         config.preferences = prefreen
         config.setValue(true, forKey: "allowUniversalAccessFromFileURLs")
         config.setURLSchemeHandler(Schemehandler(fileName: self.fileName), forURLScheme: schemeString)
         
-        /** region start  add console.log  */
-        let consoleJs = """
         
-        """
-        let consoleScript = WKUserScript(source: consoleJs, injectionTime: .atDocumentStart, forMainFrameOnly: false)
-        config.userContentController.addUserScript(consoleScript)
-        config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "logging")
-        /** region end  */
-
         let webView = WKWebView(frame: self.bounds, configuration: config)
         webView.navigationDelegate = self
         webView.uiDelegate = self
@@ -105,14 +98,13 @@ extension CustomWebView {
         guard jsNames.count > 0 else { return nil }
         var scripts: [WKUserScript] = []
         for jsName in jsNames {
-            if let path = Bundle.main.path(forResource: jsName, ofType: "js") {
-                let url = URL(fileURLWithPath: path)
-                let data = try? Data(contentsOf: url)
-                if data != nil {
-                    if let jsString = String(data: data!, encoding: .utf8) {
-                        let script = WKUserScript(source: jsString, injectionTime: .atDocumentStart, forMainFrameOnly: true)
-                        scripts.append(script)
-                    }
+          let path = Bundle.main.bundlePath + "/injectWebView/" +  jsName + ".js"
+            let url = URL(fileURLWithPath: path)
+            let data = try? Data(contentsOf: url)
+            if data != nil {
+                if let jsString = String(data: data!, encoding: .utf8) {
+                    let script = WKUserScript(source: jsString, injectionTime: .atDocumentStart, forMainFrameOnly: true)
+                    scripts.append(script)
                 }
             }
         }
