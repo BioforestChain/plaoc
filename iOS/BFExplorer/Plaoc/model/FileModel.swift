@@ -7,7 +7,7 @@
 
 import UIKit
 
-struct FileModel {
+struct FileModel: Encodable {
     
     var name: String?
     var extname: String?

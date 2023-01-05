@@ -94,6 +94,8 @@ class FileSystemManager: NSObject {
     }
     
     static func rmdir(at fileUrl: URL, recursive: Bool) throws {
+        print(fileUrl)
+        print(recursive)
         let directoryContents = try FileManager.default.contentsOfDirectory(at: fileUrl, includingPropertiesForKeys: nil, options: [])
         if directoryContents.count != 0 && !recursive {
             throw FilesystemError.notEmpty

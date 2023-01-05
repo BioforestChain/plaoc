@@ -53,7 +53,6 @@ class CustomWebView: UIView {
         
         let config = WKWebViewConfiguration()
         
-        config.limitsNavigationsToAppBoundDomains = true
         config.userContentController = WKUserContentController()
         if self.scripts != nil {
             for script in self.scripts! {
@@ -64,7 +63,6 @@ class CustomWebView: UIView {
         config.limitsNavigationsToAppBoundDomains = self.openAppBoundDomains(urlString: self.loadingUrlString)
         config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "InstallBFS")
         config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "getConnectChannel")
-        config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "postConnectChannel")
         let prefreen = WKPreferences()
         prefreen.javaScriptCanOpenWindowsAutomatically = true
         config.preferences = prefreen
@@ -201,10 +199,8 @@ extension CustomWebView:  WKScriptMessageHandler {
             //同时显示下载进度条
         } else if message.name == "logging" {
             print(message.body)
-        } else if message.name == "postConnectChannel" {
-            print(message.body)
         } else if message.name == "getConnectChannel" {
-            print(message.body)
+            print("swift#getConnectChannel",message.body)
             guard let bodyDict = message.body as? [String:String] else { return }
             guard let param = bodyDict["param"] else { return }
             jsManager.handleEvaluateScript(jsString: param)

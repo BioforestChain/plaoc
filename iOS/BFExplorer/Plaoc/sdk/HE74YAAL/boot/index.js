@@ -99,892 +99,6 @@ var metaData = metaConfig({
 // importMap assert
 /// dwebview index.ts
 
-const stringToByte = (s) => {
-    const res = new Uint16Array(s.length);
-    for (let i = 0; i < s.length; i += 1) {
-        const u = s.codePointAt(i);
-        if (u) {
-            res[i] = u;
-        }
-    }
-    return res;
-};
-/**
- * arrayBuffer to String
- * @param buffer
- * @returns
- */
-const bufferToString = (buffer) => {
-    return String.fromCharCode.apply(null, buffer);
-};
-/**
- * 合并Uint16array
- * @param arrs
- * @returns
- */
-const contactUint16 = (...arrs) => {
-    const length = arrs.reduce((l, a) => l += a.length, 0);
-    const r = new Uint16Array(length);
-    let walk = 0;
-    for (const arr of arrs) {
-        r.set(arr, walk);
-        walk += arr.length;
-    }
-    return r;
-};
-/**
- * 合并Uint16array
- * @param arrs
- * @returns
- */
-const contactUint8 = (...arrs) => {
-    const length = arrs.reduce((l, a) => l += a.length, 0);
-    const r = new Uint8Array(length);
-    let walk = 0;
-    for (const arr of arrs) {
-        r.set(arr, walk);
-        walk += arr.length;
-    }
-    return r;
-};
-/**
- * hex string to Uint8Array
- * @param hex string
- * @returns Uint8Array
- */
-const hexToBinary = (hex) => {
-    return hex.split(",").map(v => +v);
-};
-
-var EChannelMode;
-(function (EChannelMode) {
-    EChannelMode["static"] = "static";
-    EChannelMode["pattern"] = "pattern";
-})(EChannelMode || (EChannelMode = {}));
-var ECommand;
-(function (ECommand) {
-    ECommand["openBackPressure"] = "openBackPressure";
-    ECommand["openChannel"] = "openChannel"; // 判断是否是打开一个Channel通道
-})(ECommand || (ECommand = {}));
-
-// your OS.
-/**js 到rust的消息 */
-function js_to_rust_buffer(zerocopybuffer) {
-    Deno.core.opSync("op_js_to_rust_buffer", zerocopybuffer);
-}
-/**js 到rust的消息： 传递零拷贝消息 */
-function send_zero_copy_buffer(req_id, zerocopybuffer) {
-    let buffer;
-    // 需要解析成Uint8
-    if (zerocopybuffer.buffer.byteLength % 2 !== 0) {
-        buffer = contactUint8(new Uint8Array(req_id.buffer), zerocopybuffer);
-    }
-    else {
-        buffer = contactUint16(req_id, new Uint16Array(zerocopybuffer.buffer));
-    }
-    Deno.core.opSync("op_send_zero_copy_buffer", buffer);
-}
-/**
- * 发送系统通知
- * @param data
- */
-function setNotification(data) {
-    Deno.core.opSync("op_rust_to_js_set_app_notification", data);
-}
-/**
- * 循环从rust里拿数据
- * 这里拿的是service worker 构建的 chunk的数据
- */
-async function getRustChunk() {
-    const buffer = await Deno.core.opAsync("op_rust_to_js_buffer"); // backDataToRust
-    // 没得数据回来
-    if (buffer[0] === 0) {
-        return {
-            value: buffer,
-            done: true,
-        };
-    }
-    return {
-        value: buffer,
-        done: false,
-    };
-}
-/**循环从rust里拿数据 */
-function getRustBuffer(ex_head_view) {
-    const uint8_head = new Uint8Array(ex_head_view.buffer);
-    const data = `${uint8_head[0]}-${uint8_head[1]}`;
-    const buffer = Deno.core.opSync("op_rust_to_js_system_buffer", data); // backSystemDataToRust
-    if (buffer[0] === 0 && buffer.length === 1) {
-        return {
-            value: buffer,
-            done: true,
-        };
-    }
-    console.log("getRustBuffer2: -->  ", buffer);
-    // 如果是普通消息,versionID == 1
-    if (buffer[0] === 1) {
-        buffer.splice(0, 2); //拿到版本号
-        buffer.splice(0, 2); // 拿到头部标记
-    }
-    // const buff = new Uint8Array(buffer);
-    return {
-        value: buffer,
-        done: false,
-    };
-}
-
-/**
- * @param value
- * @returns
- * @inline
- */
-const isPromiseLike = (value) => {
-    return (value instanceof Object &&
-        typeof value.then === "function");
-};
-
-class PromiseOut {
-    constructor() {
-        Object.defineProperty(this, "promise", {
-            enumerable: true,
-            configurable: true,
-            writable: true,
-            value: void 0
-        });
-        Object.defineProperty(this, "is_resolved", {
-            enumerable: true,
-            configurable: true,
-            writable: true,
-            value: false
-        });
-        Object.defineProperty(this, "is_rejected", {
-            enumerable: true,
-            configurable: true,
-            writable: true,
-            value: false
-        });
-        Object.defineProperty(this, "is_finished", {
-            enumerable: true,
-            configurable: true,
-            writable: true,
-            value: false
-        });
-        Object.defineProperty(this, "value", {
-            enumerable: true,
-            configurable: true,
-            writable: true,
-            value: void 0
-        });
-        Object.defineProperty(this, "reason", {
-            enumerable: true,
-            configurable: true,
-            writable: true,
-            value: void 0
-        });
-        Object.defineProperty(this, "resolve", {
-            enumerable: true,
-            configurable: true,
-            writable: true,
-            value: void 0
-        });
-        Object.defineProperty(this, "reject", {
-            enumerable: true,
-            configurable: true,
-            writable: true,
-            value: void 0
-        });
-        Object.defineProperty(this, "_innerFinally", {
-            enumerable: true,
-            configurable: true,
-            writable: true,
-            value: void 0
-        });
-        Object.defineProperty(this, "_innerFinallyArg", {
-            enumerable: true,
-            configurable: true,
-            writable: true,
-            value: void 0
-        });
-        Object.defineProperty(this, "_innerThen", {
-            enumerable: true,
-            configurable: true,
-            writable: true,
-            value: void 0
-        });
-        Object.defineProperty(this, "_innerCatch", {
-            enumerable: true,
-            configurable: true,
-            writable: true,
-            value: void 0
-        });
-        this.promise = new Promise((resolve, reject) => {
-            this.resolve = (value) => {
-                try {
-                    if (isPromiseLike(value)) {
-                        value.then(this.resolve, this.reject);
-                    }
-                    else {
-                        this.is_resolved = true;
-                        this.is_finished = true;
-                        resolve((this.value = value));
-                        this._runThen();
-                        this._innerFinallyArg = Object.freeze({
-                            status: "resolved",
-                            result: this.value,
-                        });
-                        this._runFinally();
-                    }
-                }
-                catch (err) {
-                    this.reject(err);
-                }
-            };
-            this.reject = (reason) => {
-                this.is_rejected = true;
-                this.is_finished = true;
-                reject((this.reason = reason));
-                this._runCatch();
-                this._innerFinallyArg = Object.freeze({
-                    status: "rejected",
-                    reason: this.reason,
-                });
-                this._runFinally();
-            };
-        });
-    }
-    onSuccess(innerThen) {
-        if (this.is_resolved) {
-            this.__callInnerThen(innerThen);
-        }
-        else {
-            (this._innerThen || (this._innerThen = [])).push(innerThen);
-        }
-    }
-    onError(innerCatch) {
-        if (this.is_rejected) {
-            this.__callInnerCatch(innerCatch);
-        }
-        else {
-            (this._innerCatch || (this._innerCatch = [])).push(innerCatch);
-        }
-    }
-    onFinished(innerFinally) {
-        if (this.is_finished) {
-            this.__callInnerFinally(innerFinally);
-        }
-        else {
-            (this._innerFinally || (this._innerFinally = [])).push(innerFinally);
-        }
-    }
-    _runFinally() {
-        if (this._innerFinally) {
-            for (const innerFinally of this._innerFinally) {
-                this.__callInnerFinally(innerFinally);
-            }
-            this._innerFinally = undefined;
-        }
-    }
-    __callInnerFinally(innerFinally) {
-        queueMicrotask(async () => {
-            try {
-                await innerFinally(this._innerFinallyArg);
-            }
-            catch (err) {
-                console.error("Unhandled promise rejection when running onFinished", innerFinally, err);
-            }
-        });
-    }
-    _runThen() {
-        if (this._innerThen) {
-            for (const innerThen of this._innerThen) {
-                this.__callInnerThen(innerThen);
-            }
-            this._innerThen = undefined;
-        }
-    }
-    _runCatch() {
-        if (this._innerCatch) {
-            for (const innerCatch of this._innerCatch) {
-                this.__callInnerCatch(innerCatch);
-            }
-            this._innerCatch = undefined;
-        }
-    }
-    __callInnerThen(innerThen) {
-        queueMicrotask(async () => {
-            try {
-                await innerThen(this.value);
-            }
-            catch (err) {
-                console.error("Unhandled promise rejection when running onSuccess", innerThen, err);
-            }
-        });
-    }
-    __callInnerCatch(innerCatch) {
-        queueMicrotask(async () => {
-            try {
-                await innerCatch(this.value);
-            }
-            catch (err) {
-                console.error("Unhandled promise rejection when running onError", innerCatch, err);
-            }
-        });
-    }
-}
-
-let EasyMap$1 = class EasyMap extends Map {
-    // private _map: Map<F, V>;
-    constructor(creater, entries, transformKey = (v) => v, _afterDelete) {
-        super(entries);
-        Object.defineProperty(this, "creater", {
-            enumerable: true,
-            configurable: true,
-            writable: true,
-            value: creater
-        });
-        Object.defineProperty(this, "transformKey", {
-            enumerable: true,
-            configurable: true,
-            writable: true,
-            value: transformKey
-        });
-        Object.defineProperty(this, "_afterDelete", {
-            enumerable: true,
-            configurable: true,
-            writable: true,
-            value: _afterDelete
-        });
-    }
-    static from(args) {
-        return new EasyMap$1(args.creater, args.entries, args.transformKey, args.afterDelete);
-    }
-    forceGet(key, creater = this.creater) {
-        const k = this.transformKey(key);
-        if (super.has(k)) {
-            return super.get(k);
-        }
-        const res = creater(key, k);
-        super.set(k, res);
-        return res;
-    }
-    tryGet(key) {
-        return this.get(this.transformKey(key));
-    }
-    trySet(key, val) {
-        return this.set(this.transformKey(key), val);
-    }
-    tryDelete(key) {
-        return this.delete(this.transformKey(key));
-    }
-    tryHas(key) {
-        return this.has(this.transformKey(key));
-    }
-    delete(key) {
-        const res = super.delete(key);
-        if (res && this._afterDelete) {
-            this._afterDelete(key);
-        }
-        return res;
-    }
-    get [Symbol.toStringTag]() {
-        return "EasyMap";
-    }
-    static call(_this, creater, entries, transformKey, _afterDelete) {
-        if (!(_this instanceof EasyMap$1)) {
-            throw new TypeError("please use new keyword to create EasyMap instance.");
-        }
-        const protoMap = new EasyMap$1(creater, entries, transformKey, _afterDelete);
-        const protoMap_PROTO = Object.getPrototypeOf(protoMap);
-        const protoMap_PROTO_PROTO = Object.getPrototypeOf(protoMap_PROTO);
-        const mapProps = Object.getOwnPropertyDescriptors(protoMap_PROTO_PROTO);
-        for (const key in mapProps) {
-            if (key !== "constructor") {
-                const propDes = mapProps[key];
-                if (typeof propDes.value === "function") {
-                    propDes.value = propDes.value.bind(protoMap);
-                }
-                else {
-                    if (typeof propDes.get === "function") {
-                        propDes.get = propDes.get.bind(protoMap);
-                    }
-                    if (typeof propDes.set === "function") {
-                        propDes.set = propDes.set.bind(protoMap);
-                    }
-                }
-                Object.defineProperty(_this, key, propDes);
-            }
-        }
-        const easymapProps = Object.getOwnPropertyDescriptors(protoMap_PROTO);
-        for (const key in easymapProps) {
-            if (key !== "constructor") {
-                const propDes = easymapProps[key];
-                if (typeof propDes.value === "function") {
-                    propDes.value = propDes.value.bind(protoMap);
-                }
-                else {
-                    if (typeof propDes.get === "function") {
-                        propDes.get = propDes.get.bind(protoMap);
-                    }
-                    if (typeof propDes.set === "function") {
-                        propDes.set = propDes.set.bind(protoMap);
-                    }
-                }
-                Object.defineProperty(_this, key, propDes);
-            }
-        }
-        const thisProps = Object.getOwnPropertyDescriptors(protoMap);
-        for (const key in thisProps) {
-            if (key !== "constructor")
-                Object.defineProperty(_this, key, {
-                    enumerable: true,
-                    configurable: true,
-                    get() {
-                        return Reflect.get(protoMap, key);
-                    },
-                    set(v) {
-                        Reflect.set(protoMap, key, v);
-                    },
-                });
-        }
-        return _this;
-    }
-};
-
-let _L = 0;
-var Transform_Type;
-(function (Transform_Type) {
-    /**不需要返回值的消息 */
-    Transform_Type[Transform_Type["NOT_RETURN"] = 1 << _L++] = "NOT_RETURN";
-    /**通用的消息 */
-    Transform_Type[Transform_Type["HAS_RETURN"] = 1 << _L++] = "HAS_RETURN";
-    /**传递buffer的消息 */
-    Transform_Type[Transform_Type["IS_ALL_BUFFER"] = 1 << _L++] = "IS_ALL_BUFFER";
-    // IS_ALL_JSON = 1 >> L++,
-    // IS_ALL_STRING = 1 >> L++,
-    // IS_ALL_U32 = 1 >> L++,
-    // IS_ALL_BOOLEAN = 1 >> L++,
-})(Transform_Type || (Transform_Type = {}));
-
-/////////////////////////////
-const REQ_CATCH = EasyMap$1.from({
-    creater(_req_id) {
-        return {
-            po: new PromiseOut()
-        };
-    },
-});
-let Deno$1 = class Deno {
-    constructor() {
-        Object.defineProperty(this, "version_id", {
-            enumerable: true,
-            configurable: true,
-            writable: true,
-            value: new Uint16Array([1])
-        });
-        Object.defineProperty(this, "reqId", {
-            enumerable: true,
-            configurable: true,
-            writable: true,
-            value: new Uint16Array([0])
-        }); // 初始化头部标记
-    }
-    async request(cmd, input, type) {
-        const zerocopybuffer_list = [];
-        const transferable_metadata = [];
-        let z_acc_id = 0;
-        // 处理 buffer view
-        const copy_list = input.map((value, index) => {
-            if (ArrayBuffer.isView(value)) {
-                console.log("deno#zerocopybuffer_list:", index, value);
-                zerocopybuffer_list.push(value);
-                transferable_metadata.push(index, z_acc_id++);
-                return z_acc_id;
-            }
-            return value;
-        });
-        this.postMessageToKotlin(this.reqId, cmd, type, JSON.stringify(copy_list), zerocopybuffer_list, transferable_metadata);
-        // 如果不需要返回值
-        if ((type & Transform_Type.NOT_RETURN) === Transform_Type.NOT_RETURN) {
-            console.log("deno#request,不需要返回值:", cmd);
-            return new ArrayBuffer(1);
-        }
-        return await REQ_CATCH.forceGet(this.reqId).po.promise;
-    }
-    /** 发送请求 */
-    postMessageToKotlin(req_id, cmd, type, data_string, zerocopybuffer_list, transferable_metadata) {
-        this.headViewAdd();
-        console.log("deno#postMessageToKotlin#🚓cmd： %s, data_string:%s，req_id:%s", cmd, data_string, req_id[0]);
-        // 发送bufferview
-        if (zerocopybuffer_list.length !== 0) {
-            zerocopybuffer_list.map((zerocopybuffer) => {
-                send_zero_copy_buffer(req_id, zerocopybuffer);
-            });
-        }
-        // 发送具体操作消息
-        this.callFunction(cmd, type, data_string, transferable_metadata);
-        // 需要返回值的才需要等待
-        if ((type & Transform_Type.NOT_RETURN) !== Transform_Type.NOT_RETURN) {
-            this.loopGetKotlinReturn(req_id, cmd);
-        }
-    }
-    headViewAdd() {
-        this.reqId[0]++;
-    }
-    /**
-     * 调用deno的函数
-     * @param handleFn
-     * @param data
-     */
-    callFunction(handleFn, type, data = "''", transferable_metadata) {
-        const body = this.structureBinary(handleFn, type, data, transferable_metadata);
-        // 发送消息
-        js_to_rust_buffer(body); // android - denoOp
-    }
-    /**
-     * 循环获取kotlin system 返回的数据
-     * @returns
-     */
-    async loopGetKotlinReturn(reqId, cmd) {
-        do {
-            const result = await getRustBuffer(reqId); // backSystemDataToRust
-            if (result.done) {
-                continue;
-            }
-            console.log(`deno#loopGetKotlinReturn ✅:${cmd},req_id,当前请求的：${this.reqId[0]},是否存在请求：${REQ_CATCH.has(this.reqId)}`);
-            REQ_CATCH.get(this.reqId)?.po.resolve(result.value);
-            REQ_CATCH.delete(this.reqId);
-            break;
-        } while (true);
-    }
-    /** 针对64位
-     * 第一块分区：版本号 2^8 8位，一个字节 1：表示消息，2：表示广播，4：心跳检测
-     * 第二块分区：头部标记 2^16 16位 两个字节  根据版本号这里各有不同，假如是消息，就是0，1；如果是广播则是组
-     * 第三块分区：数据主体 动态创建
-     */
-    structureBinary(fn, type, data = "", transferable_metadata) {
-        // op(send , version:number, cmd:string, reqId:number, type:number, data:string, transferable_metadata:number[])
-        const message = `{"cmd":"${fn}","type":${type},"data":${data},"transferable_metadata":[${transferable_metadata.join()}]}`;
-        // 字符 转 Uint16Array
-        const body = stringToByte(message);
-        return contactUint16(this.version_id, this.reqId, body);
-    }
-};
-const deno = new Deno$1();
-
-// dnt-shim-ignore
-// deno-lint-ignore no-explicit-any
-var jscore = globalThis
-    .PlaocJavascriptBridge;
-
-// 记得值需要大写开头，跟Native enum  保持一直
-var callNative;
-(function (callNative) {
-    /**打开dwebView */
-    callNative["openDWebView"] = "OpenDWebView";
-    /**二维码 */
-    callNative["openQrScanner"] = "OpenQrScanner";
-    /**条形码 */
-    callNative["openBarcodeScanner"] = "BarcodeScanner";
-    /**初始化app数据 */
-    callNative["initMetaData"] = "InitMetaData";
-    /**初始化运行时 */
-    callNative["denoRuntime"] = "DenoRuntime";
-    /**获取appid */
-    callNative["getBfsAppId"] = "GetBfsAppId";
-    /**传递给前端消息 */
-    callNative["evalJsRuntime"] = "EvalJsRuntime";
-    /**获取设备信息 */
-    callNative["getDeviceInfo"] = "GetDeviceInfo";
-    /**发送消息 */
-    callNative["sendNotification"] = "SendNotification";
-    /**申请权限 */
-    callNative["applyPermissions"] = "ApplyPermissions";
-    /**获取权限信息 */
-    callNative["getPermissions"] = "GetPermissions";
-    /** serviceworker 告知已经准备好 */
-    callNative["serviceWorkerReady"] = "ServiceWorkerReady";
-    /**设置dwebview的ui */
-    callNative["setDWebViewUI"] = "SetDWebViewUI";
-})(callNative || (callNative = {}));
-/**不需要返回的命令 */
-var callNotReturnNative;
-(function (callNotReturnNative) {
-    /**退出app */
-    callNotReturnNative["exitApp"] = "ExitApp";
-})(callNotReturnNative || (callNotReturnNative = {}));
-// 回调到对应的组件
-var callDVebView;
-(function (callDVebView) {
-    callDVebView["BarcodeScanner"] = "dweb-scanner";
-    callDVebView["OpenQrScanner"] = "dweb-scanner";
-    callDVebView["OpenDWebView"] = "dweb-view";
-    callDVebView["ExitApp"] = "dweb-app";
-})(callDVebView || (callDVebView = {}));
-// const callDeno
-
-/////////////////////////////
-const checkType$1 = (name, type) => {
-    try {
-        return new Function(`return typeof ${name} === "${type}"`)();
-    }
-    catch (_) {
-        return false;
-    }
-};
-
-/**
- * 发送系统通知
- * @param data
- */
-function sendJsCoreNotification(data) {
-    return jscore.callJavaScriptWithFunctionNameParam(callNative.sendNotification, data);
-}
-function netCallNativeService(fn, data = "") {
-    const uint8 = jscore.callJavaScriptWithFunctionNameParam(fn, data);
-    if (!uint8)
-        return new Uint8Array(0);
-    console.log("netCallNativeService:==>", uint8);
-    return uint8;
-}
-
-/**判断是不是denoRuntime环境 */
-function isDenoRuntime$1() {
-    return checkType$1("Deno", "object");
-}
-var EDeviceModule;
-(function (EDeviceModule) {
-    EDeviceModule["default"] = "default";
-    EDeviceModule["silentMode"] = "silentMode";
-    EDeviceModule["doNotDisturb"] = "doNotDisturb";
-})(EDeviceModule || (EDeviceModule = {}));
-
-/** 判断当前属于哪个平台 */
-function currentPlatform() {
-    let platform = "";
-    if (jscore) {
-        platform = "ios";
-    }
-    else if (isDenoRuntime$1()) {
-        platform = "android";
-    }
-    else {
-        platform = "desktop";
-    }
-    return platform;
-}
-var EPlatform;
-(function (EPlatform) {
-    EPlatform["ios"] = "ios";
-    EPlatform["android"] = "android";
-    EPlatform["desktop"] = "desktop";
-})(EPlatform || (EPlatform = {}));
-
-class Network {
-    /**
-     * 异步调用方法,这个是给后端调用的方法，不会传递数据到前端
-     * @param handleFn
-     * @param data
-     * @returns
-     */
-    async asyncCallDenoFunction(handleFn, data = "") {
-        return await this.asyncSendMsgNative(handleFn, data).then((data) => {
-            const result = bufferToString(data);
-            return result;
-        }).catch((err) => {
-            console.log("deno#asyncCallDenoFunction err", err);
-            return err;
-        });
-    }
-    /**
-     * 异步调用方法,这个是给后端调用的方法，不会传递数据到前端
-     * @param handleFn
-     * @param data
-     * @returns  Buffer
-     */
-    async asyncCallbackBuffer(handleFn, data = "") {
-        return await this.asyncSendMsgNative(handleFn, data);
-    }
-    /**
-     * 异步发送消息到android/ios
-     * @param handleFn
-     * @param data
-     * @returns
-     */
-    async asyncSendMsgNative(handleFn, data = "") {
-        // 发送消息的类型（标记为需要消息返回）
-        const type = Transform_Type.HAS_RETURN;
-        if (data instanceof Object && !ArrayBuffer.isView(data)) {
-            data = JSON.stringify(data); // stringify 两次转义一下双引号
-        }
-        // console.log("deno#asyncSendMsgNative request: ", handleFn, data)
-        // 处理IOS，可以不转buffer就不转，少了一道工序
-        if (currentPlatform() === EPlatform.ios) {
-            const msg = await netCallNativeService(handleFn, data);
-            return msg;
-        }
-        // 发送请求
-        const buffer = await deno.request(handleFn, [data], type);
-        // console.log("deno#asyncSendMsgNative Response: ", buffer)
-        return buffer;
-    }
-    /**
-     * 同步调用方法没返回值
-     * @param handleFn
-     * @param data
-     */
-    async syncSendMsgNative(handleFn, data = "") {
-        // 发送消息的类型 （标记为不需要返回）
-        const type = Transform_Type.NOT_RETURN;
-        if (data instanceof Object) {
-            data = JSON.stringify(data); // stringify 两次转义一下双引号
-        }
-        // 处理IOS，
-        if (currentPlatform() === EPlatform.ios) {
-            netCallNativeService(handleFn, data);
-        }
-        console.log("syncSendMsgNative#request: ", handleFn, data);
-        const result = await deno.request(handleFn, [data], type); // 发送请求
-        console.log("syncSendMsgNative#result: ", handleFn, result);
-    }
-    /**
-     * 分段发送buffer请求到native
-     * @param handleFn
-     * @param data
-     * @returns
-     */
-    async asyncSendBufferNative(handleFn, data) {
-        // 发送消息的类型（标记为需要消息返回，并且是二进制传输）
-        const type = Transform_Type.HAS_RETURN | Transform_Type.IS_ALL_BUFFER;
-        // 处理IOS，
-        if (currentPlatform() === EPlatform.ios) {
-            netCallNativeService(handleFn, data);
-        }
-        // 发送请求
-        const buffer = await deno.request(handleFn, data, type);
-        console.log("deno#asyncSendBufferNative Response: ", buffer);
-        return buffer;
-    }
-}
-const network = new Network();
-
-class EasyMap extends Map {
-    // private _map: Map<F, V>;
-    constructor(creater, entries, transformKey = (v) => v, _afterDelete) {
-        super(entries);
-        Object.defineProperty(this, "creater", {
-            enumerable: true,
-            configurable: true,
-            writable: true,
-            value: creater
-        });
-        Object.defineProperty(this, "transformKey", {
-            enumerable: true,
-            configurable: true,
-            writable: true,
-            value: transformKey
-        });
-        Object.defineProperty(this, "_afterDelete", {
-            enumerable: true,
-            configurable: true,
-            writable: true,
-            value: _afterDelete
-        });
-    }
-    static from(args) {
-        return new EasyMap(args.creater, args.entries, args.transformKey, args.afterDelete);
-    }
-    forceGet(key, creater = this.creater) {
-        const k = this.transformKey(key);
-        if (super.has(k)) {
-            return super.get(k);
-        }
-        const res = creater(key, k);
-        super.set(k, res);
-        return res;
-    }
-    tryGet(key) {
-        return this.get(this.transformKey(key));
-    }
-    trySet(key, val) {
-        return this.set(this.transformKey(key), val);
-    }
-    tryDelete(key) {
-        return this.delete(this.transformKey(key));
-    }
-    tryHas(key) {
-        return this.has(this.transformKey(key));
-    }
-    delete(key) {
-        const res = super.delete(key);
-        if (res && this._afterDelete) {
-            this._afterDelete(key);
-        }
-        return res;
-    }
-    get [Symbol.toStringTag]() {
-        return "EasyMap";
-    }
-    static call(_this, creater, entries, transformKey, _afterDelete) {
-        if (!(_this instanceof EasyMap)) {
-            throw new TypeError("please use new keyword to create EasyMap instance.");
-        }
-        const protoMap = new EasyMap(creater, entries, transformKey, _afterDelete);
-        const protoMap_PROTO = Object.getPrototypeOf(protoMap);
-        const protoMap_PROTO_PROTO = Object.getPrototypeOf(protoMap_PROTO);
-        const mapProps = Object.getOwnPropertyDescriptors(protoMap_PROTO_PROTO);
-        for (const key in mapProps) {
-            if (key !== "constructor") {
-                const propDes = mapProps[key];
-                if (typeof propDes.value === "function") {
-                    propDes.value = propDes.value.bind(protoMap);
-                }
-                else {
-                    if (typeof propDes.get === "function") {
-                        propDes.get = propDes.get.bind(protoMap);
-                    }
-                    if (typeof propDes.set === "function") {
-                        propDes.set = propDes.set.bind(protoMap);
-                    }
-                }
-                Object.defineProperty(_this, key, propDes);
-            }
-        }
-        const easymapProps = Object.getOwnPropertyDescriptors(protoMap_PROTO);
-        for (const key in easymapProps) {
-            if (key !== "constructor") {
-                const propDes = easymapProps[key];
-                if (typeof propDes.value === "function") {
-                    propDes.value = propDes.value.bind(protoMap);
-                }
-                else {
-                    if (typeof propDes.get === "function") {
-                        propDes.get = propDes.get.bind(protoMap);
-                    }
-                    if (typeof propDes.set === "function") {
-                        propDes.set = propDes.set.bind(protoMap);
-                    }
-                }
-                Object.defineProperty(_this, key, propDes);
-            }
-        }
-        const thisProps = Object.getOwnPropertyDescriptors(protoMap);
-        for (const key in thisProps) {
-            if (key !== "constructor")
-                Object.defineProperty(_this, key, {
-                    enumerable: true,
-                    configurable: true,
-                    get() {
-                        return Reflect.get(protoMap, key);
-                    },
-                    set(v) {
-                        Reflect.set(protoMap, key, v);
-                    },
-                });
-        }
-        return _this;
-    }
-}
-
 /*! *****************************************************************************
 Copyright (c) Microsoft Corporation.
 
@@ -1390,7 +504,7 @@ typeof process !== "undefined" &&
     (process.platform === "win32" ||
         /^(msys|cygwin)$/.test(process.env && process.env.OSTYPE));
 
-const checkType = (name, type) => {
+const checkType$1 = (name, type) => {
     try {
         return new Function(`return typeof ${name} === "${type}"`)();
     }
@@ -1398,17 +512,17 @@ const checkType = (name, type) => {
         return false;
     }
 };
-const isCordova = checkType("cordova", "object");
+const isCordova = checkType$1("cordova", "object");
 /**web worker and main thread all has location as navigator */
-const isWebView = checkType("navigator", "object");
-const isDenoRuntime = checkType("Deno", "object");
+const isWebView = checkType$1("navigator", "object");
+const isDenoRuntime$1 = checkType$1("Deno", "object");
 const isAndroid = isWebView && /Android/i.test(navigator.userAgent);
 const isIOS = isWebView && /iPhone|iPod|iPad/i.test(navigator.userAgent);
-const isWebMainThread = isWebView && checkType("document", "object");
+const isWebMainThread = isWebView && checkType$1("document", "object");
 const isWebWorker = isWebView && !isWebMainThread;
 const platformInfo = {
     getGlobalFlag(flag_name, defaultValue = "") {
-        const g = isDenoRuntime ? this : this.global();
+        const g = isDenoRuntime$1 ? this : this.global();
         return (g[flag_name] ||
             (g.process && g.process.env && g.process.env[flag_name]) ||
             (g.location &&
@@ -1678,6 +792,960 @@ __decorate([
     __metadata("design:paramtypes", [])
 ], MapEventEmitter.prototype, "removeListener", null);
 
+let EasyMap$1 = class EasyMap extends Map {
+    // private _map: Map<F, V>;
+    constructor(creater, entries, transformKey = (v) => v, _afterDelete) {
+        super(entries);
+        Object.defineProperty(this, "creater", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: creater
+        });
+        Object.defineProperty(this, "transformKey", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: transformKey
+        });
+        Object.defineProperty(this, "_afterDelete", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: _afterDelete
+        });
+    }
+    static from(args) {
+        return new EasyMap$1(args.creater, args.entries, args.transformKey, args.afterDelete);
+    }
+    forceGet(key, creater = this.creater) {
+        const k = this.transformKey(key);
+        if (super.has(k)) {
+            return super.get(k);
+        }
+        const res = creater(key, k);
+        super.set(k, res);
+        return res;
+    }
+    tryGet(key) {
+        return this.get(this.transformKey(key));
+    }
+    trySet(key, val) {
+        return this.set(this.transformKey(key), val);
+    }
+    tryDelete(key) {
+        return this.delete(this.transformKey(key));
+    }
+    tryHas(key) {
+        return this.has(this.transformKey(key));
+    }
+    delete(key) {
+        const res = super.delete(key);
+        if (res && this._afterDelete) {
+            this._afterDelete(key);
+        }
+        return res;
+    }
+    get [Symbol.toStringTag]() {
+        return "EasyMap";
+    }
+    static call(_this, creater, entries, transformKey, _afterDelete) {
+        if (!(_this instanceof EasyMap$1)) {
+            throw new TypeError("please use new keyword to create EasyMap instance.");
+        }
+        const protoMap = new EasyMap$1(creater, entries, transformKey, _afterDelete);
+        const protoMap_PROTO = Object.getPrototypeOf(protoMap);
+        const protoMap_PROTO_PROTO = Object.getPrototypeOf(protoMap_PROTO);
+        const mapProps = Object.getOwnPropertyDescriptors(protoMap_PROTO_PROTO);
+        for (const key in mapProps) {
+            if (key !== "constructor") {
+                const propDes = mapProps[key];
+                if (typeof propDes.value === "function") {
+                    propDes.value = propDes.value.bind(protoMap);
+                }
+                else {
+                    if (typeof propDes.get === "function") {
+                        propDes.get = propDes.get.bind(protoMap);
+                    }
+                    if (typeof propDes.set === "function") {
+                        propDes.set = propDes.set.bind(protoMap);
+                    }
+                }
+                Object.defineProperty(_this, key, propDes);
+            }
+        }
+        const easymapProps = Object.getOwnPropertyDescriptors(protoMap_PROTO);
+        for (const key in easymapProps) {
+            if (key !== "constructor") {
+                const propDes = easymapProps[key];
+                if (typeof propDes.value === "function") {
+                    propDes.value = propDes.value.bind(protoMap);
+                }
+                else {
+                    if (typeof propDes.get === "function") {
+                        propDes.get = propDes.get.bind(protoMap);
+                    }
+                    if (typeof propDes.set === "function") {
+                        propDes.set = propDes.set.bind(protoMap);
+                    }
+                }
+                Object.defineProperty(_this, key, propDes);
+            }
+        }
+        const thisProps = Object.getOwnPropertyDescriptors(protoMap);
+        for (const key in thisProps) {
+            if (key !== "constructor")
+                Object.defineProperty(_this, key, {
+                    enumerable: true,
+                    configurable: true,
+                    get() {
+                        return Reflect.get(protoMap, key);
+                    },
+                    set(v) {
+                        Reflect.set(protoMap, key, v);
+                    },
+                });
+        }
+        return _this;
+    }
+};
+
+/**
+ * @param value
+ * @returns
+ * @inline
+ */
+const isPromiseLike = (value) => {
+    return (value instanceof Object &&
+        typeof value.then === "function");
+};
+
+class PromiseOut {
+    constructor() {
+        Object.defineProperty(this, "promise", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
+        Object.defineProperty(this, "is_resolved", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: false
+        });
+        Object.defineProperty(this, "is_rejected", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: false
+        });
+        Object.defineProperty(this, "is_finished", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: false
+        });
+        Object.defineProperty(this, "value", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
+        Object.defineProperty(this, "reason", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
+        Object.defineProperty(this, "resolve", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
+        Object.defineProperty(this, "reject", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
+        Object.defineProperty(this, "_innerFinally", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
+        Object.defineProperty(this, "_innerFinallyArg", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
+        Object.defineProperty(this, "_innerThen", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
+        Object.defineProperty(this, "_innerCatch", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
+        this.promise = new Promise((resolve, reject) => {
+            this.resolve = (value) => {
+                try {
+                    if (isPromiseLike(value)) {
+                        value.then(this.resolve, this.reject);
+                    }
+                    else {
+                        this.is_resolved = true;
+                        this.is_finished = true;
+                        resolve((this.value = value));
+                        this._runThen();
+                        this._innerFinallyArg = Object.freeze({
+                            status: "resolved",
+                            result: this.value,
+                        });
+                        this._runFinally();
+                    }
+                }
+                catch (err) {
+                    this.reject(err);
+                }
+            };
+            this.reject = (reason) => {
+                this.is_rejected = true;
+                this.is_finished = true;
+                reject((this.reason = reason));
+                this._runCatch();
+                this._innerFinallyArg = Object.freeze({
+                    status: "rejected",
+                    reason: this.reason,
+                });
+                this._runFinally();
+            };
+        });
+    }
+    onSuccess(innerThen) {
+        if (this.is_resolved) {
+            this.__callInnerThen(innerThen);
+        }
+        else {
+            (this._innerThen || (this._innerThen = [])).push(innerThen);
+        }
+    }
+    onError(innerCatch) {
+        if (this.is_rejected) {
+            this.__callInnerCatch(innerCatch);
+        }
+        else {
+            (this._innerCatch || (this._innerCatch = [])).push(innerCatch);
+        }
+    }
+    onFinished(innerFinally) {
+        if (this.is_finished) {
+            this.__callInnerFinally(innerFinally);
+        }
+        else {
+            (this._innerFinally || (this._innerFinally = [])).push(innerFinally);
+        }
+    }
+    _runFinally() {
+        if (this._innerFinally) {
+            for (const innerFinally of this._innerFinally) {
+                this.__callInnerFinally(innerFinally);
+            }
+            this._innerFinally = undefined;
+        }
+    }
+    __callInnerFinally(innerFinally) {
+        queueMicrotask(async () => {
+            try {
+                await innerFinally(this._innerFinallyArg);
+            }
+            catch (err) {
+                console.error("Unhandled promise rejection when running onFinished", innerFinally, err);
+            }
+        });
+    }
+    _runThen() {
+        if (this._innerThen) {
+            for (const innerThen of this._innerThen) {
+                this.__callInnerThen(innerThen);
+            }
+            this._innerThen = undefined;
+        }
+    }
+    _runCatch() {
+        if (this._innerCatch) {
+            for (const innerCatch of this._innerCatch) {
+                this.__callInnerCatch(innerCatch);
+            }
+            this._innerCatch = undefined;
+        }
+    }
+    __callInnerThen(innerThen) {
+        queueMicrotask(async () => {
+            try {
+                await innerThen(this.value);
+            }
+            catch (err) {
+                console.error("Unhandled promise rejection when running onSuccess", innerThen, err);
+            }
+        });
+    }
+    __callInnerCatch(innerCatch) {
+        queueMicrotask(async () => {
+            try {
+                await innerCatch(this.value);
+            }
+            catch (err) {
+                console.error("Unhandled promise rejection when running onError", innerCatch, err);
+            }
+        });
+    }
+}
+
+const stringToByte = (s) => {
+    const res = new Uint16Array(s.length);
+    for (let i = 0; i < s.length; i += 1) {
+        const u = s.codePointAt(i);
+        if (u) {
+            res[i] = u;
+        }
+    }
+    return res;
+};
+/**
+ * arrayBuffer to String
+ * @param buffer
+ * @returns
+ */
+const bufferToString = (buffer) => {
+    return String.fromCharCode.apply(null, buffer);
+};
+/**
+ * 合并Uint16array
+ * @param arrs
+ * @returns
+ */
+const contactUint16 = (...arrs) => {
+    const length = arrs.reduce((l, a) => l += a.length, 0);
+    const r = new Uint16Array(length);
+    let walk = 0;
+    for (const arr of arrs) {
+        r.set(arr, walk);
+        walk += arr.length;
+    }
+    return r;
+};
+/**
+ * 合并Uint16array
+ * @param arrs
+ * @returns
+ */
+const contactUint8 = (...arrs) => {
+    const length = arrs.reduce((l, a) => l += a.length, 0);
+    const r = new Uint8Array(length);
+    let walk = 0;
+    for (const arr of arrs) {
+        r.set(arr, walk);
+        walk += arr.length;
+    }
+    return r;
+};
+/**
+ * hex string to Uint8Array
+ * @param hex string
+ * @returns Uint8Array
+ */
+const hexToBinary = (hex) => {
+    return hex.split(",").map(v => +v);
+};
+
+/////////////////////////////
+const checkType = (name, type) => {
+    try {
+        return new Function(`return typeof ${name} === "${type}"`)();
+    }
+    catch (_) {
+        return false;
+    }
+};
+
+var EChannelMode;
+(function (EChannelMode) {
+    EChannelMode["static"] = "static";
+    EChannelMode["pattern"] = "pattern";
+})(EChannelMode || (EChannelMode = {}));
+var ECommand;
+(function (ECommand) {
+    ECommand["openBackPressure"] = "openBackPressure";
+    ECommand["openChannel"] = "openChannel";
+    ECommand["openMessageChannel"] = "openMessageChannel";
+    ECommand["registerChannelId"] = "registerChannelId"; // 注册一个channel id
+})(ECommand || (ECommand = {}));
+
+// your OS.
+/**js 到rust的消息 */
+function js_to_rust_buffer(zerocopybuffer) {
+    Deno.core.opSync("op_js_to_rust_buffer", zerocopybuffer);
+}
+/**js 到rust的消息： 传递零拷贝消息 */
+function send_zero_copy_buffer(req_id, zerocopybuffer) {
+    let buffer;
+    // 需要解析成Uint8
+    if (zerocopybuffer.buffer.byteLength % 2 !== 0) {
+        buffer = contactUint8(new Uint8Array(req_id.buffer), zerocopybuffer);
+    }
+    else {
+        buffer = contactUint16(req_id, new Uint16Array(zerocopybuffer.buffer));
+    }
+    Deno.core.opSync("op_send_zero_copy_buffer", buffer);
+}
+/**
+ * 发送系统通知
+ * @param data
+ */
+function setNotification(data) {
+    Deno.core.opSync("op_rust_to_js_set_app_notification", data);
+}
+/**
+ * 循环从rust里拿数据
+ * 这里拿的是service worker 构建的 chunk的数据
+ */
+async function getRustChunk() {
+    const buffer = await Deno.core.opAsync("op_rust_to_js_buffer"); // backDataToRust
+    // 没得数据回来
+    if (buffer[0] === 0) {
+        return {
+            value: buffer,
+            done: true,
+        };
+    }
+    return {
+        value: buffer,
+        done: false,
+    };
+}
+/**循环从rust里拿数据 */
+function getRustBuffer(ex_head_view) {
+    const uint8_head = new Uint8Array(ex_head_view.buffer);
+    const data = `${uint8_head[0]}-${uint8_head[1]}`;
+    const buffer = Deno.core.opSync("op_rust_to_js_system_buffer", data); // backSystemDataToRust
+    if (buffer[0] === 0 && buffer.length === 1) {
+        return {
+            value: buffer,
+            done: true,
+        };
+    }
+    console.log("getRustBuffer2: -->  ", buffer);
+    // 如果是普通消息,versionID == 1
+    if (buffer[0] === 1) {
+        buffer.splice(0, 2); //拿到版本号
+        buffer.splice(0, 2); // 拿到头部标记
+    }
+    // const buff = new Uint8Array(buffer);
+    return {
+        value: buffer,
+        done: false,
+    };
+}
+
+class EasyMap extends Map {
+    // private _map: Map<F, V>;
+    constructor(creater, entries, transformKey = (v) => v, _afterDelete) {
+        super(entries);
+        Object.defineProperty(this, "creater", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: creater
+        });
+        Object.defineProperty(this, "transformKey", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: transformKey
+        });
+        Object.defineProperty(this, "_afterDelete", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: _afterDelete
+        });
+    }
+    static from(args) {
+        return new EasyMap(args.creater, args.entries, args.transformKey, args.afterDelete);
+    }
+    forceGet(key, creater = this.creater) {
+        const k = this.transformKey(key);
+        if (super.has(k)) {
+            return super.get(k);
+        }
+        const res = creater(key, k);
+        super.set(k, res);
+        return res;
+    }
+    tryGet(key) {
+        return this.get(this.transformKey(key));
+    }
+    trySet(key, val) {
+        return this.set(this.transformKey(key), val);
+    }
+    tryDelete(key) {
+        return this.delete(this.transformKey(key));
+    }
+    tryHas(key) {
+        return this.has(this.transformKey(key));
+    }
+    delete(key) {
+        const res = super.delete(key);
+        if (res && this._afterDelete) {
+            this._afterDelete(key);
+        }
+        return res;
+    }
+    get [Symbol.toStringTag]() {
+        return "EasyMap";
+    }
+    static call(_this, creater, entries, transformKey, _afterDelete) {
+        if (!(_this instanceof EasyMap)) {
+            throw new TypeError("please use new keyword to create EasyMap instance.");
+        }
+        const protoMap = new EasyMap(creater, entries, transformKey, _afterDelete);
+        const protoMap_PROTO = Object.getPrototypeOf(protoMap);
+        const protoMap_PROTO_PROTO = Object.getPrototypeOf(protoMap_PROTO);
+        const mapProps = Object.getOwnPropertyDescriptors(protoMap_PROTO_PROTO);
+        for (const key in mapProps) {
+            if (key !== "constructor") {
+                const propDes = mapProps[key];
+                if (typeof propDes.value === "function") {
+                    propDes.value = propDes.value.bind(protoMap);
+                }
+                else {
+                    if (typeof propDes.get === "function") {
+                        propDes.get = propDes.get.bind(protoMap);
+                    }
+                    if (typeof propDes.set === "function") {
+                        propDes.set = propDes.set.bind(protoMap);
+                    }
+                }
+                Object.defineProperty(_this, key, propDes);
+            }
+        }
+        const easymapProps = Object.getOwnPropertyDescriptors(protoMap_PROTO);
+        for (const key in easymapProps) {
+            if (key !== "constructor") {
+                const propDes = easymapProps[key];
+                if (typeof propDes.value === "function") {
+                    propDes.value = propDes.value.bind(protoMap);
+                }
+                else {
+                    if (typeof propDes.get === "function") {
+                        propDes.get = propDes.get.bind(protoMap);
+                    }
+                    if (typeof propDes.set === "function") {
+                        propDes.set = propDes.set.bind(protoMap);
+                    }
+                }
+                Object.defineProperty(_this, key, propDes);
+            }
+        }
+        const thisProps = Object.getOwnPropertyDescriptors(protoMap);
+        for (const key in thisProps) {
+            if (key !== "constructor")
+                Object.defineProperty(_this, key, {
+                    enumerable: true,
+                    configurable: true,
+                    get() {
+                        return Reflect.get(protoMap, key);
+                    },
+                    set(v) {
+                        Reflect.set(protoMap, key, v);
+                    },
+                });
+        }
+        return _this;
+    }
+}
+
+let _L = 0;
+var Transform_Type;
+(function (Transform_Type) {
+    /**不需要返回值的消息 */
+    Transform_Type[Transform_Type["NOT_RETURN"] = 1 << _L++] = "NOT_RETURN";
+    /**通用的消息 */
+    Transform_Type[Transform_Type["HAS_RETURN"] = 1 << _L++] = "HAS_RETURN";
+    /**传递buffer的消息 */
+    Transform_Type[Transform_Type["IS_ALL_BUFFER"] = 1 << _L++] = "IS_ALL_BUFFER";
+    // IS_ALL_JSON = 1 >> L++,
+    // IS_ALL_STRING = 1 >> L++,
+    // IS_ALL_U32 = 1 >> L++,
+    // IS_ALL_BOOLEAN = 1 >> L++,
+})(Transform_Type || (Transform_Type = {}));
+
+/////////////////////////////
+const REQ_CATCH = EasyMap.from({
+    creater(_req_id) {
+        return {
+            po: new PromiseOut()
+        };
+    },
+});
+let Deno$1 = class Deno {
+    constructor() {
+        Object.defineProperty(this, "version_id", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: new Uint16Array([1])
+        });
+        Object.defineProperty(this, "reqId", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: new Uint16Array([0])
+        }); // 初始化头部标记
+    }
+    async request(cmd, input, type) {
+        const zerocopybuffer_list = [];
+        const transferable_metadata = [];
+        let z_acc_id = 0;
+        // 处理 buffer view
+        const copy_list = input.map((value, index) => {
+            if (ArrayBuffer.isView(value)) {
+                console.log("deno#zerocopybuffer_list:", index, value);
+                zerocopybuffer_list.push(value);
+                transferable_metadata.push(index, z_acc_id++);
+                return z_acc_id;
+            }
+            return value;
+        });
+        this.postMessageToKotlin(this.reqId, cmd, type, JSON.stringify(copy_list), zerocopybuffer_list, transferable_metadata);
+        // 如果不需要返回值
+        if ((type & Transform_Type.NOT_RETURN) === Transform_Type.NOT_RETURN) {
+            console.log("deno#request,不需要返回值:", cmd);
+            return new ArrayBuffer(1);
+        }
+        return await REQ_CATCH.forceGet(this.reqId).po.promise;
+    }
+    /** 发送请求 */
+    postMessageToKotlin(req_id, cmd, type, data_string, zerocopybuffer_list, transferable_metadata) {
+        this.headViewAdd();
+        console.log("deno#postMessageToKotlin#🚓cmd： %s, data_string:%s，req_id:%s", cmd, data_string, req_id[0]);
+        // 发送bufferview
+        if (zerocopybuffer_list.length !== 0) {
+            zerocopybuffer_list.map((zerocopybuffer) => {
+                send_zero_copy_buffer(req_id, zerocopybuffer);
+            });
+        }
+        // 发送具体操作消息
+        this.callFunction(cmd, type, data_string, transferable_metadata);
+        // 需要返回值的才需要等待
+        if ((type & Transform_Type.NOT_RETURN) !== Transform_Type.NOT_RETURN) {
+            this.loopGetKotlinReturn(req_id, cmd);
+        }
+    }
+    headViewAdd() {
+        this.reqId[0]++;
+    }
+    /**
+     * 调用deno的函数
+     * @param handleFn
+     * @param data
+     */
+    callFunction(handleFn, type, data = "''", transferable_metadata) {
+        const body = this.structureBinary(handleFn, type, data, transferable_metadata);
+        // 发送消息
+        js_to_rust_buffer(body); // android - denoOp
+    }
+    /**
+     * 循环获取kotlin system 返回的数据
+     * @returns
+     */
+    async loopGetKotlinReturn(reqId, cmd) {
+        do {
+            const result = await getRustBuffer(reqId); // backSystemDataToRust
+            if (result.done) {
+                continue;
+            }
+            console.log(`deno#loopGetKotlinReturn ✅:${cmd},req_id,当前请求的：${this.reqId[0]},是否存在请求：${REQ_CATCH.has(this.reqId)}`);
+            REQ_CATCH.get(this.reqId)?.po.resolve(result.value);
+            REQ_CATCH.delete(this.reqId);
+            break;
+        } while (true);
+    }
+    /** 针对64位
+     * 第一块分区：版本号 2^8 8位，一个字节 1：表示消息，2：表示广播，4：心跳检测
+     * 第二块分区：头部标记 2^16 16位 两个字节  根据版本号这里各有不同，假如是消息，就是0，1；如果是广播则是组
+     * 第三块分区：数据主体 动态创建
+     */
+    structureBinary(fn, type, data = "", transferable_metadata) {
+        // op(send , version:number, cmd:string, reqId:number, type:number, data:string, transferable_metadata:number[])
+        const message = `{"cmd":"${fn}","type":${type},"data":${data},"transferable_metadata":[${transferable_metadata.join()}]}`;
+        // 字符 转 Uint16Array
+        const body = stringToByte(message);
+        return contactUint16(this.version_id, this.reqId, body);
+    }
+};
+const deno = new Deno$1();
+
+// dnt-shim-ignore
+// deno-lint-ignore no-explicit-any
+var jscore = globalThis
+    .PlaocJavascriptBridge;
+
+// 记得值需要大写开头，跟Native enum  保持一直
+var callNative;
+(function (callNative) {
+    /**打开dwebView */
+    callNative["openDWebView"] = "OpenDWebView";
+    /**二维码 */
+    callNative["openQrScanner"] = "OpenQrScanner";
+    /**条形码 */
+    callNative["openBarcodeScanner"] = "BarcodeScanner";
+    /**初始化app数据 */
+    callNative["initMetaData"] = "InitMetaData";
+    /**初始化运行时 */
+    callNative["denoRuntime"] = "DenoRuntime";
+    /**获取appid */
+    callNative["getBfsAppId"] = "GetBfsAppId";
+    /**传递给前端消息 */
+    callNative["evalJsRuntime"] = "EvalJsRuntime";
+    /**获取设备信息 */
+    callNative["getDeviceInfo"] = "GetDeviceInfo";
+    /**发送消息 */
+    callNative["sendNotification"] = "SendNotification";
+    /**申请权限 */
+    callNative["applyPermissions"] = "ApplyPermissions";
+    /**获取权限信息 */
+    callNative["getPermissions"] = "GetPermissions";
+    /** serviceworker 告知已经准备好 */
+    callNative["serviceWorkerReady"] = "ServiceWorkerReady";
+    /**设置dwebview的ui */
+    callNative["setDWebViewUI"] = "SetDWebViewUI";
+})(callNative || (callNative = {}));
+/**不需要返回的命令 */
+var callNotReturnNative;
+(function (callNotReturnNative) {
+    /**退出app */
+    callNotReturnNative["exitApp"] = "ExitApp";
+})(callNotReturnNative || (callNotReturnNative = {}));
+// 回调到对应的组件
+var callDVebView;
+(function (callDVebView) {
+    callDVebView["BarcodeScanner"] = "dweb-scanner";
+    callDVebView["OpenQrScanner"] = "dweb-scanner";
+    callDVebView["OpenDWebView"] = "dweb-view";
+    callDVebView["ExitApp"] = "dweb-app";
+})(callDVebView || (callDVebView = {}));
+// const callDeno
+
+/**
+ * 发送系统通知
+ * @param data
+ */
+function sendJsCoreNotification(data) {
+    return jscore.callJavaScriptWithFunctionNameParam(callNative.sendNotification, data);
+}
+function netCallNativeService(fn, data = "") {
+    const uint8 = jscore.callJavaScriptWithFunctionNameParam(fn, data);
+    if (!uint8)
+        return new Uint8Array(0);
+    console.log("netCallNativeService:==>", uint8);
+    return uint8;
+}
+
+/**判断是不是denoRuntime环境 */
+function isDenoRuntime() {
+    return checkType("Deno", "object");
+}
+var EDeviceModule;
+(function (EDeviceModule) {
+    EDeviceModule["default"] = "default";
+    EDeviceModule["silentMode"] = "silentMode";
+    EDeviceModule["doNotDisturb"] = "doNotDisturb";
+})(EDeviceModule || (EDeviceModule = {}));
+
+/** 判断当前属于哪个平台 */
+function currentPlatform() {
+    let platform = "";
+    if (jscore) {
+        platform = "ios";
+    }
+    else if (isDenoRuntime()) {
+        platform = "android";
+    }
+    else {
+        platform = "desktop";
+    }
+    return platform;
+}
+var EPlatform;
+(function (EPlatform) {
+    EPlatform["ios"] = "ios";
+    EPlatform["android"] = "android";
+    EPlatform["desktop"] = "desktop";
+})(EPlatform || (EPlatform = {}));
+
+class Network {
+    /**
+     * 异步调用方法,这个是给后端调用的方法，不会传递数据到前端
+     * @param handleFn
+     * @param data
+     * @returns
+     */
+    async asyncCallDenoFunction(handleFn, data = "") {
+        return await this.asyncSendMsgNative(handleFn, data).then((data) => {
+            if (currentPlatform() === EPlatform.ios) {
+                return data;
+            }
+            const result = bufferToString(data);
+            return result;
+        }).catch((err) => {
+            console.log("deno#asyncCallDenoFunction err", err);
+            return err;
+        });
+    }
+    /**
+     * 异步调用方法,这个是给后端调用的方法，不会传递数据到前端
+     * @param handleFn
+     * @param data
+     * @returns  Buffer
+     */
+    async asyncCallbackBuffer(handleFn, data = "") {
+        return await this.asyncSendMsgNative(handleFn, data);
+    }
+    /**
+     * 异步发送消息到android/ios
+     * @param handleFn
+     * @param data
+     * @returns
+     */
+    async asyncSendMsgNative(handleFn, data = "") {
+        // 发送消息的类型（标记为需要消息返回）
+        const type = Transform_Type.HAS_RETURN;
+        if (data instanceof Object && !ArrayBuffer.isView(data)) {
+            data = JSON.stringify(data); // stringify 两次转义一下双引号
+        }
+        // console.log("deno#asyncSendMsgNative request: ", handleFn, data)
+        // 处理IOS，可以不转buffer就不转，少了一道工序
+        if (currentPlatform() === EPlatform.ios) {
+            const msg = await netCallNativeService(handleFn, data);
+            return msg;
+        }
+        // 发送请求
+        const buffer = await deno.request(handleFn, [data], type);
+        // console.log("deno#asyncSendMsgNative Response: ", buffer)
+        return buffer;
+    }
+    /**
+     * 同步调用方法没返回值
+     * @param handleFn
+     * @param data
+     */
+    async syncSendMsgNative(handleFn, data = "") {
+        // 发送消息的类型 （标记为不需要返回）
+        const type = Transform_Type.NOT_RETURN;
+        if (data instanceof Object) {
+            data = JSON.stringify(data); // stringify 两次转义一下双引号
+        }
+        // 处理IOS，
+        if (currentPlatform() === EPlatform.ios) {
+            netCallNativeService(handleFn, data);
+        }
+        console.log("syncSendMsgNative#request: ", handleFn, data);
+        const result = await deno.request(handleFn, [data], type); // 发送请求
+        console.log("syncSendMsgNative#result: ", handleFn, result);
+    }
+    /**
+     * 分段发送buffer请求到native
+     * @param handleFn
+     * @param data
+     * @returns
+     */
+    async asyncSendBufferNative(handleFn, data) {
+        // 发送消息的类型（标记为需要消息返回，并且是二进制传输）
+        const type = Transform_Type.HAS_RETURN | Transform_Type.IS_ALL_BUFFER;
+        // 处理IOS，
+        if (currentPlatform() === EPlatform.ios) {
+            netCallNativeService(handleFn, data);
+        }
+        // 发送请求
+        const buffer = await deno.request(handleFn, data, type);
+        console.log("deno#asyncSendBufferNative Response: ", buffer);
+        return buffer;
+    }
+}
+const network = new Network();
+
+// /getBlockInfo 
+// [{ "url": "/getBlockInfo", "response": "https://62b94efd41bf319d22797acd.mockapi.io/bfchain/v1/getBlockInfo" }, { "url": "/getBlockHigh", "response": "https://62b94efd41bf319d22797acd.mockapi.io/bfchain/v1/getBlockInfo" }, { "url": "/app/bfchain.dev/index.html", "response": "/app/bfchain.dev/index.html" }, { "url": "/api/*", "response": "./api/*" }, { "url": "/api/upload", "response": "/api/update" }]
+/**
+ * 代理数据请求
+ * @param path
+ * @param importMap
+ */
+async function parseNetData(event, pathname, importMap) {
+    let url = "";
+    const request = event.request;
+    // 匹配bfsa-betadata.ts importMap 里面映射的
+    importMap.map((obj) => {
+        if (obj.url.includes(pathname)) {
+            url = obj.response;
+            return;
+        }
+    });
+    // 
+    // 如果没有在bfsa-metadata.ts里
+    if (!url) {
+        event.response.write("Not Found importMap in bfsa-metadata.ts !!!");
+        event.response.end();
+        return url;
+    }
+    let res;
+    if (request.method.toUpperCase() === "GET") {
+        //不含body
+        res = await fetch(url, {
+            headers: request.headers,
+            method: request.method,
+            mode: request.mode
+        });
+    }
+    else {
+        // 包含body
+        res = await fetch(url, {
+            headers: request.headers,
+            method: request.method,
+            mode: request.mode,
+            body: request.body,
+        });
+    }
+    // const buffer = await res.arrayBuffer(); // ⚠️考虑使用ReadableStream
+    // headers
+    res.headers.forEach((val, key) => {
+        event.response.setHeaders(key, val);
+    });
+    // statusCode
+    event.response.statusCode = res.status;
+    if (res.ok && res.body) {
+        const buff = res.body.getReader();
+        while (true) {
+            const { value, done } = await buff.read();
+            if (done) {
+                event.response.end();
+                break;
+            }
+            console.log("bodyStringValue:", value, ArrayBuffer.isView(value));
+            event.response.write(value);
+        }
+    }
+}
+
 class RequestEvent {
     constructor(request, response, channelId, bodyId) {
         Object.defineProperty(this, "request", {
@@ -1889,77 +1957,412 @@ function getServiceWorkerReady(fun) {
  * @param data
  * @returns
  */
-async function openChannel(data) {
-    await network.syncSendMsgNative(callNative.evalJsRuntime, `navigator.serviceWorker.controller.postMessage('${JSON.stringify({ cmd: ECommand.openChannel, data })}')`);
+function openChannel(config) {
+    callSWPostMessage({ cmd: ECommand.openChannel, data: config });
+}
+/**
+ * 申请一个channelId
+ * @param channelId
+ */
+function applyChannelId(channelId) {
+    callSWPostMessage({ cmd: ECommand.registerChannelId, data: channelId });
+}
+/**
+* 发送消息给serviceWorker message
+* @param hexResult
+*/
+function callSWPostMessage(result) {
+    network.syncSendMsgNative(callNative.evalJsRuntime, `navigator.serviceWorker.controller.postMessage('${JSON.stringify(result)}')`);
 }
 
-// /getBlockInfo 
-// [{ "url": "/getBlockInfo", "response": "https://62b94efd41bf319d22797acd.mockapi.io/bfchain/v1/getBlockInfo" }, { "url": "/getBlockHigh", "response": "https://62b94efd41bf319d22797acd.mockapi.io/bfchain/v1/getBlockInfo" }, { "url": "/app/bfchain.dev/index.html", "response": "/app/bfchain.dev/index.html" }, { "url": "/api/*", "response": "./api/*" }, { "url": "/api/upload", "response": "/api/update" }]
 /**
- * 代理数据请求
- * @param path
- * @param importMap
+ *
  */
-async function parseNetData(event, pathname, importMap) {
-    let url = "";
-    const request = event.request;
-    // 匹配bfsa-betadata.ts importMap 里面映射的
-    importMap.map((obj) => {
-        if (obj.url.includes(pathname)) {
-            url = obj.response;
-            return;
+class snowflakeIdv1 {
+    /**
+         *Creates an instance of Genid.
+         * @author zhupengfeivip
+         * @param {{
+         *     BaseTime: 1577836800000,  // 基础时间（ms 单位），默认2020年1月1日，不能超过当前系统时间，一旦投入使用就不能再更改，更改后产生的ID可能会和以前的重复
+         *     WorkerId: Number, // 机器码，必须由外部设定，最大值 2^WorkerIdBitLength-1
+         *     WorkerIdBitLength: 6,   // 机器码位长，默认值 6，取值范围 [1, 15](要求：序列数位长+机器码位长不超过 22)
+         *     SeqBitLength: 6,   // 序列数位长，默认值 6，取值范围 [3, 21](要求：序列数位长+机器码位长不超过 22)
+         *     MaxSeqNumber: 5, // 最大序列数（含），设置范围 [MinSeqNumber, 2^SeqBitLength-1]，默认值 0，表示最大序列数取最大值（2^SeqBitLength-1]）
+         *     MinSeqNumber: 5, // 最小序列数（含），默认值 5，取值范围 [5, MaxSeqNumber]，每毫秒的前 5 个序列数对应编号 0-4 是保留位，其中 1-4 是时间回拨相应预留位，0 是手工新值预留位
+         *     TopOverCostCount: 2000// 最大漂移次数（含），默认 2000，推荐范围 500-10000（与计算能力有关）
+         * }} options
+         * @memberof Genid
+         */
+    constructor(options) {
+        /**
+         * 雪花计算方法，（1-漂移算法|2-传统算法），默认 1
+         */
+        Object.defineProperty(this, "Method", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
+        /**
+         * 基础时间（ms 单位），不能超过当前系统时间
+         */
+        Object.defineProperty(this, "BaseTime", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
+        /**
+         * 机器码，必须由外部设定，最大值 2^WorkerIdBitLength-1
+         */
+        Object.defineProperty(this, "WorkerId", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
+        /**
+         * 机器码位长，默认值 6，取值范围 [1, 15](要求：序列数位长+机器码位长不超过 22)
+         */
+        Object.defineProperty(this, "WorkerIdBitLength", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
+        /**
+         * 序列数位长，默认值 6，取值范围 [3, 21](要求：序列数位长+机器码位长不超过 22)
+         */
+        Object.defineProperty(this, "SeqBitLength", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
+        /**
+         * 最大序列数（含），设置范围 [MinSeqNumber, 2^SeqBitLength-1]，默认值 0，表示最大序列数取最大值（2^SeqBitLength-1]）
+         */
+        Object.defineProperty(this, "MaxSeqNumber", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
+        /**
+         * 最小序列数（含），默认值 5，取值范围 [5, MaxSeqNumber]，每毫秒的前 5 个序列数对应编号 0-4 是保留位，其中 1-4 是时间回拨相应预留位，0 是手工新值预留位
+         */
+        Object.defineProperty(this, "MinSeqNumber", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
+        /**
+         * 最大漂移次数（含），默认 2000，推荐范围 500-10000（与计算能力有关）
+         */
+        Object.defineProperty(this, "TopOverCostCount", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
+        /**
+         *
+         */
+        Object.defineProperty(this, "_TimestampShift", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
+        /**
+         *
+         */
+        Object.defineProperty(this, "_CurrentSeqNumber", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
+        /**
+         *
+         */
+        Object.defineProperty(this, "_LastTimeTick", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
+        /**
+         * 回拨次序, 支持 4 次回拨次序（避免回拨重叠导致 ID 重复）
+         */
+        Object.defineProperty(this, "_TurnBackTimeTick", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
+        /**
+         *
+         */
+        Object.defineProperty(this, "_TurnBackIndex", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
+        /**
+         *
+         */
+        Object.defineProperty(this, "_IsOverCost", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
+        /**
+         *
+         */
+        Object.defineProperty(this, "_OverCostCountInOneTerm", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
+        if (options.workerId === undefined)
+            throw new Error("lost WorkerId");
+        // 1.BaseTime 2020年1月1日 Wed, 01 Jan 2020 00:00:00 GMT 0时区的2020年1月1日
+        const BaseTime = 1577836800000;
+        if (!options.baseTime || options.baseTime < 0)
+            options.baseTime = BaseTime;
+        // 2.WorkerIdBitLength
+        const WorkerIdBitLength = 6;
+        if (!options.workerIdBitLength || options.workerIdBitLength < 0)
+            options.workerIdBitLength = WorkerIdBitLength;
+        // 4.SeqBitLength
+        const SeqBitLength = 6;
+        if (!options.seqBitLength || options.seqBitLength < 0)
+            options.seqBitLength = SeqBitLength;
+        // 5.MaxSeqNumber
+        if (options.maxSeqNumber == undefined || options.maxSeqNumber <= 0)
+            options.maxSeqNumber = (1 << SeqBitLength) - 1;
+        // 6.MinSeqNumber
+        const MinSeqNumber = 5;
+        if (options.minSeqNumber == undefined || options.minSeqNumber < 0)
+            options.minSeqNumber = MinSeqNumber;
+        // 7.Others
+        const topOverCostCount = 2000;
+        if (options.topOverCostCount == undefined || options.topOverCostCount < 0)
+            options.topOverCostCount = topOverCostCount;
+        if (options.method !== 2)
+            options.method = 1;
+        else
+            options.method = 2;
+        this.Method = BigInt(options.method);
+        this.BaseTime = BigInt(options.baseTime);
+        this.WorkerId = BigInt(options.workerId);
+        this.WorkerIdBitLength = BigInt(options.workerIdBitLength);
+        this.SeqBitLength = BigInt(options.seqBitLength);
+        this.MaxSeqNumber = BigInt(options.maxSeqNumber);
+        this.MinSeqNumber = BigInt(options.minSeqNumber);
+        this.TopOverCostCount = BigInt(options.topOverCostCount);
+        const timestampShift = this.WorkerIdBitLength + this.SeqBitLength;
+        const currentSeqNumber = this.MinSeqNumber;
+        this._TimestampShift = timestampShift;
+        this._CurrentSeqNumber = currentSeqNumber;
+        this._LastTimeTick = BigInt(0);
+        this._TurnBackTimeTick = BigInt(0);
+        this._TurnBackIndex = 0;
+        this._IsOverCost = false;
+        this._OverCostCountInOneTerm = 0;
+    }
+    /**
+     * 雪花漂移算法
+     * @returns
+     */
+    NextOverCostId() {
+        const currentTimeTick = this.GetCurrentTimeTick();
+        if (currentTimeTick > this._LastTimeTick) {
+            //当前时间大于上次时间，说明是时间是递增的，这是正常情况
+            this._LastTimeTick = currentTimeTick;
+            this._CurrentSeqNumber = this.MinSeqNumber;
+            this._IsOverCost = false;
+            this._OverCostCountInOneTerm = 0;
+            // this._GenCountInOneTerm = 0
+            return this.CalcId(this._LastTimeTick);
         }
-    });
-    // 
-    // 如果没有在bfsa-metadata.ts里
-    if (!url) {
-        event.response.write("Not Found importMap in bfsa-metadata.ts !!!");
-        event.response.end();
-        return url;
+        if (this._OverCostCountInOneTerm >= this.TopOverCostCount) {
+            //当前漂移次数超过最大限制
+            // TODO: 在漂移终止，等待时间对齐时，如果发生时间回拨较长，则此处可能等待较长时间。可优化为：在漂移终止时增加时间回拨应对逻辑。（该情况发生概率很低）
+            this._LastTimeTick = this.GetNextTimeTick();
+            this._CurrentSeqNumber = this.MinSeqNumber;
+            this._IsOverCost = false;
+            this._OverCostCountInOneTerm = 0;
+            // this._GenCountInOneTerm = 0
+            return this.CalcId(this._LastTimeTick);
+        }
+        if (this._CurrentSeqNumber > this.MaxSeqNumber) {
+            //当前序列数超过最大限制，则要提前透支
+            this._LastTimeTick++;
+            this._CurrentSeqNumber = this.MinSeqNumber;
+            this._IsOverCost = true;
+            this._OverCostCountInOneTerm++;
+            // this._GenCountInOneTerm++
+            return this.CalcId(this._LastTimeTick);
+        }
+        // this._GenCountInOneTerm++
+        return this.CalcId(this._LastTimeTick);
     }
-    let res;
-    if (request.method.toUpperCase() === "GET") {
-        //不含body
-        res = await fetch(url, {
-            headers: request.headers,
-            method: request.method,
-            mode: request.mode
-        });
-    }
-    else {
-        // 包含body
-        res = await fetch(url, {
-            headers: request.headers,
-            method: request.method,
-            mode: request.mode,
-            body: request.body,
-        });
-    }
-    // const buffer = await res.arrayBuffer(); // ⚠️考虑使用ReadableStream
-    // headers
-    res.headers.forEach((val, key) => {
-        event.response.setHeaders(key, val);
-    });
-    // statusCode
-    event.response.statusCode = res.status;
-    if (res.ok && res.body) {
-        const buff = res.body.getReader();
-        while (true) {
-            const { value, done } = await buff.read();
-            if (done) {
-                event.response.end();
-                break;
+    /**
+     * 常规雪花算法
+     * @returns
+     */
+    NextNormalId() {
+        const currentTimeTick = this.GetCurrentTimeTick();
+        if (currentTimeTick < this._LastTimeTick) {
+            if (this._TurnBackTimeTick < 1) {
+                this._TurnBackTimeTick = this._LastTimeTick - BigInt(1);
+                this._TurnBackIndex++;
+                // 每毫秒序列数的前 5 位是预留位，0 用于手工新值，1-4 是时间回拨次序
+                // 支持 4 次回拨次序（避免回拨重叠导致 ID 重复），可无限次回拨（次序循环使用）。
+                if (this._TurnBackIndex > 4)
+                    this._TurnBackIndex = 1;
             }
-            console.log("bodyStringValue:", value, ArrayBuffer.isView(value));
-            event.response.write(value);
+            return this.CalcTurnBackId(this._TurnBackTimeTick);
         }
+        // 时间追平时，_TurnBackTimeTick 清零
+        if (this._TurnBackTimeTick > 0) {
+            this._TurnBackTimeTick = BigInt(0);
+        }
+        if (currentTimeTick > this._LastTimeTick) {
+            this._LastTimeTick = currentTimeTick;
+            this._CurrentSeqNumber = this.MinSeqNumber;
+            return this.CalcId(this._LastTimeTick);
+        }
+        if (this._CurrentSeqNumber > this.MaxSeqNumber) {
+            // this._TermIndex++
+            this._LastTimeTick++;
+            this._CurrentSeqNumber = this.MinSeqNumber;
+            this._IsOverCost = true;
+            this._OverCostCountInOneTerm = 1;
+            // this._GenCountInOneTerm = 1
+            return this.CalcId(this._LastTimeTick);
+        }
+        return this.CalcId(this._LastTimeTick);
+    }
+    /**
+     * 生成ID
+     * @param useTimeTick 时间戳
+     * @returns
+     */
+    CalcId(useTimeTick) {
+        //ID组成 1.相对基础时间的时间差 | 2.WorkerId | 3.序列数
+        //时间差，是生成ID时的系统时间减去 BaseTime 的总时间差（毫秒单位）
+        const result = BigInt(useTimeTick << this._TimestampShift) + BigInt(this.WorkerId << this.SeqBitLength) + BigInt(this._CurrentSeqNumber);
+        this._CurrentSeqNumber++;
+        return result;
+    }
+    /**
+     * 生成时间回拨ID
+     * @returns
+     */
+    CalcTurnBackId(useTimeTick) {
+        const result = BigInt(useTimeTick << this._TimestampShift) + BigInt(this.WorkerId << this.SeqBitLength) + BigInt(this._TurnBackIndex);
+        this._TurnBackTimeTick--;
+        return result;
+    }
+    /**
+     *
+     * @returns
+     */
+    GetCurrentTimeTick() {
+        const millis = BigInt((new Date()).valueOf());
+        return millis - this.BaseTime;
+    }
+    /**
+     *
+     * @returns
+     */
+    GetNextTimeTick() {
+        let tempTimeTicker = this.GetCurrentTimeTick();
+        while (tempTimeTicker <= this._LastTimeTick) {
+            tempTimeTicker = this.GetCurrentTimeTick();
+        }
+        return tempTimeTicker;
+    }
+    /**
+     * 生成ID
+     * @returns 始终输出number类型，超过时throw error
+     */
+    NextNumber() {
+        if (this._IsOverCost) {
+            const id = this.NextOverCostId();
+            if (id >= 9007199254740992n)
+                throw Error(`${id.toString()} over max of Number 9007199254740992`);
+            return parseInt(id.toString());
+        }
+        else {
+            const id = this.NextNormalId();
+            if (id >= 9007199254740992n)
+                throw Error(`${id.toString()} over max of Number 9007199254740992`);
+            return parseInt(id.toString());
+        }
+    }
+    /**
+     * 生成ID
+     * @returns 根据输出数值判断，小于number最大值时输出number类型，大于时输出bigint
+     */
+    NextId() {
+        if (this._IsOverCost) {
+            const id = this.NextOverCostId();
+            if (id >= 9007199254740992n)
+                return id;
+            else
+                return parseInt(id.toString());
+        }
+        else {
+            const id = this.NextNormalId();
+            if (id >= 9007199254740992n)
+                return id;
+            else
+                return parseInt(id.toString());
+        }
+    }
+    /**
+     * 生成ID
+     * @returns 始终输出bigint类型
+     */
+    NextBigId() {
+        if (this._IsOverCost) {
+            //
+            return this.NextOverCostId();
+        }
+        else {
+            //
+            return this.NextNormalId();
+        }
+    }
+}
+
+class Channels {
+    constructor() {
+        Object.defineProperty(this, "gen", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
+        this.gen = new snowflakeIdv1({ workerId: 213, seqBitLength: 6 });
+    }
+    getChannelId() {
+        return this.gen.NextId() + "";
     }
 }
 
 // 存储需要触发前端的事件，需要等待serviceworekr准备好
 // deno-lint-ignore no-explicit-any
 const EventPollQueue = [];
-const request_body_cache = EasyMap.from({
+const request_body_cache = EasyMap$1.from({
     // deno-lint-ignore no-unused-vars
     creater(boydId) {
         let bodyStreamController;
@@ -1988,8 +2391,15 @@ class DWebView extends MapEventEmitter {
             writable: true,
             value: void 0
         });
+        Object.defineProperty(this, "channel", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
         this.entrys = metaData.manifest.enters;
         this.importMap = metaData.dwebview.importmap;
+        this.channel = new Channels();
         this.initAppMetaData(metaData);
         this.dwebviewToDeno(); // 挂载轮询操作， 这里会自动处理来自前端的请求，并且处理操作返回到前端
         this.on("request", async (event) => {
@@ -2019,7 +2429,9 @@ class DWebView extends MapEventEmitter {
    * 这里是接收dwebView-js操作系统API转发到后端的请求
    */
     async dwebviewToDeno(strPath) {
-        if (currentPlatform() === EPlatform.ios && strPath) {
+        if (currentPlatform() === EPlatform.ios) {
+            if (!strPath)
+                return;
             return this.chunkGateway(strPath);
         }
         do {
@@ -2039,6 +2451,12 @@ class DWebView extends MapEventEmitter {
      */
     async chunkGateway(strPath) {
         console.log("strPath :", strPath);
+        // 注册channelID
+        if (strPath.startsWith("/chunk/registryChannelId")) {
+            const channelId = this.channel.getChannelId();
+            return applyChannelId(channelId);
+        }
+        // 转发请求
         if (strPath.startsWith("/channel")) { // /channel/349512662458373/chunk=0002,104,116,116,112,115,58,1
             // 拿到channelId
             const channelId = strPath.substring(strPath.lastIndexOf("/channel/") + 9, strPath.lastIndexOf("/chunk"));
@@ -2084,7 +2502,7 @@ class DWebView extends MapEventEmitter {
             const event = new RequestEvent(req, new RequestResponse(responseBodyCtrl, (statusCode, headers) => {
                 postBodyDone.resolve();
                 // 发送header头到serviceworker
-                this.callSWPostMessage({
+                callSWPostMessage({
                     returnId: headersId,
                     channelId: channelId,
                     chunk: stringToByte(JSON.stringify({ statusCode, headers })).join(",") + ",0" // 后面加0 表示发送未结束
@@ -2100,7 +2518,7 @@ class DWebView extends MapEventEmitter {
                 const { value: chunk, done } = await responseBodyReader.read();
                 if (done) {
                     console.log("dwebView#responseBodyReader:啊我结束了", headersId + 1, chunk, done);
-                    this.callSWPostMessage({
+                    callSWPostMessage({
                         returnId: headersId + 1,
                         channelId: channelId,
                         chunk: "1" // 后面加1 表示发送结束
@@ -2108,7 +2526,7 @@ class DWebView extends MapEventEmitter {
                     break;
                 }
                 console.log("dwebView#responseBodyReader:", headersId + 1, chunk, done);
-                this.callSWPostMessage({
+                callSWPostMessage({
                     returnId: headersId + 1,
                     channelId: channelId,
                     chunk: chunk.join(",") + ",0" // 后面加0 表示发送未结束
@@ -2148,14 +2566,6 @@ class DWebView extends MapEventEmitter {
     openRequest(url, mode) {
         EventPollQueue.push({ url, mode });
         // await this.openChannel({ url, mode })
-    }
-    /**
-    * 发送消息给serviceWorker message
-    * @param hexResult
-    */
-    // deno-lint-ignore ban-types
-    callSWPostMessage(result) {
-        network.syncSendMsgNative(callNative.evalJsRuntime, `navigator.serviceWorker.controller.postMessage('${JSON.stringify(result)}')`);
     }
     /**
     * 初始化app元数据
@@ -2675,6 +3085,7 @@ const webView = new DWebView(metaData);
 })();
 // 多入口指定
 webView.activity("https://objectjson.waterbang.top/");
+// webView.activity("index.html");
 try {
     sendNotification({ title: "消息头", body: "今晚打老虎", priority: 1 });
 }

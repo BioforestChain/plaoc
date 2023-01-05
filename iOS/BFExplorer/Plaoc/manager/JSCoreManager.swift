@@ -62,8 +62,9 @@ class JSCoreManager: NSObject {
     }
     
     func handleEvaluateScript(jsString: String) {
-        let functionString = "webView.dwebviewToDeno" + "(\(jsString)"
+        let functionString = "webView.dwebviewToDeno('\(jsString)')"
         let result = jsContext?.evaluateScript(functionString)
+        print("swift#handleEvaluateScript",functionString)
         print(result?.toString())
     }
     

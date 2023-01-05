@@ -25,6 +25,7 @@ class BatchFileManager: NSObject {
     private var appNames: [String:String] = [:]
     private var appImages: [String:UIImage?] = [:]
     private var fileLinkDict: [String:String] = [:]
+    private var redDict: [String: Bool] = [:]
     
     private(set) var appFilePaths: [String] = []
     
@@ -408,5 +409,28 @@ class BatchFileManager: NSObject {
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         let controller = appDelegate.window?.rootViewController
         controller?.present(alertVC, animated: true)
+    }
+}
+
+extension BatchFileManager {
+    
+    //更新新版本红点
+    func updateRedHot(fileName: String, statue: Bool) {
+        redDict[fileName] = statue
+    }
+    //得到红点状态
+    func redHot(fileName: String) -> Bool {
+        return redDict[fileName] ?? false
+    }
+    
+    //更新本地文件数据
+    func updateLocalSystemAPPData(fileName: String) {
+        
+        if !appFilePaths.contains(fileName) {
+            appFilePaths.append(fileName)
+        }
+        fileType[fileName] = .system
+        appNames[fileName] = sysManager.appName(fileName: fileName)
+        appImages[fileName] = sysManager.appIcon(fileName: fileName)
     }
 }

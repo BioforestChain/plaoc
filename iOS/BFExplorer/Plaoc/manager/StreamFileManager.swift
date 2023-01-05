@@ -8,20 +8,19 @@
 import UIKit
 
 class StreamFileManager: NSObject {
-
-    func list(fileName: String, path: String) -> [FileModel] {
+    
+    func list(fileName: String, filePath: String, isContainFile: Bool = false) -> [FileModel] {
 """
         "/home/user/haha/test.txt"
-        name = "/home/user/haha/test.txt"
+        name = "test.txt"
         extname = "txt"
         path = "/home/user/haha/test.txt"
-        cwd = "/home/user/haha"
+        cwd = "/"
         type = "?"
         isLink = false
         relativePath = "/home/user/haha"
 """
-        
-        let filePath = rootFilePath(fileName: fileName) + path
+        let rootPath = rootFilePath(fileName: fileName)
         let manager = FileManager.default
         guard manager.fileExists(atPath: filePath) else { return [] }
         var currentFile = createCurrentFileModel(path: filePath)
@@ -31,8 +30,10 @@ class StreamFileManager: NSObject {
             return [currentFile]
         } else { //文件夹
             currentFile.type = "directory"
-            var subModels = createSubFileModels(path: path)
-            subModels.insert(currentFile, at: 0)
+            var subModels = createSubFileModels(path: filePath, rootPath: rootPath)
+            if isContainFile {
+                subModels.insert(currentFile, at: 0)
+            }
             return subModels
         }
     }
@@ -54,20 +55,17 @@ class StreamFileManager: NSObject {
         var pathLists: [String] = []
         let manager = FileManager.default
         guard let paths = try? manager.contentsOfDirectory(atPath: path) else { return [] }
+        for subPath in paths {
+            pathLists.append(path + "/" + subPath)
+        }
+        guard isRecursive else { return pathLists }
+        guard let recursivePaths = manager.enumerator(atPath: path)?.allObjects as? [String] else { return [] }
         if filter != nil {
             //TODO 过滤一些条件路径
             /**
              let attri = try? manager.attributesOfItem(atPath: sub)
              print(attri![FileAttributeKey(rawValue: FileAttributeKey.type.rawValue)])  //文件类型: NSFileTypeRegular 文件  NSFileTypeDirectory 文件夹
              */
-        }
-        for subPath in paths {
-            pathLists.append(path + "/" + subPath)
-        }
-        guard isRecursive else { return pathLists }
-        guard let recursivePaths = try? manager.enumerator(atPath: path)?.allObjects as? [String] else { return [] }
-        if filter != nil {
-            //TODO 过滤一些条件路径
         }
         pathLists.removeAll()
         for subPath in recursivePaths {
@@ -77,19 +75,25 @@ class StreamFileManager: NSObject {
     }
     
     //得到当前文件夹及其子文件对象，递归遍历
-    private func createSubFileModels(path: String) -> [FileModel] {
+    private func createSubFileModels(path: String, rootPath: String) -> [FileModel] {
         let manager = FileManager.default
+        // 获取应用根目录url，方便之后得到无/结尾的路径地址
+        let rootUrl = URL(fileURLWithPath: rootPath, isDirectory: true)
+        // 获取当前路径的相对于应用根目录的绝对路径地址
+        let cwd = path.replacingOccurrences(of: rootUrl.path, with: "") != "" ? path.replacingOccurrences(of: rootUrl.path, with: "") : "/"
+        // 获取当前路径的完整路径地址
+        let cwdPath = URL(fileURLWithPath: rootUrl.path + cwd).path
         guard let enumeratorPaths = try? manager.contentsOfDirectory(atPath: path) else { return [] }
         var fileArray: [FileModel] = []
         for subPath in enumeratorPaths {
             let totalPath = path + "/" + subPath
             var fileModel = FileModel()
-            fileModel.name = totalPath
+            fileModel.name = URL(fileURLWithPath: totalPath).lastPathComponent
             fileModel.extname = URL(fileURLWithPath: totalPath).pathExtension
-            fileModel.path = totalPath
-            fileModel.cwd = URL(fileURLWithPath: totalPath).deletingLastPathComponent().absoluteString
-            fileModel.isLink = false
-            fileModel.relativePath = URL(fileURLWithPath: totalPath).relativeString
+            fileModel.path = URL(fileURLWithPath: totalPath, relativeTo: rootUrl).path.replacingOccurrences(of: rootUrl.path, with: "")
+            fileModel.cwd = cwd
+            fileModel.isLink = try? FileWrapper(url: URL(fileURLWithPath: totalPath)).isSymbolicLink
+            fileModel.relativePath = "." + URL(fileURLWithPath: totalPath).path.replacingOccurrences(of: cwdPath, with: "")
             let subFiles = try? manager.contentsOfDirectory(atPath: totalPath)
             if subFiles == nil { //文件
                 fileModel.type = "file"
@@ -115,6 +119,28 @@ class StreamFileManager: NSObject {
     //读取数据返回二进制
     func readFileData(fileName: String, path: String) -> Data? {
         let filePath = rootFilePath(fileName: fileName) + path
+        guard FileManager.default.fileExists(atPath: filePath) else { return nil }
+        let stream = InputStream(fileAtPath: filePath)
+        stream?.open()
+        defer {
+            stream?.close()
+        }
+        
+        let bufferSize = 1024
+        let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: bufferSize)
+        defer {
+            buffer.deallocate()
+        }
+        var resultData = Data()
+        while stream!.hasBytesAvailable {
+            let length = stream!.read(buffer, maxLength: bufferSize)
+            let data = Data(bytes: buffer, count: length)
+            resultData.append(data)
+        }
+        return resultData
+    }
+    
+    func readFileData(filePath: String) -> Data? {
         guard FileManager.default.fileExists(atPath: filePath) else { return nil }
         let stream = InputStream(fileAtPath: filePath)
         stream?.open()

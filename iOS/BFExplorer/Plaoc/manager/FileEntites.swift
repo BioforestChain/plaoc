@@ -16,18 +16,18 @@ extension PlaocHandleModel {
         return filePath + "/system-app/\(fileName)/home"
     }
     
-    // 获取指定文件系统目录下的目录
+    func pathPrefixReplace(_ path: String) -> String {
+        return path.regexReplacePattern(pattern: "^[.]+", replaceString: "")
+    }
+    	
+    // 获取指定文件系统目录下的内容
     func executiveFileSystemLs(param: Any) -> String {
         guard let param = param as? String else { return "" }
         let data = JSON.init(parseJSON: param)
         let homePath = getDwebAppPath()
-        
-        guard let url = URL(string: homePath + data["path"].stringValue) else {
-            return ""
-        }
-        
+
         do {
-            let urls = try FileSystemManager.readdir(at: url)
+            let urls = try FileSystemManager.readdir(at: URL(fileURLWithPath: homePath + pathPrefixReplace(data["path"].stringValue)))
             
             if urls.count > 0 {
                 
@@ -39,7 +39,8 @@ extension PlaocHandleModel {
                 return "[]"
             }
         } catch {
-            return ""
+            print("ls error: \(error)")
+            return "\(error)"
         }
     }
     
@@ -49,15 +50,12 @@ extension PlaocHandleModel {
         let data = JSON.init(parseJSON: param)
         let homePath = getDwebAppPath()
         
-        guard let url = URL(string: homePath + data["path"].stringValue) else {
-            return false
-        }
-        
         do {
-            try FileSystemManager.mkdir(at: url, recursive: data["option"]["recursive"].boolValue)
+            try FileSystemManager.mkdir(at: URL(fileURLWithPath: homePath + pathPrefixReplace(data["path"].stringValue)), recursive: data["option"]["recursive"].boolValue)
             
             return true
         } catch {
+            print("mkdir error: \(error)")
             return false
         }
     }
@@ -68,23 +66,29 @@ extension PlaocHandleModel {
         let data = JSON.init(parseJSON: param)
         let homePath = getDwebAppPath()
         
-        guard let url = URL(string: homePath + data["path"].stringValue) else {
-            return false
-        }
-        
         do {
+            let url = URL(fileURLWithPath: homePath + pathPrefixReplace(data["path"].stringValue))
             // 获取文件类型
             let fileAttr = try FileSystemManager.stat(at: url)
             let fileType = FileSystemManager.getType(from: fileAttr)
             
+            print("fileType: \(fileType)")
+            
             if fileType == "file" {
                 try FileSystemManager.deleteFile(at: url)
             } else {
-                try FileSystemManager.rmdir(at: url, recursive: data["option"]["recursive"].boolValue)
+                var recursive = true
+                
+                if data["option"]["deepDelete"].exists() {
+                    recursive = data["option"]["deepDelete"].boolValue
+                }
+                
+                try FileSystemManager.rmdir(at: url, recursive: recursive)
             }
             
             return true
         } catch {
+            print("rm error: \(error)")
             return false
         }
     }
@@ -95,16 +99,13 @@ extension PlaocHandleModel {
         let data = JSON.init(parseJSON: param)
         let homePath = getDwebAppPath()
         
-        guard let url = URL(string: homePath + data["path"].stringValue) else {
-            return ""
-        }
-        
         do {
-            let result = try FileSystemManager.readFile(at: url)
+            let result = try FileSystemManager.readFile(at: URL(fileURLWithPath: homePath + pathPrefixReplace(data["path"].stringValue)), with: true)
             
             return result
         } catch {
-            return ""
+            print("read error: \(error)")
+            return "\(error)"
         }
     }
     
@@ -114,56 +115,103 @@ extension PlaocHandleModel {
         let data = JSON.init(parseJSON: param)
         let homePath = getDwebAppPath()
         
-        guard let url = URL(string: homePath + data["path"].stringValue) else {
-            return false
-        }
-        
         do {
+            let url = URL(fileURLWithPath: homePath + pathPrefixReplace(data["path"].stringValue))
             if data["option"]["append"].boolValue {
-                try FileSystemManager.appendFile(at: url, with: data["content"].stringValue, recursive: data["option"]["recursive"].boolValue)
+                try FileSystemManager.appendFile(at: url, with: data["content"].stringValue, recursive: data["option"]["autoCreate"].boolValue, with: true)
             } else {
-                try FileSystemManager.writeFile(at: url, with: data["content"].stringValue, recursive: data["option"]["recursive"].boolValue)
+                try FileSystemManager.writeFile(at: url, with: data["content"].stringValue, recursive: data["option"]["autoCreate"].boolValue, encoding: true)
             }
             
             return true
         } catch {
+            print("write error: \(error)")
             return false
         }
     }
     
-    // 获取指定文件系统目录或文件详细信息
+    // 获取指定文件详细信息
     func executiveFileSystemStat(param: Any) -> String {
         guard let param = param as? String else { return "" }
         let data = JSON.init(parseJSON: param)
         let homePath = getDwebAppPath()
         
-        guard let url = URL(string: homePath + data["path"].stringValue) else {
-            return ""
-        }
-        
         do {
             // 获取文件类型
-            let fileAttr = try FileSystemManager.stat(at: url)
+            let fileAttr = try FileSystemManager.stat(at: URL(fileURLWithPath: homePath + pathPrefixReplace(data["path"].stringValue)))
             let fileType = FileSystemManager.getType(from: fileAttr)
             
             var dict: [String:Any] = [:]
             
             dict["type"] = fileType
             dict["size"] = fileAttr[.size]
-            dict["uri"] = URL(string: data["path"].stringValue)
-            dict["mtime"] = fileAttr[.modificationDate]
-            dict["ctime"] = fileAttr[.creationDate]
-            
+            dict["uri"] = pathPrefixReplace(data["path"].stringValue)
+            dict["mtime"] = (fileAttr[.modificationDate] as? Date)?.description
+            dict["ctime"] = (fileAttr[.creationDate] as? Date)?.description
+
             let str = ChangeTools.dicValueString(dict)
             
             return str ?? ""
         } catch {
-            return ""
+            print("stat error: \(error)")
+            return "\(error)"
         }
     }
     
     // 获取指定文件系统目录信息
     func executiveFileSystemList(param: Any) -> String {
-        return ""
+        guard let param = param as? String else { return "" }
+        let data = JSON.init(parseJSON: param)
+        let homePath = getDwebAppPath()
+        
+        do {
+            let url = URL(fileURLWithPath: homePath + pathPrefixReplace(data["path"].stringValue))
+            let result = StreamFileManager().list(fileName: fileName, filePath: url.path)
+            let jsonEncoder = JSONEncoder()
+            let jsonData = try jsonEncoder.encode(result)
+            let jsonString = String(data: jsonData, encoding: .utf8)
+            
+            return jsonString ?? ""
+        } catch {
+            print("list error: \(error)")
+            return "\(error)"
+        }
+    }
+    
+    // 重命名文件
+    func executiveFileSystemRename(param: Any) -> Bool {
+        guard let param = param as? String else {
+            return false
+        }
+        
+        let data = JSON.init(parseJSON: param)
+        let homePath = getDwebAppPath()
+        
+        do {
+            try FileSystemManager.rename(at: URL(fileURLWithPath: homePath + pathPrefixReplace(data["path"].stringValue)), to: URL(fileURLWithPath: homePath + pathPrefixReplace(data["newPath"].stringValue)))
+            
+            return true
+        } catch {
+            print("rename error: \(error)")
+            return false
+        }
+    }
+    
+    // 以buffer的形式读取文件
+    func executiveFileSystemReadBuffer(param: Any) -> [UInt8]? {
+        guard let param = param as? String else {
+            return nil
+        }
+        
+        let data = JSON.init(parseJSON: param)
+        let homePath = getDwebAppPath()
+        let url = URL(fileURLWithPath: homePath + pathPrefixReplace(data["path"].stringValue))
+        let result = StreamFileManager().readFileData(filePath: url.path)
+        
+        if result != nil {
+            return [UInt8](result!)
+        } else {
+            return nil
+        }
     }
 }

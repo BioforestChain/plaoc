@@ -49,10 +49,12 @@ class BFSNetworkManager: NSObject {
                                             }
                                         } else {
                                             schemePath = desPath + "/\(name!)/sys"
+                                            isReplace = true
                                         }
                                         if name != nil {
                                             if isReplace {
                                                 Schemehandler.setupHTMLCache(fileName: name!, fromPath: schemePath)
+                                                BatchFileManager.shared.updateRedHot(fileName: name!, statue: true)
                                             }
                                             RefreshManager.saveLastUpdateTime(fileName: name!, time: Date().timeStamp)
                                         }
