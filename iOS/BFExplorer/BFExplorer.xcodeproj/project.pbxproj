@@ -113,13 +113,6 @@
 		F091CB552951B90A00FCE565 /* BatchScanManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F091CB502951B90A00FCE565 /* BatchScanManager.swift */; };
 		F091CB562951B90A00FCE565 /* BatchFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F091CB512951B90A00FCE565 /* BatchFileManager.swift */; };
 		F091CB572951B90A00FCE565 /* BatchSystemManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F091CB522951B90A00FCE565 /* BatchSystemManager.swift */; };
-		F091CB602951B91200FCE565 /* method_photo.svg in Resources */ = {isa = PBXBuildFile; fileRef = F091CB592951B91200FCE565 /* method_photo.svg */; };
-		F091CB612951B91200FCE565 /* coil_logo_colored.svg in Resources */ = {isa = PBXBuildFile; fileRef = F091CB5A2951B91200FCE565 /* coil_logo_colored.svg */; };
-		F091CB622951B91200FCE565 /* statusbar.html in Resources */ = {isa = PBXBuildFile; fileRef = F091CB5B2951B91200FCE565 /* statusbar.html */; };
-		F091CB632951B91200FCE565 /* ico_bottom_tab_publisher.svg in Resources */ = {isa = PBXBuildFile; fileRef = F091CB5C2951B91200FCE565 /* ico_bottom_tab_publisher.svg */; };
-		F091CB642951B91200FCE565 /* example.html in Resources */ = {isa = PBXBuildFile; fileRef = F091CB5D2951B91200FCE565 /* example.html */; };
-		F091CB652951B91200FCE565 /* install.js in Resources */ = {isa = PBXBuildFile; fileRef = F091CB5E2951B91200FCE565 /* install.js */; };
-		F091CB662951B91200FCE565 /* angle_nft.png in Resources */ = {isa = PBXBuildFile; fileRef = F091CB5F2951B91200FCE565 /* angle_nft.png */; };
 		F091CB7D2951B91900FCE565 /* CacheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F091CB682951B91900FCE565 /* CacheManager.swift */; };
 		F091CB7E2951B91900FCE565 /* ReachabilityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F091CB692951B91900FCE565 /* ReachabilityManager.swift */; };
 		F091CB7F2951B91900FCE565 /* BluetoothManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F091CB6A2951B91900FCE565 /* BluetoothManager.swift */; };
@@ -176,6 +169,8 @@
 		F33A570729598A1E00000037 /* ShareManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F33A570629598A1E00000037 /* ShareManager.swift */; };
 		F33B31E4295A858B000EB302 /* ToastManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F33B31E3295A858B000EB302 /* ToastManager.swift */; };
 		F33B31E6295A8AA6000EB302 /* SplashScreenManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F33B31E5295A8AA6000EB302 /* SplashScreenManager.swift */; };
+		F33BE3C42966BDAC006D30B9 /* injectWebView in Resources */ = {isa = PBXBuildFile; fileRef = F33BE3C32966BDAC006D30B9 /* injectWebView */; };
+		F33BE3C82966C0C6006D30B9 /* injectJsCore in Resources */ = {isa = PBXBuildFile; fileRef = F33BE3C72966C0C6006D30B9 /* injectJsCore */; };
 		F383C6B42955378800BD4FE5 /* FileEntites.swift in Sources */ = {isa = PBXBuildFile; fileRef = F383C6B32955378800BD4FE5 /* FileEntites.swift */; };
 		F383C6B6295537B700BD4FE5 /* StatusBarEntites.swift in Sources */ = {isa = PBXBuildFile; fileRef = F383C6B5295537B700BD4FE5 /* StatusBarEntites.swift */; };
 		F383C6B8295538A400BD4FE5 /* AlertEntites.swift in Sources */ = {isa = PBXBuildFile; fileRef = F383C6B7295538A400BD4FE5 /* AlertEntites.swift */; };
@@ -297,13 +292,6 @@
 		F091CB502951B90A00FCE565 /* BatchScanManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BatchScanManager.swift; sourceTree = "<group>"; };
 		F091CB512951B90A00FCE565 /* BatchFileManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BatchFileManager.swift; sourceTree = "<group>"; };
 		F091CB522951B90A00FCE565 /* BatchSystemManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BatchSystemManager.swift; sourceTree = "<group>"; };
-		F091CB592951B91200FCE565 /* method_photo.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = method_photo.svg; sourceTree = "<group>"; };
-		F091CB5A2951B91200FCE565 /* coil_logo_colored.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = coil_logo_colored.svg; sourceTree = "<group>"; };
-		F091CB5B2951B91200FCE565 /* statusbar.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = statusbar.html; sourceTree = "<group>"; };
-		F091CB5C2951B91200FCE565 /* ico_bottom_tab_publisher.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = ico_bottom_tab_publisher.svg; sourceTree = "<group>"; };
-		F091CB5D2951B91200FCE565 /* example.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = example.html; sourceTree = "<group>"; };
-		F091CB5E2951B91200FCE565 /* install.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = install.js; sourceTree = "<group>"; };
-		F091CB5F2951B91200FCE565 /* angle_nft.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = angle_nft.png; sourceTree = "<group>"; };
 		F091CB682951B91900FCE565 /* CacheManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CacheManager.swift; sourceTree = "<group>"; };
 		F091CB692951B91900FCE565 /* ReachabilityManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReachabilityManager.swift; sourceTree = "<group>"; };
 		F091CB6A2951B91900FCE565 /* BluetoothManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BluetoothManager.swift; sourceTree = "<group>"; };
@@ -369,6 +357,8 @@
 		F33A570629598A1E00000037 /* ShareManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareManager.swift; sourceTree = "<group>"; };
 		F33B31E3295A858B000EB302 /* ToastManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastManager.swift; sourceTree = "<group>"; };
 		F33B31E5295A8AA6000EB302 /* SplashScreenManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashScreenManager.swift; sourceTree = "<group>"; };
+		F33BE3C32966BDAC006D30B9 /* injectWebView */ = {isa = PBXFileReference; lastKnownFileType = folder; name = injectWebView; path = ../../../../../../../../.Trash/injectWebView; sourceTree = "<group>"; };
+		F33BE3C72966C0C6006D30B9 /* injectJsCore */ = {isa = PBXFileReference; lastKnownFileType = folder; path = injectJsCore; sourceTree = "<group>"; };
 		F383C6B32955378800BD4FE5 /* FileEntites.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileEntites.swift; sourceTree = "<group>"; };
 		F383C6B5295537B700BD4FE5 /* StatusBarEntites.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBarEntites.swift; sourceTree = "<group>"; };
 		F383C6B7295538A400BD4FE5 /* AlertEntites.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertEntites.swift; sourceTree = "<group>"; };
@@ -588,8 +578,7 @@
 		F05C41F42907F0E30082CC75 /* Plaoc */ = {
 			isa = PBXGroup;
 			children = (
-				F3AA03E62954581F000BD38F /* sdk */,
-				F091CBE22952E6BD00FCE565 /* recommend-app */,
+				F33BE3BB2966B86E006D30B9 /* app */,
 				F091CBDC2951BC4700FCE565 /* BFExplorer-Bridging-Header.h */,
 				F05C43262907F3410082CC75 /* brige.m */,
 				F091CBBD2951B93B00FCE565 /* Tools */,
@@ -597,7 +586,6 @@
 				F091CB9F2951B92700FCE565 /* network */,
 				F091CB922951B92100FCE565 /* model */,
 				F091CB672951B91900FCE565 /* manager */,
-				F091CB582951B91200FCE565 /* jsFile */,
 				F091CB4D2951B90A00FCE565 /* fileManager */,
 				F091CB3C2951B90200FCE565 /* extension */,
 				F091CB1D2951B8EE00FCE565 /* customView */,
@@ -685,20 +673,6 @@
 				F091CB522951B90A00FCE565 /* BatchSystemManager.swift */,
 			);
 			path = fileManager;
-			sourceTree = "<group>";
-		};
-		F091CB582951B91200FCE565 /* jsFile */ = {
-			isa = PBXGroup;
-			children = (
-				F091CB592951B91200FCE565 /* method_photo.svg */,
-				F091CB5A2951B91200FCE565 /* coil_logo_colored.svg */,
-				F091CB5B2951B91200FCE565 /* statusbar.html */,
-				F091CB5C2951B91200FCE565 /* ico_bottom_tab_publisher.svg */,
-				F091CB5D2951B91200FCE565 /* example.html */,
-				F091CB5E2951B91200FCE565 /* install.js */,
-				F091CB5F2951B91200FCE565 /* angle_nft.png */,
-			);
-			path = jsFile;
 			sourceTree = "<group>";
 		};
 		F091CB672951B91900FCE565 /* manager */ = {
@@ -819,6 +793,17 @@
 			path = WKWebViewJavascriptBridge;
 			sourceTree = "<group>";
 		};
+		F33BE3BB2966B86E006D30B9 /* app */ = {
+			isa = PBXGroup;
+			children = (
+				F33BE3C72966C0C6006D30B9 /* injectJsCore */,
+				F33BE3C32966BDAC006D30B9 /* injectWebView */,
+				F091CBE22952E6BD00FCE565 /* recommend-app */,
+				F3AA03E62954581F000BD38F /* sdk */,
+			);
+			path = app;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -880,15 +865,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				F01ABAEC28D2C7AC0038AF9C /* SourceHanSansCN-Regular.otf in Resources */,
-				F091CB652951B91200FCE565 /* install.js in Resources */,
 				F01ABAE628D2C7AC0038AF9C /* SourceHanSansCN-Medium.otf in Resources */,
-				F091CB642951B91200FCE565 /* example.html in Resources */,
 				F01ABAF028D2C9650038AF9C /* SourceHanSansCN-Regular.ttf in Resources */,
-				F091CB632951B91200FCE565 /* ico_bottom_tab_publisher.svg in Resources */,
 				F01ABAE928D2C7AC0038AF9C /* SourceHanSansCN-Normal.otf in Resources */,
 				F091CB372951B8EE00FCE565 /* qrcode_scan_part_net.png in Resources */,
-				F091CB602951B91200FCE565 /* method_photo.svg in Resources */,
-				F091CB662951B91200FCE565 /* angle_nft.png in Resources */,
 				1903642426EB427E00B82B1C /* LaunchScreen.storyboard in Resources */,
 				F091CB362951B8EE00FCE565 /* qrcode_scan_full_net.png in Resources */,
 				F3AA03E72954581F000BD38F /* sdk in Resources */,
@@ -896,11 +876,11 @@
 				F01ABAEB28D2C7AC0038AF9C /* SourceHanSansCN-ExtraLight.otf in Resources */,
 				F091CBE42952E6BD00FCE565 /* recommend-app in Resources */,
 				F01ABAEF28D2C9650038AF9C /* SourceHanSansCN-Medium.ttf in Resources */,
-				F091CB622951B91200FCE565 /* statusbar.html in Resources */,
 				F01ABAE828D2C7AC0038AF9C /* SourceHanSansCN-Light.otf in Resources */,
-				F091CB612951B91200FCE565 /* coil_logo_colored.svg in Resources */,
+				F33BE3C42966BDAC006D30B9 /* injectWebView in Resources */,
 				F01ABAEA28D2C7AC0038AF9C /* SourceHanSansCN-Heavy.otf in Resources */,
 				F01ABAE728D2C7AC0038AF9C /* SourceHanSansCN-Bold.otf in Resources */,
+				F33BE3C82966C0C6006D30B9 /* injectJsCore in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -30,10 +30,16 @@ class JSCoreManager: NSObject {
 //        loadAPPEntry(fileName: fileName)
 
     }
-    
+    /**初始化 sdk*/
     private func initJSCore() {
-
-        let entryPath = Bundle.main.bundlePath + "/sdk/HE74YAAL/boot/index.js"
+        // inject TextDe	code
+        injectJsContext("/injectJsCore/encoding-indexes.js");
+        injectJsContext("/injectJsCore/encoding.js");
+        injectJsContext("/sdk/HE74YAAL/boot/index.js");
+    }
+    /**注入javascriptCore*/
+    private func injectJsContext(_ js:String) {
+        let entryPath = Bundle.main.bundlePath + js
         
         jsContext?.setObject(plaoc, forKeyedSubscript: "PlaocJavascriptBridge" as NSCopying & NSObjectProtocol)
         if let content = try? String(contentsOfFile: entryPath) {
@@ -62,10 +68,10 @@ class JSCoreManager: NSObject {
     }
     
     func handleEvaluateScript(jsString: String) {
-        let functionString = "webView.dwebviewToDeno('\(jsString)')"
+        let functionString = "webView.getIosMessage('\(jsString)')"
         let result = jsContext?.evaluateScript(functionString)
         print("swift#handleEvaluateScript",functionString)
-        print(result?.toString())
+//        print(result?.toString())
     }
     
 }
