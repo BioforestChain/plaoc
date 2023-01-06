@@ -8,15 +8,17 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
+import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import info.bagen.libappmgr.database.AppContract
 import info.bagen.libappmgr.utils.AppContextUtil
+import info.bagen.libappmgr.utils.JsonUtil
 
 object PermissionUtil {
-  const val PERMISSION_CALENDAR = "info.bagen.rust.plaoc.CALENDAR" // 日历
-  const val PERMISSION_CAMERA = "info.bagen.rust.plaoc.CAMERA" // 相机相册
-  const val PERMISSION_CONTACTS = "info.bagen.rust.plaoc.CONTACTS" // 联系人
+  /*const val PERMISSION_CALENDAR = "info.bagen.rust.plaoc.CALENDAR"
+  const val PERMISSION_CAMERA = "info.bagen.rust.plaoc.CAMERA"
+  const val PERMISSION_CONTACTS = "info.bagen.rust.plaoc.CONTACTS"
   const val PERMISSION_LOCATION = "info.bagen.rust.plaoc.LOCATION" // 位置
   const val PERMISSION_RECORD_AUDIO = "info.bagen.rust.plaoc.RECORD_AUDIO" // 录音
   const val PERMISSION_BODY_SENSORS = "info.bagen.rust.plaoc.BODY_SENSORS" // 传感器（重力，陀螺仪）
@@ -25,6 +27,11 @@ object PermissionUtil {
   const val PERMISSION_CALL = "info.bagen.rust.plaoc.CALL" // 电话
   const val PERMISSION_DEVICE = "info.bagen.rust.plaoc.DEVICE" // （手机状态）
 
+  const val PERMISSION_PHOTO = "info.bagen.rust.plaoc.photo" // 相册
+  const val PERMISSION_MEDIA = "info.bagen.rust.plaoc.MEDIA" // 媒体库
+  const val PERMISSION_NETWORK = "info.bagen.rust.plaoc.NETWORK" // 网络
+  const val PERMISSION_NOTIFICATION = "info.bagen.rust.plaoc.NOTIFICATION" // 通知
+  const val PERMISSION_BLUETOOTH = "info.bagen.rust.plaoc.BLUETOOTH" // 蓝牙*/
   /**
    * 判断是否申请过系统权限
    */
@@ -96,38 +103,54 @@ object PermissionUtil {
     return false
   }
 
+  private data class PermissionData(
+    val permissions: String
+  )
+
   fun getActualPermissions(permission: String): ArrayList<String> {
     val actualPermissions = arrayListOf<String>()
+    if (permission.contains("{")) {
+      val permissions = JsonUtil.fromJson(PermissionData::class.java, permission)
+      permissions?.permissions?.split(",")?.forEach {
+        actualPermissions.addAll(getActualPermissions(it))
+      }
+      return actualPermissions
+    } else if (permission.contains(",")) {
+      permission.split(",").forEach {
+        actualPermissions.addAll(getActualPermissions(it))
+      }
+      return actualPermissions
+    }
     when (permission) {
-      PERMISSION_CAMERA -> actualPermissions.add(Manifest.permission.CAMERA)
-      PERMISSION_RECORD_AUDIO -> actualPermissions.add(Manifest.permission.RECORD_AUDIO)
-      PERMISSION_BODY_SENSORS -> actualPermissions.add(Manifest.permission.BODY_SENSORS)
-      PERMISSION_DEVICE -> actualPermissions.add(Manifest.permission.READ_PHONE_STATE)
-      PERMISSION_CALENDAR -> {
+      EPermission.PERMISSION_CAMERA.type -> actualPermissions.add(Manifest.permission.CAMERA)
+      EPermission.PERMISSION_RECORD_AUDIO.type -> actualPermissions.add(Manifest.permission.RECORD_AUDIO)
+      EPermission.PERMISSION_BODY_SENSORS.type -> actualPermissions.add(Manifest.permission.BODY_SENSORS)
+      EPermission.PERMISSION_DEVICE.type -> actualPermissions.add(Manifest.permission.READ_PHONE_STATE)
+      EPermission.PERMISSION_CALENDAR.type -> {
         actualPermissions.add(Manifest.permission.READ_CALENDAR)
         actualPermissions.add(Manifest.permission.WRITE_CALENDAR)
       }
-      PERMISSION_CONTACTS -> {
+      EPermission.PERMISSION_CONTACTS.type -> {
         actualPermissions.add(Manifest.permission.READ_CONTACTS)
         actualPermissions.add(Manifest.permission.WRITE_CONTACTS)
         actualPermissions.add(Manifest.permission.GET_ACCOUNTS)
       }
-      PERMISSION_LOCATION -> {
+      EPermission.PERMISSION_LOCATION.type -> {
         actualPermissions.add(Manifest.permission.ACCESS_FINE_LOCATION)
         actualPermissions.add(Manifest.permission.ACCESS_COARSE_LOCATION)
       }
-      PERMISSION_STORAGE -> {
+      EPermission.PERMISSION_STORAGE.type -> {
         actualPermissions.add(Manifest.permission.READ_EXTERNAL_STORAGE)
         actualPermissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
       }
-      PERMISSION_SMS -> {
+      EPermission.PERMISSION_SMS.type -> {
         actualPermissions.add(Manifest.permission.SEND_SMS)
         actualPermissions.add(Manifest.permission.RECEIVE_SMS)
         actualPermissions.add(Manifest.permission.READ_SMS)
         actualPermissions.add(Manifest.permission.RECEIVE_WAP_PUSH)
         actualPermissions.add(Manifest.permission.RECEIVE_MMS)
       }
-      PERMISSION_CALL -> {
+      EPermission.PERMISSION_CALL.type -> {
         actualPermissions.add(Manifest.permission.CALL_PHONE)
         actualPermissions.add(Manifest.permission.USE_SIP)
         actualPermissions.add(Manifest.permission.PROCESS_OUTGOING_CALLS)
@@ -135,7 +158,7 @@ object PermissionUtil {
         actualPermissions.add(Manifest.permission.READ_CALL_LOG)
         actualPermissions.add(Manifest.permission.WRITE_CALL_LOG)
       }
-      else -> actualPermissions.add(permission) // 如果都不匹配，直接将请求的权限填充
+      else -> {} // actualPermissions.add(permission) // 如果都不匹配，直接将请求的权限填充
     }
     return actualPermissions
   }

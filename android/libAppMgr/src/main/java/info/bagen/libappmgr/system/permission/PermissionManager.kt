@@ -15,7 +15,7 @@ class PermissionManager {
   private var activity: Activity? = null
   private var fragment: Fragment? = null
 
-  private  var permissionCallback: PermissionCallback? = null
+  // private var permissionCallback: PermissionCallback? = null
 
   // private var permission: String? = null
   private var permissions = ArrayList<String>()
@@ -42,7 +42,6 @@ class PermissionManager {
 
   fun requestPermissions(
     permissions: ArrayList<String>,
-    permissionCallback: PermissionCallback = DefaultPermissionCallback,
     showDenyDialog: Boolean = true,
     showRationale: Boolean = true,
     showNegBtn: Boolean = true,
@@ -53,6 +52,7 @@ class PermissionManager {
     denyNegBtnTxt: String = DEFAULT_DENY_DIALOG_NEG_BTN,
     requestCode: Int = MY_PERMISSIONS,
   ) {
+    if (permissions.isEmpty()) return // 如果没有直接返回
     this.permissions = permissions
     this.showDenyDialog = showDenyDialog
     this.showRationale = showRationale
@@ -62,7 +62,6 @@ class PermissionManager {
     this.denyDialogText = denyDialogText
     this.denyPosBtnTxt = denyPosBtnTxt
     this.denyNegBtnTxt = denyNegBtnTxt
-    this.permissionCallback = permissionCallback
     this.requestCode = requestCode
     askPermissionDialog()
   }
@@ -76,17 +75,16 @@ class PermissionManager {
      * 请求权限是fragment还是activity，需要调用不同的方法
      */
     fragment?.requestPermissions(
-      PermissionUtil.getActualPermissions(this.permissions).toTypedArray(), requestCode
+      permissions.toTypedArray(), requestCode
     ) ?: ActivityCompat.requestPermissions(
-      activity!!,
-      PermissionUtil.getActualPermissions(this.permissions).toTypedArray(),
-      requestCode
+      activity!!, permissions.toTypedArray(), requestCode
     )
   }
 
   @Synchronized
   fun onRequestPermissionsResult(
-    requestCode: Int, permissions: Array<out String>, grantResults: IntArray
+    requestCode: Int, permissions: Array<out String>, grantResults: IntArray,
+    onPermissionCallback: PermissionCallback? = null
   ) {
     when (requestCode) {
       this.requestCode -> {
@@ -100,19 +98,19 @@ class PermissionManager {
                 return
               } else if (showDenyDialog) {
                 // 如果用户选择了拒绝授权，并且选中了“不再显示”，那么就会显示自定义对话框，告知用户为什么需要授权，并且有跳转到设置功能。默认是允许显示的
-                displayDenyDialog(permissions[i - 1])
+                displayDenyDialog(permissions[i - 1], onPermissionCallback)
                 return
               } else {
                 hasStarted = false
                 // 用户在解释后仍拒绝了该权限。 调用了拒绝的回调
-                permissionCallback?.onPermissionDismissed(permissions[i - 1])
+                onPermissionCallback?.onPermissionDismissed(permissions[i - 1])
                 return
               }
             }
           }
         }
         hasStarted = false
-        permissionCallback?.onPermissionGranted(permissions, grantResults)
+        onPermissionCallback?.onPermissionGranted(permissions, grantResults)
       }
     }
   }
@@ -121,14 +119,16 @@ class PermissionManager {
    * 如果权限被拒绝并且不在提醒时，根据条件确认是否要弹出当前确认对话框
    */
   @Synchronized
-  private fun displayDenyDialog(permission: String) {
+  private fun displayDenyDialog(
+    permission: String, onPermissionCallback: PermissionCallback? = null
+  ) {
     val alertDialogBuilder = AlertDialog.Builder(activity!!)
       .setTitle(denyDialogTitle) // 自定义对话框的 标题
       .setMessage(getDenyDialogText(permission)) // 自定义对话框的 说明
       .setCancelable(denyCancellable) // 自定义对话框是否可被取消
       .setPositiveButton(denyPosBtnTxt) { dialog, which ->
         dialog.dismiss()
-        permissionCallback?.onPositiveButtonClicked(dialog, which)
+        onPermissionCallback?.onPositiveButtonClicked(dialog, which) ?: PermissionUtil.openAppSettings()
       } // 自定义对话框确认按钮的响应
       .setOnDismissListener {
         hasStarted = false
@@ -138,7 +138,7 @@ class PermissionManager {
     if (showNegBtn) {
       alertDialogBuilder.setNegativeButton(denyNegBtnTxt) { dialog, which ->
         dialog.dismiss()
-        permissionCallback?.onNegativeButtonClicked(dialog, which)
+        onPermissionCallback?.onNegativeButtonClicked(dialog, which)
       }
     }
 
@@ -202,21 +202,6 @@ class PermissionManager {
     fun onPermissionDismissed(permission: String)
     fun onPositiveButtonClicked(dialog: DialogInterface, which: Int)
     fun onNegativeButtonClicked(dialog: DialogInterface, which: Int)
-  }
-
-  object DefaultPermissionCallback : PermissionCallback {
-    override fun onPermissionGranted(permissions: Array<out String>, grantResults: IntArray) {
-    }
-
-    override fun onPermissionDismissed(permission: String) {
-    }
-
-    override fun onPositiveButtonClicked(dialog: DialogInterface, which: Int) {
-      PermissionUtil.openAppSettings()
-    }
-
-    override fun onNegativeButtonClicked(dialog: DialogInterface, which: Int) {
-    }
   }
 
   companion object {
