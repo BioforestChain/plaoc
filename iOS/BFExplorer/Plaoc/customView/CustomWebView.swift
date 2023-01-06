@@ -18,7 +18,7 @@ enum KeyboardType {
 
 class CustomWebView: UIView {
 
-    var jsManager: JSCoreManager!
+    var jsManager: JSCoreManager?
     var callback: UpdateTitleCallback?
     var superVC: UIViewController?
     private var scripts: [WKUserScript]?

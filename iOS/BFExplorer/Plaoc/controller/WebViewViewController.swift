@@ -65,7 +65,7 @@ class WebViewViewController: UIViewController {
 
         self.view.backgroundColor = .white
         
-        webView.openWebView(html: urlString)
+//        webView.openWebView(html: urlString)
         
         NotificationCenter.default.addObserver(self, selector: #selector(interceptAction(noti:)), name: NSNotification.Name.interceptNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(observerShowKeyboard(noti:)), name: UIResponder.keyboardWillShowNotification, object: nil)
@@ -75,9 +75,9 @@ class WebViewViewController: UIViewController {
     }
     
     @objc private func openDwebAction(noti: Notification) {
-//        guard let info = noti.userInfo as? [String:String] else { return }
-//        guard let urlString = info["param"] else { return }
-//        webView.openWebView(html: "http://www.baidu.com")
+        guard let info = noti.userInfo as? [String:String] else { return }
+        guard let urlString = info["param"] else { return }
+        webView.openWebView(html: urlString)
     }
     
     @objc private func interceptAction(noti: Notification) {

@@ -57,10 +57,5 @@
 	<string>Light</string>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
-	<key>WKAppBoundDomains</key>
-	<array>
-		<string>waterbang.top</string>
-		<string>plaoc.com</string>
-	</array>
 </dict>
 </plist>
