@@ -289,13 +289,13 @@ class AppViewModel(private val repository: AppRepository = AppRepository()) : Vi
     when (downLoadState) {
       DownLoadState.COMPLETED -> {
         appViewState.showBadge.value = true
+        appViewState.appInfo?.appDirType = APP_DIR_TYPE.SystemApp // 需要提前将路径改为 system-app
 
         repository.loadDAppUrl(appViewState.appInfo!!)?.let { dAppInfoUI -> // 跳转需要的地址
           appViewState.dAppInfoUI = dAppInfoUI
           appViewState.name.value = dAppInfoUI.name
           appViewState.iconPath.value = dAppInfoUI.icon
           appViewState.appInfo!!.dAppUrl = dAppInfoUI.dAppUrl
-          appViewState.appInfo!!.appDirType = APP_DIR_TYPE.SystemApp
         }
       }
       DownLoadState.FAILURE -> {
