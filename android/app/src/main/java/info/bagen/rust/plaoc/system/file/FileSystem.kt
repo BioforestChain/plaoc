@@ -180,7 +180,7 @@ class FileSystem {
     val file = getFileByPath(path)
     val buffer = StringBuffer()
     try {
-      file.bufferedReader().readLine().forEach {
+      file.bufferedReader().readLine()?.forEach {
         buffer.append(it)
       }
     } catch (e: FileNotFoundException) {
