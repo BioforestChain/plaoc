@@ -174,11 +174,8 @@ class CategoryView: UIView{
             second.urlString = BatchFileManager.shared.systemWebAPPURLString(fileName: info.appKey) ?? "" //":/index.html"
             let type = BatchFileManager.shared.systemAPPType(fileName: info.appKey)
             let url = BatchFileManager.shared.systemWebAPPURLString(fileName: info.appKey) ?? ""
-            if type == "web" {
-                second.urlString = url
-            } else {
-                second.urlString = "iosqmkkx:/index.html"
-            }
+   
+            second.urlString = url
             
             NotificationCenter.default.post(name: openAnAppNotification, object: second)
             

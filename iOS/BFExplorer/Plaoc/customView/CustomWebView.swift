@@ -98,7 +98,7 @@ extension CustomWebView {
         guard jsNames.count > 0 else { return nil }
         var scripts: [WKUserScript] = []
         for jsName in jsNames {
-          let path = Bundle.main.bundlePath + "/injectWebView/" +  jsName + ".js"
+          let path = Bundle.main.bundlePath + "/app/injectWebView/" +  jsName + ".js"
             let url = URL(fileURLWithPath: path)
             let data = try? Data(contentsOf: url)
             if data != nil {

@@ -42,7 +42,7 @@ class JSCoreManager: NSObject {
     }
     /**注入javascriptCore*/
     private func injectJsContext(_ js:String) {
-        let entryPath = Bundle.main.bundlePath + js
+        let entryPath = Bundle.main.bundlePath + "/app" + js
         
         jsContext?.setObject(plaoc, forKeyedSubscript: "PlaocJavascriptBridge" as NSCopying & NSObjectProtocol)
         if let content = try? String(contentsOfFile: entryPath) {

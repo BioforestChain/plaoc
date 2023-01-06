@@ -10,7 +10,7 @@ import UIKit
 class BatchRecommendManager: BatchReadManager {
 
     override func filePath() -> String {
-        return Bundle.main.bundlePath + "/recommend-app"
+        return Bundle.main.bundlePath + "/app/recommend-app"
     }
     
     override func saveUpdateInfoFilePath() -> String {

@@ -25,6 +25,7 @@ extension PlaocHandleModel {
         guard let param = param as? String else { return "" }
         let data = JSON.init(parseJSON: param)
         let homePath = getDwebAppPath()
+        print(homePath)
 
         do {
             let urls = try FileSystemManager.readdir(at: URL(fileURLWithPath: homePath + pathPrefixReplace(data["path"].stringValue)))
@@ -32,60 +33,52 @@ extension PlaocHandleModel {
             if urls.count > 0 {
                 
                 let urlPaths = try urls.filter { url in
-//                    if data["option"]["filter"].exists() {
-//                        var result = false
-//                        try data["option"]["filter"].arrayValue.forEach { filterItem in
-//                            var typeBool = false
-//                            var nameBool = false
-//                            print(url.lastPathComponent)
-//                            // 用于判断文件类型是否符合
-//                            if filterItem["type"].exists() {
-//                                print(filterItem["type"].stringValue)
-//
-//                                let fileAttr = try FileSystemManager.stat(at: url)
-//                                let fileType = FileSystemManager.getType(from: fileAttr)
-//
-//                                if fileType == filterItem["type"].stringValue {
-//                                    typeBool = true
-//                                }
-//                            } else {
-//                                typeBool = true
-//                            }
-//
-//                            // 用于判断文件名是否符合
-//                            if filterItem["name"].exists() {
-//                                print(filterItem["name"].arrayValue)
-//                                let urlName = url.deletingPathExtension().lastPathComponent
-//                                let nameArr = filterItem["name"].arrayValue.map{ $0.stringValue }
-//
-//                                try nameArr.forEach { name in
-//                                    let name = name.replacingOccurrences(of: ".", with: "\\.").replacingOccurrences(of: "*", with: ".*")
-//                                    print("name: \(name)")
-////                                    print("urlName.contains(name): \(urlName.contains(name))")
-////
-////                                    if urlName.contains(/name/) {
-////                                        nameBool = true
-////                                    }
-//                                    let regex = try NSRegularExpression(pattern: name)
-//                                    print(name)
-//                                    if regex.matches(in: urlName, range: NSRange(0..<urlName.count)).count > 0 {
-//                                        nameBool = true
-//                                    }
-//                                }
-//                            } else {
-//                                nameBool = true
-//                            }
-//
-//                            print("typeBool: \(typeBool)")
-//                            print("nameBool: \(nameBool)")
-//                            result = typeBool && nameBool
-//                        }
-//
-//                        return result
-//                    } else {
-//                        return true
-//                    }
-                    return true
+                    if data["option"]["filter"].exists() {
+                        var result = false
+                        try data["option"]["filter"].arrayValue.forEach { filterItem in
+                            var typeBool = false
+                            var nameBool = false
+                            print(url.lastPathComponent)
+                            // 用于判断文件类型是否符合
+                            if filterItem["type"].exists() {
+                                print(filterItem["type"].stringValue)
+
+                                let fileAttr = try FileSystemManager.stat(at: url)
+                                let fileType = FileSystemManager.getType(from: fileAttr)
+
+                                if fileType == filterItem["type"].stringValue {
+                                    typeBool = true
+                                }
+                            } else {
+                                typeBool = true
+                            }
+
+                            // 用于判断文件名是否符合
+                            if filterItem["name"].exists() {
+                                print(filterItem["name"].arrayValue)
+                                let urlName = url.deletingPathExtension().lastPathComponent
+                                let nameArr = filterItem["name"].arrayValue.map{ $0.stringValue }
+
+                                nameArr.forEach { name in
+                                    let regex = name.replacingOccurrences(of: ".", with: "\\.").replacingOccurrences(of: "*", with: ".*")
+                                    
+                                    if regex.match(regex).count > 0 {
+                                        nameBool = true
+                                    }
+                                }
+                            } else {
+                                nameBool = true
+                            }
+
+                            print("typeBool: \(typeBool)")
+                            print("nameBool: \(nameBool)")
+                            result = typeBool && nameBool
+                        }
+
+                        return result
+                    } else {
+                        return true
+                    }
                 }.map { $0.path.replacingOccurrences(of: homePath, with: "") }
                 
                 print("urlPaths")

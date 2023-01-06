@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 extension String {
     //16进制转data
@@ -91,5 +92,13 @@ extension String {
         guard let data = Data(base64Encoded: self, options: .ignoreUnknownCharacters) else { return nil }
         let image = UIImage(data: data)
         return image
+    }
+    
+    //字符串正则匹配
+    func match(_ regex: String) -> [[String]] {
+        let nsString = self as NSString
+        return (try? NSRegularExpression(pattern: regex, options: []))?.matches(in: self, options: [], range: NSMakeRange(0, nsString.length)).map { match in
+            (0..<match.numberOfRanges).map { match.range(at: $0).location == NSNotFound ? "" : nsString.substring(with: match.range(at: $0)) }
+        } ?? []
     }
 }
