@@ -25,7 +25,6 @@ extension PlaocHandleModel {
         guard let param = param as? String else { return "" }
         let data = JSON.init(parseJSON: param)
         let homePath = getDwebAppPath()
-        print(homePath)
 
         do {
             let urls = try FileSystemManager.readdir(at: URL(fileURLWithPath: homePath + pathPrefixReplace(data["path"].stringValue)))
@@ -38,11 +37,9 @@ extension PlaocHandleModel {
                         try data["option"]["filter"].arrayValue.forEach { filterItem in
                             var typeBool = false
                             var nameBool = false
-                            print(url.lastPathComponent)
+                            
                             // 用于判断文件类型是否符合
                             if filterItem["type"].exists() {
-                                print(filterItem["type"].stringValue)
-
                                 let fileAttr = try FileSystemManager.stat(at: url)
                                 let fileType = FileSystemManager.getType(from: fileAttr)
 
@@ -55,14 +52,15 @@ extension PlaocHandleModel {
 
                             // 用于判断文件名是否符合
                             if filterItem["name"].exists() {
-                                print(filterItem["name"].arrayValue)
-                                let urlName = url.deletingPathExtension().lastPathComponent
+                                let urlName = url.lastPathComponent
                                 let nameArr = filterItem["name"].arrayValue.map{ $0.stringValue }
 
                                 nameArr.forEach { name in
+                                    // *开头的正则表达式会报错，是用.*替代，转义.
                                     let regex = name.replacingOccurrences(of: ".", with: "\\.").replacingOccurrences(of: "*", with: ".*")
                                     
-                                    if regex.match(regex).count > 0 {
+                                    // String扩展了match方法，用于正则匹配
+                                    if urlName.match(regex).count > 0 {
                                         nameBool = true
                                     }
                                 }
@@ -70,9 +68,9 @@ extension PlaocHandleModel {
                                 nameBool = true
                             }
 
-                            print("typeBool: \(typeBool)")
-                            print("nameBool: \(nameBool)")
-                            result = typeBool && nameBool
+                            if typeBool && nameBool {
+                                result = true
+                            }
                         }
 
                         return result
@@ -81,8 +79,6 @@ extension PlaocHandleModel {
                     }
                 }.map { $0.path.replacingOccurrences(of: homePath, with: "") }
                 
-                print("urlPaths")
-                print(urlPaths)
                 let str = ChangeTools.arrayValueString(urlPaths)
                 
                 return str ?? "[]"
@@ -186,15 +182,16 @@ extension PlaocHandleModel {
         let homePath = getDwebAppPath()
         
         do {
+            let url = URL(fileURLWithPath: homePath + pathPrefixReplace(data["path"].stringValue))
             // 获取文件类型
-            let fileAttr = try FileSystemManager.stat(at: URL(fileURLWithPath: homePath + pathPrefixReplace(data["path"].stringValue)))
+            let fileAttr = try FileSystemManager.stat(at: url)
             let fileType = FileSystemManager.getType(from: fileAttr)
             
             var dict: [String:Any] = [:]
             
             dict["type"] = fileType
             dict["size"] = fileAttr[.size]
-            dict["uri"] = pathPrefixReplace(data["path"].stringValue)
+            dict["uri"] = url.path.replacingOccurrences(of: homePath, with: "")
             dict["mtime"] = (fileAttr[.modificationDate] as? Date)?.description
             dict["ctime"] = (fileAttr[.creationDate] as? Date)?.description
 

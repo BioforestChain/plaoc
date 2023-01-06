@@ -174,7 +174,7 @@ extension CustomWebView:  WKScriptMessageHandler {
             print("swift#getConnectChannel",message.body)
             guard let bodyDict = message.body as? [String:String] else { return }
             guard let param = bodyDict["param"] else { return }
-            jsManager.handleEvaluateScript(jsString: param)
+            jsManager?.handleEvaluateScript(jsString: param)
         }
     }
     
