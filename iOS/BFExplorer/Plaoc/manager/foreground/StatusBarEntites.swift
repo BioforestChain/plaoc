@@ -21,7 +21,7 @@ extension PlaocHandleModel {
     }
     //状态栏是否是暗黑模式
     func statusBarIsDark(param: Any) -> Bool {
-        return false
+        return controller?.statusBarStyle() == "true"
     }
     //状态栏是否可见
     func statusBarVisible(param: Any) -> Bool {

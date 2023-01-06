@@ -42,19 +42,20 @@ class BottomView: UIView {
                     
                 } else {
                     if imageName.hasSuffix("svg") {
-                        let name = imageName.replacingOccurrences(of: ".svg", with: "")
-                        if model.colors?.iconColor != nil {
-                            button.setImage(UIImage.svgImageNamed(name, size: CGSize(width: image_width, height: image_width), tintColor: UIColor((model.colors?.iconColor)!)), for: .normal)
-                        } else {
-                            button.setImage(UIImage.svgImageNamed(name, size: CGSize(width: image_width, height: image_width)), for: .normal)
-                        }
+                        button.sd_setImage(with: URL(string: imageName), for: .normal, placeholderImage: nil)
+//                        let name = imageName.replacingOccurrences(of: ".svg", with: "")
+//                        if model.colors?.iconColor != nil {
+//                            button.setImage(UIImage.svgImageNamed(name, size: CGSize(width: image_width, height: image_width), tintColor: UIColor((model.colors?.iconColor)!)), for: .normal)
+//                        } else {
+//                            button.setImage(UIImage.svgImageNamed(name, size: CGSize(width: image_width, height: image_width)), for: .normal)
+//                        }
                     } else {
                         button.setImage(UIImage(named: imageName), for: .normal)
                     }
                 }
                 button.isEnabled = !(model.disabled ?? false)
                 button.isSelected = model.selected ?? false
-                button.setTitle(model.titleString, for: .normal)
+//                button.setTitle(model.titleString, for: .normal)
                 
                 var color = model.colors?.textColor ?? ""
                 if color.isEmpty {
@@ -65,7 +66,7 @@ class BottomView: UIView {
 //                button.menu = menuAction()
                 button.addTarget(self, action: #selector(clickAction(sender:)), for: .touchUpInside)
 //                button.showsMenuAsPrimaryAction = true
-                
+                button.backgroundColor = .red
                 self.addSubview(button)
                 buttonList.append(button)
             }

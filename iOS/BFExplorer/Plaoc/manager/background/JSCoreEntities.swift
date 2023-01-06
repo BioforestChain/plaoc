@@ -69,98 +69,6 @@ import SwiftyJSON
             return executiveFileSystemRename(param: param)
         case "FileSystemReadBuffer":
             return executiveFileSystemReadBuffer(param: param)
-        case "SetStatusBarColor":
-            return updateStatusBarColor(param: param)
-        case "GetStatusBarColor":
-            return statusBarColor(param: param)
-        case "GetStatusBarIsDark":
-            return statusBarIsDark(param: param)
-        case "GetStatusBarVisible":
-            return statusBarVisible(param: param)
-        case "SetStatusBarVisible":
-            return updateStatusBarVisible(param: param)
-        case "GetStatusBarOverlay":
-            return statusBarOverlay(param: param)
-        case "SetStatusBarOverlay":
-            return updateStatusBarOverlay(param: param)
-        case "GetKeyBoardSafeArea":
-            return keyboardSafeArea(param: param)
-        case "GetKeyBoardHeight":
-            return keyboardHeight(param: param)
-        case "GetKeyBoardOverlay":
-            return keyboardOverlay(param: param)
-        case "SetKeyBoardOverlay":
-            return updateKeyboardOverlay(param: param)
-        case "ShowKeyBoard":
-            return showKeyboard(param: param)
-        case "HideKeyBoard":
-            return hideKeyBoard(param: param)
-        case "TopBarNavigationBack":
-            return topBarNavigationBack(param: param)
-        case "GetTopBarShow":
-            return topbarShow(param: param)
-        case "SetTopBarShow":
-            return updateTopBarShow(param: param)
-        case "GetTopBarOverlay":
-            return topBarOverlay(param: param)
-        case "SetTopBarOverlay":
-            return updateTopBarOverlay(param: param)
-        case "GetTopBarAlpha":
-            return topBarAlpha(param: param)
-        case "SetTopBarAlpha":
-            return updateTopBarAlpha(param: param)
-        case "GetTopBarTitle":
-            return topBarTitle(param: param)
-        case "SetTopBarTitle":
-            return updateTopBarTitle(param: param)
-        case "HasTopBarTitle":
-            return isTopBarTitle(param: param)
-        case "GetTopBarHeight":
-            return topBarHeight(param: param)
-        case "GetTopBarActions":
-            return topBarActions(param: param)
-        case "SetTopBarActions":
-            return updateTopBarActions(param: param)
-        case "GetTopBarBackgroundColor":
-            return topBarBackgroundColor(param: param)
-        case "SetTopBarBackgroundColor":
-            return updateTopBarBackgroundColor(param: param)
-        case "GetTopBarForegroundColor":
-            return topBarForegroundColor(param: param)
-        case "SetTopBarForegroundColor":
-            return updateTopBarForegroundColor(param: param)
-        case "GetBottomBarEnabled":
-            return bottomBarShow(param: param)
-        case "SetBottomBarEnabled":
-            return updateBottomBarShow(param: param)
-        case "GetBottomBarAlpha":
-            return bottomBarAlpha(param: param)
-        case "SetBottomBarAlpha":
-            return updateBottomBarAlpha(param: param)
-        case "GetBottomBarHeight":
-            return bottomBarHeight(param: param)
-        case "SetBottomBarHeight":
-            return updateBottomBarHeight(param: param)
-        case "GetBottomBarActions":
-            return bottomBarActions(param: param)
-        case "SetBottomBarActions":
-            return updateBottomBarActions(param: param)
-        case "GetBottomBarBackgroundColor":
-            return bottomBarBackgroundColor(param: param)
-        case "SetBottomBarBackgroundColor":
-            return updateBottomBarBackgroundColor(param: param)
-        case "GetBottomBarForegroundColor":
-            return bottomBarForegroundColor(param: param)
-        case "SetBottomBarForegroundColor":
-            return updatebottomBarForegroundColor(param: param)
-        case "OpenDialogAlert":
-            return OpenDialogAlert(param: param)
-        case "OpenDialogPrompt":
-            return OpenDialogPrompt(param: param)
-        case "OpenDialogConfirm":
-            return OpenDialogConfirm(param: param)
-        case "OpenDialogWarning":
-            return OpenDialogWarning(param: param)
         case "GetNetworkStatus":
             return ReachabilityManager.shared.getNetworkStatus()
         case "HapticsImpactLight":
@@ -173,6 +81,9 @@ import SwiftyJSON
             return showToast(param: param)
         case "SystemShare":
             return systemShare(param: param)
+        // 前端ui
+        case "SetDWebViewUI":
+            return executiveDwebviewUI(param: param)
         default:
             return ""
         }
@@ -213,7 +124,10 @@ extension PlaocHandleModel {
     }
     //传递给前端消息
     private func executiveEvalJsRuntime(param: Any) -> String {
-        return ""
+        guard let param = param as? String else { return "false" }
+        controller?.evaluateJavaScript(jsString: param)
+        
+        return "true"
     }
     //获取设备信息
     private func executiveGetDeviceInfo(param: Any) -> String {
