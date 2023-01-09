@@ -62,6 +62,7 @@ class CustomWebView: UIView {
         //true 可以下载  
         config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "InstallBFS")
         config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "getConnectChannel")
+        config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "postConnectChannel")
         config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "logging")
         let prefreen = WKPreferences()
         prefreen.javaScriptCanOpenWindowsAutomatically = true
@@ -174,6 +175,13 @@ extension CustomWebView:  WKScriptMessageHandler {
             guard let bodyDict = message.body as? [String:String] else { return }
             guard let param = bodyDict["param"] else { return }
             jsManager.handleEvaluateScript(jsString: param)
+        } else if message.name == "postConnectChannel" {
+            print("swift#postConnectChannel", message.body)
+            guard let bodyDict = message.body as? [String:Any] else { return }
+            guard let strPath = bodyDict["strPath"] as? String else { return }
+            guard let cmd = bodyDict["cmd"] as? String else { return }
+            guard let buffer = bodyDict["buffer"] as? String else { return }
+            jsManager.handleEvaluatePostScript(strPath: strPath, cmd: cmd, buffer: buffer)
         }
     }
     

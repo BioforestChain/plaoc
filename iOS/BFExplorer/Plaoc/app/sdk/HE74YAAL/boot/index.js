@@ -2483,7 +2483,11 @@ async function setIosUiHandle(url, hexBuffer) {
         console.error("Parameter passing cannot be empty！"); // 如果没有任何请求体
         throw new Error("Parameter passing cannot be empty！");
     }
-    const data = await network.asyncSendBufferNative(callNative.setDWebViewUI, [new Uint8Array(hexToBinary(hexBuffer))]);
+    console.log("setIosUiHandle: ", url);
+    console.log(hexBuffer);
+    const data = await network.asyncCallDenoFunction(callNative.setDWebViewUI, 
+    // [new Uint8Array(hexToBinary(hexBuffer))]
+    hexBuffer);
     return data;
 }
 /**
