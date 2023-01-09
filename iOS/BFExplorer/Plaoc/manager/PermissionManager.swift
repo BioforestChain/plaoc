@@ -19,25 +19,25 @@ import CoreBluetooth
 let permissionManager = PermissionManager()
 class PermissionManager: NSObject {
     
-    enum PermissionsType {
+    enum PermissionsType: String {
         //相机
-        case camera
+        case camera = "PERMISSION_CAMERA"
         //相册
-        case photo
+        case photo = "PERMISSION_PHOTO"
         //定位
-        case location
+        case location = "PERMISSION_LOCATION"
         //网络
-        case network
+        case network = "PERMISSION_NETWORK"
         //麦克风
-        case microphone
+        case microphone = "PERMISSION_RECORD_AUDIO"
         //媒体库
-        case media
+        case media = "PERMISSION_MEDIA"
         //通讯录
-        case contact
+        case contact = "PERMISSION_CONTACTS"
         //通知
-        case notification
+        case notification = "PERMISSION_NOTIFICATION"
         //蓝牙
-        case bluetooth
+        case bluetooth = "PERMISSION_BLUETOOTH"
     }
     
     func startPermissionAuthenticate(type: PermissionsType, isSet: Bool? = nil, action: @escaping ((Bool) -> Void)) {

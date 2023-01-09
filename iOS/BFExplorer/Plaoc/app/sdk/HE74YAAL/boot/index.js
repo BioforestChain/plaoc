@@ -1551,6 +1551,11 @@ var callDVebView;
     callDVebView["GetPermissions"] = "dweb-permission";
 })(callDVebView || (callDVebView = {}));
 // const callDeno
+// 需要ios异步返回结果方法
+var callIOSAsyncFunc;
+(function (callIOSAsyncFunc) {
+    callIOSAsyncFunc["ApplyPermissions"] = "ApplyPermissions";
+})(callIOSAsyncFunc || (callIOSAsyncFunc = {}));
 
 /**
  * 发送系统通知
@@ -1564,7 +1569,7 @@ function netCallNativeService(fn, data = "") {
     const uint8 = jscore.callJavaScriptWithFunctionNameParam(fn, data);
     if (!uint8)
         return new Uint8Array(0);
-    console.log("netCallNativeService:==>", uint8);
+    console.log("netCallNativeService:==>", fn, uint8);
     return uint8;
 }
 
@@ -1774,10 +1779,7 @@ async function warpPermissions(cmd, permissions) {
  */
 async function applyPermissions(permissions) {
     console.log("deno#applyPermissions：", permissions, currentPlatform());
-    await network.syncSendMsgNative(callNative.applyPermissions, {
-        permissions,
-    });
-    return "";
+    return await network.asyncCallDenoFunction(callNative.applyPermissions, permissions);
 }
 /**
  * 获取权限信息
@@ -1790,21 +1792,21 @@ var EPermissions;
 (function (EPermissions) {
     /**相机 */
     EPermissions["CAMERA"] = "PERMISSION_CAMERA";
-    /**相册 */
-    EPermissions["PHOTO"] = "PERMISSION_PHOTO";
     /**位置 */
     EPermissions["LOCATION"] = "PERMISSION_LOCATION";
-    /**网络 */
-    EPermissions["NETWORK"] = "PERMISSION_NETWORK";
-    /**录音 */
-    EPermissions["RECORD_AUDIO"] = "PERMISSION_RECORD_AUDIO";
-    /**媒体库 */
-    EPermissions["MEDIA"] = "PERMISSION_MEDIA";
     /**联系人 */
     EPermissions["CONTACTS"] = "PERMISSION_CONTACTS";
-    /**通知 */
+    /**录音 */
+    EPermissions["RECORD_AUDIO"] = "PERMISSION_RECORD_AUDIO";
+    /**相册(ios only) */
+    EPermissions["PHOTO"] = "PERMISSION_PHOTO";
+    /**网络(ios only) */
+    EPermissions["NETWORK"] = "PERMISSION_NETWORK";
+    /**媒体库(ios only) */
+    EPermissions["MEDIA"] = "PERMISSION_MEDIA";
+    /**通知(ios only) */
     EPermissions["NOTIFICATION"] = "PERMISSION_NOTIFICATION";
-    /**蓝牙 */
+    /**蓝牙(ios only) */
     EPermissions["BLUETOOTH"] = "PERMISSION_BLUETOOTH";
     /**日历(android only) */
     EPermissions["CALENDAR"] = "PERMISSION_CALENDAR";
@@ -1987,7 +1989,7 @@ async function setPollHandle(event) {
  * @returns
  */
 async function basePollHandle(cmd, data) {
-    console.log("deno#basePollHandle need return?:", Object.values(callNative).includes(cmd));
+    console.log("deno#basePollHandle need return?:", cmd, Object.values(callNative).includes(cmd));
     if (!Object.values(callNative).includes(cmd)) {
         // 不需要返回值的调用
         network.syncSendMsgNative(cmd, data);
@@ -2000,6 +2002,10 @@ async function basePollHandle(cmd, data) {
     }
     else {
         result = await network.asyncCallDenoFunction(cmd, data);
+    }
+    // 需要ios异步返回结果，直接返回，在ios端通过jscore主动调用 callDwebViewFactory
+    if (currentPlatform() === EPlatform.ios && cmd in callIOSAsyncFunc) {
+        return;
     }
     console.log("deno#basePollHandle result: ", result);
     callDwebViewFactory(cmd, result);
@@ -2483,8 +2489,6 @@ async function setIosUiHandle(url, hexBuffer) {
         console.error("Parameter passing cannot be empty！"); // 如果没有任何请求体
         throw new Error("Parameter passing cannot be empty！");
     }
-    console.log("setIosUiHandle: ", url);
-    console.log(hexBuffer);
     const data = await network.asyncCallDenoFunction(callNative.setDWebViewUI, 
     // [new Uint8Array(hexToBinary(hexBuffer))]
     hexBuffer);
@@ -2503,12 +2507,14 @@ function setIosPollHandle(url, hexBuffer) {
     if (bufferData) {
         buffer = hexToBinary(bufferData);
     }
-    // 处理post 
-    if (!hexBuffer) {
-        console.error("Parameter passing cannot be empty！");
-        throw new Error("Parameter passing cannot be empty！"); // 如果没有任何请求体
+    else {
+        // 处理post
+        if (!hexBuffer) {
+            console.error("Parameter passing cannot be empty！");
+            throw new Error("Parameter passing cannot be empty！"); // 如果没有任何请求体
+        }
+        buffer = hexToBinary(hexBuffer);
     }
-    buffer = hexToBinary(hexBuffer);
     const stringData = bufferToString(buffer);
     const handler = JSON.parse(stringData);
     console.log("deno#setIosPollHandle Data:", stringData);

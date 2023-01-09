@@ -30,9 +30,9 @@ import SwiftyJSON
         case "OpenDWebView":
             return executiveOpenDWebView(param: param)
         case "OpenQrScanner":
-            return executiveOpenQrScanner(param: param)
+            return executiveOpenQrScanner(param: param, functionName: functionName)
         case "BarcodeScanner":
-            return executiveOpenBarcodeScanner(param: param)
+            return executiveOpenBarcodeScanner(param: param, functionName: functionName)
         case "InitMetaData":
             return executiveInitMetaData(param: param)
         case "DenoRuntime":
@@ -48,7 +48,7 @@ import SwiftyJSON
         case "GetNotification":
             return executiveGetNotification(param: param)
         case "ApplyPermissions":
-            return executiveApplyPermissions(param: param)
+            return executiveApplyPermissions(param: param, functionName: functionName)
         case "isDenoRuntime":
             return executiveIsDenoRuntime(param: param)
         case "FileSystemLs":
@@ -98,14 +98,20 @@ extension PlaocHandleModel {
         return true
     }
     //二维码
-    private func executiveOpenQrScanner(param: Any) -> String {
+    private func executiveOpenQrScanner(param: Any, functionName: String) -> String {
         let scanVC = ScanPhotoViewController()
+        scanVC.callback = { result in
+            self.asyncReturnValue(functionName: functionName, result: result)
+        }
         controller?.navigationController?.pushViewController(scanVC, animated: true)
         return ""
     }
     //条形码
-    private func executiveOpenBarcodeScanner(param: Any) -> String {
+    private func executiveOpenBarcodeScanner(param: Any, functionName: String) -> String {
         let scanVC = ScanPhotoViewController()
+        scanVC.callback = { result in
+            self.asyncReturnValue(functionName: functionName, result: result)
+        }
         controller?.navigationController?.pushViewController(scanVC, animated: true)
         return ""
     }
@@ -147,13 +153,32 @@ extension PlaocHandleModel {
     private func executiveGetNotification(param: Any) -> String {
         return ""
     }
+    
+    // 异步返回结果
+    private func asyncReturnValue(functionName: String, result: Any) {
+        self.jsContext?.evaluateScript("callDwebViewFactory('\(functionName)', '\(result)')")
+    }
+    
     //申请权限
-    private func executiveApplyPermissions(param: Any) -> String {
-        let permission = PermissionManager()
-        permission.startPermissionAuthenticate(type: .bluetooth) { result in
-            
+    private func executiveApplyPermissions(param: Any, functionName: String) -> Bool {
+        
+        guard let param = param as? String else {
+            asyncReturnValue(functionName: functionName, result: "false")
+            return false
         }
-        return ""
+        let permission = PermissionManager()
+        let permissionType = PermissionManager.PermissionsType(rawValue: param)
+        
+        if permissionType == nil {
+            asyncReturnValue(functionName: functionName, result: "false")
+            return false
+        }
+        
+        permission.startPermissionAuthenticate(type: permissionType!) { result in
+            self.asyncReturnValue(functionName: functionName, result: result)
+        }
+        
+        return true
     }
     //
     private func executiveIsDenoRuntime(param: Any) -> String {
