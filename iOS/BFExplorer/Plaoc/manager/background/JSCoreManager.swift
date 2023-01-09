@@ -81,18 +81,18 @@ class JSCoreManager: NSObject {
     
     // 处理post请求
     func handleEvaluatePostScript(strPath: String, cmd: String, buffer: String) {
-        if !postDict.keys.contains(cmd) {
-            postDict[cmd] = ""
-        }
+        
+        var postString = postDict[cmd] ?? ""
         
         if buffer != "0" {
-            if postDict[cmd]?.count != 0 {
-                postDict[cmd]! += ",\(buffer)"
+            if postString.count > 0 {
+                postString += ",\(buffer)"
             } else {
-                postDict[cmd]! += buffer
+                postString += buffer
             }
+            postDict[cmd] = postString
         } else {
-            let functionString = "webView.getIosMessage('\(strPath)', '\(postDict[cmd]!)')"
+            let functionString = "webView.getIosMessage('\(strPath)', '\(postString)')"
             let result = jsContext?.evaluateScript(functionString)
             print("swift#handleEvaluatePostScript", functionString)
             postDict.removeValue(forKey: cmd)

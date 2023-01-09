@@ -42,7 +42,6 @@ class BottomView: UIView {
                     
                 } else {
                     if imageName.hasSuffix("svg") {
-                        button.sd_setImage(with: URL(string: imageName), for: .normal, placeholderImage: nil)
                         let name = imageName.replacingOccurrences(of: ".svg", with: "")
                         if model.colors?.iconColor != nil {
                             button.setImage(UIImage.svgImageNamed(name, size: CGSize(width: image_width, height: image_width), tintColor: UIColor((model.colors?.iconColor)!)), for: .normal)

@@ -19,7 +19,7 @@ extension PlaocHandleModel {
         if data["function"].exists() {
         switch(data["function"].stringValue) {
             case "SetStatusBarColor":
-            result = updateStatusBarColor(param: data["data"].stringValue)
+                result = updateStatusBarColor(param: data["data"].stringValue)
             case "GetStatusBarColor":
                 result = statusBarColor(param: data["data"])
             case "GetStatusBarIsDark":
