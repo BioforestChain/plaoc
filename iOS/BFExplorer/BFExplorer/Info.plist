@@ -5,7 +5,7 @@
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>App需要您的同意,才能访问定位</string>
 	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>pp需要您的同意,才能打开蓝牙设备，以便发送数据</string>
+	<string>App需要您的同意,才能打开蓝牙设备，以便发送数据</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>App需要您的同意,才能访问相册</string>
 	<key>NSLocationAlwaysUsageDescription</key>
@@ -15,7 +15,7 @@
 	<key>NSMicrophoneUsageDescription</key>
 	<string>App需要您的同意,才能访问麦克风</string>
 	<key>NSBluetoothPeripheralUsageDescription</key>
-	<string>pp需要您的同意,才能打开蓝牙设备，以便发送数据</string>
+	<string>App需要您的同意,才能打开蓝牙设备，以便发送数据</string>
 	<key>NSCameraUsageDescription</key>
 	<string>App需要您的同意,才能访问相机</string>
 	<key>NSAppleMusicUsageDescription</key>

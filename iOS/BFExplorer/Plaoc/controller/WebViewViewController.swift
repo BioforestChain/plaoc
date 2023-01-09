@@ -16,7 +16,7 @@ class WebViewViewController: UIViewController {
     var urlString: String = ""
     var fileName: String = ""
     private var isStatusHidden: Bool = false
-    private var statusOverlay: Bool = true
+    private var statusOverlay: Bool = false
     private var keyboardOverlay: Bool = false
     private var style: UIStatusBarStyle = .default
     var isKeyboardShow: Bool = false
