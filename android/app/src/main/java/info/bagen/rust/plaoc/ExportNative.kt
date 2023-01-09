@@ -29,6 +29,11 @@ enum class ExportNative(val type: String) {
   CreateNotificationMsg("createNotificationMsg"), // 创建通知消息
   ReadClipboardContent("readClipboardContent"), // 读取剪切板
   WriteClipboardContent("writeClipboardContent"), // 写入剪切板
+
+  // Haptics相关
+  HapticsImpactLight("hapticsImpactLight"),
+  HapticsNotificationWarning("hapticsNotificationWarning"),
+  HapticsVibrate("hapticsVibrate"),
 }
 
 /** worker */

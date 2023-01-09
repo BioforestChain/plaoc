@@ -16,11 +16,11 @@ object ClipboardUtil {
 
   // 写内容到剪切板
   @SuppressLint("ServiceCast")
-  fun writeToClipboard(context: Context, content: String) {
+  fun writeToClipboard(context: Context, content: String, label: String = "OcrText") {
     // 获取剪贴板管理器
-    var clipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    val clipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
     // 创建普通字符型ClipData
-    var clipData = ClipData.newPlainText("OcrText", content)
+    val clipData = ClipData.newPlainText(label, content)
     // 将ClipData内容放到系统剪贴板里。
     clipboardManager.setPrimaryClip(clipData)
     Toast.makeText(context, "复制成功!", Toast.LENGTH_SHORT).show();
