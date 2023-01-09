@@ -65,7 +65,6 @@ class BottomView: UIView {
 //                button.menu = menuAction()
                 button.addTarget(self, action: #selector(clickAction(sender:)), for: .touchUpInside)
 //                button.showsMenuAsPrimaryAction = true
-                
                 self.addSubview(button)
                 buttonList.append(button)
             }

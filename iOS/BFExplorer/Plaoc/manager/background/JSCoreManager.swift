@@ -14,6 +14,7 @@ class JSCoreManager: NSObject {
     private let jsContext = JSContext()
     private var plaoc = PlaocHandleModel()
     private var name: String = ""
+    private var postDict: [String:String] = [:]
     
     
     init(fileName: String, controller: WebViewViewController?) {
@@ -70,11 +71,32 @@ class JSCoreManager: NSObject {
         return result
     }
     
+    // 处理get请求
     func handleEvaluateScript(jsString: String) {
         let functionString = "webView.getIosMessage('\(jsString)')"
         let result = jsContext?.evaluateScript(functionString)
         print("swift#handleEvaluateScript",functionString)
 //        print(result?.toString())
+    }
+    
+    // 处理post请求
+    func handleEvaluatePostScript(strPath: String, cmd: String, buffer: String) {
+        
+        var postString = postDict[cmd] ?? ""
+        
+        if buffer != "0" {
+            if postString.count > 0 {
+                postString += ",\(buffer)"
+            } else {
+                postString += buffer
+            }
+            postDict[cmd] = postString
+        } else {
+            let functionString = "webView.getIosMessage('\(strPath)', '\(postString)')"
+            let result = jsContext?.evaluateScript(functionString)
+            print("swift#handleEvaluatePostScript", functionString)
+            postDict.removeValue(forKey: cmd)
+        }
     }
     
 }

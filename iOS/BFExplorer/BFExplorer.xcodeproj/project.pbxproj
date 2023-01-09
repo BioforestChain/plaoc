@@ -169,6 +169,7 @@
 		F33B31E4295A858B000EB302 /* ToastManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F33B31E3295A858B000EB302 /* ToastManager.swift */; };
 		F33B31E6295A8AA6000EB302 /* SplashScreenManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F33B31E5295A8AA6000EB302 /* SplashScreenManager.swift */; };
 		F33BE3CD2966DE1B006D30B9 /* app in Resources */ = {isa = PBXBuildFile; fileRef = F33BE3CC2966DE1B006D30B9 /* app */; };
+		F33BE3CF2967C39C006D30B9 /* DwebviewUIEntites.swift in Sources */ = {isa = PBXBuildFile; fileRef = F33BE3CE2967C39C006D30B9 /* DwebviewUIEntites.swift */; };
 		F383C6B42955378800BD4FE5 /* FileEntites.swift in Sources */ = {isa = PBXBuildFile; fileRef = F383C6B32955378800BD4FE5 /* FileEntites.swift */; };
 		F383C6B6295537B700BD4FE5 /* StatusBarEntites.swift in Sources */ = {isa = PBXBuildFile; fileRef = F383C6B5295537B700BD4FE5 /* StatusBarEntites.swift */; };
 		F383C6B8295538A400BD4FE5 /* AlertEntites.swift in Sources */ = {isa = PBXBuildFile; fileRef = F383C6B7295538A400BD4FE5 /* AlertEntites.swift */; };
@@ -354,6 +355,7 @@
 		F33B31E3295A858B000EB302 /* ToastManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastManager.swift; sourceTree = "<group>"; };
 		F33B31E5295A8AA6000EB302 /* SplashScreenManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashScreenManager.swift; sourceTree = "<group>"; };
 		F33BE3CC2966DE1B006D30B9 /* app */ = {isa = PBXFileReference; lastKnownFileType = folder; path = app; sourceTree = "<group>"; };
+		F33BE3CE2967C39C006D30B9 /* DwebviewUIEntites.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DwebviewUIEntites.swift; sourceTree = "<group>"; };
 		F383C6B32955378800BD4FE5 /* FileEntites.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileEntites.swift; sourceTree = "<group>"; };
 		F383C6B5295537B700BD4FE5 /* StatusBarEntites.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBarEntites.swift; sourceTree = "<group>"; };
 		F383C6B7295538A400BD4FE5 /* AlertEntites.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertEntites.swift; sourceTree = "<group>"; };
@@ -782,6 +784,7 @@
 				F383C6BD2955393200BD4FE5 /* KeyboardEntites.swift */,
 				F383C6B9295538CD00BD4FE5 /* TopBarEntites.swift */,
 				F383C6BB2955391000BD4FE5 /* BottomBarEntites.swift */,
+				F33BE3CE2967C39C006D30B9 /* DwebviewUIEntites.swift */,
 			);
 			path = foreground;
 			sourceTree = "<group>";
@@ -1087,6 +1090,7 @@
 				1903644D26EB945900B82B1C /* BrowserTabViewController.swift in Sources */,
 				1903645826EBB37700B82B1C /* BrowserToolbar.swift in Sources */,
 				19128CE326FC02D20057E46D /* BrowserContainerViewController+AddressBarsAnimation.swift in Sources */,
+				F33BE3CF2967C39C006D30B9 /* DwebviewUIEntites.swift in Sources */,
 				1903645426EB983D00B82B1C /* BrowserContainerContentView.swift in Sources */,
 				F03301CC28BF016200BC0266 /* TouchView.swift in Sources */,
 				196DD6C826EFAC620096A9FB /* BrowserTabContentView.swift in Sources */,

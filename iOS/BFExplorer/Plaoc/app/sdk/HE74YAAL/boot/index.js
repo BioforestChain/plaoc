@@ -1665,6 +1665,7 @@ class Network {
         // 处理IOS，
         if (currentPlatform() === EPlatform.ios) {
             netCallNativeService(handleFn, data);
+            return;
         }
         console.log("syncSendMsgNative#request: ", handleFn, data);
         await deno.request(handleFn, [data], type); // 发送请求
@@ -2470,16 +2471,23 @@ async function iosRequestFanctory(url, buffer) {
  */
 async function setIosUiHandle(url, hexBuffer) {
     const searchParams = url.searchParams.get("data");
-    console.log("deno#setIosUiHandle:", searchParams, hexBuffer);
+    // console.log("deno#setIosUiHandle:", searchParams, hexBuffer)
     if (searchParams) {
-        const data = await network.asyncCallbackBuffer(callNative.setDWebViewUI, searchParams);
-        return data;
+        const result = await network.asyncCallDenoFunction(callNative.setDWebViewUI, searchParams);
+        console.log("deno#setIosUiHandle result:", result);
+        const { cmd, data } = JSON.parse(result);
+        callWKWebView(cmd, data);
+        return result;
     }
     if (!hexBuffer) {
         console.error("Parameter passing cannot be empty！"); // 如果没有任何请求体
         throw new Error("Parameter passing cannot be empty！");
     }
-    const data = await network.asyncSendBufferNative(callNative.setDWebViewUI, [new Uint8Array(hexToBinary(hexBuffer))]);
+    console.log("setIosUiHandle: ", url);
+    console.log(hexBuffer);
+    const data = await network.asyncCallDenoFunction(callNative.setDWebViewUI, 
+    // [new Uint8Array(hexToBinary(hexBuffer))]
+    hexBuffer);
     return data;
 }
 /**
@@ -2505,6 +2513,13 @@ function setIosPollHandle(url, hexBuffer) {
     const handler = JSON.parse(stringData);
     console.log("deno#setIosPollHandle Data:", stringData);
     basePollHandle(handler.function, handler.data);
+}
+/**
+* 发送消息给serviceWorker message
+* @param hexResult
+*/
+function callWKWebView(cmd, data) {
+    network.syncSendMsgNative(callNative.evalJsRuntime, `iosListen.listerIosSetUiCallback('${cmd}','${data}')`);
 }
 
 // 存储需要触发前端的事件，需要等待serviceworekr准备好
