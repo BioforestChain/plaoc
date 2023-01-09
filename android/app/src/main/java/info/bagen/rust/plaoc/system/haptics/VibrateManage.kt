@@ -50,7 +50,7 @@ enum class VibrateType(
   ),
 }
 
-class VibrateManage private constructor() {
+class VibrateManage public constructor() {
   private var mVibrate: Vibrator
 
   init {

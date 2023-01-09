@@ -7,6 +7,9 @@ import info.bagen.libappmgr.utils.APP_DIR_TYPE
 import info.bagen.libappmgr.utils.ClipboardUtil
 import info.bagen.libappmgr.utils.FilesUtil
 import info.bagen.rust.plaoc.system.device.DeviceInfo
+import info.bagen.rust.plaoc.system.haptics.HapticsImpactType
+import info.bagen.rust.plaoc.system.haptics.HapticsNotificationType
+import info.bagen.rust.plaoc.system.haptics.VibrateManage
 import info.bagen.rust.plaoc.system.notification.NotificationMsgItem
 import info.bagen.rust.plaoc.system.notification.NotifyManager
 import info.bagen.rust.plaoc.system.permission.PermissionManager
@@ -16,6 +19,7 @@ import info.bagen.rust.plaoc.webView.network.*
 val callable_map = mutableMapOf<ExportNative, (data: String) -> Unit>()
 private val fileSystem = FileSystem()
 private val notifyManager = NotifyManager()
+private val vibrateManage = VibrateManage()
 
 /** 初始化系统后端app*/
 fun initServiceApp() {
@@ -154,6 +158,21 @@ fun splicingPath(bfsId:String, entry:String):String {
   callable_map[ExportNative.WriteClipboardContent] = {
     ClipboardUtil.writeToClipboard(App.appContext, it)
   }
+
+  /** Haptics start */
+  /** 触碰轻质量物体 */
+  callable_map[ExportNative.HapticsImpactLight] = {
+    vibrateManage.impact(HapticsImpactType.LIGHT)
+  }
+  /** 警告分隔的振动通知 */
+  callable_map[ExportNative.HapticsNotificationWarning] = {
+    vibrateManage.notification(HapticsNotificationType.WARNING)
+  }
+  /** 反馈振动 */
+  callable_map[ExportNative.HapticsVibrate] = {
+    vibrateManage.vibrate(it.toLongOrNull() ?: 0)
+  }
+  /** Haptics end */
 }
 
 
