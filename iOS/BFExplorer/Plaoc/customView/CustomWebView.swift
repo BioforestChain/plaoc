@@ -174,14 +174,14 @@ extension CustomWebView:  WKScriptMessageHandler {
             print("swift#getConnectChannel",message.body)
             guard let bodyDict = message.body as? [String:String] else { return }
             guard let param = bodyDict["param"] else { return }
-            jsManager.handleEvaluateScript(jsString: param)
+            jsManager?.handleEvaluateScript(jsString: param)
         } else if message.name == "postConnectChannel" {
             print("swift#postConnectChannel", message.body)
             guard let bodyDict = message.body as? [String:Any] else { return }
             guard let strPath = bodyDict["strPath"] as? String else { return }
             guard let cmd = bodyDict["cmd"] as? String else { return }
             guard let buffer = bodyDict["buffer"] as? String else { return }
-            jsManager.handleEvaluatePostScript(strPath: strPath, cmd: cmd, buffer: buffer)
+            jsManager?.handleEvaluatePostScript(strPath: strPath, cmd: cmd, buffer: buffer)
         }
     }
     
