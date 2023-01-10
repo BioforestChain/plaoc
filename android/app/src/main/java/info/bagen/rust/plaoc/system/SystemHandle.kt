@@ -4,8 +4,9 @@ import android.util.Log
 import info.bagen.rust.plaoc.*
 import info.bagen.rust.plaoc.system.file.*
 import info.bagen.libappmgr.utils.APP_DIR_TYPE
-import info.bagen.libappmgr.utils.ClipboardUtil
 import info.bagen.libappmgr.utils.FilesUtil
+import info.bagen.rust.plaoc.system.clipboard.Clipboard
+import info.bagen.rust.plaoc.system.clipboard.ClipboardWriteOption
 import info.bagen.rust.plaoc.system.device.DeviceInfo
 import info.bagen.rust.plaoc.system.haptics.HapticsImpactType
 import info.bagen.rust.plaoc.system.haptics.HapticsNotificationType
@@ -13,6 +14,10 @@ import info.bagen.rust.plaoc.system.haptics.VibrateManage
 import info.bagen.rust.plaoc.system.notification.NotificationMsgItem
 import info.bagen.rust.plaoc.system.notification.NotifyManager
 import info.bagen.rust.plaoc.system.permission.PermissionManager
+import info.bagen.rust.plaoc.system.share.Share
+import info.bagen.rust.plaoc.system.share.ShareOption
+import info.bagen.rust.plaoc.system.toast.Toast
+import info.bagen.rust.plaoc.system.toast.ToastOption
 import info.bagen.rust.plaoc.webView.jsutil.sendToJavaScript
 import info.bagen.rust.plaoc.webView.network.*
 
@@ -152,11 +157,14 @@ fun splicingPath(bfsId:String, entry:String):String {
 
   /** 读取剪切板 */
   callable_map[ExportNative.ReadClipboardContent] = {
-    createBytesFactory(ExportNative.ReadClipboardContent, ClipboardUtil.readFromClipboard(App.appContext) ?: "")
+    createBytesFactory(ExportNative.ReadClipboardContent, Clipboard.read() ?: "")
   }
   /** 写入剪切板*/
   callable_map[ExportNative.WriteClipboardContent] = {
-    ClipboardUtil.writeToClipboard(App.appContext, it)
+    val writeOption = mapper.readValue(it, ClipboardWriteOption::class.java)
+    Clipboard.write(strValue = writeOption.str, imageValue = writeOption.image, urlValue = writeOption.url, labelValue = writeOption.label ?: "OcrText") {
+      println("writeClipboardContent error: $it")
+    }
   }
 
   /** Haptics start */
@@ -173,6 +181,27 @@ fun splicingPath(bfsId:String, entry:String):String {
     vibrateManage.vibrate(it.toLongOrNull() ?: 0)
   }
   /** Haptics end */
+
+  /** Toast */
+  callable_map[ExportNative.ShowToast] = {
+    val param = mapper.readValue(it, ToastOption::class.java)
+    val duration = if (param.duration == "long") Toast.DurationType.LONG else Toast.DurationType.SHORT
+    val position = when(param.position) {
+      "top" -> Toast.PositionType.valueOf("TOP")
+      "center" -> Toast.PositionType.valueOf("CENTER")
+      else -> Toast.PositionType.valueOf("BOTTOM")
+    }
+    Toast.show(text = param.text, durationType = duration, positionType = position, view = null)
+  }
+
+  /** Share */
+  callable_map[ExportNative.SystemShare] = {
+    val param = mapper.readValue(it, ShareOption::class.java)
+
+    Share.share(title = param.title, text = param.text, url = param.url, files = param.files, dialogTitle = param.dialogTitle ?: "分享到：") {
+      println("SystemShare error: $it")
+    }
+  }
 }
 
 

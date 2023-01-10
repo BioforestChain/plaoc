@@ -77,3 +77,10 @@ object Clipboard {
     return ClipboardData(value.toString(), type)
   }
 }
+
+data class ClipboardWriteOption(
+  val str: String?,
+  val image: String?,
+  val url: String?,
+  val label: String?,
+)

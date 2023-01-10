@@ -34,6 +34,11 @@ enum class ExportNative(val type: String) {
   HapticsImpactLight("hapticsImpactLight"),
   HapticsNotificationWarning("hapticsNotificationWarning"),
   HapticsVibrate("hapticsVibrate"),
+
+  // Toast
+  ShowToast("showToast"),
+  // Share
+  SystemShare("SystemShare"),
 }
 
 /** worker */

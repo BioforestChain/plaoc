@@ -315,3 +315,11 @@ object Share {
     return str?.isNotEmpty() ?: false
   }
 }
+
+data class ShareOption(
+  val title: String? = null,
+  val text: String? = null,
+  val url: String? = null,
+  val files: Array<String>? = null,
+  val dialogTitle: String? = null,
+)
