@@ -4,8 +4,9 @@ import android.util.Log
 import info.bagen.rust.plaoc.*
 import info.bagen.rust.plaoc.system.file.*
 import info.bagen.libappmgr.utils.APP_DIR_TYPE
-import info.bagen.libappmgr.utils.ClipboardUtil
 import info.bagen.libappmgr.utils.FilesUtil
+import info.bagen.rust.plaoc.system.clipboard.Clipboard
+import info.bagen.rust.plaoc.system.clipboard.ClipboardWriteOption
 import info.bagen.rust.plaoc.system.device.DeviceInfo
 import info.bagen.rust.plaoc.system.haptics.HapticsImpactType
 import info.bagen.rust.plaoc.system.haptics.HapticsNotificationType
@@ -156,11 +157,14 @@ fun splicingPath(bfsId:String, entry:String):String {
 
   /** 读取剪切板 */
   callable_map[ExportNative.ReadClipboardContent] = {
-    createBytesFactory(ExportNative.ReadClipboardContent, ClipboardUtil.readFromClipboard(App.appContext) ?: "")
+    createBytesFactory(ExportNative.ReadClipboardContent, Clipboard.read() ?: "")
   }
   /** 写入剪切板*/
   callable_map[ExportNative.WriteClipboardContent] = {
-    ClipboardUtil.writeToClipboard(App.appContext, it)
+    val writeOption = mapper.readValue(it, ClipboardWriteOption::class.java)
+    Clipboard.write(strValue = writeOption.str, imageValue = writeOption.image, urlValue = writeOption.url, labelValue = writeOption.label ?: "OcrText") {
+      println("writeClipboardContent error: $it")
+    }
   }
 
   /** Haptics start */
