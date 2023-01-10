@@ -81,6 +81,10 @@ import SwiftyJSON
             return showToast(param: param)
         case "SystemShare":
             return systemShare(param: param)
+        case "ReadClipboardContent":
+            return readClipboardContent(param: param)
+        case "WriteClipboardContent":
+            return writeClipboardContent(param: param)
         // 前端ui
         case "SetDWebViewUI":
             return executiveDwebviewUI(param: param)
@@ -221,6 +225,35 @@ extension PlaocHandleModel {
         }
         
         ShareManager.loadSystemShare(title: data["title"].stringValue, text: data["text"].stringValue, url: data["url"].stringValue, files: files)
+    }
+    
+    // 读取剪切板
+    private func readClipboardContent(param: Any) -> String {
+        let param = param as? String ?? ""
+        let type = ClipboardManager.ContentType(rawValue: param) ?? ClipboardManager.ContentType.string
+        let dict = ClipboardManager.read()
+        
+        return ChangeTools.dicValueString(dict) ?? ""
+    }
+    
+    // 写入剪切板
+    private func writeClipboardContent(param: Any) {
+        guard let param = param as? String else { return }
+        let data = JSON(parseJSON: param)
+        
+        if data["writeOption"].exists() {
+            let option = data["writeOption"]
+            
+            if option["str"].exists() {
+                let _ = ClipboardManager.write(content: option["str"].stringValue, ofType: ClipboardManager.ContentType.string)
+            } else if (option["image"].exists()) {
+                let _ = ClipboardManager.write(content: option["image"], ofType: ClipboardManager.ContentType.image)
+            } else if (option["url"].exists()) {
+                let _ = ClipboardManager.write(content: option["url"], ofType: ClipboardManager.ContentType.url)
+            } else if (option["color"].exists()) {
+                let _ = ClipboardManager.write(content: option["color"], ofType: ClipboardManager.ContentType.color)
+            }
+        }
     }
 }
 

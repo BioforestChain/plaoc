@@ -53,7 +53,7 @@ extension PlaocHandleModel {
             case "GetTopBarOverlay":
                 result = topBarOverlay(param: data["data"])
             case "SetTopBarOverlay":
-                result = updateTopBarOverlay(param: data["data"].stringValue)
+                result = updateTopBarOverlay(param: data["data"].boolValue)
             case "GetTopBarAlpha":
                 result = topBarAlpha(param: data["data"])
             case "SetTopBarAlpha":
