@@ -17,7 +17,6 @@ import java.net.NetworkInterface
 import java.util.*
 import java.util.regex.Pattern
 
-
 data class NetWorkData(
   var enableInternet: Boolean = false,
   var enableWifi: Boolean = false,
@@ -62,20 +61,20 @@ class NetWorkInfo {
 
   val switchOfInternet: Boolean
     get() {
-      var cm = App.appContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-      var ni = cm.activeNetworkInfo
-      return ni?.let { it.isAvailable } ?: false
+      val cm = App.appContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+      val ni = cm.activeNetworkInfo
+      return ni?.isAvailable ?: false
     }
 
   val switchOfWifi: Boolean
     get() {
-      var wifi = App.appContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+      val wifi = App.appContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
       return wifi.isWifiEnabled
     }
 
   val switchOfBluetooth: Boolean
     get() {
-      var bluetooth = BluetoothAdapter.getDefaultAdapter()
+      val bluetooth = BluetoothAdapter.getDefaultAdapter()
       return bluetooth.isEnabled
     }
 
@@ -86,7 +85,7 @@ class NetWorkInfo {
 
   val macAddrOfWifi: String
     get() {
-      var wifi = App.appContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+      val wifi = App.appContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
       return if (wifi.isWifiEnabled) {
         getWifiMacAddress()
       } else {
@@ -100,7 +99,7 @@ class NetWorkInfo {
         Settings.Secure.getString(App.appContext.contentResolver, "bluetooth_address") ?: "01"
       } else {
         val bta = BluetoothAdapter.getDefaultAdapter()
-        bta?.let { it.address } ?: "02"
+        bta?.address ?: "02"
       }
     }
 
@@ -230,7 +229,7 @@ fun String.isIPv4(): Boolean {
     return false
   }
   // 2.判断首尾是否有'.'字符
-  var c = toCharArray()
+  val c = toCharArray()
   if (c[0] == '.' || c[c.size - 1] == '.') {
     //LogUtils.d("isIPv4 -> start/end not '.'")
     return false
@@ -242,14 +241,14 @@ fun String.isIPv4(): Boolean {
     }
   }
   // 3.按照'.'分隔，数组为4
-  var s = split(".")
+  val s = split(".")
   if (s.size != 4) {
     //LogUtils.d("isIPv4 -> split array size=${s.size}")
     return false
   }
   // 4.判断数组第一位在1~255之间，后面三个在0~255
   for (i in 0..3) {
-    var value = s[i].toInt()
+    val value = s[i].toInt()
     if (i == 0 && (value <= 0 || value > 255)) {
       //LogUtils.d("isIPv4 -> first value in 1~255 :$value")
       return false
@@ -267,13 +266,13 @@ fun String.isIPv6(): Boolean {
   // 1.判断长度 >7
   if (length < 7) return false
   // 2.判断首尾是否有':'字符
-  var c = toCharArray()
+  val c = toCharArray()
   if (c[0] == ':' || c[c.size - 1] == ':') return false
   for (cc in c) { // 如果非数字、字母和':'组合即为非法
     if (!cc.isDigit() || !cc.isLetter() || cc != ':') return false
   }
   // 3.按照':'分隔，数组为8
-  var s = split(":")
+  val s = split(":")
   if (s.size != 8) return false
   // 4.判断数组中每一位都不能大于8位
   for (value in s) {
