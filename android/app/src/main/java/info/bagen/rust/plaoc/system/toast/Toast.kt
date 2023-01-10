@@ -15,7 +15,7 @@ object Toast {
   }
 
   fun show(
-    text: String, view: View,
+    text: String, view: View?,
     durationType: DurationType = DurationType.SHORT,
     positionType: PositionType = PositionType.BOTTOM
   ) {
@@ -57,3 +57,9 @@ object Toast {
     toast.show()
   }
 }
+
+data class ToastOption(
+  val text: String,
+  val duration: String = "short",
+  val position: String = "bottom"
+)

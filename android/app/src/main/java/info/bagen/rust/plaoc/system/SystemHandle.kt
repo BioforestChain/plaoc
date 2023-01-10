@@ -13,6 +13,10 @@ import info.bagen.rust.plaoc.system.haptics.VibrateManage
 import info.bagen.rust.plaoc.system.notification.NotificationMsgItem
 import info.bagen.rust.plaoc.system.notification.NotifyManager
 import info.bagen.rust.plaoc.system.permission.PermissionManager
+import info.bagen.rust.plaoc.system.share.Share
+import info.bagen.rust.plaoc.system.share.ShareOption
+import info.bagen.rust.plaoc.system.toast.Toast
+import info.bagen.rust.plaoc.system.toast.ToastOption
 import info.bagen.rust.plaoc.webView.jsutil.sendToJavaScript
 import info.bagen.rust.plaoc.webView.network.*
 
@@ -173,6 +177,27 @@ fun splicingPath(bfsId:String, entry:String):String {
     vibrateManage.vibrate(it.toLongOrNull() ?: 0)
   }
   /** Haptics end */
+
+  /** Toast */
+  callable_map[ExportNative.ShowToast] = {
+    val param = mapper.readValue(it, ToastOption::class.java)
+    val duration = if (param.duration == "long") Toast.DurationType.LONG else Toast.DurationType.SHORT
+    val position = when(param.position) {
+      "top" -> Toast.PositionType.valueOf("TOP")
+      "center" -> Toast.PositionType.valueOf("CENTER")
+      else -> Toast.PositionType.valueOf("BOTTOM")
+    }
+    Toast.show(text = param.text, durationType = duration, positionType = position, view = null)
+  }
+
+  /** Share */
+  callable_map[ExportNative.SystemShare] = {
+    val param = mapper.readValue(it, ShareOption::class.java)
+
+    Share.share(title = param.title, text = param.text, url = param.url, files = param.files, dialogTitle = param.dialogTitle ?: "分享到：") {
+      println("SystemShare error: $it")
+    }
+  }
 }
 
 
