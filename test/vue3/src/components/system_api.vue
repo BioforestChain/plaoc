@@ -36,7 +36,7 @@ function setNavigationBarOverlay() {
 }
 function getStatusBarColor() {
   const status = document.querySelector<BfcsStatusBar>("dweb-status-bar");
-  status?.getStatusBarColor()
+  status?.getStatusBarBackgroundColor()
 }
 // app相关
 function listenerAppMessage() {
@@ -51,12 +51,27 @@ async function exitApp() {
   const app = document.querySelector<App>('dweb-app')!;
   app.exitApp()
 }
+
+// 复制到剪切板
+async function writeClipboardContent() {
+  const app = document.querySelector<App>("dweb-app")!;
+  const bool = await app.writeClipboardContent({str: document.getElementById("title")!.textContent!});
+  app.showToast(`复制${bool}`, "short", "top");
+  const result = await app.readClipboardContent();
+  app.showToast(`type: ${result.type} value: ${result.value}`, "long");
+}
+
+// 获取网络状态
+async function getNetworkStatus() {
+  const app = document.querySelector<App>("dweb-app")!;
+  app.showToast(await app.getNetworkStatus(), "short");
+}
 </script>
 
 <template>
   <dweb-app></dweb-app>
-  <h2>andrid/ios 系统api 测试</h2>
-  <dweb-status-bar id="status_bar" background-color="rgba(133,100,100,0.5)" overlay></dweb-status-bar>
+  <h2 id="title">andrid/ios 系统api 测试</h2>
+  <dweb-status-bar id="status_bar" background-color="rgba(133,100,100,0.5)" bar-style="light-content"></dweb-status-bar>
   <dweb-keyboard id="key_board" hidden></dweb-keyboard>
   <dweb-navigation></dweb-navigation>
   <ion-button expand="block" fill="outline" @click="exitApp">退出APP</ion-button>
@@ -66,8 +81,13 @@ async function exitApp() {
   <ion-button expand="block" fill="outline" @click="setNavigationBarColor">设置系统navigation颜色</ion-button>
   <ion-button expand="full" fill="outline" @click="onShowKeyboard">点击开启虚拟键盘</ion-button>
   <ion-button shape="round" fill="outline" @click="getStatusBarColor">点击获取状态栏颜色</ion-button>
+  <ion-button shape="round" fill="outline" @click="writeClipboardContent">复制到剪切板</ion-button>
+  <ion-button shape="round" fill="outline" @click="getNetworkStatus">获取网络状态</ion-button>
+  <div id="placeholder"></div>
 </template>
 
 <style scoped>
-
+  #placeholder {
+    height: 100px;
+  }
 </style>

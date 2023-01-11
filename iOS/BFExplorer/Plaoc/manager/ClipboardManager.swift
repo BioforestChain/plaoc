@@ -9,7 +9,7 @@ import UIKit
 
 class ClipboardManager: NSObject {
 
-    enum ContentType {
+    enum ContentType: String {
         case string
         case url
         case image
@@ -17,7 +17,7 @@ class ClipboardManager: NSObject {
     }
     
     enum ClipboardError: LocalizedError {
-        case invalidURL, invalidImage, invalidColor, invalidString
+        case invalidURL, invalidImage, invalidColor, invalidString, invalidType
         
         public var errorDescription: String? {
             switch self {
@@ -29,6 +29,8 @@ class ClipboardManager: NSObject {
                 return "Unable to form Color"
             case .invalidString:
                 return "Unable to form String"
+            case .invalidType:
+                return "Unfound type"
             }
         }
     }
@@ -43,40 +45,61 @@ class ClipboardManager: NSObject {
                 return .failure(ClipboardError.invalidString)
             }
         case .url:
-            if content is URL {
-                UIPasteboard.general.url = content as? URL
-                return .success(())
-            } else {
-                return .failure(ClipboardError.invalidURL)
-            }
+            guard let content = content as? String else { return .failure(ClipboardError.invalidURL) }
+            
+            UIPasteboard.general.url = URL(string: content)
+            return .success(())
         case .image:
-            if content is UIImage {
-                UIPasteboard.general.image = content as? UIImage
-                return .success(())
-            } else {
+            guard let content = content as? String else { return .failure(ClipboardError.invalidImage) }
+            guard let stringData = Data(base64Encoded: content),
+                  let uiImage = UIImage(data: stringData) else {
                 return .failure(ClipboardError.invalidImage)
             }
+            
+            UIPasteboard.general.image = uiImage
+            return .success(())
         case .color:
-            if content is UIImage {
-                UIPasteboard.general.color = content as? UIColor
-                return .success(())
-            } else {
-                return .failure(ClipboardError.invalidColor)
-            }
+            guard let content = content as? String else { return .failure(ClipboardError.invalidColor) }
+            let color = UIColor(hexColor: content)
+            UIPasteboard.general.color = color
+            
+            return .success(())
         }
     }
     
-    static func read(type: ContentType) -> Any? {
-        switch type {
-        case .string:
-            return UIPasteboard.general.string
-        case .url:
-            return UIPasteboard.general.url
-        case .image:
-            return UIPasteboard.general.image
-        case .color:
-            return UIPasteboard.general.color
+    static func read() -> [String:Any] {
+        if let stringValue = UIPasteboard.general.string {
+            return [
+                "value": stringValue,
+                "type": "text/plain"
+            ]
         }
+
+        if let url = UIPasteboard.general.url {
+            return [
+                "value": url.absoluteString,
+                "type": "text/plain"
+            ]
+        }
+
+        if let image = UIPasteboard.general.image {
+            let data = image.pngData()
+            if let base64 = data?.base64EncodedString() {
+                return [
+                    "value": "data:image/png;base64," + base64,
+                    "type": "image/png"
+                ]
+            }
+        }
+        
+        if let color = UIPasteboard.general.color {
+            return [
+                "value": color.hexString(true),
+                "type": "text/plain"
+            ]
+        }
+
+        return [:]
     }
 }
 

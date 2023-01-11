@@ -1110,7 +1110,7 @@ class PromiseOut {
 }
 
 new TextEncoder();
-const _decoder = new TextDecoder();
+const _decoder = new TextDecoder("utf-8");
 const stringToByte = (s) => {
     const res = new Uint16Array(s.length);
     for (let i = 0; i < s.length; i += 1) {
@@ -1127,7 +1127,13 @@ const stringToByte = (s) => {
  * @returns
  */
 const bufferToString = (buffer) => {
-    return String.fromCharCode.apply(null, buffer);
+    if (ArrayBuffer.isView(buffer)) {
+        // return String.fromCharCode.apply(null, buffer as number[])
+        return _decoder.decode(buffer.buffer);
+    }
+    console.log("bufferToString");
+    console.log(buffer);
+    return _decoder.decode(buffer);
 };
 /**
  * 合并Uint16array
@@ -1165,7 +1171,7 @@ const contactUint8 = (...arrs) => {
  * @returns Uint8Array
  */
 const hexToBinary = (hex) => {
-    return hex.split(",").map(v => +v);
+    return Uint8Array.from(hex.split(",").map(v => +v));
 };
 
 /////////////////////////////
@@ -1532,12 +1538,25 @@ var callNative;
     callNative["serviceWorkerReady"] = "ServiceWorkerReady";
     /**设置dwebview的ui */
     callNative["setDWebViewUI"] = "SetDWebViewUI";
+    /** 剪切板 */
+    callNative["writeClipboardContent"] = "WriteClipboardContent";
+    callNative["readClipboardContent"] = "ReadClipboardContent";
+    /** 获取网络状态 */
+    callNative["getNetworkStatus"] = "GetNetworkStatus";
 })(callNative || (callNative = {}));
 /**不需要返回的命令 */
 var callNotReturnNative;
 (function (callNotReturnNative) {
     /**退出app */
     callNotReturnNative["exitApp"] = "ExitApp";
+    /** toast 提示 */
+    callNotReturnNative["showToast"] = "ShowToast";
+    /** share 系统分享 */
+    callNotReturnNative["systemShare"] = "SystemShare";
+    /** haptics 交互 */
+    callNotReturnNative["hapticsImpactLight"] = "HapticsImpactLight";
+    callNotReturnNative["hapticsNotificationWarning"] = "HapticsNotificationWarning";
+    callNotReturnNative["hapticsVibrate"] = "HapticsVibrate";
 })(callNotReturnNative || (callNotReturnNative = {}));
 // 回调到对应的组件
 var callDVebView;
@@ -1549,12 +1568,22 @@ var callDVebView;
     callDVebView["ApplyPermissions"] = "dweb-permission";
     callDVebView["CheckCameraPermission"] = "dweb-permission";
     callDVebView["GetPermissions"] = "dweb-permission";
+    callDVebView["ShowToast"] = "dweb-app";
+    callDVebView["SystemShare"] = "dweb-app";
+    callDVebView["GetNetworkStatus"] = "dweb-app";
+    callDVebView["HapticsImpactLight"] = "dweb-app";
+    callDVebView["HapticsNotificationWarning"] = "dweb-app";
+    callDVebView["HapticsVibrate"] = "dweb-app";
+    callDVebView["ReadClipboardContent"] = "dweb-app";
+    callDVebView["WriteClipboardContent"] = "dweb-app";
 })(callDVebView || (callDVebView = {}));
 // const callDeno
 // 需要ios异步返回结果方法
 var callIOSAsyncFunc;
 (function (callIOSAsyncFunc) {
     callIOSAsyncFunc["ApplyPermissions"] = "ApplyPermissions";
+    callIOSAsyncFunc["OpenQrScanner"] = "OpenQrScanner";
+    callIOSAsyncFunc["BarcodeScanner"] = "BarcodeScanner";
 })(callIOSAsyncFunc || (callIOSAsyncFunc = {}));
 
 /**
@@ -2616,7 +2645,7 @@ class DWebView extends MapEventEmitter {
                 continue;
             }
             // console.log("dwebviewToDeno====>", data.value);
-            const strPath = bufferToString(data.value);
+            const strPath = bufferToString(Uint8Array.from(data.value));
             this.chunkGateway(strPath);
             /// 这里是重点，使用 do-while ，替代 finally，可以避免堆栈溢出。
         } while (true);
@@ -2636,8 +2665,9 @@ class DWebView extends MapEventEmitter {
         if (strPath.startsWith("/channel")) { // /channel/349512662458373/chunk=0002,104,116,116,112,115,58,1
             // 拿到channelId
             const channelId = strPath.substring(strPath.lastIndexOf("/channel/") + 9, strPath.lastIndexOf("/chunk"));
-            const stringHex = strPath.substring(strPath.lastIndexOf("=") + 1);
-            const buffers = stringHex.split(",").map(v => Number(v));
+            strPath.substring(strPath.lastIndexOf("=") + 1);
+            // const buffers = stringHex.split(",").map(v => Number(v))
+            const buffers = hexToBinary(strPath);
             // const chunk = (new Uint8Array(buffers))
             console.log("deno#chunkGateway", channelId, buffers.length);
             await this.chunkHanlder(channelId, buffers);

@@ -81,6 +81,10 @@ import SwiftyJSON
             return showToast(param: param)
         case "SystemShare":
             return systemShare(param: param)
+        case "ReadClipboardContent":
+            return readClipboardContent(param: param)
+        case "WriteClipboardContent":
+            return writeClipboardContent(param: param)
         // 前端ui
         case "SetDWebViewUI":
             return executiveDwebviewUI(param: param)
@@ -221,6 +225,42 @@ extension PlaocHandleModel {
         }
         
         ShareManager.loadSystemShare(title: data["title"].stringValue, text: data["text"].stringValue, url: data["url"].stringValue, files: files)
+    }
+    
+    // 读取剪切板
+    private func readClipboardContent(param: Any) -> String {
+        let param = param as? String ?? ""
+        let type = ClipboardManager.ContentType(rawValue: param) ?? ClipboardManager.ContentType.string
+        let dict = ClipboardManager.read()
+        
+        return ChangeTools.dicValueString(dict) ?? ""
+    }
+    
+    // 写入剪切板
+    private func writeClipboardContent(param: Any) -> Bool {
+        guard let param = param as? String else { return false }
+        let data = JSON(parseJSON: param)
+        let result: Result<Void, Error>
+        
+        if data["str"].exists() {
+            result = ClipboardManager.write(content: data["str"].stringValue, ofType: ClipboardManager.ContentType.string)
+        } else if (data["image"].exists()) {
+            result = ClipboardManager.write(content: data["image"], ofType: ClipboardManager.ContentType.image)
+        } else if (data["url"].exists()) {
+            result = ClipboardManager.write(content: data["url"], ofType: ClipboardManager.ContentType.url)
+        } else if (data["color"].exists()) {
+            result = ClipboardManager.write(content: data["color"], ofType: ClipboardManager.ContentType.color)
+        } else {
+            result = .failure(ClipboardManager.ClipboardError.invalidType)
+        }
+        
+        switch(result) {
+        case .success():
+            return true
+        case .failure(let error):
+            print("writeClipboardContent error: \(error.localizedDescription)")
+            return false
+        }
     }
 }
 
