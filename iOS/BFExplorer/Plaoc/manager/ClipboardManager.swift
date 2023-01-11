@@ -17,7 +17,7 @@ class ClipboardManager: NSObject {
     }
     
     enum ClipboardError: LocalizedError {
-        case invalidURL, invalidImage, invalidColor, invalidString
+        case invalidURL, invalidImage, invalidColor, invalidString, invalidType
         
         public var errorDescription: String? {
             switch self {
@@ -29,6 +29,8 @@ class ClipboardManager: NSObject {
                 return "Unable to form Color"
             case .invalidString:
                 return "Unable to form String"
+            case .invalidType:
+                return "Unfound type"
             }
         }
     }

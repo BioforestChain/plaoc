@@ -237,22 +237,29 @@ extension PlaocHandleModel {
     }
     
     // 写入剪切板
-    private func writeClipboardContent(param: Any) {
-        guard let param = param as? String else { return }
+    private func writeClipboardContent(param: Any) -> Bool {
+        guard let param = param as? String else { return false }
         let data = JSON(parseJSON: param)
+        let result: Result<Void, Error>
         
-        if data["writeOption"].exists() {
-            let option = data["writeOption"]
-            
-            if option["str"].exists() {
-                let _ = ClipboardManager.write(content: option["str"].stringValue, ofType: ClipboardManager.ContentType.string)
-            } else if (option["image"].exists()) {
-                let _ = ClipboardManager.write(content: option["image"], ofType: ClipboardManager.ContentType.image)
-            } else if (option["url"].exists()) {
-                let _ = ClipboardManager.write(content: option["url"], ofType: ClipboardManager.ContentType.url)
-            } else if (option["color"].exists()) {
-                let _ = ClipboardManager.write(content: option["color"], ofType: ClipboardManager.ContentType.color)
-            }
+        if data["str"].exists() {
+            result = ClipboardManager.write(content: data["str"].stringValue, ofType: ClipboardManager.ContentType.string)
+        } else if (data["image"].exists()) {
+            result = ClipboardManager.write(content: data["image"], ofType: ClipboardManager.ContentType.image)
+        } else if (data["url"].exists()) {
+            result = ClipboardManager.write(content: data["url"], ofType: ClipboardManager.ContentType.url)
+        } else if (data["color"].exists()) {
+            result = ClipboardManager.write(content: data["color"], ofType: ClipboardManager.ContentType.color)
+        } else {
+            result = .failure(ClipboardManager.ClipboardError.invalidType)
+        }
+        
+        switch(result) {
+        case .success():
+            return true
+        case .failure(let error):
+            print("writeClipboardContent error: \(error.localizedDescription)")
+            return false
         }
     }
 }
