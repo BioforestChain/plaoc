@@ -241,11 +241,12 @@ extension WebViewViewController {
     
     //更新状态栏状态
     func updateStatusStyle(style: String) {
-        if style == "default" {
-            self.style = .default
-        } else {
-            self.style = .lightContent
-        }
+//        if style == "default" {
+//            self.style = .default
+//        } else {
+//            self.style = .lightContent
+//        }
+        self.style = .lightContent
         setNeedsStatusBarAppearanceUpdate()
     }
     //返回状态栏状态

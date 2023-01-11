@@ -1233,29 +1233,6 @@ async function getRustChunk() {
         done: false,
     };
 }
-/**循环从rust里拿数据 */
-function getRustBuffer(ex_head_view) {
-    const uint8_head = new Uint8Array(ex_head_view.buffer);
-    const data = `${uint8_head[0]}-${uint8_head[1]}`;
-    const buffer = Deno.core.opSync("op_rust_to_js_system_buffer", data); // backSystemDataToRust
-    if (buffer[0] === 0 && buffer.length === 1) {
-        return {
-            value: buffer,
-            done: true,
-        };
-    }
-    console.log("getRustBuffer2: -->  ", buffer);
-    // 如果是普通消息,versionID == 1
-    if (buffer[0] === 1) {
-        buffer.splice(0, 2); //拿到版本号
-        buffer.splice(0, 2); // 拿到头部标记
-    }
-    const buff = new Uint8Array(buffer);
-    return {
-        value: buff,
-        done: false,
-    };
-}
 
 class EasyMap extends Map {
     // private _map: Map<F, V>;
@@ -1392,6 +1369,9 @@ var Transform_Type;
 
 /////////////////////////////
 const REQ_CATCH = EasyMap.from({
+    transformKey(key) {
+        return `${key[0]}-${key[1]}`;
+    },
     creater(_req_id) {
         return {
             po: new PromiseOut()
@@ -1448,9 +1428,9 @@ let Deno$1 = class Deno {
         // 发送具体操作消息
         this.callFunction(cmd, type, data_string, transferable_metadata);
         // 需要返回值的才需要等待
-        if ((type & Transform_Type.NOT_RETURN) !== Transform_Type.NOT_RETURN) {
-            this.loopGetKotlinReturn(req_id, cmd);
-        }
+        // if ((type & Transform_Type.NOT_RETURN) !== Transform_Type.NOT_RETURN) {
+        //   this.loopGetKotlinReturn(req_id, cmd)
+        // }
     }
     headViewAdd() {
         this.reqId[0]++;
@@ -1465,22 +1445,39 @@ let Deno$1 = class Deno {
         // 发送消息
         js_to_rust_buffer(body); // android - denoOp
     }
-    /**
-     * 循环获取kotlin system 返回的数据
-     * @returns
-     */
-    async loopGetKotlinReturn(reqId, cmd) {
-        do {
-            const result = await getRustBuffer(reqId); // backSystemDataToRust
-            if (result.done) {
-                continue;
-            }
-            console.log(`deno#loopGetKotlinReturn ✅:${cmd},req_id,当前请求的：${this.reqId[0]},是否存在请求：${REQ_CATCH.has(this.reqId)}`);
-            REQ_CATCH.get(this.reqId)?.po.resolve(result.value);
-            REQ_CATCH.delete(this.reqId);
-            break;
-        } while (true);
+    getRustBuffer(head_view, buffer) {
+        console.log("deno#backSystemDataToRust: ", head_view, buffer);
+        if (buffer[0] === 0 && buffer.length === 1) {
+            return {
+                value: buffer,
+                done: true,
+            };
+        }
+        // 如果是普通消息,versionID == 1
+        if (buffer[0] === 1) {
+            buffer.splice(0, 2); //拿到版本号
+            buffer.splice(0, 2); // 拿到头部标记
+        }
+        const buff = new Uint8Array(buffer);
+        REQ_CATCH.get(head_view)?.po.resolve(buff);
+        REQ_CATCH.delete(head_view);
     }
+    // /**
+    //  * 循环获取kotlin system 返回的数据
+    //  * @returns 
+    //  */
+    // async loopGetKotlinReturn(reqId: Uint16Array, cmd: string) {
+    //   do {
+    //     const result = await getRustBuffer(reqId); // backSystemDataToRust
+    //     if (result.done) {
+    //       continue;
+    //     }
+    //     console.log(`deno#loopGetKotlinReturn ✅:${cmd},req_id,当前请求的：${this.reqId[0]},是否存在请求：${REQ_CATCH.has(this.reqId)}`);
+    //     REQ_CATCH.get(this.reqId)?.po.resolve(result.value);
+    //     REQ_CATCH.delete(this.reqId)
+    //     break;
+    //   } while (true);
+    // }
     /** 针对64位
      * 第一块分区：版本号 2^8 8位，一个字节 1：表示消息，2：表示广播，4：心跳检测
      * 第二块分区：头部标记 2^16 16位 两个字节  根据版本号这里各有不同，假如是消息，就是0，1；如果是广播则是组
@@ -1551,11 +1548,6 @@ var callDVebView;
     callDVebView["GetPermissions"] = "dweb-permission";
 })(callDVebView || (callDVebView = {}));
 // const callDeno
-// 需要ios异步返回结果方法
-var callIOSAsyncFunc;
-(function (callIOSAsyncFunc) {
-    callIOSAsyncFunc["ApplyPermissions"] = "ApplyPermissions";
-})(callIOSAsyncFunc || (callIOSAsyncFunc = {}));
 
 /**
  * 发送系统通知
@@ -1569,7 +1561,7 @@ function netCallNativeService(fn, data = "") {
     const uint8 = jscore.callJavaScriptWithFunctionNameParam(fn, data);
     if (!uint8)
         return new Uint8Array(0);
-    console.log("netCallNativeService:==>", fn, uint8);
+    console.log("netCallNativeService:==>", uint8);
     return uint8;
 }
 
@@ -1779,7 +1771,8 @@ async function warpPermissions(cmd, permissions) {
  */
 async function applyPermissions(permissions) {
     console.log("deno#applyPermissions：", permissions, currentPlatform());
-    return await network.asyncCallDenoFunction(callNative.applyPermissions, permissions);
+    await network.syncSendMsgNative(callNative.applyPermissions, permissions);
+    return "";
 }
 /**
  * 获取权限信息
@@ -2002,10 +1995,6 @@ async function basePollHandle(cmd, data) {
     }
     else {
         result = await network.asyncCallDenoFunction(cmd, data);
-    }
-    // 需要ios异步返回结果，直接返回，在ios端通过jscore主动调用 callDwebViewFactory
-    if (currentPlatform() === EPlatform.ios && cmd in callIOSAsyncFunc) {
-        return;
     }
     console.log("deno#basePollHandle result: ", result);
     callDwebViewFactory(cmd, result);
@@ -2489,9 +2478,7 @@ async function setIosUiHandle(url, hexBuffer) {
         console.error("Parameter passing cannot be empty！"); // 如果没有任何请求体
         throw new Error("Parameter passing cannot be empty！");
     }
-    const data = await network.asyncCallDenoFunction(callNative.setDWebViewUI, 
-    // [new Uint8Array(hexToBinary(hexBuffer))]
-    hexBuffer);
+    const data = await network.asyncSendBufferNative(callNative.setDWebViewUI, [new Uint8Array(hexToBinary(hexBuffer))]);
     return data;
 }
 /**
@@ -2507,14 +2494,12 @@ function setIosPollHandle(url, hexBuffer) {
     if (bufferData) {
         buffer = hexToBinary(bufferData);
     }
-    else {
-        // 处理post
-        if (!hexBuffer) {
-            console.error("Parameter passing cannot be empty！");
-            throw new Error("Parameter passing cannot be empty！"); // 如果没有任何请求体
-        }
-        buffer = hexToBinary(hexBuffer);
+    // 处理post 
+    if (!hexBuffer) {
+        console.error("Parameter passing cannot be empty！");
+        throw new Error("Parameter passing cannot be empty！"); // 如果没有任何请求体
     }
+    buffer = hexToBinary(hexBuffer);
     const stringData = bufferToString(buffer);
     const handler = JSON.parse(stringData);
     console.log("deno#setIosPollHandle Data:", stringData);

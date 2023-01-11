@@ -41,15 +41,20 @@ class SystemUiFFI(
     }
 
     /**第一个参数是颜色HEX。第二个是图标是否更期望于使用深色*/
-    fun setStatusBarColor( colorHex: String, darkIcons: Boolean):Boolean {
+    fun setStatusBarBackgroundColor( colorHex: String):Boolean {
         systemUIState.statusBar.apply {
             color.value = Color(hexToIntColor(colorHex))
-            isDarkIcons.value = darkIcons
         }
       return true
     }
+    fun setStatusBarStyle( darkIcons: Boolean ): Boolean {
+      systemUIState.statusBar.apply {
+            isDarkIcons.value = darkIcons
+      }
+      return true
+    }
   /** 获取状态栏背景颜色*/
-  fun getStatusBarColor(): String {
+  fun getStatusBarBackgroundColor(): String {
     val color = systemUIState.statusBar.color.value;
     val colorInt = android.graphics.Color.argb(color.alpha, color.red, color.green, color.blue);
     return getColorHex(colorInt)

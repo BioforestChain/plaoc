@@ -36,7 +36,7 @@ function setNavigationBarOverlay() {
 }
 function getStatusBarColor() {
   const status = document.querySelector<BfcsStatusBar>("dweb-status-bar");
-  status?.getStatusBarColor()
+  status?.getStatusBarBackgroundColor()
 }
 // app相关
 function listenerAppMessage() {
@@ -56,7 +56,7 @@ async function exitApp() {
 <template>
   <dweb-app></dweb-app>
   <h2>andrid/ios 系统api 测试</h2>
-  <dweb-status-bar id="status_bar" background-color="rgba(133,100,100,0.5)" overlay></dweb-status-bar>
+  <dweb-status-bar id="status_bar" background-color="rgba(133,100,100,0.5)" bar-style="light-content"></dweb-status-bar>
   <dweb-keyboard id="key_board" hidden></dweb-keyboard>
   <dweb-navigation></dweb-navigation>
   <ion-button expand="block" fill="outline" @click="exitApp">退出APP</ion-button>

@@ -14,13 +14,12 @@ extension PlaocHandleModel {
         guard let param = param as? String else { return "{cmd: error, data: \(result)}"  }
         let str = param.hexStringToString(symbol: ",")
         let data = JSON(parseJSON: str)
-        print(data)
         
         if data["function"].exists() {
         switch(data["function"].stringValue) {
-            case "SetStatusBarColor":
-                result = updateStatusBarColor(param: data["data"].stringValue)
-            case "GetStatusBarColor":
+            case "SetStatusBarBackgroundColor":
+                result = updateStatusBarBackgroundColor(param: data["data"].stringValue)
+            case "GetStatusBarBackgroundColor":
                 result = statusBarColor(param: data["data"])
             case "GetStatusBarIsDark":
                 result = statusBarIsDark(param: data["data"])
@@ -32,6 +31,8 @@ extension PlaocHandleModel {
                 result = statusBarOverlay(param: data["data"])
             case "SetStatusBarOverlay":
                 result = updateStatusBarOverlay(param: data["data"].boolValue)
+            case "SetStatusBarStyle":
+                result = updateStatusBarStyle(param: data["data"].stringValue)
             case "GetKeyBoardSafeArea":
                 result = keyboardSafeArea(param: data["data"])
             case "GetKeyBoardHeight":

@@ -6,22 +6,25 @@
 //
 
 import UIKit
+import SwiftyJSON
 
 extension PlaocHandleModel {
 
     //设置状态栏颜色
-    func updateStatusBarColor(param: Any) -> Bool {
+    func updateStatusBarBackgroundColor(param: Any) -> Bool {
         guard let param = param as? String else { return false }
         controller?.updateStatusBackgroundColor(colorString: param)
+        
         return true
     }
     //获取状态栏颜色
     func statusBarColor(param: Any) -> String {
         return controller?.statusBackgroundColor() ?? ""
     }
-    //状态栏是否是暗黑模式
+    //状态栏是否是黑底白字
     func statusBarIsDark(param: Any) -> Bool {
-        return controller?.statusBarStyle() == "true"
+        let style = controller?.statusBarStyle()
+        return style == "true"
     }
     //状态栏是否可见
     func statusBarVisible(param: Any) -> Bool {
@@ -41,6 +44,13 @@ extension PlaocHandleModel {
     func updateStatusBarOverlay(param: Any) -> Bool {
         guard let param = param as? Bool else { return false }
         controller?.updateStatusBarOverlay(overlay: param)
+        return true
+    }
+    //设置状态栏状态
+    func updateStatusBarStyle(param: Any) -> Bool {
+        guard let param = param as? String else { return false }
+        let barStyle = param == "light-content" ? "light" : "default"
+        controller?.updateStatusStyle(style: barStyle)
         return true
     }
 }

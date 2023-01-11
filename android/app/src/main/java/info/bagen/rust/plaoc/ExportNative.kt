@@ -47,13 +47,14 @@ enum class ExportNativeUi(val type: String) {
   SetNavigationBarOverlay("setNavigationBarOverlay"),
   GetNavigationBarOverlay("getNavigationBarOverlay"),
   // Status Bar
-  GetStatusBarColor("getStatusBarColor"),
-  SetStatusBarColor("setStatusBarColor"),
+  GetStatusBarBackgroundColor("getStatusBarBackgroundColor"),
+  SetStatusBarBackgroundColor("setStatusBarBackgroundColor"),
   GetStatusBarIsDark("getStatusBarIsDark"),
   GetStatusBarVisible("getStatusBarVisible"),
   SetStatusBarVisible("setStatusBarVisible"),
   GetStatusBarOverlay("getStatusBarOverlay"),
   SetStatusBarOverlay("setStatusBarOverlay"),
+  SetStatusBarStyle("setStatusBarStyle"),
   // keyboard
   GetKeyBoardSafeArea("getKeyBoardSafeArea"),
   GetKeyBoardHeight("getKeyBoardHeight"),
