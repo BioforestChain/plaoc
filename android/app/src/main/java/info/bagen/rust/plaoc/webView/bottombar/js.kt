@@ -31,14 +31,19 @@ class BottomBarFFI(
     return getEnabled()
   }
 
-  fun getOverlay(): Float {
-    return state.overlay.value ?: 1F
+  fun getOverlay(): Boolean {
+    return state.overlay.value ?: false
   }
 
   // 控制是开启bottom bar 遮罩。
-  fun setOverlay(isOverlay: String): Float {
-    state.overlay.value = isOverlay.toFloat()
-    return state.overlay.value ?: 1F
+  fun setOverlay(isOverlay: String): Boolean {
+    state.overlay.value = isOverlay.toBoolean()
+    return state.overlay.value ?: false
+  }
+
+  fun setAlpha(alpha: String): Float? {
+    state.alpha.value = alpha.toFloat()
+    return state.alpha.value
   }
 
   fun getHeight(): Float {

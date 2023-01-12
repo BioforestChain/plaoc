@@ -195,7 +195,7 @@ fun parseBytesFactory(bytes: ByteArray): Triple<ByteArray, ByteArray, String> {
   val versionId = bytes.sliceArray(0..1)
   val headId = bytes.sliceArray(2..3)
   val message = bytes.sliceArray(4 until bytes.size)
-  val stringData = String(message, Charsets.UTF_16LE);
+  val stringData = String(message, Charsets.UTF_16LE)
 
   println("parseBytesFactory🍙 $stringData,headId:[${headId[0]},${headId[1]}] ")
   return Triple(versionId, headId, stringData)
