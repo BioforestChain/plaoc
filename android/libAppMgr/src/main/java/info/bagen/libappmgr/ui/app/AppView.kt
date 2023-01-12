@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -54,8 +55,8 @@ private fun BoxScope.AppIcon(appViewState: AppViewState) {
     modifier = Modifier
       .padding(3.dp)
       .fillMaxWidth()
-      //.clip(RoundedCornerShape(12.dp)),
-      .clip(CircleShape),
+      .clip(RoundedCornerShape(6.dp)),
+      //.clip(CircleShape),
     contentScale = ContentScale.FillWidth,
     // placeholder = BitmapPainter(image = ImageBitmap.imageResource(id = R.drawable.ic_launcher)),
     error = BitmapPainter(image = ImageBitmap.imageResource(id = R.drawable.ic_launcher))
