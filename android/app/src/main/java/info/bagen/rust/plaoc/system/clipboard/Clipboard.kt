@@ -79,8 +79,8 @@ object Clipboard {
 }
 
 data class ClipboardWriteOption(
-  val str: String?,
-  val image: String?,
-  val url: String?,
-  val label: String?,
+  val str: String? = null,
+  val image: String? = null,
+  val url: String? = null,
+  val label: String? = null,
 )

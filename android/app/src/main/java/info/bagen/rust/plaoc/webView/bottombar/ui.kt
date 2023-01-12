@@ -30,7 +30,7 @@ fun DWebBottomBar(
             .onGloballyPositioned { coordinates ->
                 bottomBarState.height.value = coordinates.size.height / localDensity.density
             },
-        containerColor = bottomBarState.backgroundColor.value.copy(bottomBarState.overlay.value ?: 1F),
+        containerColor = bottomBarState.backgroundColor.value.copy(bottomBarState.alpha.value ?: 1F),
         contentColor = bottomBarState.foregroundColor.value,
         tonalElevation = 0.dp,
     ) {

@@ -151,11 +151,11 @@ fun DWebView(
       .padding(overlayPadding)
       .offset { overlayOffset },
     // 如果前端没有传递overlay,并且没有传递enabled
-    topBar = { if ((topBarState.overlay.value == 1F) and topBarState.enabled.value) TopAppBar() },
+    topBar = { if (topBarState.enabled.value) TopAppBar() },
     bottomBar = {
       // Log.i("DwebView","bottomBarState.isEnabled:${ bottomBarState.isEnabled}, bottomBarState.overlay:${ bottomBarState.overlay.value}");
       // 如果前端没有传递hidden，也就是bottomBarState.isEnabled等于true，则显示bottom bar
-      if ((bottomBarState.overlay.value == 1F) and bottomBarState.isEnabled) {
+      if (bottomBarState.isEnabled) {
         BottomAppBar()
       }
     },
@@ -393,11 +393,11 @@ fun DWebView(
           val layoutDirection = LocalLayoutDirection.current
           var start = innerPadding.calculateStartPadding(layoutDirection)
           var end = innerPadding.calculateEndPadding(layoutDirection)
-          if ((topBarState.overlay.value != 1F) or !topBarState.enabled.value) {
+          if ((topBarState.alpha.value != 1F) or !topBarState.enabled.value) {
             top = 0.dp
           }
           // 如果不显示bottomBar，即bottomBarState.isEnabled 为false
-          if ((bottomBarState.overlay.value != 1F) or !bottomBarState.isEnabled) {
+          if ((bottomBarState.alpha.value != 1F) or !bottomBarState.isEnabled) {
             bottom = 0.dp
           }
           if ((top.value == 0F) and (bottom.value == 0F)) {
@@ -409,7 +409,7 @@ fun DWebView(
       )
 
       // 如果前端传递了透明度属性，并且是需要显示的
-      if ((topBarState.overlay.value != 1F) and topBarState.enabled.value) {
+      if ((topBarState.alpha.value != 1F) and topBarState.enabled.value) {
         Box(
           contentAlignment = Alignment.TopCenter,
           modifier = if (systemUIState.statusBar.overlay.value) {
@@ -423,7 +423,7 @@ fun DWebView(
           TopAppBar()
         }
       }
-      if ((bottomBarState.overlay.value != 1F) and bottomBarState.isEnabled) {
+      if ((bottomBarState.alpha.value != 1F) and bottomBarState.isEnabled) {
         Box(
           contentAlignment = Alignment.BottomCenter,
           modifier = Modifier.fillMaxSize()

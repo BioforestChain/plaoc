@@ -42,7 +42,7 @@ fun uiGateWay(
   try {
     mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true) // 允许使用单引号包裹字符串
     val handle = mapper.readValue(stringData, JsHandle::class.java)
-    val funName = ExportNativeUi.valueOf(handle.function);
+    val funName = ExportNativeUi.valueOf(handle.function)
     // 执行函数
     val result = call_ui_map[funName]?.let { it ->
       it(handle.data)

@@ -14,8 +14,8 @@ const webView = new DWebView(metaData);
 webView.activity("https://objectjson.waterbang.top/");
 // webView.activity("index.html");
 
-try {
-  sendNotification({ title: "消息头", body: "今晚打老虎", priority: 1 });
-} catch (error) {
-  console.log(error);
-}
+// try {
+//   sendNotification({ title: "消息头", body: "今晚打老虎", priority: 1 });
+// } catch (error) {
+//   console.log(error);
+// }

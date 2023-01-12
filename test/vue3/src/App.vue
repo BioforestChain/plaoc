@@ -43,7 +43,6 @@ async function openBarScanner() {
 
 onMounted(async () => {
   const topBar = document.querySelector<BfcsTopBar>('dweb-top-bar')!;
-  console.log("getTopBarAlpha: ", await topBar.getTopBarAlpha())
   console.log("getTopBarShow: ", await topBar.getTopBarShow())
   console.log("getTopBarTitle: ", await topBar.getTopBarTitle())
   console.log("getTopBarHeight: ", await topBar.getTopBarHeight())

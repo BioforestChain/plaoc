@@ -11,7 +11,8 @@ import androidx.compose.ui.graphics.Color
 @Stable
 class BottomBarState(
     val enabled: MutableState<Boolean?>,
-    val overlay: MutableState<Float?>,
+    val overlay: MutableState<Boolean?>,
+    val alpha: MutableState<Float?>,
     val height: MutableState<Float?>,
     val actions: SnapshotStateList<BottomBarAction>,
     val backgroundColor: MutableState<Color>,
@@ -45,7 +46,8 @@ class BottomBarState(
             return remember {
                 BottomBarState(
                     enabled = mutableStateOf(null),
-                    overlay = mutableStateOf(1.0F),
+                    overlay = mutableStateOf(false),
+                    alpha = mutableStateOf(1.0F),
                     height = mutableStateOf(0F),
                     actions = mutableStateListOf(),
                     backgroundColor = bottomBarBackgroundColor,

@@ -59,7 +59,7 @@ object Toast {
 }
 
 data class ToastOption(
-  val text: String,
+  val text: String = "",
   val duration: String = "short",
   val position: String = "bottom"
 )
