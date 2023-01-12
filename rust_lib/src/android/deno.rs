@@ -151,20 +151,34 @@ pub async extern "C" fn Java_info_bagen_rust_plaoc_DenoService_backSystemDataToR
     let buffer_array = env.convert_byte_array(byte_data).unwrap();
 
     let head_view = get_head_view_id(&buffer_array);
-    let js_code = format!(r#"_getRustBuffer('{}',{:?});"#, head_view, buffer_array);
-    log::info!("rust#backSystemDataToRust,js_code {:?}", &js_code);
-    let event = JS_CONTEXT.lock()[0].execute_script("", js_code.as_str());
+    let js_code = format!(
+        r#"
+        try {{
+            _getRustBuffer('{}',{:?});
+        }} catch(e) {{
+            console.log(e)
+        }}
+    "#,
+        head_view, buffer_array
+    );
+    unsafe {
+        log::info!(
+            "rust#backSystemDataToRust,js_code {:?},{}",
+            &js_code,
+            JS_CONTEXT.len()
+        );
+        let event = JS_CONTEXT[0].execute_script("", &js_code);
 
-    log::info!("rust#backSystemDataToRust,js_code 执行成功🍟");
-    match event {
-        Ok(_) => {
-            log::info!("rust#backSystemDataToRust,ok JS_CONTEXT 执行成功🍟");
-        }
-        Err(e) => {
-            log::info!("rust#backSystemDataToRust,error{:?}", e);
+        log::info!("rust#backSystemDataToRust,js_code 执行成功🍟");
+        match event {
+            Ok(_) => {
+                log::info!("rust#backSystemDataToRust,ok JS_CONTEXT 执行成功🍟");
+            }
+            Err(e) => {
+                log::info!("rust#backSystemDataToRust,error{:?}", e);
+            }
         }
     }
-
     // let mut buffer_map = BUFFER_INSTANCES_MAP.lock().unwrap();
     // // 存入map
     // let buffer = buffer_map.insert(head_view, ZeroCopyBuf::new_temp(buffer_array));

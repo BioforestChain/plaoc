@@ -61,6 +61,8 @@ pub struct MainWorker {
 }
 
 unsafe impl Send for MainWorker {}
+
+unsafe impl Sync for MainWorker {}
 pub struct WorkerOptions {
     pub bootstrap: BootstrapOptions,
     pub extensions: Vec<Extension>,
@@ -203,7 +205,6 @@ impl MainWorker {
     }
 
     pub fn bootstrap(&mut self, options: &BootstrapOptions) {
-        log::info!("main bootstrap 1");
         let script = format!("bootstrap.mainRuntime({})", options.as_json());
 
         log::info!("main bootstrap 2:{}", script);

@@ -5,7 +5,6 @@ use deno_broadcast_channel::InMemoryBroadcastChannel;
 use deno_core::anyhow::Ok;
 use deno_core::error::AnyError;
 use deno_core::futures::future::LocalFutureObj;
-use deno_core::parking_lot::Mutex;
 use deno_core::CompiledWasmModuleStore;
 use deno_core::FsModuleLoader;
 #[allow(unused_imports)]
@@ -21,13 +20,14 @@ use deno_runtime::web_worker::{WebWorker, WebWorkerOptions};
 use deno_runtime::worker::MainWorker;
 use deno_runtime::worker::WorkerOptions;
 use deno_runtime::BootstrapOptions;
-use lazy_static::*;
 use std::rc::Rc;
 use std::sync::Arc;
 
-lazy_static! {
-    pub(crate) static ref JS_CONTEXT: Mutex<Vec<MainWorker>> = Mutex::new(vec![]);
-}
+// lazy_static! {
+//     // pub(crate) static ref JS_CONTEXT: Arc<Mutex<Vec<MainWorker>>> = Arc::new(Mutex::new(vec![]));
+//     pub(crate) static  ref JS_CONTEXT: Vec<MainWorker> = vec![];
+// }
+pub static mut JS_CONTEXT: Vec<MainWorker> = vec![];
 
 #[cfg(target_os = "android")]
 use crate::module_loader::AssetsModuleLoader;
@@ -315,19 +315,21 @@ pub async fn bootstrap_deno_fs_runtime(entry_js_path: &str) -> Result<(), AnyErr
     //     worker.execute_script(script_name, source_code);
     // };
 
-    JS_CONTEXT.lock().push(worker);
+    unsafe {
+        JS_CONTEXT.push(worker);
 
-    let result = JS_CONTEXT.lock()[0].execute_main_module(&main_module).await;
-    log::info!(
-        "rust#bootstrap_deno_fs_runtime,执行结束🌶: {:}",
-        &entry_js_path
-    );
-    if let Err(err) = result {
-        log::error!("execute_mod err {:?}", err);
-    }
+        let result = JS_CONTEXT[0].execute_main_module(&main_module).await;
+        log::info!(
+            "rust#bootstrap_deno_fs_runtime,执行结束🌶: {:}",
+            &entry_js_path
+        );
+        if let Err(err) = result {
+            log::error!("execute_mod err {:?}", err);
+        }
 
-    if let Err(e) = JS_CONTEXT.lock()[0].run_event_loop(false).await {
-        log::error!("Future got unexpected error: {:?}", e);
+        if let Err(e) = JS_CONTEXT[0].run_event_loop(false).await {
+            log::error!("Future got unexpected error: {:?}", e);
+        }
     }
 
     Ok(())
