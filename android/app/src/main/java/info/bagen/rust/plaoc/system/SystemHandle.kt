@@ -8,6 +8,7 @@ import info.bagen.libappmgr.utils.FilesUtil
 import info.bagen.rust.plaoc.system.clipboard.Clipboard
 import info.bagen.rust.plaoc.system.clipboard.ClipboardWriteOption
 import info.bagen.rust.plaoc.system.device.DeviceInfo
+import info.bagen.rust.plaoc.system.device.Network
 import info.bagen.rust.plaoc.system.haptics.HapticsImpactType
 import info.bagen.rust.plaoc.system.haptics.HapticsNotificationType
 import info.bagen.rust.plaoc.system.haptics.VibrateManage
@@ -25,6 +26,7 @@ val callable_map = mutableMapOf<ExportNative, (data: String) -> Unit>()
 private val fileSystem = FileSystem()
 private val notifyManager = NotifyManager()
 private val vibrateManage = VibrateManage()
+private val networkManager = Network()
 
 /** 初始化系统后端app*/
 fun initServiceApp() {
@@ -204,6 +206,11 @@ fun splicingPath(bfsId:String, entry:String):String {
     Share.share(title = param.title, text = param.text, url = param.url, files = param.files, dialogTitle = param.dialogTitle ?: "分享到：") {
       println("SystemShare error: $it")
     }
+  }
+
+  /** Network */
+  callable_map[ExportNative.GetNetworkStatus] = {
+    createBytesFactory(ExportNative.GetNetworkStatus, networkManager.getNetworkStatus().toString())
   }
 }
 

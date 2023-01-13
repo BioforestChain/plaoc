@@ -38,7 +38,9 @@ enum class ExportNative(val type: String) {
   // Toast
   ShowToast("showToast"),
   // Share
-  SystemShare("SystemShare"),
+  SystemShare("systemShare"),
+  // Network
+  GetNetworkStatus("getNetworkStatus"),
 }
 
 /** worker */
