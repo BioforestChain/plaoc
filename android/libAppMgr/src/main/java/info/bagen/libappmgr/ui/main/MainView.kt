@@ -128,7 +128,7 @@ fun MainHomeView(
             Color(0xFF71D78E), Color(0xFF548FE3)
           )
           Text(
-            text = "BFExplorer",
+            text = stringResource(id = R.string.app_name),
             modifier = Modifier.align(Alignment.BottomCenter),
             style = TextStyle(
               brush = Brush.linearGradient(gradient),
@@ -174,7 +174,8 @@ fun MainMeView() {
 
 @Composable
 fun MainSearchView(onSearchAction: ((SearchAction, String) -> Unit)? = null) {
-  var inputText by remember { mutableStateOf("http://linge.plaoc.com/index.html") }
+  //var inputText by remember { mutableStateOf("http://linge.plaoc.com/index.html") }
+  var inputText by remember { mutableStateOf("") }
   val focusManager = LocalFocusManager.current
   BasicTextField(
     value = inputText,
