@@ -1,15 +1,42 @@
 ## m1电脑需要配置的环境
 
 
+### rusty_v8
+
 ```shell
 export RUSTY_V8_ARCHIVE="$PWD/assets/rusty_v8_mirror/v0.48.1/librusty_v8_release_aarch64-linux-android.a"
+# or
+export RUSTY_V8_ARCHIVE="$PWD/assets/rusty_v8_mirror/v0.60.0/librusty_v8_release_aarch64-linux-android.a"
 
-export ANDROID_NDK_ROOT="/Users/bngj/Library/Android/sdk/ndk/22.0.7026061"
 
-export PATH="$PATH:$ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/darwin-x86_64/bin"
-
-export RUSTY_V8_MIRROR="$PWD/assets/rusty_v8_mirror/"
 ```
+
+### ndk suport
+
+```bash
+# 25.0.8775105 / 22.0.7026061
+export ANDROID_NDK_ROOT="/Users/bngj/Library/Android/sdk/ndk/25.0.8775105"&& \
+export PATH="$PATH:$ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/darwin-x86_64/bin" && \
+export RUSTY_V8_MIRROR="$PWD/assets/rusty_v8_mirror/"
+
+```
+
+#### linker/ar
+
+add content in ~/.cargo/config.toml
+
+```bash
+# 25.0.8775105 / 22.0.7026061
+[target.aarch64-linux-android]
+ ar = "/Users/bngj/Library/Android/sdk/ndk/22.0.7026061/toolchains/llvm/prebuilt/darwin-x86_64/bin/aarch64-linux-android-ar"
+ linker = "/Users/bngj/Library/Android/sdk/ndk/22.0.7026061/toolchains/llvm/prebuilt/darwin-x86_64/bin/aarch64-linux-android28-clang++"
+
+ [target.aarch64-linux-android]
+ ar = "/Users/bngj/Library/Android/sdk/ndk/25.0.8775105/toolchains/llvm/prebuilt/darwin-x86_64/bin/aarch64-linux-android-ar"
+ linker = "/Users/bngj/Library/Android/sdk/ndk/25.0.8775105/toolchains/llvm/prebuilt/darwin-x86_64/bin/aarch64-linux-android28-clang++"
+
+```
+
 
 ### 基础rust项目命令
 

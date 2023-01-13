@@ -12,7 +12,7 @@ deno_core = { path = "../deno/core" }
 deno_crypto = { path = "../deno/ext/crypto" }
 # deno_ffi = {path = "../deno/ext/ffi"}
 deno_broadcast_channel = { path = "../deno/ext/broadcast_channel" }
-deno_runtime = { path = "./runtime" }
+deno_runtime = { path = "../deno/runtime" }
 deno_tls = { path = "../deno/ext/tls" }
 deno_url = { path = "../deno/ext/url" }
 deno_web = { path = "../deno/ext/web" }

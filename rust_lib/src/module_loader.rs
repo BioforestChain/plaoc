@@ -1,6 +1,7 @@
 #![cfg(target_os = "android")]
-#![allow(unused_imports,dead_code)]
+#![allow(unused_imports, dead_code)]
 use deno_core::anyhow::Error;
+use deno_core::ResolutionKind;
 // use assets_manager::{loader, Asset, AssetCache};
 use deno_core::error::generic_error;
 use deno_core::resolve_import;
@@ -10,6 +11,7 @@ use deno_core::ModuleSourceFuture;
 use deno_core::ModuleSpecifier;
 use deno_core::ModuleType;
 use futures::future::FutureExt;
+
 use ndk::asset::{Asset, AssetManager};
 use std::ffi::CString;
 
@@ -86,7 +88,7 @@ impl ModuleLoader for AssetsModuleLoader {
         &self,
         specifier: &str,
         referrer: &str,
-        _is_main: bool,
+        _kind: ResolutionKind,
     ) -> Result<ModuleSpecifier, Error> {
         Ok(resolve_import(specifier, referrer)?)
     }
