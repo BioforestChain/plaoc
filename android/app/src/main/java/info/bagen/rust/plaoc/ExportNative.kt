@@ -41,6 +41,11 @@ enum class ExportNative(val type: String) {
   SystemShare("systemShare"),
   // Network
   GetNetworkStatus("getNetworkStatus"),
+
+  // Camera
+  TakeCameraPhoto("takeCameraPhoto"),
+  PickCameraPhoto("pickCameraPhoto"),
+  PickCameraPhotos("pickCameraPhotos"),
 }
 
 /** worker */
