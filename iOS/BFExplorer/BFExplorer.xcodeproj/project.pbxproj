@@ -177,6 +177,10 @@
 		F383C6BC2955391000BD4FE5 /* BottomBarEntites.swift in Sources */ = {isa = PBXBuildFile; fileRef = F383C6BB2955391000BD4FE5 /* BottomBarEntites.swift */; };
 		F383C6BE2955393200BD4FE5 /* KeyboardEntites.swift in Sources */ = {isa = PBXBuildFile; fileRef = F383C6BD2955393200BD4FE5 /* KeyboardEntites.swift */; };
 		F383C6C029557B0D00BD4FE5 /* AdapterHandle.swift in Sources */ = {isa = PBXBuildFile; fileRef = F383C6BF29557B0D00BD4FE5 /* AdapterHandle.swift */; };
+		F39A8713297013CB00CC7126 /* CameraType.swift in Sources */ = {isa = PBXBuildFile; fileRef = F39A8712297013CB00CC7126 /* CameraType.swift */; };
+		F39A87172970F53E00CC7126 /* CameraManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F39A87162970F53E00CC7126 /* CameraManager.swift */; };
+		F39A87192970F88C00CC7126 /* CameraExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F39A87182970F88C00CC7126 /* CameraExtensions.swift */; };
+		F39A871D2971312300CC7126 /* ImageSaver.swift in Sources */ = {isa = PBXBuildFile; fileRef = F39A871C2971312300CC7126 /* ImageSaver.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -363,6 +367,10 @@
 		F383C6BB2955391000BD4FE5 /* BottomBarEntites.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomBarEntites.swift; sourceTree = "<group>"; };
 		F383C6BD2955393200BD4FE5 /* KeyboardEntites.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardEntites.swift; sourceTree = "<group>"; };
 		F383C6BF29557B0D00BD4FE5 /* AdapterHandle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdapterHandle.swift; sourceTree = "<group>"; };
+		F39A8712297013CB00CC7126 /* CameraType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraType.swift; sourceTree = "<group>"; };
+		F39A87162970F53E00CC7126 /* CameraManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraManager.swift; sourceTree = "<group>"; };
+		F39A87182970F88C00CC7126 /* CameraExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraExtensions.swift; sourceTree = "<group>"; };
+		F39A871C2971312300CC7126 /* ImageSaver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageSaver.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -674,6 +682,7 @@
 		F091CB672951B91900FCE565 /* manager */ = {
 			isa = PBXGroup;
 			children = (
+				F39A8711297013AB00CC7126 /* camera */,
 				F399D7312966C9C200F7679C /* cache */,
 				F399D7302966C96100F7679C /* File */,
 				F399D72F2966C34200F7679C /* background */,
@@ -688,7 +697,6 @@
 				F383C6BF29557B0D00BD4FE5 /* AdapterHandle.swift */,
 				F091CB772951B91900FCE565 /* PermissionManager.swift */,
 				F091CB782951B91900FCE565 /* LocationManager.swift */,
-				F091CB7B2951B91900FCE565 /* PhotoManager.swift */,
 				F33A570629598A1E00000037 /* ShareManager.swift */,
 				F33B31E3295A858B000EB302 /* ToastManager.swift */,
 				F33B31E5295A8AA6000EB302 /* SplashScreenManager.swift */,
@@ -820,6 +828,18 @@
 				F091CB792951B91900FCE565 /* DatabaseManager.swift */,
 			);
 			path = cache;
+			sourceTree = "<group>";
+		};
+		F39A8711297013AB00CC7126 /* camera */ = {
+			isa = PBXGroup;
+			children = (
+				F091CB7B2951B91900FCE565 /* PhotoManager.swift */,
+				F39A8712297013CB00CC7126 /* CameraType.swift */,
+				F39A87162970F53E00CC7126 /* CameraManager.swift */,
+				F39A87182970F88C00CC7126 /* CameraExtensions.swift */,
+				F39A871C2971312300CC7126 /* ImageSaver.swift */,
+			);
+			path = camera;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -1030,6 +1050,7 @@
 				F091CB4C2951B90200FCE565 /* UIView_extension.swift in Sources */,
 				F091CBB62951B92D00FCE565 /* UIImage+SVG.m in Sources */,
 				F091CBE62952FD1E00FCE565 /* BatchTempManager.swift in Sources */,
+				F39A871D2971312300CC7126 /* ImageSaver.swift in Sources */,
 				F091CB492951B90200FCE565 /* UIButton_extension.swift in Sources */,
 				F091CB2E2951B8EE00FCE565 /* RecordView.swift in Sources */,
 				F033020C28C73E1700BC0266 /* UIViewController+PKExtensions.swift in Sources */,
@@ -1042,10 +1063,12 @@
 				182EF46328B62DE4001E039E /* UIImage+Text.swift in Sources */,
 				F091CB8F2951B91900FCE565 /* FileSystemManager.swift in Sources */,
 				F033022428C73E1700BC0266 /* CALayer+PKExtensions.swift in Sources */,
+				F39A87192970F88C00CC7126 /* CameraExtensions.swift in Sources */,
 				F033022A28C73E1700BC0266 /* UIGestureRecognizer+PKExtensions.swift in Sources */,
 				F091CB902951B91900FCE565 /* PhotoManager.swift in Sources */,
 				F383C6B8295538A400BD4FE5 /* AlertEntites.swift in Sources */,
 				F091CB8B2951B91900FCE565 /* JSCoreEntities.swift in Sources */,
+				F39A8713297013CB00CC7126 /* CameraType.swift in Sources */,
 				F091CB392951B8EE00FCE565 /* ScanNetAnimationImageView.swift in Sources */,
 				19128CE526FC0BCE0057E46D /* BrowserTabHomeView.swift in Sources */,
 				F091CBCB2951B93B00FCE565 /* Schemehandler.swift in Sources */,
@@ -1099,6 +1122,7 @@
 				F091CBCE2951B93B00FCE565 /* XXWebView.swift in Sources */,
 				F091CB142951B8E400FCE565 /* CustomNaviViewController.swift in Sources */,
 				F033023A28C74F0100BC0266 /* OverlayShareView.swift in Sources */,
+				F39A87172970F53E00CC7126 /* CameraManager.swift in Sources */,
 				F01ABAD028D07AE30038AF9C /* Model.swift in Sources */,
 				F01ABAC528D020BA0038AF9C /* Date+Famatter.swift in Sources */,
 				F03301D828C730DE00BC0266 /* OverlayController.swift in Sources */,

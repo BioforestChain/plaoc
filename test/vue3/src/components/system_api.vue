@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { IonFab, IonFabButton, IonFabList, IonButton, IonIcon } from '@ionic/vue';
 import { defineComponent, onMounted } from 'vue';
-import { BfcsKeyboard, Navigation, BfcsStatusBar, App } from '@bfsx/plugin';
+import { BfcsKeyboard, Navigation, BfcsStatusBar, App, DwebCamera, CameraDirection, CameraResultType, CameraSource } from '@bfsx/plugin';
 
 defineComponent({
   components: { IonFab, IonFabButton, IonFabList, IonButton, IonIcon }
@@ -66,6 +66,37 @@ async function getNetworkStatus() {
   const app = document.querySelector<App>("dweb-app")!;
   app.showToast(await app.getNetworkStatus(), "short");
 }
+
+// 拍摄照片
+async function takeCameraPhoto() {
+  const camera = document.querySelector<DwebCamera>("dweb-camera")!;
+  camera.takeCameraPhoto({
+    quality: 90,
+    resultType: CameraResultType.Base64,
+    allowEditing: false,
+    saveToGallery: false,
+    source: CameraSource.Camera,
+    direction: CameraDirection.Rear
+  });
+}
+
+// 从图库获取单张照片
+async function pickCameraPhoto() {
+  const camera = document.querySelector<DwebCamera>("dweb-camera")!;
+  camera.pickCameraPhoto({
+    quality: 80,
+    allowEditing: false,
+    resultType: CameraResultType.Uri,
+    source: CameraSource.Photos
+  });
+}
+// 从图库获取多张照片
+async function pickCameraPhotos() {
+  const camera = document.querySelector<DwebCamera>("dweb-camera")!;
+  camera.pickCameraPhotos({
+    quality: 100,
+  });
+}
 </script>
 
 <template>
@@ -83,6 +114,9 @@ async function getNetworkStatus() {
   <ion-button shape="round" fill="outline" @click="getStatusBarColor">点击获取状态栏颜色</ion-button>
   <ion-button shape="round" fill="outline" @click="writeClipboardContent">复制到剪切板</ion-button>
   <ion-button shape="round" fill="outline" @click="getNetworkStatus">获取网络状态</ion-button>
+  <ion-button shape="round" fill="outline" @click="takeCameraPhoto">拍摄照片</ion-button>
+  <ion-button shape="round" fill="outline" @click="pickCameraPhoto">单张照片</ion-button>
+  <ion-button shape="round" fill="outline" @click="pickCameraPhotos">多张照片</ion-button>
   <div id="placeholder"></div>
 </template>
 
