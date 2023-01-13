@@ -85,6 +85,12 @@ import SwiftyJSON
             return readClipboardContent(param: param)
         case "WriteClipboardContent":
             return writeClipboardContent(param: param)
+        case "TakeCameraPhoto":
+            return takeCameraPhoto(param: param, functionName: functionName)
+        case "PickCameraPhoto":
+            return pickCameraPhoto(param: param, functionName: functionName)
+        case "PickCameraPhotos":
+            return pickCameraPhotos(param: param, functionName: functionName)
         // 前端ui
         case "SetDWebViewUI":
             return executiveDwebviewUI(param: param)
@@ -262,5 +268,24 @@ extension PlaocHandleModel {
             return false
         }
     }
+    
+    // 拍摄照片
+    private func takeCameraPhoto(param: Any, functionName: String) {
+        let cameraManager = CameraManager()
+        cameraManager.getPhoto(param: param, controller: controller, jsContext: jsContext, functionName: functionName)
+    }
+    
+    // 从图库中选取单张照片
+    private func pickCameraPhoto(param: Any, functionName: String) {
+        let cameraManager = CameraManager()
+        cameraManager.getPhoto(param: param, controller: controller, jsContext: jsContext, functionName: functionName)
+    }
+    
+    // 从图库中选取多张相片
+    private func pickCameraPhotos(param: Any, functionName: String) {
+        let cameraManager = CameraManager()
+        cameraManager.pickImages(param: param, controller: controller, jsContext: jsContext, functionName: functionName)
+    }
+    
 }
 
