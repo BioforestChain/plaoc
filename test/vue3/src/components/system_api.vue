@@ -105,6 +105,7 @@ async function pickCameraPhotos() {
   <dweb-status-bar id="status_bar" background-color="rgba(133,100,100,0.5)" bar-style="light-content"></dweb-status-bar>
   <dweb-keyboard id="key_board" hidden></dweb-keyboard>
   <dweb-navigation></dweb-navigation>
+  <dweb-camera></dweb-camera>
   <ion-button expand="block" fill="outline" @click="exitApp">退出APP</ion-button>
   <ion-button expand="block" fill="outline" @click="hideNavigation">点我隐藏系统navigation</ion-button>
   <ion-button expand="block" fill="outline" @click="getNavigationVisible">获取navigation颜色</ion-button>
