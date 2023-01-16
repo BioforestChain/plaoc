@@ -204,15 +204,16 @@ class AppViewModel(private val repository: AppRepository = AppRepository()) : Vi
   private suspend fun loadAppNewVersion(appViewState: AppViewState) {
     uiState.curAppViewState = appViewState
     // 调用下载接口，然后弹出对话框
-    val path = FilesUtil.getLastUpdateContent(appViewState.appInfo!!)
-    path?.let {
-      JsonUtil.fromJson(AppVersion::class.java, it)?.let { appVersion ->
-        dialogShowNewVersion(appVersion)
+    appViewState.appInfo?.apply {
+      FilesUtil.getLastUpdateContent(this)?.let { path ->
+        JsonUtil.fromJson(AppVersion::class.java, path)?.let { appVersion ->
+          dialogShowNewVersion(appVersion)
+        }
       }
-    }
-    appViewState.appInfo?.autoUpdate?.let { autoUpdateInfo ->
-      repository.loadAppNewVersion(autoUpdateInfo.url).collectLatest { appVersion ->
-        dialogShowNewVersion(appVersion)
+      autoUpdate?.let { autoUpdateInfo ->
+        repository.loadAppNewVersion(autoUpdateInfo.url).collectLatest { appVersion ->
+          dialogShowNewVersion(appVersion)
+        }
       }
     }
   }
@@ -289,13 +290,14 @@ class AppViewModel(private val repository: AppRepository = AppRepository()) : Vi
     when (downLoadState) {
       DownLoadState.COMPLETED -> {
         appViewState.showBadge.value = true
-        appViewState.appInfo?.appDirType = APP_DIR_TYPE.SystemApp // 需要提前将路径改为 system-app
-
-        repository.loadDAppUrl(appViewState.appInfo!!)?.let { dAppInfoUI -> // 跳转需要的地址
-          appViewState.dAppInfoUI = dAppInfoUI
-          appViewState.name.value = dAppInfoUI.name
-          appViewState.iconPath.value = dAppInfoUI.icon
-          appViewState.appInfo!!.dAppUrl = dAppInfoUI.dAppUrl
+        appViewState.appInfo?.apply {
+          appDirType = APP_DIR_TYPE.SystemApp // 需要提前将路径改为 system-app
+          repository.loadDAppUrl(this)?.let { dAppInfoUI -> // 跳转需要的地址
+            appViewState.dAppInfoUI = dAppInfoUI
+            appViewState.name.value = dAppInfoUI.name
+            appViewState.iconPath.value = dAppInfoUI.icon
+            appViewState.appInfo!!.dAppUrl = dAppInfoUI.dAppUrl
+          }
         }
       }
       DownLoadState.FAILURE -> {

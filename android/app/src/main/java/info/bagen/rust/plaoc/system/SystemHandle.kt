@@ -5,6 +5,7 @@ import info.bagen.rust.plaoc.*
 import info.bagen.rust.plaoc.system.file.*
 import info.bagen.libappmgr.utils.APP_DIR_TYPE
 import info.bagen.libappmgr.utils.FilesUtil
+import info.bagen.rust.plaoc.system.camera.*
 import info.bagen.rust.plaoc.system.clipboard.Clipboard
 import info.bagen.rust.plaoc.system.clipboard.ClipboardWriteOption
 import info.bagen.rust.plaoc.system.device.DeviceInfo
@@ -27,6 +28,7 @@ private val fileSystem = FileSystem()
 private val notifyManager = NotifyManager()
 private val vibrateManage = VibrateManage()
 private val networkManager = Network()
+private val cameraPlugin = CameraPlugin()
 
 /** 初始化系统后端app*/
 fun initServiceApp() {
@@ -211,6 +213,29 @@ fun splicingPath(bfsId:String, entry:String):String {
   /** Network */
   callable_map[ExportNative.GetNetworkStatus] = {
     createBytesFactory(ExportNative.GetNetworkStatus, networkManager.getNetworkStatus().toString())
+  }
+
+  /** Camera */
+  callable_map[ExportNative.TakeCameraPhoto] = {
+    val option = mapper.readValue(it, CameraImageOption::class.java)
+
+    cameraPlugin.getPhoto(option.toCameraSettings()) {
+      createBytesFactory(ExportNative.TakeCameraPhoto, it)
+    }
+  }
+  callable_map[ExportNative.PickCameraPhoto] = {
+    val option = mapper.readValue(it, CameraImageOption::class.java)
+
+    cameraPlugin.getPhoto(option.toCameraSettings()) {
+      createBytesFactory(ExportNative.PickCameraPhoto, it)
+    }
+  }
+  callable_map[ExportNative.PickCameraPhotos] = {
+    val option = mapper.readValue(it, CameraGalleryImageOption::class.java)
+
+    cameraPlugin.pickImages(option.toCameraSettings()) {
+      createBytesFactory(ExportNative.PickCameraPhotos, it)
+    }
   }
 }
 
