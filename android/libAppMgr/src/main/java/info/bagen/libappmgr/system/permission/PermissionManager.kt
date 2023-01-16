@@ -89,6 +89,8 @@ class PermissionManager {
     when (requestCode) {
       this.requestCode -> {
         if (permissions.isNotEmpty() && grantResults.isNotEmpty() && permissions.size == grantResults.size) {
+          permissions.forEach { permission -> this.permissions.add(permission) }
+
           for (i in 1..permissions.size) {
             if (grantResults[i - 1] != PackageManager.PERMISSION_GRANTED) {
               if (activity!!.shouldShowRequestPermissionRationale(permissions[i - 1]) && showRationale) {

@@ -25,10 +25,10 @@ class ThirdViewController: UIViewController {
         button.setTitleColor(.black, for: .normal)
         self.view.addSubview(button)
         
-        operateMonitor.scanMonitor.subscribe(onNext: { [weak self] (fileName,dict) in
+        operateMonitor.scanMonitor.subscribe(onNext: { [weak self] (appId,dict) in
             guard let strongSelf = self else { return }
             DispatchQueue.main.async {
-                strongSelf.alertUpdateViewController(fileName: fileName, dataDict: dict)
+                strongSelf.alertUpdateViewController(appId: appId, dataDict: dict)
                 
             }
         }).disposed(by: disposeBag)
@@ -37,19 +37,19 @@ class ThirdViewController: UIViewController {
     @objc func tap(sender: UIButton) {
         
         let refreshManager = RefreshManager()
-        refreshManager.loadUpdateRequestInfo(fileName: nil, urlString: "https://shop.plaoc.com/KEJPMHLA/appversion.json", isCompare: false)
+        refreshManager.loadUpdateRequestInfo(appId: nil, urlString: "https://shop.plaoc.com/KEJPMHLA/appversion.json", isCompare: false)
         
     }
     
-    private func alertUpdateViewController(fileName: String, dataDict: [String:Any]) {
+    private func alertUpdateViewController(appId: String, dataDict: [String:Any]) {
         let alertVC = UIAlertController(title: "确认下载更新吗？", message: nil, preferredStyle: .alert)
         let sureAction = UIAlertAction(title: "确认", style: .default) { action in
             
-            BatchFileManager.shared.scanToDownloadApp(fileName: fileName, dict: dataDict)
+            InnerAppFileManager.shared.scanToDownloadApp(appId: appId, dict: dataDict)
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 self.navigationController?.popViewController(animated: true)
-                self.callback?(fileName)
+                self.callback?(appId)
             }
         }
         let cancelAction = UIAlertAction(title: "取消", style: .cancel) { action in

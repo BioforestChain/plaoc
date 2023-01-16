@@ -8,7 +8,7 @@ import android.net.NetworkCapabilities
 import info.bagen.rust.plaoc.App
 
 
-class Network private constructor() {
+class Network public constructor() {
   private val mStatusChangeListener: ArrayList<NetworkStatusChangeListener> = arrayListOf()
 
   private var mConnectivityCallback: ConnectivityCallback? = null

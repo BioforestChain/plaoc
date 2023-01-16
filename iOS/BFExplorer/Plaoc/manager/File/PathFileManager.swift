@@ -9,7 +9,7 @@ import UIKit
 
 class PathFileManager: NSObject {
 
-    func list(fileName: String, path: String) -> [FileModel] {
+    func list(appId: String, path: String) -> [FileModel] {
 """
         "/home/user/haha/test.txt"
         name = "/home/user/haha/test.txt"
@@ -21,7 +21,7 @@ class PathFileManager: NSObject {
         relativePath = "/home/user/haha"
 """
         
-        let filePath = rootFilePath(fileName: fileName) + path
+        let filePath = rootFilePath(fileName: appId) + path
         let manager = FileManager.default
         guard manager.fileExists(atPath: filePath) else { return [] }
         var currentFile = createCurrentFileModel(path: filePath)
@@ -201,7 +201,6 @@ class PathFileManager: NSObject {
     
     
     private func rootFilePath(fileName: String) -> String {
-        guard let filePath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first else { return "" }
-        return filePath + "/system-app" + "/\(fileName)/home/"
+        return documentdir + "/system-app" + "/\(fileName)/home/"
     }
 }

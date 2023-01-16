@@ -43,12 +43,16 @@ let ItemHorzGap = CGFloat( 10)
 let lineGap = CGFloat( 20)
 
 var appNames: [String]?{
-    BatchFileManager.shared.appFilePaths
+    Array (InnerAppFileManager.shared.appIdList)
 }
 
 public enum Category: Int {
     case hotSite, bookmark, apps
 }
+
+var onDeckApps = sharedCachesMgr.readAvailableApps()
+
+
 
 class CategoryView: UIView{
     public let titleLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 150, height: TitleHeight))
@@ -83,18 +87,30 @@ class CategoryView: UIView{
             btn.addTarget(self, action: selector, for: .touchUpInside)
         }
         if type == .apps{
-            operateMonitor.startAnimationMonitor.subscribe(onNext: { [weak self] fileName in
-                guard let strongSelf = self else { return }
-                DispatchQueue.main.async { [self] in
-                    print("-----******in Homeview startAnimationMonitor")
-
-                    guard let button = self!.clickables!.filter({ touchView in
-                        touchView.realTitleLabel.text == fileName
-                    }).first else { return }
-                    
-                    button.realImageView.setupForAppleReveal()
+            operateMonitor.startAnimationMonitor.subscribe(onNext: { [weak self] appId in
+          
+                DispatchQueue.main.async {
+                    if let index = onDeckApps.firstIndex(where: { info in
+                        info.appId == appId
+                    }){
+                        let button = self!.clickables![index]
+                        button.realImageView.setupForAppleReveal()
+                        
+                    }
                 }
+               
             }).disposed(by: bg)
+            updateRedSpot()
+        }
+
+    }
+    
+    
+    func updateRedSpot(){
+        for (index, info) in onDeckApps.enumerated(){
+            let shouldHide = !InnerAppFileManager.shared.redHot(appId: info.appId)
+            let touchView = self.clickables![index]
+            touchView.hideRedSpot(shouldHide)
         }
 
     }
@@ -130,7 +146,6 @@ class CategoryView: UIView{
     }
     
     func updateTouches(_ records:[LinkRecord]){
-        //clickables!.enumerated()
         
         for index in 0...7{
             if index < 8 {
@@ -163,26 +178,32 @@ class CategoryView: UIView{
     }
     
     @objc func iconClicked(sender: UIButton) {
-        guard sender.tag < sharedCachesMgr.readAvailableApps().count else { return }
-        let info = sharedCachesMgr.readAvailableApps()[sender.tag]
+        guard sender.tag < onDeckApps.count else { return }
+        let info = onDeckApps[sender.tag]
+        let touchView = clickables![sender.tag]
+        if InnerAppFileManager.shared.redHot(appId: info.appId){
+            touchView.hideRedSpot(true)
+            InnerAppFileManager.shared.updateRedHot(appId: info.appId, statue: false)
+        }
+        
         print(sender.tag)
-        let type = BatchFileManager.shared.currentAppType(fileName: info.appKey)
+        let type = InnerAppFileManager.shared.currentAppType(appId: info.appId)
         if type == .system {
             
             let second = WebViewViewController()
-            second.fileName = info.appKey
-            second.urlString = BatchFileManager.shared.systemWebAPPURLString(fileName: info.appKey) ?? "" //":/index.html"
-            let type = BatchFileManager.shared.systemAPPType(fileName: info.appKey)
-            let url = BatchFileManager.shared.systemWebAPPURLString(fileName: info.appKey) ?? ""
+            second.appId = info.appId
+            second.urlString = InnerAppFileManager.shared.systemWebAPPURLString(appId: info.appId) ?? "" //":/index.html"
+            let type = InnerAppFileManager.shared.systemAPPType(appId: info.appId)
+            let url = InnerAppFileManager.shared.systemWebAPPURLString(appId: info.appId) ?? ""
    
             second.urlString = url
             
             NotificationCenter.default.post(name: openAnAppNotification, object: second)
             
         } else if type == .recommend {
-            BatchFileManager.shared.clickRecommendAppAction(fileName: info.appKey)
-        } else if type == .scan {
-            BatchFileManager.shared.clickRecommendAppAction(fileName: info.appKey)
+            InnerAppFileManager.shared.clickRecommendAppAction(appId: info.appId)
+        } else if type == .user {
+            InnerAppFileManager.shared.clickRecommendAppAction(appId: info.appId)
         }
     }
 }
@@ -257,11 +278,13 @@ let HoverViewTag = 10013
             // set attributed text on a UILabel
             btn.setAttributedTitle(attrStr1, for: .normal)
             
+            print("current thread" + "\(Thread.current)")
             if let hoverView = btn.viewWithTag(HoverViewTag) as? HoverView {
                 hoverView.visible = true
             }
         }
     }
+    
     
     @objc func newsClicked(sender:UIButton){
         
@@ -374,52 +397,71 @@ class BrowserTabHomeView: UIView, UIScrollViewDelegate {
         }
         appsContainerView.updateAppContainerView(list)
     }
-    
-    func appendTemporaryApp(appKey: String){
-        guard let image = PKImageExtensions.image(with: .cyan,size: CGSize(width: 120, height: 120)) else { return }
-        var appInfo = AppInfo(appName: appKey, appKey: appKey)
-        appInfo.appIcon = image
-        var list = sharedCachesMgr.readAvailableApps()
-        list.append(appInfo)
-        appsContainerView.updateAppContainerView(list)
 
-        self.operateQueue.append(appInfo)
+    func appendTemporaryApp(appId: String){
+        if !onDeckApps.contains(where: { info in
+            info.appId == appId
+        }){
+            guard let image = PKImageExtensions.image(with: .cyan,size: CGSize(width: 120, height: 120)) else { return }
+            var appInfo = AppInfo(appName: appId, appId: appId)
+            appInfo.appIcon = image
+            onDeckApps.append(appInfo)
+            appsContainerView.updateAppContainerView(onDeckApps)
+        }
+
     }
-    var operateQueue = [AppInfo]()
     
     func installingProgressUpdate(_ notify: Notification){
         guard let infoDict = notify.userInfo,
                 let progress = infoDict["progress"] as? String else { return }
-        guard let fileName = infoDict["fileName"] as? String else { return }
+        guard let appId = infoDict["appId"] as? String else { return }
         
-        if !operateQueue.contains(where: { info in
-            info.appName == fileName
+        if !onDeckApps.contains(where: { info in
+            info.appId == appId
         }){
-            appendTemporaryApp(appKey: fileName)
-            operateMonitor.startAnimationMonitor.onNext(fileName)
-
+            appendTemporaryApp(appId: appId)
+            operateMonitor.startAnimationMonitor.onNext(appId)
         }
-     
-        guard let clickables = self.appsContainerView.clickables else { return }
                 
         if progress == "complete" {
-            guard let appKey = infoDict["realName"] as? String else { return }
-            BatchFileManager.shared.updateFileType(fileName: appKey)
-            guard let index = appNames?.firstIndex(of: appKey) else {return}
-            clickables[index].realImageView.startExpandAnimation()
-            clickables[index].realImageView.image = BatchFileManager.shared.currentAppImage(fileName: appKey)
-            clickables[index].realTitleLabel.text = BatchFileManager.shared.currentAppName(fileName: appKey)
-        }else{
+            guard let appId = infoDict["appId"] as? String else { return }
+            InnerAppFileManager.shared.updateFileType(appId: appId)
+  
+            guard let index = onDeckApps.firstIndex(where: { info in
+                info.appId == appId
+            })  else {return}
+            
+            let button = self.appsContainerView.clickables![index]
+            button.realImageView.startExpandAnimation()
+            button.realImageView.image = InnerAppFileManager.shared.currentAppImage(appId: appId)
+            button.realTitleLabel.text = InnerAppFileManager.shared.currentAppName(appId: appId)
+            if let index = onDeckApps.firstIndex(where: { info in
+                info.appName == appId
+            }){
+                onDeckApps.remove(at: index)
+            }
+            appsContainerView.updateRedSpot()
+
+        }else if progress == "fail"{
+            if let index = onDeckApps.firstIndex(where: { info in
+                info.appName == appId
+            }){
+                onDeckApps.remove(at: index)
+            }
+            self.appsContainerView.updateAppContainerView(onDeckApps)
+            
+        }else {
             guard var progress = Double(progress) else { return }
             progress = progress < 0.98 ? progress : 0.98
-            guard let button = clickables.filter({ touchView in
-                touchView.realTitleLabel.text == fileName
-            }).first else { return }
-            button.realImageView.startProgressAnimation(progress: 1.0 - progress)
-        }
             
+            if let index = onDeckApps.firstIndex(where: { info in
+                info.appId == appId
+            }){
+                let button = self.appsContainerView.clickables![index]
+                button.realImageView.startProgressAnimation(progress: 1.0 - progress)
+            }
+        }
     }
-        
 }
 
 // MARK: Helper methods

@@ -8,12 +8,13 @@
 import UIKit
 import SwiftyJSON
 
+let documentdir = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first!
+
 extension PlaocHandleModel {
 
     // 获取dweb app home目录路径
     func getDwebAppPath() -> String {
-        guard let filePath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first else { return "" }
-        return filePath + "/system-app/\(fileName)/home"
+        documentdir + "/system-app/\(appId)/home"
     }
     
     func pathPrefixReplace(_ path: String) -> String {
@@ -212,7 +213,7 @@ extension PlaocHandleModel {
         
         do {
             let url = URL(fileURLWithPath: homePath + pathPrefixReplace(data["path"].stringValue))
-            let result = StreamFileManager().list(fileName: fileName, filePath: url.path)
+            let result = StreamFileManager().list(appId: appId, filePath: url.path)
             let jsonEncoder = JSONEncoder()
             let jsonData = try jsonEncoder.encode(result)
             let jsonString = String(data: jsonData, encoding: .utf8)

@@ -31,7 +31,7 @@ class XXWebView: WKWebView {
         prefreen.javaScriptCanOpenWindowsAutomatically = true
         config.preferences = prefreen
         config.setValue(true, forKey: "allowUniversalAccessFromFileURLs")
-        config.setURLSchemeHandler(Schemehandler(fileName: "TODO"), forURLScheme: schemeString)
+        config.setURLSchemeHandler(Schemehandler(appId: "TODO"), forURLScheme: schemeString)
         return config
     }
     

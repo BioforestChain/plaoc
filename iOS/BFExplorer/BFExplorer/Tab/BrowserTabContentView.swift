@@ -28,7 +28,7 @@ class BrowserTabContentView: UIView {
         super.layoutSubviews()
         var statusBarHeight = 0.0
         if #available(iOS 13.0, *) {
-            statusBarHeight = Double(window?.windowScene?.statusBarManager?.statusBarFrame.height ?? 0.0)
+            statusBarHeight = Double(window?.windowScene?.statusBarManager?.statusBarFrame.height ?? 0.0) + 5
         } else {
             // Fallback on earlier versions
         }

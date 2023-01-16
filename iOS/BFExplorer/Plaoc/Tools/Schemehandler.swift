@@ -18,9 +18,9 @@ class Schemehandler: NSObject, WKURLSchemeHandler {
     
     private var fileString: String = ""
     
-    init(fileName: String) {
+    init(appId: String) {
         super.init()
-        fileString = fileName
+        fileString = appId
     }
     
     func webView(_ webView: WKWebView, start urlSchemeTask: WKURLSchemeTask) {
@@ -32,10 +32,10 @@ class Schemehandler: NSObject, WKURLSchemeHandler {
             return
         }
         
-        guard let filename = urlSchemeTask.request.url?.path else { return }
+        guard let appId = urlSchemeTask.request.url?.path else { return }
         let mainPath = Schemehandler.filePath()
-        let htmlPath = mainPath + "/" + fileString//Schemehandler.fileName()
-        let filepath = htmlPath + filename
+        let htmlPath = mainPath + "/" + fileString//Schemehandler.appId()
+        let filepath = htmlPath + appId
         print(filepath)
         let manager = FileManager.default
         if manager.fileExists(atPath: filepath) {
@@ -95,11 +95,11 @@ class Schemehandler: NSObject, WKURLSchemeHandler {
         schemeTasksDict[urlSchemeTask.description] = false
     }
     
-    static func setupHTMLCache(fileName: String, fromPath: String) {
+    static func setupHTMLCache(appId: String, fromPath: String) {
         
-        clearHTMLCache(fileName: fileName)
+        clearHTMLCache(appId: appId)
         let manager = FileManager.default
-        let markString = fileName//Schemehandler.fileName()
+        let markString = appId//Schemehandler.appId()
         let toPath = Schemehandler.filePath() + "/" + markString
         if manager.fileExists(atPath: toPath) {
             
@@ -108,22 +108,21 @@ class Schemehandler: NSObject, WKURLSchemeHandler {
         }
     }
     
-    static func clearHTMLCache(fileName: String) {
+    static func clearHTMLCache(appId: String) {
         let manager = FileManager.default
-        let markString = fileName//fileName()
+        let markString = appId//appId()
         let toPath = filePath() + "/" + markString
         if manager.fileExists(atPath: toPath) {
             try? manager.removeItem(atPath: toPath)
         }
     }
     
-    static func fileName() -> String {
+    static func appId() -> String {
         return "bmr9vohvtvbvwrs3p4bwgzsmolhtphsvvj"
     }
 
     static func filePath() -> String {
-        guard let filePath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first else { return "" }
-        return filePath
+         documentdir
     }
     
     func mimeType(pathExtension: String) -> String {

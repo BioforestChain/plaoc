@@ -14,7 +14,7 @@ import JavaScriptCore
 class WebViewViewController: UIViewController {
 
     var urlString: String = ""
-    var fileName: String = ""
+    var appId: String = ""
     private var isStatusHidden: Bool = false
     private var statusOverlay: Bool = false
     private var keyboardOverlay: Bool = false
@@ -51,7 +51,7 @@ class WebViewViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        jsManager = JSCoreManager.init(fileName: fileName, controller: self)
+        jsManager = JSCoreManager.init(appId: appId, controller: self)
         webView.jsManager = jsManager
     }
     
@@ -114,7 +114,7 @@ class WebViewViewController: UIViewController {
     }()
     
     lazy private var webView: CustomWebView = {
-        let webView = CustomWebView(frame: CGRect(x: 0, y: 44, width: self.view.bounds.width, height: UIScreen.main.bounds.height - 44), jsNames: ["console","network"], fileName: fileName, urlString: self.urlString)
+        let webView = CustomWebView(frame: CGRect(x: 0, y: 44, width: self.view.bounds.width, height: UIScreen.main.bounds.height - 44), jsNames: ["console","network"], appId: appId, urlString: self.urlString)
         webView.superVC = self
         webView.callback = { [weak self] title in
             guard let strongSelf = self else { return }
