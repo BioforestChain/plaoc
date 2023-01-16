@@ -29,6 +29,10 @@ import SwiftyJSON
         switch functionName {
         case "OpenDWebView":
             return executiveOpenDWebView(param: param)
+        case "ExitApp":
+            return executiveCloseDWebView(param: param)
+        case "ListenBackButton":
+            return executiveListenBackButton(param: param)
         case "OpenQrScanner":
             return executiveOpenQrScanner(param: param, functionName: functionName)
         case "BarcodeScanner":
@@ -107,6 +111,18 @@ extension PlaocHandleModel {
         NotificationCenter.default.post(name: NSNotification.Name.openDwebNotification, object: nil, userInfo: ["param":param])
         return true
     }
+    
+    //关闭DwebView
+    private func executiveCloseDWebView(param: Any) -> Bool {
+        NotificationCenter.default.post(name: NSNotification.Name.closeAnAppNotification, object: nil, userInfo: nil)
+        return true
+    }
+    
+    private func executiveListenBackButton(param: Any) -> Void {
+//        NotificationCenter.default.post()
+//        controller?.webView.canGoback()
+    }
+    
     //二维码
     private func executiveOpenQrScanner(param: Any, functionName: String) -> String {
         let scanVC = ScanPhotoViewController()

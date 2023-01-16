@@ -51,6 +51,9 @@ class WebViewViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        // 开启网络监听
+        ReachabilityManager.shared.startMonitoring()
+        
         jsManager = JSCoreManager.init(appId: appId, controller: self)
         webView.jsManager = jsManager
     }
@@ -72,6 +75,11 @@ class WebViewViewController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(observerHiddenKeyboard(noti:)), name: UIResponder.keyboardWillHideNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(openDwebAction(noti:)), name: NSNotification.Name.openDwebNotification, object: nil)
         
+    }
+    
+    //释放时，停止网络监听
+    func dealloc() {
+        ReachabilityManager.shared.stopMonitoring()
     }
     
     @objc private func openDwebAction(noti: Notification) {

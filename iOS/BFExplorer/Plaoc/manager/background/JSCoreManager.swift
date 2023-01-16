@@ -99,6 +99,11 @@ class JSCoreManager: NSObject {
         }
     }
     
+    // 处理监听事件
+    func handleEvaluateEmitScript(wb: String, fun: String, data: Any) {
+        let functionString = "javascript:document.querySelector('\(wb)').notifyListeners('\(fun)','\(data)')"
+        jsContext?.evaluateScript(functionString)
+    }
 }
 
 extension JSCoreManager {

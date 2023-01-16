@@ -141,6 +141,14 @@ class BrowserContainerViewController: UIViewController,  OverlayShareViewDelegat
                 self.navigationController?.pushViewController(vc, animated: true)
             }
         }
+        
+        // 用于jscore关闭app应用
+        NotificationCenter.default.addObserver(forName: NSNotification.Name.closeAnAppNotification, object: nil, queue: .main) { notify in
+            print("-----******in BrowserContainerViewController closeAnAppNotification")
+            
+            self.navigationController?.popViewController(animated: true)
+        }
+        
         sharedCachesMgr.addObserver(self, forKeyPath: #keyPath(CachesManager.cachedNewsData), options: .new, context: nil)
         
         NotificationCenter.default.addObserver(forName: NSNotification.Name.progressNotification, object: nil, queue: .main) { notify in
