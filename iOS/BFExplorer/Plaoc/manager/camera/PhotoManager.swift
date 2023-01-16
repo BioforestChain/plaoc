@@ -164,18 +164,14 @@ class PhotoManager: NSObject {
     
     //保存图片到文件中
     func savePhotoToDocument(image: UIImage) {
-        
-        guard let rootPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first else { return }
         let fileManager = FileManager.default
-        let filePath = "\(rootPath)/pickedimage.jpg"
+        let filePath = "\(documentdir)/pickedimage.jpg"
         let imageData = image.jpegData(compressionQuality: 1.0)
         fileManager.createFile(atPath: filePath, contents: imageData, attributes: nil)
     }
     //获取图片路径
     func photoFilePath() -> String {
-        guard let rootPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first else { return "" }
-        let filePath = "\(rootPath)/pickedimage.jpg"
-        return filePath
+        "\(documentdir)/pickedimage.jpg"
     }
     
     //预览图片

@@ -136,7 +136,7 @@ struct LinkRecord: Codable{
 
 struct AppInfo{
     var appName: String
-    var appKey: String
+    var appId: String
     var appIconUrl: String?
     var appIcon: UIImage?
 }
@@ -210,15 +210,15 @@ extension CachesManager{
     }
     
     func readAvailableApps()->[AppInfo]{
-        var appNames = BatchFileManager.shared.appFilePaths
+        var appNames = InnerAppFileManager.shared.appIdList
         var infos = [AppInfo]()
         for name in appNames{
-            var appInfo = AppInfo(appName: BatchFileManager.shared.currentAppName(fileName: name),appKey: name)
-            let type = BatchFileManager.shared.currentAppType(fileName: name)
-            if type == .scan {
-                appInfo.appIconUrl = BatchFileManager.shared.scanImageURL(fileName: name)
+            var appInfo = AppInfo(appName: InnerAppFileManager.shared.currentAppName(appId: name),appId: name)
+            let type = InnerAppFileManager.shared.currentAppType(appId: name)
+            if type == .user {
+                appInfo.appIconUrl = InnerAppFileManager.shared.scanImageURL(appId: name)
             } else {
-                appInfo.appIcon = BatchFileManager.shared.currentAppImage(fileName: name)
+                appInfo.appIcon = InnerAppFileManager.shared.currentAppImage(appId: name)
             }
             infos.append(appInfo)
         }
@@ -311,7 +311,7 @@ extension CachesManager{
         return true
     }
     
-    //download or create an image, then save to local file, return local filename of the image
+    //download or create an image, then save to local file, return local appId of the image
     private func cacheIcon(iconUrl:String, urlFirstChar: String) -> String{
         var hasCachedImage = false
         var cacheImageId: String = "bookmark_def"

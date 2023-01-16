@@ -17,18 +17,18 @@ class JSCoreManager: NSObject {
     private var postDict: [String:String] = [:]
     
     
-    init(fileName: String, controller: WebViewViewController?) {
+    init(appId: String, controller: WebViewViewController?) {
         super.init()
         baseViewController = controller
-        name = fileName
+        name = appId
         
         plaoc.controller = baseViewController
         plaoc.jsContext = jsContext
-        plaoc.fileName = name
+        plaoc.appId = name
         
         JSInjectManager.shared.registerInContext(jsContext!)
         initJSCore()
-//        loadAPPEntry(fileName: fileName)
+//        loadAPPEntry(appId: appId)
 
     }
     /**初始化 sdk*/
@@ -51,9 +51,9 @@ class JSCoreManager: NSObject {
         }
     }
     
-    private func loadAPPEntry(fileName: String) {
+    private func loadAPPEntry(appId: String) {
         
-        guard let entryPath = BatchFileManager.shared.systemAPPEntryPath(fileName: fileName) else { return }
+        guard let entryPath = InnerAppFileManager.shared.systemAPPEntryPath(appId: appId) else { return }
         
         jsContext?.setObject(plaoc, forKeyedSubscript: "PlaocJavascriptBridge" as NSCopying & NSObjectProtocol)
         if let content = try? String(contentsOfFile: entryPath) {

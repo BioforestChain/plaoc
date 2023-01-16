@@ -22,7 +22,7 @@ import SwiftyJSON
     
     var controller: WebViewViewController?
     var jsContext: JSContext?
-    var fileName: String = ""
+    var appId: String = ""
     
     func callJavaScript(functionName: String, param: Any) -> Any {
         print("swift#callJavaScript:",functionName)
@@ -128,7 +128,7 @@ extension PlaocHandleModel {
     //初始化app数据
     private func executiveInitMetaData(param: Any) -> Void {
         guard let param = param as? String else { return }
-        NetworkMap.shared.metaData(metadata: param, fileName: fileName)
+        NetworkMap.shared.metaData(metadata: param, appId: appId)
     }
     //初始化运行时
     private func executiveDenoRuntime(param: Any) -> String {
@@ -136,7 +136,7 @@ extension PlaocHandleModel {
     }
     //获取appID
     private func executiveGetBfsAppId(param: Any) -> String {
-        return fileName
+        return appId
     }
     //传递给前端消息
     private func executiveEvalJsRuntime(param: Any) -> String {

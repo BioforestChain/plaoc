@@ -16,15 +16,17 @@ class RefreshManager: NSObject {
         return UserDefaults.standard.object(forKey: "updateTime") as? Int
     }
     
-    static func fetchLastUpdateTime(fileName: String) -> Int? {
-        return UserDefaults.standard.object(forKey: fileName) as? Int
+    static func fetchLastUpdateTime(appId: String) -> Int? {
+        return UserDefaults.standard.object(forKey: appId) as? Int
     }
     
-    static func saveLastUpdateTime(fileName: String, time: Int) {
-        UserDefaults.standard.setValue(time, forKey: fileName)
+    
+    // FIXME: 太多这个记录更新了，这个字段具体做什么用的？
+    static func saveLastUpdateTime(appId: String, time: Int) {
+        UserDefaults.standard.setValue(time, forKey: appId)
     }
     
-    func loadUpdateRequestInfo(fileName: String? = nil, urlString: String? = nil, isCompare: Bool = false) {
+    func loadUpdateRequestInfo(appId: String? = nil, urlString: String? = nil, isCompare: Bool = false) {
         
         guard urlString != nil else { return }
         guard let url = URL(string: urlString!) else { return }
@@ -36,7 +38,7 @@ class RefreshManager: NSObject {
             guard let result = String(data: data!, encoding: .utf8) else { return }
             let dict = ChangeTools.stringValueDic(result)
             guard let dataDict = dict?["data"] as? [String:Any] else { return }
-            if fileName != nil {
+            if appId != nil {
 //                let versionType = self.analysisVersion(urlString: urlString!)
 //                guard let subDict = self.versionTypeJson(type: versionType, dict: dataDict) else {
 //                    DispatchQueue.main.async {
@@ -46,11 +48,11 @@ class RefreshManager: NSObject {
 //                    }
 //                    return
 //                }
-                RefreshManager.saveLastUpdateTime(fileName: fileName!, time: Date().timeStamp)
-                BatchFileManager.shared.writeUpdateContent(fileName: fileName!, json: dataDict)
+                RefreshManager.saveLastUpdateTime(appId: appId!, time: Date().timeStamp)
+                InnerAppFileManager.shared.writeUpdateContent(appId: appId!, json: dataDict)
                 if isCompare {
                     //TODO 发送比较版本信息
-                    operateMonitor.refreshCompleteMonitor.onNext(fileName!)
+                    operateMonitor.refreshCompleteMonitor.onNext(appId!)
                 }
             } else {  //扫码下载
                 guard let name = dataDict["name"] as? String else { return }

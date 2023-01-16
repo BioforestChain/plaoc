@@ -9,7 +9,7 @@ import UIKit
 
 class StreamFileManager: NSObject {
     
-    func list(fileName: String, filePath: String, isContainFile: Bool = false) -> [FileModel] {
+    func list(appId: String, filePath: String, isContainFile: Bool = false) -> [FileModel] {
 """
         "/home/user/haha/test.txt"
         name = "test.txt"
@@ -20,7 +20,7 @@ class StreamFileManager: NSObject {
         isLink = false
         relativePath = "/home/user/haha"
 """
-        let rootPath = rootFilePath(fileName: fileName)
+        let rootPath = rootFilePath(fileName: appId)
         let manager = FileManager.default
         guard manager.fileExists(atPath: filePath) else { return [] }
         var currentFile = createCurrentFileModel(path: filePath)
@@ -227,7 +227,6 @@ class StreamFileManager: NSObject {
     
     
     private func rootFilePath(fileName: String) -> String {
-        guard let filePath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first else { return "" }
-        return filePath + "/system-app" + "/\(fileName)/home/"
+        return documentdir + "/system-app" + "/\(fileName)/home/"
     }
 }
