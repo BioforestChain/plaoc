@@ -19,4 +19,21 @@ class RecommendAppManager: InnerAppManager {
         return filePath + "/\(appId)/sys/"
     }
     
+    
+    func fetchRecommandAppLinkConfig(by appId: String) -> [String: Any]?{
+        let path = filePath + "/\(appId)/boot/link.json"
+        guard let data = FileManager.default.contents(atPath: path) else { return nil}
+        guard let content = String(data: data, encoding: .utf8) else { return nil}
+        return  ChangeTools.stringValueDic(content)
+    }
+    
+    func fetchAllRecommandAppLinkConfig() -> [[String : Any]]? {
+        var configs = [[String : Any]]()
+        self.appDirs().forEach { appId in
+            if let config = fetchRecommandAppLinkConfig(by: appId){
+                configs.append(config)
+            }
+        }
+        return configs
+    }
 }

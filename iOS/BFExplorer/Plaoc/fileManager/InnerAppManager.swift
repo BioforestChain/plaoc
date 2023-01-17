@@ -21,8 +21,9 @@ class InnerAppManager: NSObject {
     //读取各种app的信息（已安装的和推荐安装的）
     func appDirs() -> [String] {
         var appIds: [String] = []
-        guard let filePaths = FileManager.default.subpaths(atPath: filePath) else { return appIds }
-        for appId in filePaths {
+        let filePaths = FileManager.default.subpaths(atPath: filePath)
+        guard (filePaths != nil) else { return appIds }
+        filePaths?.forEach { appId in
             var isDir: ObjCBool = true
             let fullPath = "\(filePath)/\(appId)"
             if FileManager.default.fileExists(atPath: fullPath, isDirectory: &isDir) {

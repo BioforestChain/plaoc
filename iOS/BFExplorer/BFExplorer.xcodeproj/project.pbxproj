@@ -65,6 +65,7 @@
 		F0292DA42975502700C2E464 /* FWPopupCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0292D942975502700C2E464 /* FWPopupCategory.swift */; };
 		F0292DA52975502700C2E464 /* FWPopupItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0292D952975502700C2E464 /* FWPopupItem.swift */; };
 		F0292DA62975502700C2E464 /* FWPColorCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0292D962975502700C2E464 /* FWPColorCategory.swift */; };
+		F0292DA8297686CF00C2E464 /* AppVersionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0292DA7297686CF00C2E464 /* AppVersionManager.swift */; };
 		F03301CA28BE0FD400BC0266 /* ButtonWithImageAndTitleExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F03301C928BE0FD400BC0266 /* ButtonWithImageAndTitleExtension.swift */; };
 		F03301CC28BF016200BC0266 /* TouchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F03301CB28BF016200BC0266 /* TouchView.swift */; };
 		F03301D828C730DE00BC0266 /* OverlayController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F03301D728C730DE00BC0266 /* OverlayController.swift */; };
@@ -263,6 +264,7 @@
 		F0292D942975502700C2E464 /* FWPopupCategory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FWPopupCategory.swift; sourceTree = "<group>"; };
 		F0292D952975502700C2E464 /* FWPopupItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FWPopupItem.swift; sourceTree = "<group>"; };
 		F0292D962975502700C2E464 /* FWPColorCategory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FWPColorCategory.swift; sourceTree = "<group>"; };
+		F0292DA7297686CF00C2E464 /* AppVersionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppVersionManager.swift; sourceTree = "<group>"; };
 		F03301C928BE0FD400BC0266 /* ButtonWithImageAndTitleExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ButtonWithImageAndTitleExtension.swift; sourceTree = "<group>"; };
 		F03301CB28BF016200BC0266 /* TouchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TouchView.swift; sourceTree = "<group>"; };
 		F03301D728C730DE00BC0266 /* OverlayController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OverlayController.swift; sourceTree = "<group>"; };
@@ -791,6 +793,7 @@
 				F33A570629598A1E00000037 /* ShareManager.swift */,
 				F33B31E3295A858B000EB302 /* ToastManager.swift */,
 				F33B31E5295A8AA6000EB302 /* SplashScreenManager.swift */,
+				F0292DA7297686CF00C2E464 /* AppVersionManager.swift */,
 			);
 			path = manager;
 			sourceTree = "<group>";
@@ -1160,6 +1163,7 @@
 				F091CB9B2951B92100FCE565 /* AlertConfiguration.swift in Sources */,
 				F091CB322951B8EE00FCE565 /* CustomConfirmPopView.swift in Sources */,
 				182EF46328B62DE4001E039E /* UIImage+Text.swift in Sources */,
+				F0292DA8297686CF00C2E464 /* AppVersionManager.swift in Sources */,
 				F091CB8F2951B91900FCE565 /* FileSystemManager.swift in Sources */,
 				F033022428C73E1700BC0266 /* CALayer+PKExtensions.swift in Sources */,
 				F0292D9C2975502700C2E464 /* LBXPermissions.swift in Sources */,
@@ -1304,7 +1308,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -1360,7 +1364,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;

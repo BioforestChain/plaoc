@@ -14,11 +14,12 @@ enum InnerAppType: Int {
     case user   //第三方已安装的
 }
 
+let sharedRecommendAppManager = RecommendAppManager()
+
 class InnerAppFileManager: NSObject {
 
     private let disposeBag = DisposeBag()
     private let sysManager = SystemAppManager()
-    private let recommendManager = RecommendAppManager()
     private let scanManager = UserAppManager()
     private var appNames: [String:String] = [:]
     private var appImages: [String:UIImage?] = [:]
@@ -74,7 +75,7 @@ class InnerAppFileManager: NSObject {
         if type == .system {
             sysManager.writeUpdateInfoToTmpFile(appId: appId, json: json!)
         } else if type == .recommend {
-            recommendManager.writeUpdateInfoToTmpFile(appId: appId, json: json!)
+            sharedRecommendAppManager.writeUpdateInfoToTmpFile(appId: appId, json: json!)
         } else if type == .user {
             scanManager.writeUpdateInfoToTmpFile(appId: appId, json: json!)
         }
@@ -233,7 +234,7 @@ class InnerAppFileManager: NSObject {
         if type == .system {
             return sysManager.readCacheUpdateInfo(appId: appId)
         } else if type == .recommend {
-            return recommendManager.readCacheUpdateInfo(appId: appId)
+            return sharedRecommendAppManager.readCacheUpdateInfo(appId: appId)
         } else if type == .user {
             return scanManager.readCacheUpdateInfo(appId: appId)
         }
@@ -262,7 +263,7 @@ class InnerAppFileManager: NSObject {
         if type == .system {
             return sysManager.readAutoUpdateURLInfo(appId: appId)
         } else if type == .recommend {
-            return recommendManager.readAutoUpdateURLInfo(appId: appId)
+            return sharedRecommendAppManager.readAutoUpdateURLInfo(appId: appId)
         } else if type == .user {
             return scanManager.readAutoUpdateURLInfo(appId: appId)
         }
@@ -275,7 +276,7 @@ class InnerAppFileManager: NSObject {
         if type == .system {
             return sysManager.readAutoUpdateMaxAge(appId: appId)
         } else if type == .recommend {
-            return recommendManager.readAutoUpdateMaxAge(appId: appId)
+            return sharedRecommendAppManager.readAutoUpdateMaxAge(appId: appId)
         } else if type == .user {
             return scanManager.readAutoUpdateMaxAge(appId: appId)
         }
@@ -288,7 +289,7 @@ class InnerAppFileManager: NSObject {
         if type == .system {
             return sysManager.isNewUpdateInfo(appId: appId)
         } else if type == .recommend {
-            return recommendManager.isNewUpdateInfo(appId: appId)
+            return sharedRecommendAppManager.isNewUpdateInfo(appId: appId)
         } else if type == .user {
             return scanManager.isNewUpdateInfo(appId: appId)
         }
@@ -307,9 +308,13 @@ class InnerAppFileManager: NSObject {
         return false
     }
     
+    func recommandAppList(){
+        
+    }
+    
     //获取文件夹的类型
     private func loadAppType() {
-        let recommendAppList = recommendManager.appDirs()
+        let recommendAppList = sharedRecommendAppManager.appDirs()
         let sysAppList = sysManager.appDirs()
         let userAppList = scanManager.appDirs()
         
@@ -385,7 +390,7 @@ extension InnerAppFileManager {
             if type == .system {
                 appNames[appId] = sysManager.appName(appId: appId)
             } else if type == .recommend {
-                appNames[appId] = recommendManager.appName(appId: appId)
+                appNames[appId] = sharedRecommendAppManager.appName(appId: appId)
             } else if type == .user {
                 appNames[appId] = scanManager.appName(appId: appId)
             }
@@ -397,7 +402,7 @@ extension InnerAppFileManager {
             if type == .system {
                 appImages[key] = sysManager.appIcon(appId: key)
             } else if type == .recommend {
-                appImages[key] = recommendManager.appIcon(appId: key)
+                appImages[key] = sharedRecommendAppManager.appIcon(appId: key)
             }
         }
     }
