@@ -300,20 +300,17 @@ extension PlaocHandleModel {
     
     // 拍摄照片
     private func takeCameraPhoto(param: Any, functionName: String) {
-        let cameraManager = CameraManager()
-        cameraManager.getPhoto(param: param, controller: controller, jsContext: jsContext, functionName: functionName)
+        sharedCameraMgr.getPhoto(param: param, controller: controller, jsContext: jsContext, functionName: functionName)
     }
     
     // 从图库中选取单张照片
     private func pickCameraPhoto(param: Any, functionName: String) {
-        let cameraManager = CameraManager()
-        cameraManager.getPhoto(param: param, controller: controller, jsContext: jsContext, functionName: functionName)
+        sharedCameraMgr.getPhoto(param: param, controller: controller, jsContext: jsContext, functionName: functionName)
     }
     
     // 从图库中选取多张相片
     private func pickCameraPhotos(param: Any, functionName: String) {
-        let cameraManager = CameraManager()
-        cameraManager.pickImages(param: param, controller: controller, jsContext: jsContext, functionName: functionName)
+        sharedCameraMgr.pickImages(param: param, controller: controller, jsContext: jsContext, functionName: functionName)
     }
     
 }

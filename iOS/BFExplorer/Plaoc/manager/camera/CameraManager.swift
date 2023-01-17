@@ -9,6 +9,8 @@ import Photos
 import PhotosUI
 import JavaScriptCore
 
+let sharedCameraMgr = CameraManager()
+
 class CameraManager: NSObject {
     private var settings = CameraSettings()
     private let defaultSource = CameraSource.prompt
