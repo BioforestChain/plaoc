@@ -1,4 +1,3 @@
-//
 //  CameraManager.swift
 //  BFExplorer
 //

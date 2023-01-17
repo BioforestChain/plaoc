@@ -51,7 +51,7 @@ public enum Category: Int {
 }
 
 var onDeckApps = sharedCachesMgr.readAvailableApps()
-
+var downloadingAppIds = [String]()
 
 
 class CategoryView: UIView{
@@ -406,6 +406,7 @@ class BrowserTabHomeView: UIView, UIScrollViewDelegate {
             var appInfo = AppInfo(appName: appId, appId: appId)
             appInfo.appIcon = image
             onDeckApps.append(appInfo)
+            downloadingAppIds.append(appId)
             appsContainerView.updateAppContainerView(onDeckApps)
         }
 
@@ -416,8 +417,8 @@ class BrowserTabHomeView: UIView, UIScrollViewDelegate {
                 let progress = infoDict["progress"] as? String else { return }
         guard let appId = infoDict["appId"] as? String else { return }
         
-        if !onDeckApps.contains(where: { info in
-            info.appId == appId
+        if !downloadingAppIds.contains(where: { installingAppId in
+            installingAppId == appId
         }){
             appendTemporaryApp(appId: appId)
             operateMonitor.startAnimationMonitor.onNext(appId)
@@ -426,11 +427,11 @@ class BrowserTabHomeView: UIView, UIScrollViewDelegate {
         if progress == "complete" {
             guard let appId = infoDict["appId"] as? String else { return }
             InnerAppFileManager.shared.updateFileType(appId: appId)
-  
+
             guard let index = onDeckApps.firstIndex(where: { info in
                 info.appId == appId
             })  else {return}
-            
+
             let button = self.appsContainerView.clickables![index]
             button.realImageView.startExpandAnimation()
             button.realImageView.image = InnerAppFileManager.shared.currentAppImage(appId: appId)
@@ -439,6 +440,11 @@ class BrowserTabHomeView: UIView, UIScrollViewDelegate {
                 info.appName == appId
             }){
                 onDeckApps.remove(at: index)
+            }
+            if let index2 = downloadingAppIds .firstIndex(where: { installingId in
+                installingId == appId
+            }){
+                downloadingAppIds.remove(at: index2)
             }
             appsContainerView.updateRedSpot()
 

@@ -106,8 +106,10 @@ class ScanPhotoViewController: UIViewController {
 //            self.scanRectView?.layer.borderColor = UIColor.green.cgColor
 //            self.scanRectView?.layer.borderWidth = 1
             self.view.addSubview(self.scanRectView!)
-            
-            self.session?.startRunning()
+//            DispatchQueue.main.async {
+                self.session?.startRunning()
+
+//            }
             
             //通过代码拉近镜头焦距，放大内容区域让机器更好的识别
             do {

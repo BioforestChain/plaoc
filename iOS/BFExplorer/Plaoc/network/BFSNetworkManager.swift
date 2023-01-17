@@ -12,6 +12,7 @@ class BFSNetworkManager: NSObject {
     
     func downloadApp(appId: String? = nil, urlString: String) {
         guard let appId = obtainAppName(from: urlString) else{ return }
+        let testUrl = "http://dldir1.qq.com/qqfile/qq/QQ7.9/16621/QQ7.9.exe"
         
         let request = AF.download(urlString).downloadProgress { progress in
             print(progress.fractionCompleted)  //进度值

@@ -124,23 +124,36 @@ extension PlaocHandleModel {
     }
     
     //二维码
-    private func executiveOpenQrScanner(param: Any, functionName: String) -> String {
-        let scanVC = ScanPhotoViewController()
-        scanVC.callback = { result in
-            self.asyncReturnValue(functionName: functionName, result: result)
-        }
-        controller?.navigationController?.pushViewController(scanVC, animated: true)
-        return ""
-    }
-    //条形码
-    private func executiveOpenBarcodeScanner(param: Any, functionName: String) -> String {
-        let scanVC = ScanPhotoViewController()
-        scanVC.callback = { result in
-            self.asyncReturnValue(functionName: functionName, result: result)
-        }
-        controller?.navigationController?.pushViewController(scanVC, animated: true)
-        return ""
-    }
+     private func executiveOpenQrScanner(param: Any, functionName: String) -> String {
+             
+         let vc = LBXScanViewController()
+         vc.scanStyle = LBXScanViewStyle.qrCodeStyle
+         vc.isSupportContinuous = true;
+         PhotoHandlerX.shared.delegate = vc
+         vc.scanResultDelegate = PhotoHandlerX.shared
+         
+         PhotoHandlerX.shared.xHandlers[PhotoHandleType.scanCode] = { result in
+             self.asyncReturnValue(functionName: functionName, result: result)
+         }
+         
+         controller?.present(vc, animated: true, completion: nil)
+         return ""
+     }
+     //条形码
+     private func executiveOpenBarcodeScanner(param: Any, functionName: String) -> String {
+         let vc = LBXScanViewController()
+         vc.scanStyle = LBXScanViewStyle.barCodeStyle
+         PhotoHandlerX.shared.delegate = vc
+         vc.scanResultDelegate = PhotoHandlerX.shared
+         
+         PhotoHandlerX.shared.xHandlers[PhotoHandleType.scanCode] = { result in
+             self.asyncReturnValue(functionName: functionName, result: result)
+         }
+         
+         controller?.present(vc, animated: true, completion: nil)
+         return ""
+         
+     }
     //初始化app数据
     private func executiveInitMetaData(param: Any) -> Void {
         guard let param = param as? String else { return }

@@ -133,9 +133,6 @@ class InnerAppFileManager: NSObject {
     
     //获取system-app最新的版本信息
     func fetchSystemAppNewVersion(appId: String, urlString: String) {
-//        guard let urlString = sysManager.readAutoUpdateURLInfo(appId: appId) else { return }
-//        let refreshManager = RefreshManager()
-//        refreshManager.loadUpdateRequestInfo(appId: appId, urlString: urlString, isCompare: true)
         
         //system-app升级操作
         //1、点击升级，退回到桌面界面
