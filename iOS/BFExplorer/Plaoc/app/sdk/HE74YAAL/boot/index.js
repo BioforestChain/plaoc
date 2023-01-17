@@ -1131,8 +1131,6 @@ const bufferToString = (buffer) => {
         // return String.fromCharCode.apply(null, buffer as number[])
         return _decoder.decode(buffer.buffer);
     }
-    console.log("bufferToString");
-    console.log(buffer);
     return _decoder.decode(buffer);
 };
 /**
@@ -1213,13 +1211,6 @@ function send_zero_copy_buffer(req_id, zerocopybuffer) {
         buffer = contactUint16(req_id, new Uint16Array(zerocopybuffer.buffer));
     }
     Deno.core.opSync("op_send_zero_copy_buffer", buffer);
-}
-/**
- * 发送系统通知
- * @param data
- */
-function setNotification(data) {
-    Deno.core.opSync("op_rust_to_js_set_app_notification", data);
 }
 /**
  * 循环从rust里拿数据
@@ -1543,6 +1534,10 @@ var callNative;
     callNative["readClipboardContent"] = "ReadClipboardContent";
     /** 获取网络状态 */
     callNative["getNetworkStatus"] = "GetNetworkStatus";
+    /** camera */
+    callNative["takeCameraPhoto"] = "TakeCameraPhoto";
+    callNative["pickCameraPhoto"] = "PickCameraPhoto";
+    callNative["pickCameraPhotos"] = "PickCameraPhotos";
 })(callNative || (callNative = {}));
 /**不需要返回的命令 */
 var callNotReturnNative;
@@ -1554,8 +1549,8 @@ var callNotReturnNative;
     /** share 系统分享 */
     callNotReturnNative["systemShare"] = "SystemShare";
     /** haptics 交互 */
-    callNotReturnNative["hapticsImpactLight"] = "HapticsImpactLight";
-    callNotReturnNative["hapticsNotificationWarning"] = "HapticsNotificationWarning";
+    callNotReturnNative["hapticsImpact"] = "HapticsImpact";
+    callNotReturnNative["hapticsNotification"] = "HapticsNotification";
     callNotReturnNative["hapticsVibrate"] = "HapticsVibrate";
 })(callNotReturnNative || (callNotReturnNative = {}));
 // 回调到对应的组件
@@ -1571,11 +1566,14 @@ var callDVebView;
     callDVebView["ShowToast"] = "dweb-app";
     callDVebView["SystemShare"] = "dweb-app";
     callDVebView["GetNetworkStatus"] = "dweb-app";
-    callDVebView["HapticsImpactLight"] = "dweb-app";
-    callDVebView["HapticsNotificationWarning"] = "dweb-app";
+    callDVebView["HapticsImpact"] = "dweb-app";
+    callDVebView["HapticsNotification"] = "dweb-app";
     callDVebView["HapticsVibrate"] = "dweb-app";
     callDVebView["ReadClipboardContent"] = "dweb-app";
     callDVebView["WriteClipboardContent"] = "dweb-app";
+    callDVebView["TakeCameraPhoto"] = "dweb-camera";
+    callDVebView["PickCameraPhoto"] = "dweb-camera";
+    callDVebView["PickCameraPhotos"] = "dweb-camera";
 })(callDVebView || (callDVebView = {}));
 // const callDeno
 // 需要ios异步返回结果方法
@@ -1584,15 +1582,11 @@ var callIOSAsyncFunc;
     callIOSAsyncFunc["ApplyPermissions"] = "ApplyPermissions";
     callIOSAsyncFunc["OpenQrScanner"] = "OpenQrScanner";
     callIOSAsyncFunc["BarcodeScanner"] = "BarcodeScanner";
+    callIOSAsyncFunc["TakeCameraPhoto"] = "TakeCameraPhoto";
+    callIOSAsyncFunc["PickCameraPhoto"] = "PickCameraPhoto";
+    callIOSAsyncFunc["PickCameraPhotos"] = "PickCameraPhotos";
 })(callIOSAsyncFunc || (callIOSAsyncFunc = {}));
 
-/**
- * 发送系统通知
- * @param data
- */
-function sendJsCoreNotification(data) {
-    return jscore.callJavaScriptWithFunctionNameParam(callNative.sendNotification, data);
-}
 function netCallNativeService(fn, data = "") {
     console.log("🥳deno#netCallNativeService:", fn, data);
     const uint8 = jscore.callJavaScriptWithFunctionNameParam(fn, data);
@@ -2045,6 +2039,7 @@ async function basePollHandle(cmd, data) {
  * @returns
  */
 function callDwebViewFactory(func, data) {
+    console.log("func: " + func);
     const handler = func;
     if (handler && callDVebView[handler]) {
         handlerEvalJs(handler, callDVebView[handler], data);
@@ -2665,11 +2660,10 @@ class DWebView extends MapEventEmitter {
         if (strPath.startsWith("/channel")) { // /channel/349512662458373/chunk=0002,104,116,116,112,115,58,1
             // 拿到channelId
             const channelId = strPath.substring(strPath.lastIndexOf("/channel/") + 9, strPath.lastIndexOf("/chunk"));
-            strPath.substring(strPath.lastIndexOf("=") + 1);
+            const stringHex = strPath.substring(strPath.lastIndexOf("=") + 1);
             // const buffers = stringHex.split(",").map(v => Number(v))
-            const buffers = hexToBinary(strPath);
+            const buffers = hexToBinary(stringHex);
             // const chunk = (new Uint8Array(buffers))
-            console.log("deno#chunkGateway", channelId, buffers.length);
             await this.chunkHanlder(channelId, buffers);
         }
     }
@@ -2795,30 +2789,6 @@ class DWebView extends MapEventEmitter {
         }
         console.error("您传递的入口不在配置的入口内，需要在配置文件里配置入口");
         throw new Error("not found entry");
-    }
-}
-
-/**
- * 发送通知
- * @param data
- * @returns
- */
-async function sendNotification(data) {
-    // 如果是android需要在这里拿到app_id，如果是ios,会在ios端拼接
-    if (data.app_id == undefined && currentPlatform() === EPlatform.android) {
-        const app_id = await network.asyncCallDenoFunction(callNative.getBfsAppId);
-        data = Object.assign(data, { app_id: app_id });
-    }
-    const message = JSON.stringify(data);
-    const buffer = stringToByte(message);
-    switch (currentPlatform()) {
-        case EPlatform.android:
-            return setNotification(buffer);
-        case EPlatform.ios:
-            return sendJsCoreNotification(message);
-        case EPlatform.desktop:
-        default:
-            return;
     }
 }
 
@@ -3216,9 +3186,8 @@ const webView = new DWebView(metaData);
 // 多入口指定
 webView.activity("https://objectjson.waterbang.top/");
 // webView.activity("index.html");
-try {
-    sendNotification({ title: "消息头", body: "今晚打老虎", priority: 1 });
-}
-catch (error) {
-    console.log(error);
-}
+// try {
+//   sendNotification({ title: "消息头", body: "今晚打老虎", priority: 1 });
+// } catch (error) {
+//   console.log(error);
+// }

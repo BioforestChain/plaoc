@@ -31,8 +31,6 @@ import SwiftyJSON
             return executiveOpenDWebView(param: param)
         case "ExitApp":
             return executiveCloseDWebView(param: param)
-        case "ListenBackButton":
-            return executiveListenBackButton(param: param)
         case "OpenQrScanner":
             return executiveOpenQrScanner(param: param, functionName: functionName)
         case "BarcodeScanner":
@@ -75,10 +73,10 @@ import SwiftyJSON
             return executiveFileSystemReadBuffer(param: param)
         case "GetNetworkStatus":
             return ReachabilityManager.shared.getNetworkStatus()
-        case "HapticsImpactLight":
-            return FeedbackGenerator.impactFeedbackGenerator(style: .light)
-        case "HapticsNotificationWarning":
-            return FeedbackGenerator.notificationFeedbackGenerator(style: .warning)
+        case "HapticsImpact":
+            return executiveHapticsImpact(param: param)
+        case "HapticsNotification":
+            return executiveHapticsNotification(param: param)
         case "HapticsVibrate":
             return hapticsVibrate(param: param)
         case "ShowToast":
@@ -116,11 +114,6 @@ extension PlaocHandleModel {
     private func executiveCloseDWebView(param: Any) -> Bool {
         NotificationCenter.default.post(name: NSNotification.Name.closeAnAppNotification, object: nil, userInfo: nil)
         return true
-    }
-    
-    private func executiveListenBackButton(param: Any) -> Void {
-//        NotificationCenter.default.post()
-//        controller?.webView.canGoback()
     }
     
     //二维码
@@ -224,9 +217,66 @@ extension PlaocHandleModel {
         return "false"
     }
     
+    /** 触碰物体 */
+    private func executiveHapticsImpact(param: Any) -> Void {
+        guard let param = param as? String else { return }
+        let data = JSON(parseJSON: param)
+        var style: Int
+        
+        switch data["style"].stringValue {
+        case "MEDIUM":
+            style = 1
+        case "HEAVY":
+            style = 2
+        // 默认LIGHT
+        default:
+            style = 0
+        }
+        
+        FeedbackGenerator.impactFeedbackGenerator(style: UIImpactFeedbackGenerator.FeedbackStyle(rawValue: style)!)
+    }
+    
+    /** 振动通知 */
+    private func executiveHapticsNotification(param: Any) -> Void {
+        guard let param = param as? String else { return }
+        let data = JSON(parseJSON: param)
+        var type: Int
+        
+        switch data["type"].stringValue {
+        case "SUCCESS":
+            type = 0
+        case "WARNING":
+            type = 1
+        case "ERROR":
+            type = 2
+        default:
+            type = -1
+        }
+        
+        if type == -1 {
+            print("HapticsNotification type param error: \(type)")
+            return
+        }
+        
+        FeedbackGenerator.notificationFeedbackGenerator(style: UINotificationFeedbackGenerator.FeedbackType(rawValue: type)!)
+    }
+    
     private func hapticsVibrate(param: Any) -> Void {
-        guard let param = param as? String, Float(param) != nil else { return }
-        FeedbackGenerator.vibrate(Double(Float(param)!))
+        guard let param = param as? String else { return }
+        let data = JSON(parseJSON: param)
+        
+        if data["duration"].exists() {
+            let duration = data["duration"].doubleValue
+            FeedbackGenerator.vibrate(duration)
+        } else {
+            if let data = data.array {
+                let durationArr = data.map {
+                    $0.doubleValue
+                }
+                
+                FeedbackGenerator.vibrate(durationArr: durationArr)
+            }
+        }
     }
     
     // 显示提示

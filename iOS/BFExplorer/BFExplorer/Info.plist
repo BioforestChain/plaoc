@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>App需要您的同意，才能保存到相册</string>
+	<string>App需要您的同意,才能保存到相册</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>App需要您的同意,才能访问定位</string>
 	<key>NSBluetoothAlwaysUsageDescription</key>

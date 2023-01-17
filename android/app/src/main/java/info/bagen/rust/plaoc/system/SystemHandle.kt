@@ -9,9 +9,7 @@ import info.bagen.rust.plaoc.system.clipboard.Clipboard
 import info.bagen.rust.plaoc.system.clipboard.ClipboardWriteOption
 import info.bagen.rust.plaoc.system.device.DeviceInfo
 import info.bagen.rust.plaoc.system.device.Network
-import info.bagen.rust.plaoc.system.haptics.HapticsImpactType
-import info.bagen.rust.plaoc.system.haptics.HapticsNotificationType
-import info.bagen.rust.plaoc.system.haptics.VibrateManage
+import info.bagen.rust.plaoc.system.haptics.*
 import info.bagen.rust.plaoc.system.notification.NotificationMsgItem
 import info.bagen.rust.plaoc.system.notification.NotifyManager
 import info.bagen.rust.plaoc.system.permission.PermissionManager
@@ -173,13 +171,33 @@ fun splicingPath(bfsId:String, entry:String):String {
   }
 
   /** Haptics start */
-  /** 触碰轻质量物体 */
-  callable_map[ExportNative.HapticsImpactLight] = {
-    vibrateManage.impact(HapticsImpactType.LIGHT)
+  /** 触碰物体 */
+  callable_map[ExportNative.HapticsImpact] = {
+    val option = mapper.readValue(it, ImpactOption::class.java)
+    val style = when(option.style) {
+      "MEDIUM" -> HapticsImpactType.MEDIUM
+      "HEAVY" -> HapticsImpactType.HEAVY
+      else -> HapticsImpactType.LIGHT
+    }
+    vibrateManage.impact(style)
   }
-  /** 警告分隔的振动通知 */
-  callable_map[ExportNative.HapticsNotificationWarning] = {
-    vibrateManage.notification(HapticsNotificationType.WARNING)
+  /** 振动通知 */
+  callable_map[ExportNative.HapticsNotification] = {
+    val option = mapper.readValue(it, NotificationOption::class.java)
+    val type = when(option.type) {
+      "SUCCESS" -> HapticsNotificationType.SUCCESS
+      "WARNING" -> HapticsNotificationType.WARNING
+      "ERROR" -> HapticsNotificationType.ERROR
+      else -> null
+    }
+
+    if (type != null) {
+      vibrateManage.notification(type)
+    } else {
+      println("HapticsNotification type param error ${option.toString()}")
+    }
+
+
   }
   /** 反馈振动 */
   callable_map[ExportNative.HapticsVibrate] = {

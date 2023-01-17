@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { IonFab, IonFabButton, IonFabList, IonButton, IonIcon } from '@ionic/vue';
 import { defineComponent, onMounted } from 'vue';
-import { BfcsKeyboard, Navigation, BfcsStatusBar, App, DwebCamera, CameraDirection, CameraResultType, CameraSource } from '@bfsx/plugin';
+import { BfcsKeyboard, Navigation, BfcsStatusBar, App, DwebCamera, CameraDirection, CameraResultType, CameraSource, ImpactStyle, NotificationType } from '@bfsx/plugin';
 
 defineComponent({
   components: { IonFab, IonFabButton, IonFabList, IonButton, IonIcon }
@@ -70,7 +70,7 @@ async function getNetworkStatus() {
 // 拍摄照片
 async function takeCameraPhoto() {
   const camera = document.querySelector<DwebCamera>("dweb-camera")!;
-  camera.takeCameraPhoto({
+  const result = await camera.takeCameraPhoto({
     quality: 90,
     resultType: CameraResultType.Base64,
     allowEditing: false,
@@ -78,24 +78,60 @@ async function takeCameraPhoto() {
     source: CameraSource.Camera,
     direction: CameraDirection.Rear
   });
+  console.log("takeCameraPhoto result: ", result);
+  console.log(JSON.parse(result as string));
 }
 
 // 从图库获取单张照片
 async function pickCameraPhoto() {
   const camera = document.querySelector<DwebCamera>("dweb-camera")!;
-  camera.pickCameraPhoto({
+  const result = await camera.pickCameraPhoto({
     quality: 80,
     allowEditing: false,
     resultType: CameraResultType.Uri,
     source: CameraSource.Photos
   });
+  console.log("pickCameraPhoto result: ", result);
+  console.log(JSON.parse(result as string));
 }
 // 从图库获取多张照片
 async function pickCameraPhotos() {
   const camera = document.querySelector<DwebCamera>("dweb-camera")!;
-  camera.pickCameraPhotos({
+  const result = await camera.pickCameraPhotos({
     quality: 100,
   });
+
+  console.log("pickCameraPhotos result: ", result);
+  console.log(JSON.parse(result as string));
+}
+
+async function hapticsImpact() {
+  const app = document.querySelector<App>('dweb-app')!;
+  app.hapticsImpact({style: ImpactStyle.Light})
+}
+async function hapticsNotification() {
+  const app = document.querySelector<App>('dweb-app')!;
+  app.hapticsNotification({type: NotificationType.Warning})
+}
+async function hapticsVibrate() {
+  const app = document.querySelector<App>('dweb-app')!;
+  app.hapticsVibrate({duration: 1})
+}
+async function hapticsVibrateDisabled() {
+  const app = document.querySelector<App>('dweb-app')!;
+  app.hapticsVibrate([1, 63, 1, 119, 1, 129, 1])
+}
+async function hapticsVibrateTick() {
+  const app = document.querySelector<App>('dweb-app')!;
+  app.hapticsVibrate([10, 999, 1, 1])
+}
+async function hapticsVibrateDoubleClick() {
+  const app = document.querySelector<App>('dweb-app')!;
+  app.hapticsVibrate([10, 1])
+}
+async function hapticsVibrateHeavyClick() {
+  const app = document.querySelector<App>('dweb-app')!;
+  app.hapticsVibrate([1, 100, 1, 1])
 }
 </script>
 
@@ -118,6 +154,13 @@ async function pickCameraPhotos() {
   <ion-button shape="round" fill="outline" @click="takeCameraPhoto">拍摄照片</ion-button>
   <ion-button shape="round" fill="outline" @click="pickCameraPhoto">单张照片</ion-button>
   <ion-button shape="round" fill="outline" @click="pickCameraPhotos">多张照片</ion-button>
+  <ion-button expand="block" fill="outline" @click="hapticsImpact">触碰物体</ion-button>
+  <ion-button expand="block" fill="outline" @click="hapticsNotification">振动通知</ion-button>
+  <ion-button expand="block" fill="outline" @click="hapticsVibrate">反馈振动点击</ion-button>
+  <ion-button expand="block" fill="outline" @click="hapticsVibrateDisabled">反馈振动禁用</ion-button>
+  <ion-button expand="block" fill="outline" @click="hapticsVibrateTick">反馈振动滴答</ion-button>
+  <ion-button expand="block" fill="outline" @click="hapticsVibrateDoubleClick">反馈振动双击</ion-button>
+  <ion-button expand="block" fill="outline" @click="hapticsVibrateHeavyClick">反馈振动重击</ion-button>
   <div id="placeholder"></div>
 </template>
 

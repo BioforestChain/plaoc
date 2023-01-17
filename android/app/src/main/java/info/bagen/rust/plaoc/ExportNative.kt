@@ -31,8 +31,8 @@ enum class ExportNative(val type: String) {
   WriteClipboardContent("writeClipboardContent"), // 写入剪切板
 
   // Haptics相关
-  HapticsImpactLight("hapticsImpactLight"),
-  HapticsNotificationWarning("hapticsNotificationWarning"),
+  HapticsImpact("hapticsImpact"),
+  HapticsNotification("hapticsNotification"),
   HapticsVibrate("hapticsVibrate"),
 
   // Toast

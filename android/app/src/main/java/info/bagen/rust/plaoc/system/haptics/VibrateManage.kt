@@ -165,3 +165,11 @@ class VibrateManage public constructor() {
     }
   }
 }
+
+data class ImpactOption(
+  val style: String = "LIGHT"
+)
+
+data class NotificationOption(
+  val type: String = "Warning"
+)

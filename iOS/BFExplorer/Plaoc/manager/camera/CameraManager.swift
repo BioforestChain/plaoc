@@ -86,8 +86,12 @@ class CameraManager: NSObject {
     }
 
     // 异步返回结果
-    private func asyncReturnValue(_ result: Any) {
-        self.jsContext?.evaluateScript("callDwebViewFactory('\(self.functionName)', '\(result)')")
+    private func asyncReturnValue(_ result: [String: Any]) {
+        let functionName = self.functionName!
+        let data = ChangeTools.dicValueString(result) ?? "{'error': '\(functionName) return value error'}"
+        
+        print(data)
+        self.jsContext?.evaluateScript("callDwebViewFactory('\(functionName)', '\(data)')")
     }
 
     private func checkUsageDescriptions() -> String? {
