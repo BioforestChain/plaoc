@@ -198,6 +198,7 @@ class AppViewModel(private val repository: AppRepository = AppRepository()) : Vi
       appViewState.dAppInfoUI = repository.loadDAppUrl(appInfo) // 补充跳转到地址
       list.add(appViewState)
     }
+    uiState.appViewStateList.clear()
     uiState.appViewStateList.addAll(list)
   }
 

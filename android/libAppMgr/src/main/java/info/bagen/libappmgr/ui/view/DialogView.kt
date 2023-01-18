@@ -58,14 +58,14 @@ private fun CustomAlertDialog(
     confirmButton = {
       TextButton(onClick = {
         onConfirm?.let { onConfirm() } // 回调通知点击了确认按钮
-      }, colors = ButtonDefaults.textButtonColors(contentColor = Color.Black)) {
+      }, colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colors.onPrimary)) {
         Text(text = dialogInfo.confirmText)
       }
     },
     dismissButton = {
       TextButton(
         onClick = { onCancel?.let { onCancel() } },
-        colors = ButtonDefaults.textButtonColors(contentColor = Color.Black)
+        colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colors.onPrimary)
       ) {
         Text(text = dialogInfo.cancelText)
       }
