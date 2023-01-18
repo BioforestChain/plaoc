@@ -102,7 +102,7 @@ async function getBlockInfo() {
         </ion-fab-button>
       </ion-fab-list>
     </ion-fab>
-    <dweb-top-bar id="topbar" title="Ar 扫雷" background-color="#ff0000ff" foreground-color="#00ff00ff" overlay>
+    <dweb-top-bar id="topbar" title="Ar 扫雷" background-color="#99CC33" foreground-color="#000" overlay>
 
       <dweb-top-bar-button id="aaa" @click="openBarScanner">
         <dweb-icon source="Filled.AddCircle"></dweb-icon>

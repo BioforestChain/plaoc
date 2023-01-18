@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { IonFab, IonFabButton, IonFabList, IonButton, IonIcon } from '@ionic/vue';
 import { defineComponent, onMounted } from 'vue';
-import { BfcsKeyboard, Navigation, BfcsStatusBar, App, DwebCamera, CameraDirection, CameraResultType, CameraSource, ImpactStyle, NotificationType } from '@bfsx/plugin';
+import { BfcsKeyboard, Navigation, BfcsStatusBar, App, DwebCamera, CameraDirection, CameraResultType, CameraSource, ImpactStyle, NotificationType, VibratePresetType } from '@bfsx/plugin';
 
 defineComponent({
   components: { IonFab, IonFabButton, IonFabList, IonButton, IonIcon }
@@ -119,19 +119,53 @@ async function hapticsVibrate() {
 }
 async function hapticsVibrateDisabled() {
   const app = document.querySelector<App>('dweb-app')!;
-  app.hapticsVibrate([1, 63, 1, 119, 1, 129, 1])
+  // app.hapticsVibrate([1, 63, 1, 119, 1, 129, 1])
+  app.hapticsVibratePreset({type: VibratePresetType.DISABLED})
 }
 async function hapticsVibrateTick() {
   const app = document.querySelector<App>('dweb-app')!;
-  app.hapticsVibrate([10, 999, 1, 1])
+  // app.hapticsVibrate([10, 999, 1, 1])
+  app.hapticsVibratePreset({type: VibratePresetType.TICK})
 }
 async function hapticsVibrateDoubleClick() {
   const app = document.querySelector<App>('dweb-app')!;
-  app.hapticsVibrate([10, 1])
+  // app.hapticsVibrate([10, 1])
+  app.hapticsVibratePreset({type: VibratePresetType.DOUBLE_CLICK})
 }
 async function hapticsVibrateHeavyClick() {
   const app = document.querySelector<App>('dweb-app')!;
-  app.hapticsVibrate([1, 100, 1, 1])
+  // app.hapticsVibrate([1, 100, 1, 1])
+  app.hapticsVibratePreset({type: VibratePresetType.HEAVY_CLICK})
+}
+
+async function hapticsVibrateDisabledWeb() {
+  if(window) {
+    window.navigator.vibrate([1, 63, 1, 119, 1, 129, 1])
+  } else if(globalThis) {
+    globalThis.navigator.vibrate([1, 63, 1, 119, 1, 129, 1])
+  }
+  
+}
+async function hapticsVibrateTickWeb() {
+  if(window) {
+    window.navigator.vibrate([10, 999, 1, 1])
+  } else if(globalThis) {
+    globalThis.navigator.vibrate([10, 999, 1, 1])
+  }
+}
+async function hapticsVibrateDoubleClickWeb() {
+  if(window) {
+    window.navigator.vibrate([10, 1])
+  } else if(globalThis) {
+    globalThis.navigator.vibrate([10, 1])
+  }
+}
+async function hapticsVibrateHeavyClickWeb() {
+  if(window) {
+    window.navigator.vibrate([1, 100, 1, 1])
+  } else if(globalThis) {
+    globalThis.navigator.vibrate([1, 100, 1, 1])
+  }
 }
 </script>
 
@@ -157,10 +191,14 @@ async function hapticsVibrateHeavyClick() {
   <ion-button expand="block" fill="outline" @click="hapticsImpact">触碰物体</ion-button>
   <ion-button expand="block" fill="outline" @click="hapticsNotification">振动通知</ion-button>
   <ion-button expand="block" fill="outline" @click="hapticsVibrate">反馈振动点击</ion-button>
-  <ion-button expand="block" fill="outline" @click="hapticsVibrateDisabled">反馈振动禁用</ion-button>
-  <ion-button expand="block" fill="outline" @click="hapticsVibrateTick">反馈振动滴答</ion-button>
-  <ion-button expand="block" fill="outline" @click="hapticsVibrateDoubleClick">反馈振动双击</ion-button>
-  <ion-button expand="block" fill="outline" @click="hapticsVibrateHeavyClick">反馈振动重击</ion-button>
+  <ion-button shape="round" fill="outline" @click="hapticsVibrateDisabled">反馈振动禁用</ion-button>
+  <ion-button shape="round" fill="outline" @click="hapticsVibrateDisabledWeb">反馈振动禁用web</ion-button>
+  <ion-button shape="round" fill="outline" @click="hapticsVibrateTick">反馈振动滴答</ion-button>
+  <ion-button shape="round" fill="outline" @click="hapticsVibrateTickWeb">反馈振动滴答web</ion-button>
+  <ion-button shape="round" fill="outline" @click="hapticsVibrateDoubleClick">反馈振动双击</ion-button>
+  <ion-button shape="round" fill="outline" @click="hapticsVibrateDoubleClickWeb">反馈振动双击web</ion-button>
+  <ion-button shape="round" fill="outline" @click="hapticsVibrateHeavyClick">反馈振动重击</ion-button>
+  <ion-button shape="round" fill="outline" @click="hapticsVibrateHeavyClickWeb">反馈振动重击web</ion-button>
   <div id="placeholder"></div>
 </template>
 

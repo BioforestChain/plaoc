@@ -79,6 +79,8 @@ import SwiftyJSON
             return executiveHapticsNotification(param: param)
         case "HapticsVibrate":
             return hapticsVibrate(param: param)
+        case "HapticsVibratePreset":
+            return hapticsVibratePreset(param: param)
         case "ShowToast":
             return showToast(param: param)
         case "SystemShare":
@@ -261,6 +263,7 @@ extension PlaocHandleModel {
         FeedbackGenerator.notificationFeedbackGenerator(style: UINotificationFeedbackGenerator.FeedbackType(rawValue: type)!)
     }
     
+    // 反馈振动
     private func hapticsVibrate(param: Any) -> Void {
         guard let param = param as? String else { return }
         let data = JSON(parseJSON: param)
@@ -277,6 +280,13 @@ extension PlaocHandleModel {
                 FeedbackGenerator.vibrate(durationArr: durationArr)
             }
         }
+    }
+    
+    // 反馈振动预设
+    private func hapticsVibratePreset(param: Any) -> Void {
+        guard let param = param as? String else { return }
+        
+        FeedbackGenerator.vibratePreset(type: param)
     }
     
     // 显示提示

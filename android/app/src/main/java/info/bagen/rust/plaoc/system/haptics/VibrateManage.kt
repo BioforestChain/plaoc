@@ -173,3 +173,7 @@ data class ImpactOption(
 data class NotificationOption(
   val type: String = "Warning"
 )
+
+data class VibrateOption(
+  val duration: Long = 1
+)

@@ -201,7 +201,18 @@ fun splicingPath(bfsId:String, entry:String):String {
   }
   /** 反馈振动 */
   callable_map[ExportNative.HapticsVibrate] = {
-    vibrateManage.vibrate(it.toLongOrNull() ?: 0)
+    val option = mapper.readValue(it, VibrateOption::class.java)
+    vibrateManage.vibrate(option.duration)
+  }
+  callable_map[ExportNative.HapticsVibratePreset] = {
+    when(it) {
+      "CLICK" -> vibrateManage.vibrateClick()
+      "DOUBLE_CLICK" -> vibrateManage.vibrateDoubleClick()
+      "HEAVY_CLICK" -> vibrateManage.vibrateHeavyClick()
+      "TICK" -> vibrateManage.vibrateTick()
+      "DISABLED" -> vibrateManage.vibrateDisabled()
+      else -> print("HapticsVibratePreset param error")
+    }
   }
   /** Haptics end */
 

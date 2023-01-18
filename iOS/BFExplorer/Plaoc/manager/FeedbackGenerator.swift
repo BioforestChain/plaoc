@@ -10,6 +10,14 @@ import CoreHaptics
 import AudioToolbox
 
 class FeedbackGenerator: NSObject {
+    
+    enum VibrateType: String {
+        case CLICK = "1"
+        case DOUBLE_CLICK = "10,1"
+        case HEAVY_CLICK = "1,100,1,1"
+        case TICK = "10,999,1,1"
+        case DISABLED = "1,63,1,119,1,129,1"
+    }
 
     
     static func notificationFeedbackGenerator(style: UINotificationFeedbackGenerator.FeedbackType) {
@@ -102,6 +110,30 @@ class FeedbackGenerator: NSObject {
             }
         } else {
             AudioServicesPlayAlertSound(SystemSoundID(kSystemSoundID_Vibrate))
+        }
+    }
+    
+    static func vibratePreset(type: String) {
+        var durationStr: String
+        switch(type) {
+        case "CLICK":
+            durationStr = VibrateType.CLICK.rawValue
+        case "DOUBLE_CLICK":
+            durationStr = VibrateType.DOUBLE_CLICK.rawValue
+        case "HEAVY_CLICK":
+            durationStr = VibrateType.HEAVY_CLICK.rawValue
+        case "TICK":
+            durationStr = VibrateType.TICK.rawValue
+        case "DISABLED":
+            durationStr = VibrateType.DISABLED.rawValue
+        default:
+            print("HapticsVibratePreset param error")
+            durationStr = ""
+        }
+        
+        if durationStr.count > 0 {
+            let durationArr = durationStr.split(separator: ",").map { Double($0) ?? 1.0 }
+            vibrate(durationArr: durationArr)
         }
     }
 }
