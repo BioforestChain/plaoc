@@ -9,10 +9,10 @@ val Teal200 = Color(0xFF03DAC5)
 
 val White = Color(0xFFFFFBF0)
 val Gray = Color(0xFF808080)
-val DarkBackground = Color(0x010101)
-val DarkSearch = Color(0x1A1A1A)
-val LightBackground = Color(0xF2F3F5)
-val LightSearch = Color(0xFFFFFF)
+val DarkBackground = Color(0xFF757575)
+val DarkSearch = Color(0xFF1A1A1A)
+val LightBackground = Color(0xFFF2F3F5)
+val LightSearch = Color(0xFFFFFFFF)
 
 val ColorGrayLevel1 = Color(0xffe6e6e6)
 val ColorGrayLevel2 = Color(0xffdbdbdb)
@@ -31,8 +31,6 @@ val ColorBackgroundSearch = Color(0xFF4C4C4C) // 用于DCIM工具栏背景色
 val ColorBackgroundSpinner = Color(0xFFB2B2B2) // 用于DCIM工具栏背景色
 val ColorSendButtonGreen = Color(0xFF07C160) // 用于DCIM发送按键的绿色背景
 val ColorSendButtonGray = Color(0xFF434343) // 用于DCIM发送按键的灰色背景
-
-
 
 val replyLightPrimary = Color(0xFF825500)
 val replyLightOnPrimary = Color(0xFFFFFFFF)

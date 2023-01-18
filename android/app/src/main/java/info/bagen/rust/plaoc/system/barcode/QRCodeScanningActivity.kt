@@ -39,7 +39,9 @@ import info.bagen.rust.plaoc.MainActivity
 import info.bagen.rust.plaoc.createBytesFactory
 import info.bagen.rust.plaoc.*
 import info.bagen.rust.plaoc.lib.drawRect
-
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class QRCodeScanningActivity : QRCodeCameraScanActivity() {
     var isQRCode = false
@@ -88,7 +90,7 @@ class QRCodeScanningActivity : QRCodeCameraScanActivity() {
         ivResult.setImageBitmap(previewView.bitmap)
         val points = ArrayList<Point>()
         for ((index, data) in results.withIndex()) {
-            val rect = results[index].boundingBox
+            val rect = results[index].boundingBox // data.boundingBox
             //将实际的结果中心点坐标转换成界面预览的坐标
             val point = PointUtils.transform(
                 rect.centerX(),
@@ -104,11 +106,12 @@ class QRCodeScanningActivity : QRCodeCameraScanActivity() {
         viewfinderView.setOnItemClickListener {
             //显示点击Item将所在位置扫码识别的结果返回
             val intent = Intent()
-            intent.putExtra(CameraScan.SCAN_RESULT, results[it].displayValue)
-            results[it].displayValue?.let {
-                Log.d("1.2.xxxxxxxx", it)
+            val data = results[it].displayValue
+            intent.putExtra(CameraScan.SCAN_RESULT, data)
+            data?.let { displayValue ->
+                Log.d("1.2.xxxxxxxx", displayValue)
                 // 拿到扫完的数据，传递给rust方法
-                createBytesFactory(ExportNative.OpenQrScanner, it)
+                createBytesFactory(ExportNative.OpenQrScanner, displayValue)
             }
             setResult(RESULT_OK, intent)
             finish()
@@ -123,14 +126,17 @@ class QRCodeScanningActivity : QRCodeCameraScanActivity() {
         //显示结果点信息
         viewfinderView.showResultPoints(points)
         if (results.size == 1) {//只有一个结果直接返回
-            val intent = Intent()
-            intent.putExtra(CameraScan.SCAN_RESULT, results[0].displayValue)
-            results[0].displayValue?.let {
-                Log.d("2.xxxxxxxx", it)
-                createBytesFactory(ExportNative.OpenQrScanner, it)
+            GlobalScope.launch {
+              delay(1000)
+              val intent = Intent()
+              intent.putExtra(CameraScan.SCAN_RESULT, results[0].displayValue)
+              results[0].displayValue?.let {
+                  Log.d("2.xxxxxxxx", it)
+                  createBytesFactory(ExportNative.OpenQrScanner, it)
+              }
+              setResult(RESULT_OK, intent)
+              finish()
             }
-            setResult(RESULT_OK, intent)
-            finish()
         }
 
     }

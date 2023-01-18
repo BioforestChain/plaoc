@@ -1,20 +1,25 @@
 package info.bagen.rust.plaoc
 
 import android.Manifest
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.res.Resources.NotFoundException
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.ViewCompat
 import com.google.mlkit.vision.barcode.Barcode
 import com.king.app.dialog.AppDialog
 import com.king.app.dialog.AppDialogConfig
@@ -23,6 +28,8 @@ import com.king.mlkit.vision.camera.CameraScan
 import com.king.mlkit.vision.camera.analyze.Analyzer.OnAnalyzeListener
 import com.king.mlkit.vision.camera.util.LogUtils
 import com.king.mlkit.vision.camera.util.PermissionUtils
+import info.bagen.libappmgr.system.permission.EPermission
+import info.bagen.libappmgr.system.permission.PermissionUtil
 import info.bagen.libappmgr.ui.app.AppViewModel
 import info.bagen.libappmgr.ui.main.Home
 import info.bagen.libappmgr.ui.main.MainViewModel
@@ -34,6 +41,7 @@ import info.bagen.rust.plaoc.system.barcode.BarcodeScanningActivity
 import info.bagen.rust.plaoc.system.barcode.QRCodeScanningActivity
 import info.bagen.rust.plaoc.system.initServiceApp
 import info.bagen.rust.plaoc.system.initSystemFn
+import info.bagen.rust.plaoc.system.permission.PermissionManager
 import info.bagen.rust.plaoc.ui.theme.RustApplicationTheme
 import info.bagen.rust.plaoc.webView.network.dWebView_host
 import info.bagen.rust.plaoc.webView.network.shakeUrl
@@ -75,6 +83,8 @@ class MainActivity : AppCompatActivity() {
     // 初始化广播
     registerBFSBroadcastReceiver()
     setContent {
+      ViewCompat.getWindowInsetsController(LocalView.current)?.isAppearanceLightStatusBars =
+        !isSystemInDarkTheme() // 设置状态栏颜色跟着主题走
       RustApplicationTheme {
         Box(
           modifier = Modifier
@@ -89,7 +99,13 @@ class MainActivity : AppCompatActivity() {
                   openDWebWindow(this@MainActivity, data)
                 }
                 SearchAction.OpenCamera -> {
-                  openScannerActivity()
+                  if (PermissionUtil.isPermissionsGranted(EPermission.PERMISSION_CAMERA.type)) {
+                    openScannerActivity()
+                  } else {
+                    PermissionManager.requestPermissions(
+                      this@MainActivity, EPermission.PERMISSION_CAMERA.type
+                    )
+                  }
                 }
               }
             },
@@ -100,8 +116,9 @@ class MainActivity : AppCompatActivity() {
               dWebView_host = appId
               LogUtils.d("启动了Ar 扫雷：isDWeb:${dAppInfo?.isDWeb}，$dWebView_host--$dAppInfo ")
               dAppInfo?.let { appInfo ->
-                  createWorker(WorkerNative.valueOf("DenoRuntime"), appInfo.dAppUrl)
+                createWorker(WorkerNative.valueOf("DenoRuntime"), appInfo.dAppUrl)
               }
+
             })
         }
       }
@@ -126,7 +143,28 @@ class MainActivity : AppCompatActivity() {
     grantResults: IntArray
   ) {
     super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-    if (requestCode == REQUEST_CODE_REQUEST_EXTERNAL_STORAGE && PermissionUtils.requestPermissionsResult(
+    if (requestCode == info.bagen.libappmgr.system.permission.PermissionManager.MY_PERMISSIONS) {
+      info.bagen.libappmgr.system.permission.PermissionManager(this@MainActivity)
+        .onRequestPermissionsResult(
+          requestCode, permissions, grantResults,
+          object : info.bagen.libappmgr.system.permission.PermissionManager.PermissionCallback {
+            override fun onPermissionGranted(
+              permissions: Array<out String>, grantResults: IntArray
+            ) {
+              openScannerActivity()
+            }
+
+            override fun onPermissionDismissed(permission: String) {
+            }
+
+            override fun onNegativeButtonClicked(dialog: DialogInterface, which: Int) {
+            }
+
+            override fun onPositiveButtonClicked(dialog: DialogInterface, which: Int) {
+              PermissionUtil.openAppSettings()
+            }
+          })
+    } else if (requestCode == REQUEST_CODE_REQUEST_EXTERNAL_STORAGE && PermissionUtils.requestPermissionsResult(
         Manifest.permission.READ_EXTERNAL_STORAGE,
         permissions,
         grantResults
@@ -159,7 +197,12 @@ class MainActivity : AppCompatActivity() {
   // 扫码后显示一下Toast
   private fun processScanResult(data: Intent?) {
     val text = CameraScan.parseScanResult(data)
-    Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
+    // Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
+    Log.d("MainActivity", "processScanResult text=$text")
+    if (text?.startsWith("http") == true) {
+      dWebView_host = "http"
+      openDWebViewActivity(text)
+    }
   }
 
   // 显示扫码的结果，是显示一张图片
@@ -257,12 +300,12 @@ class MainActivity : AppCompatActivity() {
   fun openDWebViewActivity(path: String) {
     // 存储一下host，用来判断是远程的还是本地的
     if (dWebView_host == "") {
-       throw NotFoundException("app host not found!")
+      throw NotFoundException("app host not found!")
     }
     val url = if (path.startsWith("http")) {
-        path
+      path
     } else {
-       "https://${dWebView_host.lowercase(Locale.ROOT)}.dweb${shakeUrl(path)}?_=${Date().time}"
+      "https://${dWebView_host.lowercase(Locale.ROOT)}.dweb${shakeUrl(path)}?_=${Date().time}"
     }
     LogUtils.d("启动了DWebView:$url")
     openDWebWindow(

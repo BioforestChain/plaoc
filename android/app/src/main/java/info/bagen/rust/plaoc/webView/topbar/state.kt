@@ -24,7 +24,7 @@ class TopBarState(
         fun Default(doBack: () -> Unit): TopBarState {
 
             val backgroundColor =
-                MaterialTheme.colors.primarySurface.let { defaultPrimarySurface ->
+                MaterialTheme.colors.primaryVariant.let { defaultPrimarySurface ->
                     remember {
                         mutableStateOf(defaultPrimarySurface)
                     }

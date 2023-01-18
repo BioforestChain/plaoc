@@ -3,6 +3,7 @@ package info.bagen.rust.plaoc.webView.topbar
 
 import android.util.Log
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
@@ -15,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.dp
 import info.bagen.rust.plaoc.webView.icon.DWebIcon
 import info.bagen.rust.plaoc.webView.jsutil.JsUtil
 import info.bagen.rust.plaoc.webkit.AdWebViewState
@@ -41,7 +43,8 @@ fun DWebTopBar(
         title = {
             Text(
                 text = topBarState.title.value ?: webViewState.pageTitle ?: "",
-                modifier = Modifier
+                maxLines = 1,
+                modifier = Modifier.padding(start = 10.dp, end = 10.dp)
 //                        .pointerInteropFilter { event ->
 //                            Log.i(TAG, "filter Title event $event")
 //                            false
