@@ -59,7 +59,7 @@ function InstallBFS(type: string = "tar.gz") {
     <ion-card-content>
       <div> {{ dwebPluginData }} </div>
       <form class="from-data" method="post" enctype="multipart/from-data" action="api/upload">
-        <input id="toastMessage" type="file" placeholder="Toast message" name="file">
+        <ion-input id="toastMessage" type="file" placeholder="Toast message" name="file"></ion-input>
         <ion-button type="submit">上传文件</ion-button>
       </form>
     </ion-card-content>

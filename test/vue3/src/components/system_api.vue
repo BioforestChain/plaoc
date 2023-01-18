@@ -167,6 +167,10 @@ async function hapticsVibrateHeavyClickWeb() {
     globalThis.navigator.vibrate([1, 100, 1, 1])
   }
 }
+async function systemShare() {
+  const app = document.querySelector<App>('dweb-app')!;
+  app.systemShare({title:"Ar扫雷", text: "hahahahaha"});
+}
 </script>
 
 <template>
@@ -199,6 +203,7 @@ async function hapticsVibrateHeavyClickWeb() {
   <ion-button shape="round" fill="outline" @click="hapticsVibrateDoubleClickWeb">反馈振动双击web</ion-button>
   <ion-button shape="round" fill="outline" @click="hapticsVibrateHeavyClick">反馈振动重击</ion-button>
   <ion-button shape="round" fill="outline" @click="hapticsVibrateHeavyClickWeb">反馈振动重击web</ion-button>
+  <ion-button expand="block" fill="outline" @click="systemShare">分享文案</ion-button>
   <div id="placeholder"></div>
 </template>
 
