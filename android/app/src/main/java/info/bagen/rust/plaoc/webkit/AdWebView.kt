@@ -20,6 +20,7 @@ import android.view.ViewGroup
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.viewinterop.AndroidView
 import info.bagen.rust.plaoc.webkit.inputFile.AdFileInputHelper
 import info.bagen.rust.plaoc.webkit.inputFile.rememberAdFileInputHelper
@@ -63,6 +64,7 @@ fun AdWebView(
         with(navigator) { webView?.handleNavigationEvents() }
     }
 
+  DisposableEffect(
     AndroidView(
         factory = { context ->
             AdAndroidWebView(context).apply {
@@ -114,4 +116,9 @@ fun AdWebView(
         navigator.canGoBack = view.canGoBack()
         navigator.canGoForward = view.canGoForward()
     }
+  ) {
+    onDispose {
+      webView?.let { it.destroy() } // 为了修复播放音频后返回时，声音仍然在播放的问题
+    }
+  }
 }
