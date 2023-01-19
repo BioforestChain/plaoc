@@ -11,7 +11,8 @@ import androidx.compose.ui.graphics.Color
 @Stable
 class TopBarState(
     val enabled: MutableState<Boolean>,
-    val overlay: MutableState<Float?>,
+    val overlay: MutableState<Boolean?>,
+    val alpha: MutableState<Float?>,
     val title: MutableState<String?>,
     var actions: SnapshotStateList<TopBarAction>,
     val foregroundColor: MutableState<Color>,
@@ -44,7 +45,8 @@ class TopBarState(
             return remember(doBack) {
                 TopBarState(
                     enabled = mutableStateOf(true),
-                    overlay = mutableStateOf(1.0F),
+                    overlay = mutableStateOf(false),
+                    alpha = mutableStateOf(1.0F),
                     title = mutableStateOf(null),
                     actions = mutableStateListOf(),
                     foregroundColor = foregroundColor,

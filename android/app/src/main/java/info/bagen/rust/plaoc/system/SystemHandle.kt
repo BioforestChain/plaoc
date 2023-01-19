@@ -168,9 +168,12 @@ fun splicingPath(bfsId:String, entry:String):String {
   /** 写入剪切板*/
   callable_map[ExportNative.WriteClipboardContent] = {
     val writeOption = mapper.readValue(it, ClipboardWriteOption::class.java)
+    var result = "true"
     Clipboard.write(strValue = writeOption.str, imageValue = writeOption.image, urlValue = writeOption.url, labelValue = writeOption.label ?: "OcrText") { error ->
       println("writeClipboardContent error: $error")
+      result = "false"
     }
+    createBytesFactory(ExportNative.WriteClipboardContent, result)
   }
 
   /** Haptics start */

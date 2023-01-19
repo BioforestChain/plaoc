@@ -33,12 +33,11 @@ fun initSystemUiFn(systemUiFFI: SystemUiFFI) {
     systemUiFFI.setNavigationBarOverlay(it)
   }
   /**Status Bar*/
-  call_ui_map[ExportNativeUi.GetStatusBarColor] = {
-    systemUiFFI.getStatusBarColor()
+  call_ui_map[ExportNativeUi.GetStatusBarBackgroundColor] = {
+    systemUiFFI.getStatusBarBackgroundColor()
   }
-  call_ui_map[ExportNativeUi.SetStatusBarColor] = {
-    val color = mapper.readValue(it, NavigationBarColor::class.java)
-    systemUiFFI.setStatusBarColor(color.colorHex,color.darkIcons)
+  call_ui_map[ExportNativeUi.SetStatusBarBackgroundColor] = {
+    systemUiFFI.setStatusBarBackgroundColor(it)
   }
   call_ui_map[ExportNativeUi.GetStatusBarIsDark] = {
     systemUiFFI.getStatusBarIsDark()
@@ -54,6 +53,10 @@ fun initSystemUiFn(systemUiFFI: SystemUiFFI) {
   }
   call_ui_map[ExportNativeUi.GetStatusBarVisible] = {
     systemUiFFI.getStatusBarVisible()
+  }
+  call_ui_map[ExportNativeUi.SetStatusBarStyle] = {
+    val isDark = it == "dark-content"
+    systemUiFFI.setStatusBarStyle(isDark)
   }
   /**keyboard*/
   call_ui_map[ExportNativeUi.GetKeyBoardSafeArea] = {
@@ -95,16 +98,16 @@ fun initTopBarFn(topBarFFI: TopBarFFI) {
     topBarFFI.setTopBarShow(it.toBoolean())
   }
   call_ui_map[ExportNativeUi.GetTopBarOverlay] = {
-    topBarFFI.getTopBarOverlay()!!
+    topBarFFI.getTopBarOverlay()
   }
   call_ui_map[ExportNativeUi.SetTopBarOverlay] = {
-    topBarFFI.setTopBarOverlay(it)!!
+    topBarFFI.setTopBarOverlay(it)
   }
-  call_ui_map[ExportNativeUi.GetTopBarAlpha] = {
-    topBarFFI.getTopBarOverlay()!!
-  }
+//  call_ui_map[ExportNativeUi.GetTopBarAlpha] = {
+//    topBarFFI.getTopBarOverlay()!!
+//  }
   call_ui_map[ExportNativeUi.SetTopBarAlpha] = {
-    topBarFFI.setTopBarOverlay(it)!!
+    topBarFFI.setTopBarAlpha(it)!!
   }
   call_ui_map[ExportNativeUi.GetTopBarTitle] = {
     topBarFFI.getTopBarTitle()
@@ -148,10 +151,16 @@ fun initBottomFn(bottomBarFFI: BottomBarFFI) {
   call_ui_map[ExportNativeUi.SetBottomBarEnabled] = {
     bottomBarFFI.setEnabled(it)
   }
-  call_ui_map[ExportNativeUi.GetBottomBarAlpha] = {
+//  call_ui_map[ExportNativeUi.GetBottomBarAlpha] = {
+//    bottomBarFFI.getOverlay()
+//  }
+  call_ui_map[ExportNativeUi.SetBottomBarAlpha] = {
+    bottomBarFFI.setAlpha(it)!!
+  }
+  call_ui_map[ExportNativeUi.GetBottomBarOverlay] = {
     bottomBarFFI.getOverlay()
   }
-  call_ui_map[ExportNativeUi.SetBottomBarAlpha] = {
+  call_ui_map[ExportNativeUi.SetBottomBarOverlay] = {
     bottomBarFFI.setOverlay(it)
   }
   call_ui_map[ExportNativeUi.GetBottomBarHeight] = {

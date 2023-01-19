@@ -34,14 +34,19 @@ class TopBarFFI(
         return state.enabled.value
     }
 
-    fun getTopBarOverlay(): Float? {
-        return state.overlay.value
+    fun getTopBarOverlay(): Boolean {
+        return state.overlay.value ?: false
+    }
+    /**设置遮罩*/
+    fun setTopBarOverlay(isOverlay: String): Boolean {
+//      Log.i(TAG, "toggleOverlay:${state.overlay.value},${isOverlay}")
+      state.overlay.value = isOverlay.toBoolean()
+      return state.overlay.value ?: false
     }
     /**设置透明度*/
-    fun setTopBarOverlay(isOverlay: String): Float? {
-//      Log.i(TAG, "toggleOverlay:${state.overlay.value},${isOverlay}")
-      state.overlay.value = isOverlay.toFloat()
-      return state.overlay.value
+    fun setTopBarAlpha(alpha: String): Float? {
+      state.alpha.value = alpha.toFloat()
+      return state.alpha.value
     }
 
     fun getTopBarTitle(): String {

@@ -49,14 +49,18 @@ class BFSNetworkManager: NSObject {
                                             }
                                         } else {
                                             schemePath = desPath + "/\(name!)/sys"
+                                            isReplace = true
                                         }
                                         if name != nil {
                                             if isReplace {
                                                 Schemehandler.setupHTMLCache(fileName: name!, fromPath: schemePath)
+                                                BatchFileManager.shared.updateRedHot(fileName: name!, statue: true)
                                             }
                                             RefreshManager.saveLastUpdateTime(fileName: name!, time: Date().timeStamp)
                                         }
                                         NotificationCenter.default.post(name: NSNotification.Name.progressNotification, object: nil, userInfo: ["progress": "complete", "fileName": fileName ?? timeStamp, "realName": name ?? ""])
+                                    } else {
+                                        NotificationCenter.default.post(name: NSNotification.Name.progressNotification, object: nil, userInfo: ["progress": "fail", "fileName": fileName ?? timeStamp])
                                     }
                                 }
                             }

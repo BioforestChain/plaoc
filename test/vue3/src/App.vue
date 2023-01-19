@@ -43,7 +43,6 @@ async function openBarScanner() {
 
 onMounted(async () => {
   const topBar = document.querySelector<BfcsTopBar>('dweb-top-bar')!;
-  console.log("getTopBarAlpha: ", await topBar.getTopBarAlpha())
   console.log("getTopBarShow: ", await topBar.getTopBarShow())
   console.log("getTopBarTitle: ", await topBar.getTopBarTitle())
   console.log("getTopBarHeight: ", await topBar.getTopBarHeight())
@@ -103,7 +102,7 @@ async function getBlockInfo() {
         </ion-fab-button>
       </ion-fab-list>
     </ion-fab>
-    <dweb-top-bar id="topbar" title="Ar 扫雷" background-color="#eee" foreground-color="#000" overlay=0.4>
+    <dweb-top-bar id="topbar" title="Ar 扫雷" background-color="#ff0000ff" foreground-color="#00ff00ff" overlay>
 
       <dweb-top-bar-button id="aaa" disabled @click="openBarScanner">
         <dweb-icon source="Filled.AddCircle"></dweb-icon>
@@ -116,7 +115,7 @@ async function getBlockInfo() {
   <RouterView />
 
   <div class="bottombar">
-    <dweb-bottom-bar id="bottombar" background-color="#D0BCFF" foreground-color="#1C1B1F" height=70 overlay=0.2>
+    <dweb-bottom-bar id="bottombar" background-color="#D0BCFF00" foreground-color="#1C1B1F00" height=70 overlay>
       <dweb-bottom-bar-button id="ddd" selected @click="onBottomBar('one')">
         <dweb-bottom-bar-icon :source="bottomBarImg.one" type="AssetIcon"></dweb-bottom-bar-icon>
         <dweb-bottom-bar-text color="#938F99" selected-color="#1C1B1F" value="土地"></dweb-bottom-bar-text>
@@ -135,11 +134,4 @@ async function getBlockInfo() {
 </template>
 
 <style scoped>
-.topbar {
-  margin-bottom: 80px;
-}
-
-.bottombar {
-  margin-top: 80px;
-}
 </style>

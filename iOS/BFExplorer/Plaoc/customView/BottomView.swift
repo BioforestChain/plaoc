@@ -34,7 +34,12 @@ class BottomView: UIView {
                 button.tag = i
                 let imageName = model.iconModel?.source ?? ""
                 if model.iconModel?.type == "AssetIcon" {
-                    button.sd_setImage(with: URL(string: imageName), for: .normal)
+                    if imageName.hasSuffix("svg") {
+                        button.setImage(UIImage.svgImage(withURL: imageName, size: CGSize(width: image_width, height: image_width)), for: .normal)
+                    } else {
+                        button.sd_setImage(with: URL(string: imageName), for: .normal)
+                    }
+                    
                 } else {
                     if imageName.hasSuffix("svg") {
                         let name = imageName.replacingOccurrences(of: ".svg", with: "")
@@ -60,7 +65,6 @@ class BottomView: UIView {
 //                button.menu = menuAction()
                 button.addTarget(self, action: #selector(clickAction(sender:)), for: .touchUpInside)
 //                button.showsMenuAsPrimaryAction = true
-                
                 self.addSubview(button)
                 buttonList.append(button)
             }

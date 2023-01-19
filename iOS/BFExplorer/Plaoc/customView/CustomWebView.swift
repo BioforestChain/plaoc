@@ -18,7 +18,7 @@ enum KeyboardType {
 
 class CustomWebView: UIView {
 
-    var jsManager: JSCoreManager!
+    var jsManager: JSCoreManager?
     var callback: UpdateTitleCallback?
     var superVC: UIViewController?
     private var scripts: [WKUserScript]?
@@ -53,7 +53,6 @@ class CustomWebView: UIView {
         
         let config = WKWebViewConfiguration()
         
-        config.limitsNavigationsToAppBoundDomains = true
         config.userContentController = WKUserContentController()
         if self.scripts != nil {
             for script in self.scripts! {
@@ -61,46 +60,17 @@ class CustomWebView: UIView {
             }
         }
         //true 可以下载  
-        config.limitsNavigationsToAppBoundDomains = self.openAppBoundDomains(urlString: self.loadingUrlString)
         config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "InstallBFS")
         config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "getConnectChannel")
         config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "postConnectChannel")
+        config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "logging")
         let prefreen = WKPreferences()
         prefreen.javaScriptCanOpenWindowsAutomatically = true
         config.preferences = prefreen
         config.setValue(true, forKey: "allowUniversalAccessFromFileURLs")
         config.setURLSchemeHandler(Schemehandler(fileName: self.fileName), forURLScheme: schemeString)
         
-        /** region start  add console.log  */
-        let consoleJs = """
-            function log(emoji, type, args) {
-              window.webkit.messageHandlers.logging.postMessage(
-                `${emoji} JS ${type}: ${Object.values(args)
-                  .map(v => typeof(v) === "undefined" ? "undefined" : typeof(v) === "object" ? JSON.stringify(v) : v.toString())
-                  .map(v => v.substring(0, 3000)) // Limit msg to 3000 chars
-                  .join(", ")}`
-              )
-            }
-
-            let originalLog = console.log
-            let originalWarn = console.warn
-            let originalError = console.error
-            let originalDebug = console.debug
-
-            console.log = function() { log("📗", "log", arguments); originalLog.apply(null, arguments) }
-            console.warn = function() { log("📙", "warning", arguments); originalWarn.apply(null, arguments) }
-            console.error = function() { log("📕", "error", arguments); originalError.apply(null, arguments) }
-            console.debug = function() { log("📘", "debug", arguments); originalDebug.apply(null, arguments) }
-
-            window.addEventListener("error", function(e) {
-               log("💥", "Uncaught", [`${e.message} at ${e.filename}:${e.lineno}:${e.colno}`])
-            })
-        """
-        let consoleScript = WKUserScript(source: consoleJs, injectionTime: .atDocumentStart, forMainFrameOnly: false)
-        config.userContentController.addUserScript(consoleScript)
-        config.userContentController.add(LeadScriptHandle(messageHandle: self), name: "logging")
-        /** region end  */
-
+        
         let webView = WKWebView(frame: self.bounds, configuration: config)
         webView.navigationDelegate = self
         webView.uiDelegate = self
@@ -128,14 +98,13 @@ extension CustomWebView {
         guard jsNames.count > 0 else { return nil }
         var scripts: [WKUserScript] = []
         for jsName in jsNames {
-            if let path = Bundle.main.path(forResource: jsName, ofType: "js") {
-                let url = URL(fileURLWithPath: path)
-                let data = try? Data(contentsOf: url)
-                if data != nil {
-                    if let jsString = String(data: data!, encoding: .utf8) {
-                        let script = WKUserScript(source: jsString, injectionTime: .atDocumentStart, forMainFrameOnly: true)
-                        scripts.append(script)
-                    }
+          let path = Bundle.main.bundlePath + "/app/injectWebView/" +  jsName + ".js"
+            let url = URL(fileURLWithPath: path)
+            let data = try? Data(contentsOf: url)
+            if data != nil {
+                if let jsString = String(data: data!, encoding: .utf8) {
+                    let script = WKUserScript(source: jsString, injectionTime: .atDocumentStart, forMainFrameOnly: true)
+                    scripts.append(script)
                 }
             }
         }
@@ -201,13 +170,18 @@ extension CustomWebView:  WKScriptMessageHandler {
             //同时显示下载进度条
         } else if message.name == "logging" {
             print(message.body)
-        } else if message.name == "postConnectChannel" {
-            print(message.body)
         } else if message.name == "getConnectChannel" {
-            print(message.body)
+            print("swift#getConnectChannel",message.body)
             guard let bodyDict = message.body as? [String:String] else { return }
             guard let param = bodyDict["param"] else { return }
-            jsManager.handleEvaluateScript(jsString: param)
+            jsManager?.handleEvaluateScript(jsString: param)
+        } else if message.name == "postConnectChannel" {
+            print("swift#postConnectChannel", message.body)
+            guard let bodyDict = message.body as? [String:Any] else { return }
+            guard let strPath = bodyDict["strPath"] as? String else { return }
+            guard let cmd = bodyDict["cmd"] as? String else { return }
+            guard let buffer = bodyDict["buffer"] as? String else { return }
+            jsManager?.handleEvaluatePostScript(strPath: strPath, cmd: cmd, buffer: buffer)
         }
     }
     

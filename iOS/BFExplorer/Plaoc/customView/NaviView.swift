@@ -49,7 +49,11 @@ class NaviView: UIView {
                 button.tag = i
                 let imageName = model.iconModel?.source ?? ""
                 if model.iconModel?.type == "AssetIcon" {
-                    button.sd_setImage(with: URL(string: imageName), for: .normal)
+                    if imageName.hasSuffix("svg") {
+                        button.setImage(UIImage.svgImage(withURL: imageName, size: CGSize(width: width, height: width)), for: .normal)
+                    } else {
+                        button.sd_setImage(with: URL(string: imageName), for: .normal)
+                    }
                 } else {
                     if imageName.hasSuffix("svg") {
                         button.setImage(UIImage.svgImageNamed(imageName, size: CGSize(width: width, height: width)), for: .normal)

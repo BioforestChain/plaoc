@@ -9,7 +9,7 @@ import UIKit
 
 class ToastManager: NSObject {
     
-    enum Position {
+    enum Position: String {
         case top
         case center
         case bottom
