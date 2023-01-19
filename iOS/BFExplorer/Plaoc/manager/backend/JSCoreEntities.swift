@@ -95,6 +95,8 @@ import SwiftyJSON
             return pickCameraPhoto(param: param, functionName: functionName)
         case "PickCameraPhotos":
             return pickCameraPhotos(param: param, functionName: functionName)
+        case "FileOpener":
+            return executiveFileOpener(param: param, functionName: functionName)
         // 前端ui
         case "SetDWebViewUI":
             return executiveDwebviewUI(param: param)
@@ -128,7 +130,7 @@ extension PlaocHandleModel {
          vc.scanResultDelegate = PhotoHandlerX.shared
          
          PhotoHandlerX.shared.xHandlers[PhotoHandleType.scanCode] = { result in
-             self.asyncReturnValue(functionName: functionName, result: result)
+             self.controller?.jsManager.asyncReturnValue(functionName: functionName, result: result)
          }
          
          controller?.present(vc, animated: true, completion: nil)
@@ -142,7 +144,7 @@ extension PlaocHandleModel {
          vc.scanResultDelegate = PhotoHandlerX.shared
          
          PhotoHandlerX.shared.xHandlers[PhotoHandleType.scanCode] = { result in
-             self.asyncReturnValue(functionName: functionName, result: result)
+             self.controller?.jsManager.asyncReturnValue(functionName: functionName, result: result)
          }
          
          controller?.present(vc, animated: true, completion: nil)
@@ -188,28 +190,23 @@ extension PlaocHandleModel {
         return ""
     }
     
-    // 异步返回结果
-    private func asyncReturnValue(functionName: String, result: Any) {
-        self.jsContext?.evaluateScript("callDwebViewFactory('\(functionName)', '\(result)')")
-    }
-    
     //申请权限
     private func executiveApplyPermissions(param: Any, functionName: String) -> Bool {
         
         guard let param = param as? String else {
-            asyncReturnValue(functionName: functionName, result: "false")
+            controller?.jsManager.asyncReturnValue(functionName: functionName, result: "false")
             return false
         }
         let permission = PermissionManager()
         let permissionType = PermissionManager.PermissionsType(rawValue: param)
         
         if permissionType == nil {
-            asyncReturnValue(functionName: functionName, result: "false")
+            controller?.jsManager.asyncReturnValue(functionName: functionName, result: "false")
             return false
         }
         
         permission.startPermissionAuthenticate(type: permissionType!) { result in
-            self.asyncReturnValue(functionName: functionName, result: result)
+            self.controller?.jsManager.asyncReturnValue(functionName: functionName, result: result)
         }
         
         return true
@@ -360,18 +357,23 @@ extension PlaocHandleModel {
     
     // 拍摄照片
     private func takeCameraPhoto(param: Any, functionName: String) {
-        sharedCameraMgr.getPhoto(param: param, controller: controller, jsContext: jsContext, functionName: functionName)
+        sharedCameraMgr.getPhoto(param: param, controller: controller, functionName: functionName)
     }
     
     // 从图库中选取单张照片
     private func pickCameraPhoto(param: Any, functionName: String) {
-        sharedCameraMgr.getPhoto(param: param, controller: controller, jsContext: jsContext, functionName: functionName)
+        sharedCameraMgr.getPhoto(param: param, controller: controller, functionName: functionName)
     }
     
     // 从图库中选取多张相片
     private func pickCameraPhotos(param: Any, functionName: String) {
-        sharedCameraMgr.pickImages(param: param, controller: controller, jsContext: jsContext, functionName: functionName)
+        sharedCameraMgr.pickImages(param: param, controller: controller, functionName: functionName)
     }
     
+    // 打开文件
+    private func executiveFileOpener(param: Any, functionName: String) {
+        let homePath = getDwebAppPath()
+        fileOpenManager.open(param: param, controller: self.controller, functionName: functionName, homePath: homePath)
+    }
 }
 

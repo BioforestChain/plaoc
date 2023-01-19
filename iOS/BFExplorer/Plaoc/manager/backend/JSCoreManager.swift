@@ -104,6 +104,11 @@ class JSCoreManager: NSObject {
         let functionString = "javascript:document.querySelector('\(wb)').notifyListeners('\(fun)','\(data)')"
         jsContext?.evaluateScript(functionString)
     }
+    
+    // 异步返回结果
+    func asyncReturnValue(functionName: String, result: Any) {
+        self.jsContext?.evaluateScript("callDwebViewFactory('\(functionName)', '\(result)')")
+    }
 }
 
 extension JSCoreManager {

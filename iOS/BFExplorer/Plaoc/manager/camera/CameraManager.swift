@@ -19,7 +19,6 @@ class CameraManager: NSObject {
     private var multiple = false
     private var imageCounter = 0
     private var controller: WebViewViewController?
-    private var jsContext: JSContext?
     private var functionName: String?
 
     public var isSimEnvironment: Bool {
@@ -90,8 +89,7 @@ class CameraManager: NSObject {
         let functionName = self.functionName!
         let data = ChangeTools.dicValueString(result) ?? "{'error': '\(functionName) return value error'}"
         
-        print(data)
-        self.jsContext?.evaluateScript("callDwebViewFactory('\(functionName)', '\(data)')")
+        controller?.jsManager.asyncReturnValue(functionName: functionName, result: data)
     }
 
     private func checkUsageDescriptions() -> String? {
@@ -443,9 +441,8 @@ extension CameraManager: UIImagePickerControllerDelegate, UINavigationController
 }
 
 extension CameraManager {
-    func getPhoto(param: Any, controller: WebViewViewController?, jsContext: JSContext?, functionName: String) {
+    func getPhoto(param: Any, controller: WebViewViewController?, functionName: String) {
         self.controller = controller
-        self.jsContext = jsContext
         self.functionName = functionName
         self.multiple = false
         guard let param = param as? String else {
@@ -482,9 +479,8 @@ extension CameraManager {
         }
     }
 
-    func pickImages(param: Any, controller: WebViewViewController?, jsContext: JSContext?, functionName: String) {
+    func pickImages(param: Any, controller: WebViewViewController?, functionName: String) {
         self.controller = controller
-        self.jsContext = jsContext
         self.functionName = functionName
         self.multiple = true
         guard let param = param as? String else {

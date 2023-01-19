@@ -107,35 +107,35 @@ async function pickCameraPhotos() {
 
 async function hapticsImpact() {
   const app = document.querySelector<App>('dweb-app')!;
-  app.hapticsImpact({style: ImpactStyle.Light})
+  await app.hapticsImpact({style: ImpactStyle.Light})
 }
 async function hapticsNotification() {
   const app = document.querySelector<App>('dweb-app')!;
-  app.hapticsNotification({type: NotificationType.Warning})
+  await app.hapticsNotification({type: NotificationType.Warning})
 }
 async function hapticsVibrate() {
   const app = document.querySelector<App>('dweb-app')!;
-  app.hapticsVibrate({duration: 1})
+  await app.hapticsVibrate({duration: 1})
 }
 async function hapticsVibrateDisabled() {
   const app = document.querySelector<App>('dweb-app')!;
   // app.hapticsVibrate([1, 63, 1, 119, 1, 129, 1])
-  app.hapticsVibratePreset({type: VibratePresetType.DISABLED})
+  await app.hapticsVibratePreset({type: VibratePresetType.DISABLED})
 }
 async function hapticsVibrateTick() {
   const app = document.querySelector<App>('dweb-app')!;
   // app.hapticsVibrate([10, 999, 1, 1])
-  app.hapticsVibratePreset({type: VibratePresetType.TICK})
+  await app.hapticsVibratePreset({type: VibratePresetType.TICK})
 }
 async function hapticsVibrateDoubleClick() {
   const app = document.querySelector<App>('dweb-app')!;
   // app.hapticsVibrate([10, 1])
-  app.hapticsVibratePreset({type: VibratePresetType.DOUBLE_CLICK})
+  await app.hapticsVibratePreset({type: VibratePresetType.DOUBLE_CLICK})
 }
 async function hapticsVibrateHeavyClick() {
   const app = document.querySelector<App>('dweb-app')!;
   // app.hapticsVibrate([1, 100, 1, 1])
-  app.hapticsVibratePreset({type: VibratePresetType.HEAVY_CLICK})
+  await app.hapticsVibratePreset({type: VibratePresetType.HEAVY_CLICK})
 }
 
 async function hapticsVibrateDisabledWeb() {
@@ -169,7 +169,11 @@ async function hapticsVibrateHeavyClickWeb() {
 }
 async function systemShare() {
   const app = document.querySelector<App>('dweb-app')!;
-  app.systemShare({title:"Ar扫雷", text: "hahahahaha"});
+  await app.systemShare({title:"Ar扫雷", text: "hahahahaha"});
+}
+async function fileOpener() {
+  const app = document.querySelector<App>("dweb-app")!;
+  await app.fileOpener({filePath: "/嘎嘎.txt", openWithDefault: true})
 }
 </script>
 
@@ -204,6 +208,7 @@ async function systemShare() {
   <ion-button shape="round" fill="outline" @click="hapticsVibrateHeavyClick">反馈振动重击</ion-button>
   <ion-button shape="round" fill="outline" @click="hapticsVibrateHeavyClickWeb">反馈振动重击web</ion-button>
   <ion-button expand="block" fill="outline" @click="systemShare">分享文案</ion-button>
+  <ion-button expand="block" fill="outline" @click="fileOpener">打开文件</ion-button>
   <div id="placeholder"></div>
 </template>
 
