@@ -74,3 +74,10 @@ object FileOpener {
     return mimeType
   }
 }
+
+data class FileOpenerOption(
+  var filePath: String,
+  var contentType: String? = null,
+  var openWithDefault: Boolean = true,
+)
+

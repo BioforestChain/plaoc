@@ -10,6 +10,8 @@ import info.bagen.rust.plaoc.system.clipboard.Clipboard
 import info.bagen.rust.plaoc.system.clipboard.ClipboardWriteOption
 import info.bagen.rust.plaoc.system.device.DeviceInfo
 import info.bagen.rust.plaoc.system.device.Network
+import info.bagen.rust.plaoc.system.fileopener.FileOpener
+import info.bagen.rust.plaoc.system.fileopener.FileOpenerOption
 import info.bagen.rust.plaoc.system.haptics.HapticsImpactType
 import info.bagen.rust.plaoc.system.haptics.HapticsNotificationType
 import info.bagen.rust.plaoc.system.haptics.VibrateManage
@@ -167,8 +169,8 @@ fun splicingPath(bfsId:String, entry:String):String {
   callable_map[ExportNative.WriteClipboardContent] = {
     val writeOption = mapper.readValue(it, ClipboardWriteOption::class.java)
     var result = "true"
-    Clipboard.write(strValue = writeOption.str, imageValue = writeOption.image, urlValue = writeOption.url, labelValue = writeOption.label ?: "OcrText") {
-      println("writeClipboardContent error: $it")
+    Clipboard.write(strValue = writeOption.str, imageValue = writeOption.image, urlValue = writeOption.url, labelValue = writeOption.label ?: "OcrText") { error ->
+      println("writeClipboardContent error: $error")
       result = "false"
     }
     createBytesFactory(ExportNative.WriteClipboardContent, result)
@@ -205,8 +207,8 @@ fun splicingPath(bfsId:String, entry:String):String {
   callable_map[ExportNative.SystemShare] = {
     val param = mapper.readValue(it, ShareOption::class.java)
 
-    Share.share(title = param.title, text = param.text, url = param.url, files = param.files, dialogTitle = param.dialogTitle ?: "分享到：") {
-      println("SystemShare error: $it")
+    Share.share(title = param.title, text = param.text, url = param.url, files = param.files, dialogTitle = param.dialogTitle ?: "分享到：") { error ->
+      println("SystemShare error: $error")
     }
   }
 
@@ -219,22 +221,31 @@ fun splicingPath(bfsId:String, entry:String):String {
   callable_map[ExportNative.TakeCameraPhoto] = {
     val option = mapper.readValue(it, CameraImageOption::class.java)
 
-    cameraPlugin.getPhoto(option.toCameraSettings()) {
-      createBytesFactory(ExportNative.TakeCameraPhoto, it)
+    cameraPlugin.getPhoto(option.toCameraSettings()) { result ->
+      createBytesFactory(ExportNative.TakeCameraPhoto, result)
     }
   }
   callable_map[ExportNative.PickCameraPhoto] = {
     val option = mapper.readValue(it, CameraImageOption::class.java)
 
-    cameraPlugin.getPhoto(option.toCameraSettings()) {
-      createBytesFactory(ExportNative.PickCameraPhoto, it)
+    cameraPlugin.getPhoto(option.toCameraSettings()) { result ->
+      createBytesFactory(ExportNative.PickCameraPhoto, result)
     }
   }
   callable_map[ExportNative.PickCameraPhotos] = {
     val option = mapper.readValue(it, CameraGalleryImageOption::class.java)
 
-    cameraPlugin.pickImages(option.toCameraSettings()) {
-      createBytesFactory(ExportNative.PickCameraPhotos, it)
+    cameraPlugin.pickImages(option.toCameraSettings()) { result ->
+      createBytesFactory(ExportNative.PickCameraPhotos, result)
+    }
+  }
+
+  /** FileOpener */
+  callable_map[ExportNative.FileOpener] = {
+    val option = mapper.readValue(it, FileOpenerOption::class.java)
+
+    FileOpener.open(filePath = option.filePath, contentType = option.contentType, openWithDefault = option.openWithDefault) { error ->
+      println("FileOpener error: $error")
     }
   }
 }
