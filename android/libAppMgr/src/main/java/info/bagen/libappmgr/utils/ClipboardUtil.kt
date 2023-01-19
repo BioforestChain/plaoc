@@ -13,6 +13,7 @@ import info.bagen.libappmgr.network.ApiService
 import info.bagen.libappmgr.network.base.BaseData
 
 object ClipboardUtil {
+  private var currentDate: String = ""
 
   // 写内容到剪切板
   @SuppressLint("ServiceCast")
@@ -29,9 +30,9 @@ object ClipboardUtil {
   @SuppressLint("ServiceCast")
   fun readFromClipboard(context: Context): String? {
     // 获取剪贴板管理器
-    var clipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    val clipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
     // 获取剪贴板的剪贴数据集
-    var clipData = clipboardManager.primaryClip;
+    val clipData = clipboardManager.primaryClip;
 
     if (clipData != null && clipData!!.itemCount > 0 && clipData!!.getItemAt(0).text != null) {
       return clipData!!.getItemAt(0).text.toString()
@@ -40,16 +41,19 @@ object ClipboardUtil {
   }
 
   suspend fun readAndParsingClipboard(context: Context) {
-    var content = readFromClipboard(context)
-    if (content != null && content!!.startsWith("http")) {
+    val content = readFromClipboard(context)
+    if (content == currentDate) {
+      return
+    } else if (content != null && content.startsWith("http")) {
+      currentDate = content
       // 网络请求最新版本
       withContext(Dispatchers.IO) {
-        var xx = ApiService.instance.getAppVersion("KEJPMHLA/appversion.json")
-        if (xx.isSuccess) {
-          var bb = xx.value as BaseData<AppVersion>
+        val apiResultData = ApiService.instance.getAppVersion(content)
+        if (apiResultData.isSuccess) {
+          val bb = apiResultData.value as BaseData<AppVersion>
           Log.d("lin.huang", "readAndParsingClipboard -> ${bb.data?.version}")
         } else {
-          Log.d("lin.huang", "readAndParsingClipboard -> load fail->$xx")
+          Log.d("lin.huang", "readAndParsingClipboard -> load fail->$apiResultData")
         }
       }
     }

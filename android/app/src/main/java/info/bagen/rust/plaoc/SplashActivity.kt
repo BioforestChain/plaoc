@@ -1,8 +1,6 @@
 package info.bagen.rust.plaoc
 
-import android.content.DialogInterface
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.compose.setContent
@@ -22,18 +20,14 @@ import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.sp
 import info.bagen.libappmgr.R
-import info.bagen.libappmgr.system.permission.EPermission
-import info.bagen.libappmgr.system.permission.PermissionUtil
 import info.bagen.libappmgr.ui.splash.SplashPrivacyDialog
 import info.bagen.libappmgr.utils.getBoolean
 import info.bagen.libappmgr.utils.saveBoolean
-import info.bagen.rust.plaoc.system.permission.PermissionManager
 import info.bagen.rust.plaoc.ui.theme.RustApplicationTheme
 import info.bagen.rust.plaoc.webView.openDWebWindow
 
 class SplashActivity : AppCompatActivity() {
   private val keyAppFirstLoad = "App_First_Load"
-  private var showDialog = true
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -47,16 +41,11 @@ class SplashActivity : AppCompatActivity() {
       setContent {
         RustApplicationTheme {
           SplashMainView()
-
-          if (showDialog) {
-            SplashPrivacyDialog(openHome = {
-              if (checkAndRequestPermission()) {
-                openHomeActivity()
-              } else {
-                showDialog = false
-              }
-            }, openWebView = { url -> openDWebWindow(this, url) }, closeApp = { finish() })
-          }
+          SplashPrivacyDialog(
+            openHome = { openHomeActivity() },
+            openWebView = { url -> openDWebWindow(this, url) },
+            closeApp = { finish() }
+          )
         }
       }
     } else {
@@ -68,49 +57,6 @@ class SplashActivity : AppCompatActivity() {
     startActivity(Intent(this, MainActivity::class.java))
     this.saveBoolean(keyAppFirstLoad, false)
     finish()
-  }
-
-  private fun checkAndRequestPermission(): Boolean {
-    val permissions = arrayListOf<String>()
-    permissions.add(EPermission.PERMISSION_DEVICE.type)
-    permissions.add(EPermission.PERMISSION_STORAGE.type)
-    if (!PermissionUtil.isPermissionsGranted(permissions)) {
-      PermissionManager.requestPermissions(this, permissions)
-      return false
-    }
-    return true
-  }
-
-  override fun onRequestPermissionsResult(
-    requestCode: Int, permissions: Array<out String>, grantResults: IntArray
-  ) {
-    super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-    PermissionManager.onRequestPermissionsResult(requestCode,
-      permissions,
-      grantResults,
-      this,
-      object : info.bagen.libappmgr.system.permission.PermissionManager.PermissionCallback {
-        override fun onPermissionGranted(permissions: Array<out String>, grantResults: IntArray) {
-          kotlin.run OutLine@{
-            grantResults.forEach { grant ->
-              if (grant != PackageManager.PERMISSION_GRANTED) {
-                return@OutLine
-              }
-            }
-            openHomeActivity()
-          }
-        }
-
-        override fun onPermissionDismissed(permission: String) { }
-
-        override fun onNegativeButtonClicked(dialog: DialogInterface, which: Int) { finish() }
-
-        override fun onPositiveButtonClicked(dialog: DialogInterface, which: Int) {
-          PermissionUtil.openAppSettings()
-          showDialog = true
-          dialog.dismiss()
-        }
-      })
   }
 }
 

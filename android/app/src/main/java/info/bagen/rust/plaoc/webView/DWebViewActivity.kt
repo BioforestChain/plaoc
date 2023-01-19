@@ -10,6 +10,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -17,6 +18,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -81,7 +84,9 @@ class DWebViewActivity : AppCompatActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         dwebViewActivity = this
         setContent {
-            RustApplicationTheme {
+          ViewCompat.getWindowInsetsController(LocalView.current)?.isAppearanceLightStatusBars =
+            !isSystemInDarkTheme() // 设置状态栏颜色跟着主题走
+          RustApplicationTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background,
