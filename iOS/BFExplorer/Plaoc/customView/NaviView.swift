@@ -115,7 +115,17 @@ extension NaviView {
     
     @objc private func backAction() {
         let controller = currentViewController()
+        
+        if let controller = controller as? WebViewViewController {
+            emitListenBackButton(controller: controller)
+        }
+        
         controller.navigationController?.popViewController(animated: true)
+    }
+    
+    // 监听返回按钮事件
+    func emitListenBackButton(controller: WebViewViewController) {
+        controller.jsManager.handleEvaluateEmitScript(wb: "dweb-app", fun: "ListenBackButton", data: "{canGoBack:true}")
     }
     
     private func menuAction() -> UIMenu {

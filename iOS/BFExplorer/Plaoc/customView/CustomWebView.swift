@@ -25,13 +25,13 @@ class CustomWebView: UIView {
     private let imageUrl_key: String = "imageUrl"
     private var isKeyboardOverlay: Bool = false
     private var keyHeight:CGFloat = 0
-    private var fileName: String = ""
+    private var appId: String = ""
     private var loadingUrlString: String = ""
     
-    init(frame: CGRect, jsNames: [String], fileName: String, urlString: String) {
+    init(frame: CGRect, jsNames: [String], appId: String, urlString: String) {
         super.init(frame: frame)
         scripts = addUserScript(jsNames: jsNames)
-        self.fileName = fileName
+        self.appId = appId
         self.loadingUrlString = urlString
         self.addSubview(webView)
     }
@@ -68,7 +68,7 @@ class CustomWebView: UIView {
         prefreen.javaScriptCanOpenWindowsAutomatically = true
         config.preferences = prefreen
         config.setValue(true, forKey: "allowUniversalAccessFromFileURLs")
-        config.setURLSchemeHandler(Schemehandler(fileName: self.fileName), forURLScheme: schemeString)
+        config.setURLSchemeHandler(Schemehandler(appId: self.appId), forURLScheme: schemeString)
         
         
         let webView = WKWebView(frame: self.bounds, configuration: config)
@@ -166,7 +166,7 @@ extension CustomWebView:  WKScriptMessageHandler {
             //点击网页按钮 开始加载
             guard let bodyDict = message.body as? [String:String] else { return }
             guard let path = bodyDict["path"] else { return }
-            BFSNetworkManager.shared.loadAutoUpdateInfo(urlString: path)
+            BFSNetworkManager.shared.downloadApp(urlString: path)
             //同时显示下载进度条
         } else if message.name == "logging" {
             print(message.body)

@@ -12,4 +12,5 @@ extension Notification.Name {
     static let interceptNotification = Notification.Name(rawValue: "intercept.request")
     static let progressNotification = Notification.Name(rawValue: "download.progress")
     static let openDwebNotification = Notification.Name(rawValue: "com.openDweb")
+    static let closeAnAppNotification = Notification.Name(rawValue: "closeAnAppNotification")
 }

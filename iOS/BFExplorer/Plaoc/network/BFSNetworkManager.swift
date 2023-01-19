@@ -9,14 +9,14 @@ class BFSNetworkManager: NSObject {
     static let shared = BFSNetworkManager()
     
     private var requestDict: [String: DownloadRequest] = [:]
-
-    func loadAutoUpdateInfo(fileName: String? = nil, urlString: String) {
-        var name = fileName
-        let timeStamp = "\(Date().milliStamp)"
+    
+    func downloadApp(appId: String? = nil, urlString: String) {
+        guard let appId = obtainAppName(from: urlString) else{ return }
+        let testUrl = "http://dldir1.qq.com/qqfile/qq/QQ7.9/16621/QQ7.9.exe"
         
         let request = AF.download(urlString).downloadProgress { progress in
             print(progress.fractionCompleted)  //进度值
-            NotificationCenter.default.post(name: NSNotification.Name.progressNotification, object: nil, userInfo: ["progress": "\(progress.fractionCompleted)", "fileName": name ?? timeStamp])
+            NotificationCenter.default.post(name: NSNotification.Name.progressNotification, object: nil, userInfo: ["progress": "\(progress.fractionCompleted)", "appId": appId])
         }.responseURL { response in
             print(response)
             switch response.result {
@@ -24,56 +24,33 @@ class BFSNetworkManager: NSObject {
                 //下载后的文件路径
                 if response.fileURL != nil {
                     DispatchQueue.global().async {
-                      //  let path = Bundle.main.bundlePath + "/recommend-app/www.bfsa"
-                        
-                        let filePath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first
-                        
-                        if filePath != nil {
-                            var desPath = filePath! + "/system-app"
-                            if name == nil {
-                                desPath = NSTemporaryDirectory()
-                            }
-                            DispatchQueue.main.async {
-                                NVHTarGzip.sharedInstance().unTarGzipFile(atPath: response.fileURL!.path, toPath: desPath) { error in
-                                    if error == nil {
-                                        var schemePath = ""
-                                        var isReplace: Bool = false
-                                        if name == nil {
-                                            name = self.subFilePathNames(atPath: desPath).first
-                                            if name != nil {
-                                                schemePath = desPath + "\(name!)/sys"
-                                                isReplace = self.versionCompare(name: name!)
-                                                if isReplace {
-                                                    self.copyItemToSystem(name: name!)
-                                                }
-                                            }
-                                        } else {
-                                            schemePath = desPath + "/\(name!)/sys"
-                                            isReplace = true
-                                        }
-                                        if name != nil {
-                                            if isReplace {
-                                                Schemehandler.setupHTMLCache(fileName: name!, fromPath: schemePath)
-                                                BatchFileManager.shared.updateRedHot(fileName: name!, statue: true)
-                                            }
-                                            RefreshManager.saveLastUpdateTime(fileName: name!, time: Date().timeStamp)
-                                        }
-                                        NotificationCenter.default.post(name: NSNotification.Name.progressNotification, object: nil, userInfo: ["progress": "complete", "fileName": fileName ?? timeStamp, "realName": name ?? ""])
-                                    } else {
-                                        NotificationCenter.default.post(name: NSNotification.Name.progressNotification, object: nil, userInfo: ["progress": "fail", "fileName": fileName ?? timeStamp])
+
+                        // FIXME: 需要根据下载的app类型来判断是属于哪种
+                        var desPath = documentdir + "/system-app/"
+                        DispatchQueue.main.async {
+                            NVHTarGzip.sharedInstance().unTarGzipFile(atPath: response.fileURL!.path, toPath: desPath) { error in
+                                if error == nil {
+                                    var schemePath = desPath + "\(appId)/sys"
+                                    if self.shouldUpdate(name: appId) {
+                                        Schemehandler.setupHTMLCache(appId: appId, fromPath: schemePath)
+                                        InnerAppFileManager.shared.updateRedHot(appId: appId, statue: true)
                                     }
+                                    RefreshManager.saveLastUpdateTime(appId: appId, time: Date().timeStamp)
                                 }
+                                let msg = (error == nil) ? "complete" : "fail"
+                                NotificationCenter.default.post(name: NSNotification.Name.progressNotification, object: nil, userInfo: ["progress": msg, "appId": appId])
                             }
+                             
                         }
                     }
                 }
             case .failure:
-                NotificationCenter.default.post(name: NSNotification.Name.progressNotification, object: nil, userInfo: ["progress": "fail", "fileName": fileName ?? timeStamp])
+                NotificationCenter.default.post(name: NSNotification.Name.progressNotification, object: nil, userInfo: ["progress": "fail", "appId": appId])
             }
         }
-        if name != nil {
-            self.requestDict[name!] = request
-        }
+        
+        self.requestDict[appId] = request
+        
     }
     
     func cancelNetworkRequest(urlString: String?) {
@@ -102,15 +79,22 @@ class BFSNetworkManager: NSObject {
         }
     }
     
-    func suspendRequest(fileName: String) {
-        if let request = requestDict[fileName] {
+    func obtainAppName(from url: String) -> String?{
+        guard let appFullName = url.split(separator: "/").last,
+              let appShortName = appFullName.split(separator: ".").first else{ return nil}
+        print(appShortName)
+        return String(appShortName)
+    }
+    
+    func suspendRequest(appId: String) {
+        if let request = requestDict[appId] {
             request.suspend()
         }
         
     }
     
-    func resumeRequest(fileName: String) {
-        if let request = requestDict[fileName] {
+    func resumeRequest(appId: String) {
+        if let request = requestDict[appId] {
             request.resume()
         }
     }
@@ -119,16 +103,16 @@ class BFSNetworkManager: NSObject {
     private func subFilePathNames(atPath path: String) -> [String] {
         var fileList: [String] = []
         guard let filePaths = FileManager.default.subpaths(atPath: path) else { return fileList }
-        for fileName in filePaths {
+        for appId in filePaths {
             var isDir: ObjCBool = true
-            let fullPath = "\(path)/\(fileName)"
+            let fullPath = "\(path)/\(appId)"
             if FileManager.default.fileExists(atPath: fullPath, isDirectory: &isDir) {
                 if !isDir.boolValue {
                     
                 } else {
                     //后续是不需要判断.的，因为这是临时添加的，后续从网络获取
-                    if !fileName.contains("/"), !fileName.contains(".") {
-                        fileList.append(fileName)
+                    if !appId.contains("/"), !appId.contains(".") {
+                        fileList.append(appId)
                     }
                 }
             }
@@ -136,14 +120,14 @@ class BFSNetworkManager: NSObject {
         return fileList
     }
     
-    private func versionCompare(name: String) -> Bool {
+    private func shouldUpdate(name: String) -> Bool {
         
-        guard let filePath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first else { return false }
-        let desPath = filePath + "/system-app/\(name)"
+//        guard let filePath = documentdir else { return false }
+        let desPath = documentdir + "/system-app/\(name)"
         if FileManager.default.fileExists(atPath: desPath) {
             let tmpManager = BatchTempManager()
             let tmpVersion = tmpManager.tempAppVersion(name: name)
-            let oldVersion = BatchFileManager.shared.systemAPPVersion(fileName: name)
+            let oldVersion = InnerAppFileManager.shared.systemAPPVersion(appId: name)
             let result = tmpVersion.versionCompare(oldVersion: oldVersion)
             if result == .orderedAscending {
                 return true
@@ -155,12 +139,12 @@ class BFSNetworkManager: NSObject {
     }
     
     private func copyItemToSystem(name: String) {
-        guard let filePath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first else { return }
-        let desPath = filePath + "/system-app/\(name)"
+//        guard let filePath = documentdir else { return }
+        let desPath = documentdir + "/system-app/\(name)"
         let tmpPath = NSTemporaryDirectory() + name
         do {
             if !FileManager.default.fileExists(atPath: desPath) {
-                try FileSystemManager.mkdir(at: URL(fileURLWithPath: filePath + "/system-app/"), recursive: true)
+                try FileSystemManager.mkdir(at: URL(fileURLWithPath: documentdir + "/system-app/"), recursive: true)
             }
             try FileManager.default.copyItem(atPath: tmpPath, toPath: desPath)
         } catch {

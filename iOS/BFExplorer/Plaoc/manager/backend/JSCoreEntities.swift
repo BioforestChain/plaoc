@@ -22,13 +22,15 @@ import SwiftyJSON
     
     var controller: WebViewViewController?
     var jsContext: JSContext?
-    var fileName: String = ""
+    var appId: String = ""
     
     func callJavaScript(functionName: String, param: Any) -> Any {
         print("swift#callJavaScript:",functionName)
         switch functionName {
         case "OpenDWebView":
             return executiveOpenDWebView(param: param)
+        case "ExitApp":
+            return executiveCloseDWebView(param: param)
         case "OpenQrScanner":
             return executiveOpenQrScanner(param: param, functionName: functionName)
         case "BarcodeScanner":
@@ -71,12 +73,14 @@ import SwiftyJSON
             return executiveFileSystemReadBuffer(param: param)
         case "GetNetworkStatus":
             return ReachabilityManager.shared.getNetworkStatus()
-        case "HapticsImpactLight":
-            return FeedbackGenerator.impactFeedbackGenerator(style: .light)
-        case "HapticsNotificationWarning":
-            return FeedbackGenerator.notificationFeedbackGenerator(style: .warning)
+        case "HapticsImpact":
+            return executiveHapticsImpact(param: param)
+        case "HapticsNotification":
+            return executiveHapticsNotification(param: param)
         case "HapticsVibrate":
             return hapticsVibrate(param: param)
+        case "HapticsVibratePreset":
+            return hapticsVibratePreset(param: param)
         case "ShowToast":
             return showToast(param: param)
         case "SystemShare":
@@ -91,6 +95,8 @@ import SwiftyJSON
             return pickCameraPhoto(param: param, functionName: functionName)
         case "PickCameraPhotos":
             return pickCameraPhotos(param: param, functionName: functionName)
+        case "FileOpener":
+            return executiveFileOpener(param: param, functionName: functionName)
         // 前端ui
         case "SetDWebViewUI":
             return executiveDwebviewUI(param: param)
@@ -107,28 +113,48 @@ extension PlaocHandleModel {
         NotificationCenter.default.post(name: NSNotification.Name.openDwebNotification, object: nil, userInfo: ["param":param])
         return true
     }
+    
+    //关闭DwebView
+    private func executiveCloseDWebView(param: Any) -> Bool {
+        NotificationCenter.default.post(name: NSNotification.Name.closeAnAppNotification, object: nil, userInfo: nil)
+        return true
+    }
+    
     //二维码
-    private func executiveOpenQrScanner(param: Any, functionName: String) -> String {
-        let scanVC = ScanPhotoViewController()
-        scanVC.callback = { result in
-            self.asyncReturnValue(functionName: functionName, result: result)
-        }
-        controller?.navigationController?.pushViewController(scanVC, animated: true)
-        return ""
-    }
-    //条形码
-    private func executiveOpenBarcodeScanner(param: Any, functionName: String) -> String {
-        let scanVC = ScanPhotoViewController()
-        scanVC.callback = { result in
-            self.asyncReturnValue(functionName: functionName, result: result)
-        }
-        controller?.navigationController?.pushViewController(scanVC, animated: true)
-        return ""
-    }
+     private func executiveOpenQrScanner(param: Any, functionName: String) -> String {
+             
+         let vc = LBXScanViewController()
+         vc.scanStyle = LBXScanViewStyle.qrCodeStyle
+         vc.isSupportContinuous = true;
+         PhotoHandlerX.shared.delegate = vc
+         vc.scanResultDelegate = PhotoHandlerX.shared
+         
+         PhotoHandlerX.shared.xHandlers[PhotoHandleType.scanCode] = { result in
+             self.controller?.jsManager.asyncReturnValue(functionName: functionName, result: result)
+         }
+         
+         controller?.present(vc, animated: true, completion: nil)
+         return ""
+     }
+     //条形码
+     private func executiveOpenBarcodeScanner(param: Any, functionName: String) -> String {
+         let vc = LBXScanViewController()
+         vc.scanStyle = LBXScanViewStyle.barCodeStyle
+         PhotoHandlerX.shared.delegate = vc
+         vc.scanResultDelegate = PhotoHandlerX.shared
+         
+         PhotoHandlerX.shared.xHandlers[PhotoHandleType.scanCode] = { result in
+             self.controller?.jsManager.asyncReturnValue(functionName: functionName, result: result)
+         }
+         
+         controller?.present(vc, animated: true, completion: nil)
+         return ""
+         
+     }
     //初始化app数据
     private func executiveInitMetaData(param: Any) -> Void {
         guard let param = param as? String else { return }
-        NetworkMap.shared.metaData(metadata: param, fileName: fileName)
+        NetworkMap.shared.metaData(metadata: param, appId: appId)
     }
     //初始化运行时
     private func executiveDenoRuntime(param: Any) -> String {
@@ -136,7 +162,7 @@ extension PlaocHandleModel {
     }
     //获取appID
     private func executiveGetBfsAppId(param: Any) -> String {
-        return fileName
+        return appId
     }
     //传递给前端消息
     private func executiveEvalJsRuntime(param: Any) -> String {
@@ -164,28 +190,23 @@ extension PlaocHandleModel {
         return ""
     }
     
-    // 异步返回结果
-    private func asyncReturnValue(functionName: String, result: Any) {
-        self.jsContext?.evaluateScript("callDwebViewFactory('\(functionName)', '\(result)')")
-    }
-    
     //申请权限
     private func executiveApplyPermissions(param: Any, functionName: String) -> Bool {
         
         guard let param = param as? String else {
-            asyncReturnValue(functionName: functionName, result: "false")
+            controller?.jsManager.asyncReturnValue(functionName: functionName, result: "false")
             return false
         }
         let permission = PermissionManager()
         let permissionType = PermissionManager.PermissionsType(rawValue: param)
         
         if permissionType == nil {
-            asyncReturnValue(functionName: functionName, result: "false")
+            controller?.jsManager.asyncReturnValue(functionName: functionName, result: "false")
             return false
         }
         
         permission.startPermissionAuthenticate(type: permissionType!) { result in
-            self.asyncReturnValue(functionName: functionName, result: result)
+            self.controller?.jsManager.asyncReturnValue(functionName: functionName, result: result)
         }
         
         return true
@@ -195,9 +216,74 @@ extension PlaocHandleModel {
         return "false"
     }
     
+    /** 触碰物体 */
+    private func executiveHapticsImpact(param: Any) -> Void {
+        guard let param = param as? String else { return }
+        let data = JSON(parseJSON: param)
+        var style: Int
+        
+        switch data["style"].stringValue {
+        case "MEDIUM":
+            style = 1
+        case "HEAVY":
+            style = 2
+        // 默认LIGHT
+        default:
+            style = 0
+        }
+        
+        FeedbackGenerator.impactFeedbackGenerator(style: UIImpactFeedbackGenerator.FeedbackStyle(rawValue: style)!)
+    }
+    
+    /** 振动通知 */
+    private func executiveHapticsNotification(param: Any) -> Void {
+        guard let param = param as? String else { return }
+        let data = JSON(parseJSON: param)
+        var type: Int
+        
+        switch data["type"].stringValue {
+        case "SUCCESS":
+            type = 0
+        case "WARNING":
+            type = 1
+        case "ERROR":
+            type = 2
+        default:
+            type = -1
+        }
+        
+        if type == -1 {
+            print("HapticsNotification type param error: \(type)")
+            return
+        }
+        
+        FeedbackGenerator.notificationFeedbackGenerator(style: UINotificationFeedbackGenerator.FeedbackType(rawValue: type)!)
+    }
+    
+    // 反馈振动
     private func hapticsVibrate(param: Any) -> Void {
-        guard let param = param as? String, Float(param) != nil else { return }
-        FeedbackGenerator.vibrate(Double(Float(param)!))
+        guard let param = param as? String else { return }
+        let data = JSON(parseJSON: param)
+        
+        if data["duration"].exists() {
+            let duration = data["duration"].doubleValue
+            FeedbackGenerator.vibrate(duration)
+        } else {
+            if let data = data.array {
+                let durationArr = data.map {
+                    $0.doubleValue
+                }
+                
+                FeedbackGenerator.vibrate(durationArr: durationArr)
+            }
+        }
+    }
+    
+    // 反馈振动预设
+    private func hapticsVibratePreset(param: Any) -> Void {
+        guard let param = param as? String else { return }
+        
+        FeedbackGenerator.vibratePreset(type: param)
     }
     
     // 显示提示
@@ -271,21 +357,23 @@ extension PlaocHandleModel {
     
     // 拍摄照片
     private func takeCameraPhoto(param: Any, functionName: String) {
-        let cameraManager = CameraManager()
-        cameraManager.getPhoto(param: param, controller: controller, jsContext: jsContext, functionName: functionName)
+        sharedCameraMgr.getPhoto(param: param, controller: controller, functionName: functionName)
     }
     
     // 从图库中选取单张照片
     private func pickCameraPhoto(param: Any, functionName: String) {
-        let cameraManager = CameraManager()
-        cameraManager.getPhoto(param: param, controller: controller, jsContext: jsContext, functionName: functionName)
+        sharedCameraMgr.getPhoto(param: param, controller: controller, functionName: functionName)
     }
     
     // 从图库中选取多张相片
     private func pickCameraPhotos(param: Any, functionName: String) {
-        let cameraManager = CameraManager()
-        cameraManager.pickImages(param: param, controller: controller, jsContext: jsContext, functionName: functionName)
+        sharedCameraMgr.pickImages(param: param, controller: controller, functionName: functionName)
     }
     
+    // 打开文件
+    private func executiveFileOpener(param: Any, functionName: String) {
+        let homePath = getDwebAppPath()
+        fileOpenManager.open(param: param, controller: self.controller, functionName: functionName, homePath: homePath)
+    }
 }
 

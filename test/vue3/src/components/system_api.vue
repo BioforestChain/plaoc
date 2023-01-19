@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { IonFab, IonFabButton, IonFabList, IonButton, IonIcon } from '@ionic/vue';
 import { defineComponent, onMounted } from 'vue';
-import { BfcsKeyboard, Navigation, BfcsStatusBar, App, DwebCamera, CameraDirection, CameraResultType, CameraSource } from '@bfsx/plugin';
+import { BfcsKeyboard, Navigation, BfcsStatusBar, App, DwebCamera, CameraDirection, CameraResultType, CameraSource, ImpactStyle, NotificationType, VibratePresetType } from '@bfsx/plugin';
 
 defineComponent({
   components: { IonFab, IonFabButton, IonFabList, IonButton, IonIcon }
@@ -70,7 +70,7 @@ async function getNetworkStatus() {
 // 拍摄照片
 async function takeCameraPhoto() {
   const camera = document.querySelector<DwebCamera>("dweb-camera")!;
-  camera.takeCameraPhoto({
+  const result = await camera.takeCameraPhoto({
     quality: 90,
     resultType: CameraResultType.Base64,
     allowEditing: false,
@@ -78,24 +78,102 @@ async function takeCameraPhoto() {
     source: CameraSource.Camera,
     direction: CameraDirection.Rear
   });
+  console.log("takeCameraPhoto result: ", result);
+  console.log(JSON.parse(result as string));
 }
 
 // 从图库获取单张照片
 async function pickCameraPhoto() {
   const camera = document.querySelector<DwebCamera>("dweb-camera")!;
-  camera.pickCameraPhoto({
+  const result = await camera.pickCameraPhoto({
     quality: 80,
     allowEditing: false,
     resultType: CameraResultType.Uri,
     source: CameraSource.Photos
   });
+  console.log("pickCameraPhoto result: ", result);
+  console.log(JSON.parse(result as string));
 }
 // 从图库获取多张照片
 async function pickCameraPhotos() {
   const camera = document.querySelector<DwebCamera>("dweb-camera")!;
-  camera.pickCameraPhotos({
+  const result = await camera.pickCameraPhotos({
     quality: 100,
   });
+
+  console.log("pickCameraPhotos result: ", result);
+  console.log(JSON.parse(result as string));
+}
+
+async function hapticsImpact() {
+  const app = document.querySelector<App>('dweb-app')!;
+  await app.hapticsImpact({style: ImpactStyle.Light})
+}
+async function hapticsNotification() {
+  const app = document.querySelector<App>('dweb-app')!;
+  await app.hapticsNotification({type: NotificationType.Warning})
+}
+async function hapticsVibrate() {
+  const app = document.querySelector<App>('dweb-app')!;
+  await app.hapticsVibrate({duration: 1})
+}
+async function hapticsVibrateDisabled() {
+  const app = document.querySelector<App>('dweb-app')!;
+  // app.hapticsVibrate([1, 63, 1, 119, 1, 129, 1])
+  await app.hapticsVibratePreset({type: VibratePresetType.DISABLED})
+}
+async function hapticsVibrateTick() {
+  const app = document.querySelector<App>('dweb-app')!;
+  // app.hapticsVibrate([10, 999, 1, 1])
+  await app.hapticsVibratePreset({type: VibratePresetType.TICK})
+}
+async function hapticsVibrateDoubleClick() {
+  const app = document.querySelector<App>('dweb-app')!;
+  // app.hapticsVibrate([10, 1])
+  await app.hapticsVibratePreset({type: VibratePresetType.DOUBLE_CLICK})
+}
+async function hapticsVibrateHeavyClick() {
+  const app = document.querySelector<App>('dweb-app')!;
+  // app.hapticsVibrate([1, 100, 1, 1])
+  await app.hapticsVibratePreset({type: VibratePresetType.HEAVY_CLICK})
+}
+
+async function hapticsVibrateDisabledWeb() {
+  if(window) {
+    window.navigator.vibrate([1, 63, 1, 119, 1, 129, 1])
+  } else if(globalThis) {
+    globalThis.navigator.vibrate([1, 63, 1, 119, 1, 129, 1])
+  }
+  
+}
+async function hapticsVibrateTickWeb() {
+  if(window) {
+    window.navigator.vibrate([10, 999, 1, 1])
+  } else if(globalThis) {
+    globalThis.navigator.vibrate([10, 999, 1, 1])
+  }
+}
+async function hapticsVibrateDoubleClickWeb() {
+  if(window) {
+    window.navigator.vibrate([10, 1])
+  } else if(globalThis) {
+    globalThis.navigator.vibrate([10, 1])
+  }
+}
+async function hapticsVibrateHeavyClickWeb() {
+  if(window) {
+    window.navigator.vibrate([1, 100, 1, 1])
+  } else if(globalThis) {
+    globalThis.navigator.vibrate([1, 100, 1, 1])
+  }
+}
+async function systemShare() {
+  const app = document.querySelector<App>('dweb-app')!;
+  await app.systemShare({title:"Ar扫雷", text: "hahahahaha"});
+}
+async function fileOpener() {
+  const app = document.querySelector<App>("dweb-app")!;
+  await app.fileOpener({filePath: "/嘎嘎.txt", openWithDefault: true})
 }
 </script>
 
@@ -105,6 +183,7 @@ async function pickCameraPhotos() {
   <dweb-status-bar id="status_bar" background-color="rgba(133,100,100,0.5)" bar-style="light-content"></dweb-status-bar>
   <dweb-keyboard id="key_board" hidden></dweb-keyboard>
   <dweb-navigation></dweb-navigation>
+  <dweb-camera></dweb-camera>
   <ion-button expand="block" fill="outline" @click="exitApp">退出APP</ion-button>
   <ion-button expand="block" fill="outline" @click="hideNavigation">点我隐藏系统navigation</ion-button>
   <ion-button expand="block" fill="outline" @click="getNavigationVisible">获取navigation颜色</ion-button>
@@ -117,6 +196,19 @@ async function pickCameraPhotos() {
   <ion-button shape="round" fill="outline" @click="takeCameraPhoto">拍摄照片</ion-button>
   <ion-button shape="round" fill="outline" @click="pickCameraPhoto">单张照片</ion-button>
   <ion-button shape="round" fill="outline" @click="pickCameraPhotos">多张照片</ion-button>
+  <ion-button expand="block" fill="outline" @click="hapticsImpact">触碰物体</ion-button>
+  <ion-button expand="block" fill="outline" @click="hapticsNotification">振动通知</ion-button>
+  <ion-button expand="block" fill="outline" @click="hapticsVibrate">反馈振动点击</ion-button>
+  <ion-button shape="round" fill="outline" @click="hapticsVibrateDisabled">反馈振动禁用</ion-button>
+  <ion-button shape="round" fill="outline" @click="hapticsVibrateDisabledWeb">反馈振动禁用web</ion-button>
+  <ion-button shape="round" fill="outline" @click="hapticsVibrateTick">反馈振动滴答</ion-button>
+  <ion-button shape="round" fill="outline" @click="hapticsVibrateTickWeb">反馈振动滴答web</ion-button>
+  <ion-button shape="round" fill="outline" @click="hapticsVibrateDoubleClick">反馈振动双击</ion-button>
+  <ion-button shape="round" fill="outline" @click="hapticsVibrateDoubleClickWeb">反馈振动双击web</ion-button>
+  <ion-button shape="round" fill="outline" @click="hapticsVibrateHeavyClick">反馈振动重击</ion-button>
+  <ion-button shape="round" fill="outline" @click="hapticsVibrateHeavyClickWeb">反馈振动重击web</ion-button>
+  <ion-button expand="block" fill="outline" @click="systemShare">分享文案</ion-button>
+  <ion-button expand="block" fill="outline" @click="fileOpener">打开文件</ion-button>
   <div id="placeholder"></div>
 </template>
 

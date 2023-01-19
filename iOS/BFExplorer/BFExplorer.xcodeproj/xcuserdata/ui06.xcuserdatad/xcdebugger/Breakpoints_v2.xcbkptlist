@@ -1406,9 +1406,9 @@
             filePath = "BFExplorer/Tab/BrowserTabHomeView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "268"
-            endingLineNumber = "268"
-            landmarkName = "updateHotNewsList(newsList:)"
+            startingLineNumber = "294"
+            endingLineNumber = "294"
+            landmarkName = "newsClicked(sender:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

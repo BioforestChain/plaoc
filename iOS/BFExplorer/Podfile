@@ -20,6 +20,7 @@ target 'BFExplorer' do
   pod 'SnapKit'
   pod 'EmptyDataSet-Swift'
   pod 'SwiftSoup'
+  pod 'SwiftyTimer'
 
   # Pods for BFExplorer
 

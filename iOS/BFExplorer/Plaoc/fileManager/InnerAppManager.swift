@@ -7,77 +7,71 @@
 
 import UIKit
 
-class BatchReadManager: NSObject {
+class InnerAppManager: NSObject {
 
-    var linkDict: [String: Any] = [:]
+    var linkDict: [String : [String : Any]] = [:]
     
+    //app的路径：推荐的app（本地配置好的），sys和user（已安装的，本地安装路径）
+    var filePath: String {""}
     
-    func filePath() -> String {  return "" }
+    var appInstalledPath: String { return "" }
     
-    func saveUpdateInfoFilePath() -> String { return "" }
+    func iconImagePath(appId: String) -> String { return "" }
     
-    func iconImagePath(fileName: String) -> String { return "" }
-    
-    //读取system-app文件夹下面的文件夹
-    func readAppSubFile() -> [String] {
-        return subFilePathNames(atPath: filePath())
-    }
-    
-    //读取文件夹下面的第一级文件夹
-    private func subFilePathNames(atPath path: String) -> [String] {
-        var fileList: [String] = []
-        guard let filePaths = FileManager.default.subpaths(atPath: path) else { return fileList }
-        for fileName in filePaths {
+    //读取各种app的信息（已安装的和推荐安装的）
+    func appDirs() -> [String] {
+        var appIds: [String] = []
+        let filePaths = FileManager.default.subpaths(atPath: filePath)
+        guard (filePaths != nil) else { return appIds }
+        filePaths?.forEach { appId in
             var isDir: ObjCBool = true
-            let fullPath = "\(path)/\(fileName)"
+            let fullPath = "\(filePath)/\(appId)"
             if FileManager.default.fileExists(atPath: fullPath, isDirectory: &isDir) {
-                if !isDir.boolValue {
-                    
-                } else {
+                if isDir.boolValue {
                     //后续是不需要判断.的，因为这是临时添加的，后续从网络获取
-                    if !fileName.contains("/"), !fileName.contains(".") {
-                        fileList.append(fileName)
+                    if !appId.contains("/"), !appId.contains(".") {
+                        appIds.append(appId)
                     }
                 }
             }
         }
-        return fileList
+        return appIds
     }
-    
+
     //读取bfs-app-id 的link文件信息
-    private func readBFSAppLinkContent(fileName: String) {
-        let path = filePath() + "/\(fileName)/boot/link.json"
+    private func readBFSAppLinkContent(appId: String) {
+        let path = filePath + "/\(appId)/boot/link.json"
         let manager = FileManager.default
         guard let data = manager.contents(atPath: path) else { return }
         guard let content = String(data: data, encoding: .utf8) else { return }
-        let tmpLinkDict = ChangeTools.stringValueDic(content)
-        linkDict[fileName] = tmpLinkDict
+        let linkConfig = ChangeTools.stringValueDic(content)
+        linkDict[appId] = linkConfig
     }
     
     //app名称
-    func appName(fileName: String) -> String {
-        var dict = linkDict[fileName] as? [String:Any]
-        if dict == nil {
-            readBFSAppLinkContent(fileName: fileName)
-            dict = linkDict[fileName] as? [String:Any]
+    func appName(appId: String) -> String {
+        var appConfig = linkDict[appId]
+        if appConfig == nil {
+            readBFSAppLinkContent(appId: appId)
+            appConfig = linkDict[appId]
         }
-        return dict?["name"] as? String ?? ""
+        return appConfig?["name"] as? String ?? ""
     }
     //app图片
-    func appIcon(fileName: String) -> UIImage? {
+    func appIcon(appId: String) -> UIImage? {
         
-        var dict = linkDict[fileName] as? [String:Any]
-        if dict == nil {
-            readBFSAppLinkContent(fileName: fileName)
-            dict = linkDict[fileName] as? [String:Any]
+        var appConfig = linkDict[appId]
+        if appConfig == nil {
+            readBFSAppLinkContent(appId: appId)
+            appConfig = linkDict[appId]
         }
         
-        var imageName = dict?["icon"] as? String ?? ""
+        var imageName = appConfig?["icon"] as? String ?? ""
         if imageName.hasPrefix("file://") {
             imageName = imageName.replacingOccurrences(of: "file://", with: "")
         }
         
-        let imagePath = iconImagePath(fileName: fileName) + imageName
+        let imagePath = iconImagePath(appId: appId) + imageName
         var image = UIImage(contentsOfFile: imagePath)
         if imagePath.hasSuffix(".svg") {
             image = UIImage.svgImage(withContentsOfFile: imagePath, size: CGSize(width: 28, height: 28))
@@ -85,11 +79,11 @@ class BatchReadManager: NSObject {
         return image
     }
     
-    func appIconUrlString(fileName: String) -> String? {
-        var dict = linkDict[fileName] as? [String:Any]
+    func appIconUrlString(appId: String) -> String? {
+        var dict = linkDict[appId] as? [String:Any]
         if dict == nil {
-            readBFSAppLinkContent(fileName: fileName)
-            dict = linkDict[fileName] as? [String:Any]
+            readBFSAppLinkContent(appId: appId)
+            dict = linkDict[appId] as? [String:Any]
         }
         
         let imageName = dict?["icon"] as? String
@@ -97,19 +91,19 @@ class BatchReadManager: NSObject {
     }
     
     //appID
-    func appID(fileName: String) -> String {
-        var dict = linkDict[fileName] as? [String:Any]
+    func appID(appId: String) -> String {
+        var dict = linkDict[appId] as? [String:Any]
         if dict == nil {
-            readBFSAppLinkContent(fileName: fileName)
-            dict = linkDict[fileName] as? [String:Any]
+            readBFSAppLinkContent(appId: appId)
+            dict = linkDict[appId] as? [String:Any]
         }
         return dict?["bfsAppId"] as? String ?? ""
     }
     
     //读取轮询更新缓存信息  取文件夹下面的很多文件
-    func readCacheUpdateInfo(fileName: String) -> [String:Any]? {
-        let filePath = saveUpdateInfoFilePath()
-        let updatePath = filePath + "/\(fileName)/tmp/autoUpdate/"
+    func readCacheUpdateInfo(appId: String) -> [String:Any]? {
+        let filePath = appInstalledPath
+        let updatePath = filePath + "/\(appId)/tmp/autoUpdate/"
         let manager = FileManager.default
         let subContents = try? manager.contentsOfDirectory(atPath: updatePath).sorted { $0 > $1 }
         guard let first = subContents?.first else { return nil }
@@ -121,9 +115,9 @@ class BatchReadManager: NSObject {
     
     
     //写入轮询更新的机制信息
-    func writeUpdateInfoToTmpFile(fileName: String, json: [String:Any]) {
-        let filePath = saveUpdateInfoFilePath()
-        var updatePath = filePath + "/\(fileName)/tmp/autoUpdate/"
+    func writeUpdateInfoToTmpFile(appId: String, json: [String:Any]) {
+        let filePath = appInstalledPath
+        var updatePath = filePath + "/\(appId)/tmp/autoUpdate/"
         if !FileManager.default.fileExists(atPath: updatePath) {
             try? FileManager.default.createDirectory(atPath: updatePath, withIntermediateDirectories: true)
         }
@@ -144,9 +138,9 @@ class BatchReadManager: NSObject {
         }
     }
     
-    func isNewUpdateInfo(fileName: String) -> Bool {
-        let filePath = saveUpdateInfoFilePath()
-        let updatePath = filePath + "/\(fileName)/tmp/autoUpdate/"
+    func isNewUpdateInfo(appId: String) -> Bool {
+        let filePath = appInstalledPath
+        let updatePath = filePath + "/\(appId)/tmp/autoUpdate/"
         let subContents = try? FileManager.default.contentsOfDirectory(atPath: updatePath).sorted { $0 > $1 }
         guard subContents != nil, subContents!.count > 1 else { return true }
         
@@ -178,21 +172,21 @@ class BatchReadManager: NSObject {
         return ""
     }
     
-    func readAutoUpdateURLInfo(fileName: String) -> String? {
-        var dict = linkDict[fileName] as? [String:Any]
+    func readAutoUpdateURLInfo(appId: String) -> String? {
+        var dict = linkDict[appId] as? [String:Any]
         if dict == nil {
-            readBFSAppLinkContent(fileName: fileName)
-            dict = linkDict[fileName] as? [String:Any]
+            readBFSAppLinkContent(appId: appId)
+            dict = linkDict[appId] as? [String:Any]
         }
         guard let updateDict = dict?["autoUpdate"] as? [String:Any] else { return nil }
         return updateDict["url"] as? String
     }
     
-    func readAutoUpdateMaxAge(fileName: String) -> Int? {
-        var dict = linkDict[fileName] as? [String:Any]
+    func readAutoUpdateMaxAge(appId: String) -> Int? {
+        var dict = linkDict[appId] as? [String:Any]
         if dict == nil {
-            readBFSAppLinkContent(fileName: fileName)
-            dict = linkDict[fileName] as? [String:Any]
+            readBFSAppLinkContent(appId: appId)
+            dict = linkDict[appId] as? [String:Any]
         }
         guard let updateDict = dict?["autoUpdate"] as? [String:Any] else { return nil }
         return updateDict["maxAge"] as? Int

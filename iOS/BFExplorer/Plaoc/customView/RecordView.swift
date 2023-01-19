@@ -22,10 +22,8 @@ class RecordView: UIView {
         try? session.setCategory(.playAndRecord)
         try? session.setActive(true)
         
-        if let docDir = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first {
-            aacPath = docDir + "/play.aac"
-        }
-        
+        aacPath = documentdir + "/play.aac"
+
         recorderSetingsDic = [
             AVFormatIDKey: NSNumber(value: kAudioFormatMPEG4AAC),
             AVNumberOfChannelsKey: 2, //录音的声道数，立体声为双声道

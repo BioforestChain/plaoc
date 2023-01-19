@@ -47,7 +47,7 @@ class ProgressAnimationView: UIImageView {
         return path
     }
     
-    lazy private var expandAnimation: CABasicAnimation = {
+    lazy  var expandAnimation: CABasicAnimation = {
         let animation = CABasicAnimation(keyPath: "path")
         animation.toValue = self.maskPathWithDiameter(diameter:150).cgPath
         animation.duration = 0.8
@@ -80,13 +80,19 @@ class ProgressAnimationView: UIImageView {
 extension ProgressAnimationView :CAAnimationDelegate {
     // 移除mask
     func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
+        if clockCircleLayer.animation(forKey: "clockRevealAnimation") == anim {
+            self.borderLayer.add(self.expandAnimation, forKey: "expandAnimation")
+        } else if self.borderLayer.animation(forKey: "expandAnimation") == anim {
+//            self.isStart = false
+            self.removeFromSuperview()
+        }
         
 //        if clockCircleLayer.animation(forKey: "clockRevealAnimation") == anim {
 //            self.borderLayer.add(self.expandAnimation(), forKey: "expandAnimation")
 //        }
-        if self.borderLayer.animation(forKey: "expandAnimation") == anim {
-            self.removeFromSuperview()
-        }
+//        if self.borderLayer.animation(forKey: "expandAnimation") == anim {
+//            self.removeFromSuperview()
+//        }
     }
 }
 
@@ -115,5 +121,10 @@ extension UIView {
     func startExpandAnimation() {
         guard let revealView = self.viewWithTag(viewTag) as? ProgressAnimationView else { return }
         revealView.borderLayerAnimation()
+    }
+    
+    func stopAnimation() {
+        guard let revealView = self.viewWithTag(viewTag) as? ProgressAnimationView else { return }
+        revealView.animationDidStop(revealView.expandAnimation, finished: true)
     }
 }

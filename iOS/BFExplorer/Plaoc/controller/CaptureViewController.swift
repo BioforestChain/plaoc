@@ -86,8 +86,7 @@ extension CaptureViewController {
     //开始按钮点击，开始录像
     @objc func onClickStartButton(_ sender: UIButton){
         guard !isRecording else { return }
-        guard let path = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first else { return }
-        let filePath = path + "/temp.mp4"
+        let filePath = documentdir + "/temp.mp4"
         let fileUrl = URL(fileURLWithPath: filePath)
         
         //启动视频编码输出

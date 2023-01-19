@@ -14,9 +14,9 @@ class NetworkMap {
     
     private var whiteString = ""
     private var importmap: [String:String] = [:]
-    func metaData(metadata:String, fileName: String) {
+    func metaData(metadata:String, appId: String) {
         guard let dict = ChangeTools.stringValueDic(metadata) else { return }
-        dWebView_host = fileName
+        dWebView_host = appId
         // 设置白名单
         if let list = dict["whitelist"] as? [String] {
             whiteString = list.joined()

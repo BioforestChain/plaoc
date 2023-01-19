@@ -18,6 +18,7 @@ PODS:
     - CocoaLumberjack (~> 3.0)
   - SwiftSoup (2.4.3)
   - SwiftyJSON (5.0.1)
+  - SwiftyTimer (2.1.0)
   - Toast-Swift (5.0.1)
   - UIColor_Hex_Swift (5.1.7)
   - ZLPhotoBrowser (4.3.7):
@@ -34,6 +35,7 @@ DEPENDENCIES:
   - SVGKit
   - SwiftSoup
   - SwiftyJSON
+  - SwiftyTimer
   - Toast-Swift
   - UIColor_Hex_Swift
   - ZLPhotoBrowser
@@ -51,6 +53,7 @@ SPEC REPOS:
     - SVGKit
     - SwiftSoup
     - SwiftyJSON
+    - SwiftyTimer
     - Toast-Swift
     - UIColor_Hex_Swift
     - ZLPhotoBrowser
@@ -67,10 +70,11 @@ SPEC CHECKSUMS:
   SVGKit: 1ad7513f8c74d9652f94ed64ddecda1a23864dea
   SwiftSoup: 3384f2e618cfc1b3cbc7852c16692fe8de13fb8f
   SwiftyJSON: 2f33a42c6fbc52764d96f13368585094bfd8aa5e
+  SwiftyTimer: 02dd6cf10cbc71cbf67cec494f6e5eb782102543
   Toast-Swift: 9b6a70f28b3bf0b96c40d46c0c4b9d6639846711
   UIColor_Hex_Swift: 31cd3e47440f07a20d2503a36bb0437a445b3c29
   ZLPhotoBrowser: f571bdaec6d0b64ae94a29787e4c7cbd8900d10f
 
-PODFILE CHECKSUM: 2235182e10bdbefca736e748b663754c7141dece
+PODFILE CHECKSUM: 273d3129468d3258d553a25c0409077b040e6b73
 
 COCOAPODS: 1.11.3

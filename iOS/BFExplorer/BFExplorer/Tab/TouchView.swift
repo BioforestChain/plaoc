@@ -11,7 +11,8 @@ class TouchView: UIButton{
     let realImageView = UIImageView()
     let realTitleLabel = UILabel()
     let maskButton = UIButton()
-
+    let redSpot = UIView()
+    
     var clickable:Bool = true{
         didSet{
             let image = realImageView.image?.withRenderingMode(.alwaysTemplate)
@@ -44,9 +45,23 @@ class TouchView: UIButton{
         realTitleLabel.font = .systemFont(ofSize: 13)
         addSubview(realImageView)
         addSubview(realTitleLabel)
-        
+
         realImageView.layer.cornerRadius = 12
-        realImageView.layer.masksToBounds = true    }
+        realImageView.layer.masksToBounds = true
+        
+        redSpot.frame = CGRect(x: frame.maxX-18, y: -2, width: 12, height: 12)
+        redSpot.backgroundColor = .systemRed
+        redSpot.layer.cornerRadius = 6
+        redSpot.layer.masksToBounds = true
+        redSpot.isHidden = true
+
+        addSubview(redSpot)
+
+    }
+    
+    func hideRedSpot(_ hide: Bool){
+        redSpot.isHidden = hide
+    }
     
     func setImage(image:UIImage){
         realImageView.image = image

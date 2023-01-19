@@ -14,7 +14,7 @@ import JavaScriptCore
 class WebViewViewController: UIViewController {
 
     var urlString: String = ""
-    var fileName: String = ""
+    var appId: String = ""
     private var isStatusHidden: Bool = false
     private var statusOverlay: Bool = false
     private var keyboardOverlay: Bool = false
@@ -51,7 +51,10 @@ class WebViewViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        jsManager = JSCoreManager.init(fileName: fileName, controller: self)
+        // 开启网络监听
+        ReachabilityManager.shared.startMonitoring()
+        
+        jsManager = JSCoreManager.init(appId: appId, controller: self)
         webView.jsManager = jsManager
     }
     
@@ -72,6 +75,11 @@ class WebViewViewController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(observerHiddenKeyboard(noti:)), name: UIResponder.keyboardWillHideNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(openDwebAction(noti:)), name: NSNotification.Name.openDwebNotification, object: nil)
         
+    }
+    
+    //释放时，停止网络监听
+    func dealloc() {
+        ReachabilityManager.shared.stopMonitoring()
     }
     
     @objc private func openDwebAction(noti: Notification) {
@@ -114,7 +122,7 @@ class WebViewViewController: UIViewController {
     }()
     
     lazy private var webView: CustomWebView = {
-        let webView = CustomWebView(frame: CGRect(x: 0, y: 44, width: self.view.bounds.width, height: UIScreen.main.bounds.height - 44), jsNames: ["console","network"], fileName: fileName, urlString: self.urlString)
+        let webView = CustomWebView(frame: CGRect(x: 0, y: 44, width: self.view.bounds.width, height: UIScreen.main.bounds.height - 44), jsNames: ["console","network"], appId: appId, urlString: self.urlString)
         webView.superVC = self
         webView.callback = { [weak self] title in
             guard let strongSelf = self else { return }

@@ -7,23 +7,17 @@
 
 import UIKit
 
-class BatchScanManager: BatchReadManager {
-
-    override func filePath() -> String {
-        guard let filePath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first else { return "" }
-        return filePath + "/scan-app"
+class UserAppManager: InnerAppManager {
+    override var appInstalledPath: String {
+        documentdir + "/user-app"
     }
     
-    override func saveUpdateInfoFilePath() -> String {
-        guard let filePath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first else { return "" }
-        return filePath + "/scan-app"
-    }
     
-    func writeLinkJson(fileName: String, dict: [String:Any]) {
+    func writeLinkJson(appId: String, dict: [String:Any]) {
         
         let jsonString = ChangeTools.dicValueString(dict) ?? ""
         guard jsonString.count > 0 else { return }
-        let path = filePath() + "/\(fileName)/boot/"
+        let path = filePath + "/\(appId)/boot/"
         if !FileManager.default.fileExists(atPath: path) {
             try? FileManager.default.createDirectory(atPath: path, withIntermediateDirectories: true)
         }

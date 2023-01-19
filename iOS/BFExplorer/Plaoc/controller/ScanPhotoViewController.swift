@@ -29,10 +29,10 @@ class ScanPhotoViewController: UIViewController {
         self.view.backgroundColor = .black
         self.view.addSubview(naviView)
         
-        operateMonitor.scanMonitor.subscribe(onNext: { [weak self] (fileName,dict) in
+        operateMonitor.scanMonitor.subscribe(onNext: { [weak self] (appId,dict) in
             guard let strongSelf = self else { return }
             DispatchQueue.main.async {
-                strongSelf.alertUpdateViewController(fileName: fileName, dataDict: dict)
+                strongSelf.alertUpdateViewController(appId: appId, dataDict: dict)
             }
         }).disposed(by: disposeBag)
     }
@@ -106,8 +106,10 @@ class ScanPhotoViewController: UIViewController {
 //            self.scanRectView?.layer.borderColor = UIColor.green.cgColor
 //            self.scanRectView?.layer.borderWidth = 1
             self.view.addSubview(self.scanRectView!)
-            
-            self.session?.startRunning()
+            DispatchQueue.global().async {
+                self.session?.startRunning()
+
+            }
             
             //通过代码拉近镜头焦距，放大内容区域让机器更好的识别
             do {
@@ -128,15 +130,15 @@ class ScanPhotoViewController: UIViewController {
         }
     }
     
-    private func alertUpdateViewController(fileName: String, dataDict: [String:Any]) {
+    private func alertUpdateViewController(appId: String, dataDict: [String:Any]) {
         let alertVC = UIAlertController(title: "确认下载更新吗？", message: nil, preferredStyle: .alert)
         let sureAction = UIAlertAction(title: "确认", style: .default) { action in
      
-            BatchFileManager.shared.scanToDownloadApp(fileName: fileName, dict: dataDict)
+            InnerAppFileManager.shared.scanToDownloadApp(appId: appId, dict: dataDict)
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 self.navigationController?.popViewController(animated: true)
-                self.callback?(fileName)
+                self.callback?(appId)
             }
         }
         let cancelAction = UIAlertAction(title: "取消", style: .cancel) { action in
@@ -210,7 +212,7 @@ extension ScanPhotoViewController: AVCaptureMetadataOutputObjectsDelegate {
             let result = metadataObj.stringValue  //扫描结果
             if result != nil {
 //                let refreshManager = RefreshManager()
-//                refreshManager.loadUpdateRequestInfo(fileName: nil, urlString: result, isCompare: false)
+//                refreshManager.loadUpdateRequestInfo(appId: nil, urlString: result, isCompare: false)
             }
         }
         self.stopScan()

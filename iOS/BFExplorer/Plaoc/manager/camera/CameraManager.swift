@@ -1,4 +1,3 @@
-//
 //  CameraManager.swift
 //  BFExplorer
 //
@@ -10,6 +9,8 @@ import Photos
 import PhotosUI
 import JavaScriptCore
 
+let sharedCameraMgr = CameraManager()
+
 class CameraManager: NSObject {
     private var settings = CameraSettings()
     private let defaultSource = CameraSource.prompt
@@ -18,9 +19,8 @@ class CameraManager: NSObject {
     private var multiple = false
     private var imageCounter = 0
     private var controller: WebViewViewController?
-    private var jsContext: JSContext?
     private var functionName: String?
-    
+
     public var isSimEnvironment: Bool {
         #if targetEnvironment(simulator)
         return true
@@ -28,23 +28,32 @@ class CameraManager: NSObject {
         return false
         #endif
     }
-    
+
     private func permissioned(action: @escaping (() -> Void)) {
-        permissionManager.startPermissionAuthenticate(type: .photo, isSet: true) { result in
-            if result {
-                action()
+        var cameraGranted = false, photoGranted = false;
+
+        for permission in CameraPermissionType.allCases {
+            switch permission {
+            case .camera:
+                permissionManager.startPermissionAuthenticate(type: .camera, isSet: true) { result in
+                    cameraGranted = result
+                }
+            case .photos:
+                permissionManager.startPermissionAuthenticate(type: .photo, isSet: true) { result in
+                    photoGranted = result
+                }
             }
         }
+
+        if cameraGranted && photoGranted {
+            action()
+        }
     }
-}
 
-
-
-extension CameraManager {
     // quality、resultType、saveToGallery、direction
     func cameraSettings(option: ImageOption) -> CameraSettings {
         var settings = CameraSettings()
-        
+
         settings.jpegQuality = min(abs(CGFloat(option.quality?.pk.toFloat ?? 100.0)) / 100.0, 1.0)
         settings.allowEditing = option.allowEditing ?? false
         settings.source = CameraSource(rawValue: option.source ?? defaultSource.rawValue) ?? defaultSource
@@ -54,72 +63,85 @@ extension CameraManager {
         if let typeString = option.resultType, let type = CameraResultType(rawValue: typeString) {
             settings.resultType = type
         }
-        
+
         settings.width = CGFloat(option.width ?? 0)
         settings.height = CGFloat(option.height ?? 0)
         if settings.width > 0 || settings.height > 0 {
             settings.shouldResize = true
         }
-        
+
         settings.userPromptText = CameraPromptText(title: option.promptLabelHeader,
                                                    photoAction: option.promptLabelPhoto,
                                                    cameraAction: option.promptLabelPicture,
                                                    cancelAction: option.promptLabelCancel)
-        
+
         if let styleString = option.presentationStyle, styleString == "popover" {
             settings.presentationStyle = .popover
         } else {
             settings.presentationStyle = .fullScreen
         }
-        
+
         return settings
     }
-    
+
+    // 异步返回结果
+    private func asyncReturnValue(_ result: [String: Any]) {
+        let functionName = self.functionName!
+        let data = ChangeTools.dicValueString(result) ?? "{'error': '\(functionName) return value error'}"
+        
+        controller?.jsManager.asyncReturnValue(functionName: functionName, result: data)
+    }
+
+    private func checkUsageDescriptions() -> String? {
+        if let dict = Bundle.main.infoDictionary {
+            for key in CameraPropertyListKeys.allCases where dict[key.rawValue] == nil {
+                return key.missingMessage
+            }
+        }
+        return nil
+    }
+}
+
+extension CameraManager {
     func showPrompt() {
         let alert = UIAlertController(title: settings.userPromptText.title, message: nil, preferredStyle: UIAlertController.Style.actionSheet)
         alert.addAction(UIAlertAction(title: settings.userPromptText.photoAction, style: .default, handler: { [weak self] (_: UIAlertAction) in
             self?.showPhotos()
         }))
-        
+
         alert.addAction(UIAlertAction(title: settings.userPromptText.cameraAction, style: .default, handler: { [weak self] (_: UIAlertAction) in
             self?.showCamera()
         }))
-        
+
         alert.addAction(UIAlertAction(title: settings.userPromptText.cancelAction, style: .default, handler: { [weak self] (_: UIAlertAction) in
             self?.asyncReturnValue(["error": "User cancelled photos app"])
         }))
-        
+
         self.setCenteredPopover(alert)
-        
+
         controller?.present(alert, animated: true, completion: nil)
     }
-    
+
     func showCamera() {
         if isSimEnvironment || !UIImagePickerController.isSourceTypeAvailable(UIImagePickerController.SourceType.camera) {
             self.asyncReturnValue(["error": "Camera not available while running in Simulator"])
             return
         }
-        
-        AVCaptureDevice.requestAccess(for: .video) {  [weak self] granted in
-            if granted {
-                DispatchQueue.main.async {
-                    self?.presentCameraPicker()
-                }
-            } else {
-                self?.asyncReturnValue(["error": "User denied access to camera"])
-            }
+
+        DispatchQueue.main.async {
+            self.presentCameraPicker()
         }
     }
-    
+
     func showPhotos() {
         presentSystemAppropriateImagePicker()
     }
-    
+
     func presentCameraPicker() {
         let picker = UIImagePickerController()
         picker.delegate = self
         picker.allowsEditing = self.settings.allowEditing
-        
+
         picker.sourceType = .camera
         if settings.direction == .rear, UIImagePickerController.isCameraDeviceAvailable(.rear) {
             picker.cameraDevice = .rear
@@ -134,7 +156,7 @@ extension CameraManager {
         }
         controller?.present(picker, animated: true, completion: nil)
     }
-    
+
     func presentSystemAppropriateImagePicker() {
         if #available(iOS 14, *) {
             presentPhotoPicker()
@@ -142,7 +164,7 @@ extension CameraManager {
             presentImagePicker()
         }
     }
-    
+
     func presentImagePicker() {
             let picker = UIImagePickerController()
             picker.delegate = self
@@ -157,7 +179,7 @@ extension CameraManager {
             }
             controller?.present(picker, animated: true, completion: nil)
         }
-    
+
     @available(iOS 14, *)
     func presentPhotoPicker() {
         var configuration = PHPickerConfiguration(photoLibrary: PHPhotoLibrary.shared())
@@ -165,20 +187,20 @@ extension CameraManager {
         configuration.filter = .images
         let picker = PHPickerViewController(configuration: configuration)
         picker.delegate = self
-        
+
         picker.modalPresentationStyle = settings.presentationStyle
-        
+
         if settings.presentationStyle == .popover {
             picker.popoverPresentationController?.delegate = self
-            
+
             if controller != nil {
                 setCenteredPopover(picker)
             }
-            
-            controller?.present(picker, animated: true, completion: nil)
         }
+
+        controller?.present(picker, animated: true, completion: nil)
     }
-    
+
     func processedImage(from image: UIImage, with metadata: [String: Any]?) -> ProcessedImage {
         var result = ProcessedImage(image: image, metadata: metadata ?? [:])
         if settings.shouldResize, settings.width > 0 || settings.height > 0 {
@@ -188,10 +210,10 @@ extension CameraManager {
             result.image = result.image.reformat()
             result.overwriteMetadataOrientation(to: 1)
         }
-        
+
         return result
     }
-    
+
     func returnImage(_ processedImage: ProcessedImage, isSaved: Bool) {
         guard let jpeg = processedImage.generateJPEG(with: settings.jpegQuality) else {
             self.asyncReturnValue(["error": "Unable to convert image to jpeg"])
@@ -216,7 +238,7 @@ extension CameraManager {
                 ])
                 return
             }
-            
+
             self.asyncReturnValue([
                 "path": fileURL.absoluteString,
                 "exif": processedImage.exifData,
@@ -253,9 +275,9 @@ extension CameraManager {
                 self.asyncReturnValue(["error": "Unable to get portable path to file"])
                 return
             }
-            
+
             let webURL = URL(fileURLWithPath: fileURL.path)
-            
+
             photos.append([
                 "path": fileURL.absoluteString,
                 "exif": processedImage.exifData,
@@ -263,10 +285,10 @@ extension CameraManager {
                 "format": "jpeg"
             ])
         }
-        
+
         self.asyncReturnValue(["photos": photos])
     }
-    
+
     func returnProcessedImage(_ processedImage: ProcessedImage) {
         // conditionally save the image
         if settings.saveToGallery && (processedImage.flags.contains(.edited) == true || processedImage.flags.contains(.gallery) == false) {
@@ -281,7 +303,7 @@ extension CameraManager {
             self.returnImage(processedImage, isSaved: false)
         }
     }
-    
+
     func saveTemporaryImage(_ data: Data) throws -> URL {
             var url: URL
             repeat {
@@ -292,7 +314,7 @@ extension CameraManager {
             try data.write(to: url, options: .atomic)
             return url
     }
-    
+
     func processImage(from info: [UIImagePickerController.InfoKey: Any]) -> ProcessedImage? {
             var selectedImage: UIImage?
             var flags: PhotoFlags = []
@@ -321,12 +343,12 @@ extension CameraManager {
             result.flags = flags
             return result
         }
-    
-    
-    
+
+
+
     func setCenteredPopover(_ vc: UIViewController) {
         if controller != nil {
-            vc.popoverPresentationController?.sourceRect = CGRectMake(controller!.view.center.x, controller!.view.center.y, 0, 0)
+            vc.popoverPresentationController?.sourceRect = CGRect(x:controller!.view.center.x, y:controller!.view.center.y, width:0, height:0)
             vc.popoverPresentationController?.sourceView = controller!.view
             vc.popoverPresentationController?.permittedArrowDirections = .init(rawValue: 0)
         }
@@ -340,7 +362,7 @@ extension CameraManager: PHPickerViewControllerDelegate {
             self.asyncReturnValue(["error": "User cancelled photos app"])
             return
         }
-        
+
         if multiple {
             var images: [ProcessedImage] = []
             var processCount = 0
@@ -349,7 +371,7 @@ extension CameraManager: PHPickerViewControllerDelegate {
                     self.asyncReturnValue(["error": "Error loading image"])
                     return
                 }
-                
+
                 img.itemProvider.loadObject(ofClass: UIImage.self) { [weak self] (reading, _) in
                     if let image = reading as? UIImage {
                         var asset: PHAsset?
@@ -373,7 +395,7 @@ extension CameraManager: PHPickerViewControllerDelegate {
                 self.asyncReturnValue(["error": "Error loading image"])
                 return
             }
-            
+
             result.itemProvider.loadObject(ofClass: UIImage.self) { [weak self] (reading, _) in
                 if let image = reading as? UIImage {
                     var asset: PHAsset?
@@ -386,7 +408,7 @@ extension CameraManager: PHPickerViewControllerDelegate {
                         return
                     }
                 }
-                
+
                 self?.asyncReturnValue(["error": "Error loading image"])
             }
         }
@@ -419,9 +441,8 @@ extension CameraManager: UIImagePickerControllerDelegate, UINavigationController
 }
 
 extension CameraManager {
-    func getPhoto(param: Any, controller: WebViewViewController?, jsContext: JSContext?, functionName: String) {
+    func getPhoto(param: Any, controller: WebViewViewController?, functionName: String) {
         self.controller = controller
-        self.jsContext = jsContext
         self.functionName = functionName
         self.multiple = false
         guard let param = param as? String else {
@@ -429,12 +450,18 @@ extension CameraManager {
             return
         }
         let jsonData = Data(param.utf8)
-        
+
         do {
             let option = try JSONDecoder().decode(ImageOption.self, from: jsonData)
             self.settings = cameraSettings(option: option)
             self.imageOption = option
-            
+
+            if let missingUsageDescription = checkUsageDescriptions() {
+                print("missingUsageDescription: \(missingUsageDescription)")
+                self.asyncReturnValue(["error": missingUsageDescription])
+                return
+            }
+
             permissioned {
                 DispatchQueue.main.async {
                     switch self.settings.source {
@@ -451,10 +478,9 @@ extension CameraManager {
             print(error.localizedDescription)
         }
     }
-    
-    func pickImages(param: Any, controller: WebViewViewController?, jsContext: JSContext?, functionName: String) {
+
+    func pickImages(param: Any, controller: WebViewViewController?, functionName: String) {
         self.controller = controller
-        self.jsContext = jsContext
         self.functionName = functionName
         self.multiple = true
         guard let param = param as? String else {
@@ -462,12 +488,12 @@ extension CameraManager {
             return
         }
         let jsonData = Data(param.utf8)
-        
+
         do {
             var option = try JSONDecoder().decode(ImageOption.self, from: jsonData)
             self.settings = cameraSettings(option: option)
             self.imageOption = option
-            
+
             permissioned {
                 DispatchQueue.main.async {
                     self.showPhotos()
@@ -477,10 +503,5 @@ extension CameraManager {
             print(error.localizedDescription)
             self.asyncReturnValue(["error": error.localizedDescription])
         }
-    }
-    
-    // 异步返回结果
-    private func asyncReturnValue(_ result: Any) {
-        self.jsContext?.evaluateScript("callDwebViewFactory('\(self.functionName)', '\(result)')")
     }
 }

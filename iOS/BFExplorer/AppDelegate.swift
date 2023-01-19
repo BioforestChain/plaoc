@@ -17,6 +17,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window?.makeKeyAndVisible()
 
         sharedCachesMgr.cacheNews()
+        appVersionMgr.startCheck()
         window?.rootViewController = UINavigationController(rootViewController: BrowserContainerViewController())
        
         return true
