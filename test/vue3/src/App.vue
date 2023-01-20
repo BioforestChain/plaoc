@@ -115,7 +115,7 @@ async function getBlockInfo() {
   <RouterView />
 
   <div class="bottombar">
-    <dweb-bottom-bar id="bottombar" background-color="#D0BCFF00" foreground-color="#1C1B1F00" height=70 overlay>
+    <dweb-bottom-bar id="bottombar" background-color="#D0BCFFEE" foreground-color="#1C1B1FEE" height=70 overlay>
       <dweb-bottom-bar-button id="ddd" selected @click="onBottomBar('one')">
         <dweb-bottom-bar-icon :source="bottomBarImg.one" type="AssetIcon"></dweb-bottom-bar-icon>
         <dweb-bottom-bar-text color="#938F99" selected-color="#1C1B1F" value="土地"></dweb-bottom-bar-text>

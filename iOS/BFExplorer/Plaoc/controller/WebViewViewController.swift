@@ -382,9 +382,9 @@ extension WebViewViewController {
         bottomView.hiddenBottomViewButton(hidden: hidden)
     }
     
-    //获取底部按钮
-    func fetchBottomButtons(content: String) {
-        bottomView.fetchBottomButtons(content: content)
+    //更新底部按钮
+    func updateBottomButtons(content: String) {
+        bottomView.updateBottomButtons(content: content)
     }
     //返回底部按钮数组
     func bottomActions() -> String {

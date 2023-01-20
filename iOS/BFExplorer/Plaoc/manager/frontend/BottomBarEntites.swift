@@ -45,7 +45,7 @@ extension PlaocHandleModel {
     //设置低部栏按钮
     func updateBottomBarActions(param: Any) -> String {
         guard let param = param as? String else { return "" }
-        controller?.fetchBottomButtons(content: param)
+        controller?.updateBottomButtons(content: param)
         return ""
     }
     //低部栏背景色
