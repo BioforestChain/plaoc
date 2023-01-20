@@ -12,9 +12,7 @@ import info.bagen.rust.plaoc.system.device.DeviceInfo
 import info.bagen.rust.plaoc.system.device.Network
 import info.bagen.rust.plaoc.system.fileopener.FileOpener
 import info.bagen.rust.plaoc.system.fileopener.FileOpenerOption
-import info.bagen.rust.plaoc.system.haptics.HapticsImpactType
-import info.bagen.rust.plaoc.system.haptics.HapticsNotificationType
-import info.bagen.rust.plaoc.system.haptics.VibrateManage
+import info.bagen.rust.plaoc.system.haptics.*
 import info.bagen.rust.plaoc.system.notification.NotificationMsgItem
 import info.bagen.rust.plaoc.system.notification.NotifyManager
 import info.bagen.rust.plaoc.system.permission.PermissionManager

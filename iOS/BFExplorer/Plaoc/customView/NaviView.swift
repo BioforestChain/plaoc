@@ -30,6 +30,7 @@ class NaviView: UIView {
     private var buttonList: [UIButton] = []
     private(set) var naviOverlay: Bool = false
     
+    private var homePath: String?
     var buttons: [ButtonModel]? {
         didSet {
             guard buttons != nil else { return }
@@ -39,28 +40,35 @@ class NaviView: UIView {
             buttonList.removeAll()
             
             let space: CGFloat = 16
-            let width: CGFloat = 44
+            let width: CGFloat = 30
             
             let originX = self.frame.width - CGFloat(buttons!.count) * (width + space)
             
             for i in stride(from: 0, to: buttons!.count, by: 1) {
                 let model = buttons![i]
-                let button = UIButton(type: .contactAdd)
-                button.tag = i
+                var button: UIButton
+                
                 let imageName = model.iconModel?.source ?? ""
                 if model.iconModel?.type == "AssetIcon" {
+                    button = UIButton(type: .custom)
                     if imageName.hasSuffix("svg") {
-                        button.setImage(UIImage.svgImage(withURL: imageName, size: CGSize(width: width, height: width)), for: .normal)
+                        var imagePath: String = imageName
+                        
+                        if !imageName.hasPrefix("http") {
+                            imagePath = URL(fileURLWithPath: homePath! + imageName).path
+                            
+                            button.setImage(UIImage.svgImageNamed(imagePath, size: CGSize(width: width, height: width)), for: .normal)
+                        } else {
+                            button.setImage(UIImage.svgImage(withURL: imagePath, size: CGSize(width: width, height: width)), for: .normal)
+                        }
                     } else {
                         button.sd_setImage(with: URL(string: imageName), for: .normal)
                     }
                 } else {
-                    if imageName.hasSuffix("svg") {
-                        button.setImage(UIImage.svgImageNamed(imageName, size: CGSize(width: width, height: width)), for: .normal)
-                    } else {
-                        button.setImage(UIImage(named: imageName), for: .normal)
-                    }
+                    button = UIButton(type: .contactAdd)
+                    button.setImage(UIImage(named: imageName), for: .normal)
                 }
+                button.tag = i
                 button.isEnabled = !(model.disabled ?? false)
 //                button.menu = menuAction()
                 button.addTarget(self, action: #selector(clickAction(sender:)), for: .touchUpInside)
@@ -70,11 +78,28 @@ class NaviView: UIView {
                     // Fallback on earlier versions
                 }
                 button.showsTouchWhenHighlighted = true
-                button.frame = CGRect(x: originX + CGFloat(i) * (width + space), y: 0, width: width, height: width)
+                button.frame = CGRect(x: originX + CGFloat(i) * (width + space), y: 7, width: width, height: width)
                 self.addSubview(button)
                 buttonList.append(button)
             }
         }
+    }
+                                            
+    // 获取首页目录
+    private func getHomePath() -> String {
+        let controller = currentViewController() as? WebViewViewController
+        
+        if controller != nil {
+            guard let appId = controller?.appId else {
+                return ""
+            }
+            
+            let homePath = documentdir + "/system-app/\(appId)/home"
+            
+            return homePath
+        }
+        
+        return ""
     }
     
     var callback: ClickViewCallback?
@@ -94,10 +119,8 @@ class NaviView: UIView {
     lazy private var backButton: UIButton = {
         let button = UIButton(type: .system)
         button.frame = CGRect(x: 16, y: 0, width: 50, height: self.frame.height)
-        button.setTitle("返回", for: .normal)
-        button.setTitleColor(UIColor.black, for: .normal)
+        button.setImage(UIImage(named: "left_d"), for: .normal)
         button.contentHorizontalAlignment = .left
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 16)
         button.addTarget(self, action: #selector(backAction), for: .touchUpInside)
         return button
     }()
