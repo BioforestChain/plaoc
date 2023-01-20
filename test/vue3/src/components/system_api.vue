@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { IonFab, IonFabButton, IonFabList, IonButton, IonIcon } from '@ionic/vue';
 import { defineComponent, onMounted } from 'vue';
-import { BfcsKeyboard, Navigation, BfcsStatusBar, App, DwebCamera, CameraDirection, CameraResultType, CameraSource, ImpactStyle, NotificationType, VibratePresetType } from '@bfsx/plugin';
+import { BfcsKeyboard, Navigation, BfcsStatusBar, App, DwebCamera, CameraDirection, CameraResultType, CameraSource, ImpactStyle, NotificationType, VibratePresetType, OpenScanner } from '@bfsx/plugin';
 
 defineComponent({
   components: { IonFab, IonFabButton, IonFabList, IonButton, IonIcon }
@@ -175,6 +175,16 @@ async function fileOpener() {
   const app = document.querySelector<App>("dweb-app")!;
   await app.fileOpener({filePath: "/嘎嘎.txt", openWithDefault: true})
 }
+async function toggleTorch() {
+  const scanner = document.querySelector<OpenScanner>('dweb-scanner')!;
+  await scanner.toggleTorch();
+}
+async function getTorchState() {
+  const scanner = document.querySelector<OpenScanner>('dweb-scanner')!;
+  const app = document.querySelector<App>("dweb-app")!;
+  const result = await scanner.getTorchState();
+  await app.showToast(result as string, "short");
+}
 </script>
 
 <template>
@@ -209,6 +219,8 @@ async function fileOpener() {
   <ion-button shape="round" fill="outline" @click="hapticsVibrateHeavyClickWeb">反馈振动重击web</ion-button>
   <ion-button expand="block" fill="outline" @click="systemShare">分享文案</ion-button>
   <ion-button expand="block" fill="outline" @click="fileOpener">打开文件</ion-button>
+  <ion-button expand="block" fill="outline" @click="toggleTorch">打开/关闭手电筒</ion-button>
+  <ion-button expand="block" fill="outline" @click="getTorchState">获取手电筒状态</ion-button>
   <div id="placeholder"></div>
 </template>
 

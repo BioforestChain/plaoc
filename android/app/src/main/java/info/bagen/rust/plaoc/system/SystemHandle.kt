@@ -67,6 +67,20 @@ fun splicingPath(bfsId:String, entry:String):String {
  fun initSystemFn(activity: MainActivity) {
   callable_map[ExportNative.OpenQrScanner] = { activity.openScannerActivity() }
   callable_map[ExportNative.BarcodeScanner] = { activity.openBarCodeScannerActivity() }
+  // 打开/关闭手电筒
+  callable_map[ExportNative.ToggleTorch] = {
+    if (FlashLightUtils.hasFlashlight()) {
+      if (FlashLightUtils.isOn) {
+        FlashLightUtils.lightOff()
+      } else {
+        FlashLightUtils.lightOn()
+      }
+    }
+  }
+  // 获取手电筒状态
+  callable_map[ExportNative.GetTorchState] = {
+    createBytesFactory(ExportNative.GetTorchState, FlashLightUtils.isOn.toString())
+  }
   callable_map[ExportNative.OpenDWebView] = {
     activity.openDWebViewActivity(it)
   }

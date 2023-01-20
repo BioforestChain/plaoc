@@ -1,5 +1,6 @@
 package info.bagen.rust.plaoc.system.camera
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.hardware.Camera
@@ -10,6 +11,7 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import info.bagen.rust.plaoc.App
 
+@SuppressLint("StaticFieldLeak")
 object FlashLightUtils {
   private val context: Context = App.appContext
 
