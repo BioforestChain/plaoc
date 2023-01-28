@@ -62,7 +62,7 @@ class FeedbackGenerator: NSObject {
         }
     }
     
-    static func vibrate(durationArr: [Double]) {
+    static func vibrate0(durationArr: [Double]) {
         if CHHapticEngine.capabilitiesForHardware().supportsHaptics {
             do {
                 let engine = try CHHapticEngine()
@@ -105,6 +105,64 @@ class FeedbackGenerator: NSObject {
                 let pattern = try CHHapticPattern(events: events, parameters: [])
                 let player = try engine.makePlayer(with: pattern)
                 try player.start(atTime: 0)
+            } catch {
+                AudioServicesPlayAlertSound(SystemSoundID(kSystemSoundID_Vibrate))
+            }
+        } else {
+            AudioServicesPlayAlertSound(SystemSoundID(kSystemSoundID_Vibrate))
+        }
+    }
+    
+    static func vibrate(durationArr: [Double]) {
+        if CHHapticEngine.capabilitiesForHardware().supportsHaptics {
+            do {
+                let engine = try CHHapticEngine()
+                try engine.start()
+                engine.resetHandler = {
+                    do {
+                        try engine.start()
+                    } catch {
+                        AudioServicesPlayAlertSound(SystemSoundID(kSystemSoundID_Vibrate))
+                    }
+                }
+              
+                var events: [CHHapticEvent] = []
+                var relativeTime = 0.0
+                
+                durationArr.enumerated().forEach { index, duration in
+                    print("index: \(index) duration: \(duration)")
+                    if index % 2 == 0 {
+                        
+                        let intensity = CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.5)
+                        let sharpness = CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.6)
+                        let continuousEvent = CHHapticEvent(eventType: .hapticContinuous, parameters: [intensity, sharpness], relativeTime: relativeTime, duration: max(0.01, Double(duration)/1000))
+                        events.append(continuousEvent)
+                    }
+
+                    print("relativeTime: \(relativeTime) duration: \(Double(duration)/1000)")
+                    relativeTime += Double(duration)/1000
+
+                }
+//                for i in stride(from: 0, to: 1, by: 0.1) {
+//                    let intensity = CHHapticEventParameter(parameterID: .hapticIntensity, value: Float(i))
+//                    let sharpness = CHHapticEventParameter(parameterID: .hapticSharpness, value: Float(i))
+//                    let event = CHHapticEvent(eventType: .hapticTransient, parameters: [intensity, sharpness], relativeTime: i)
+//                    events.append(event)
+//                }
+//
+//                for i in stride(from: 0, to: 1, by: 0.1) {
+//                    let intensity = CHHapticEventParameter(parameterID: .hapticIntensity, value: Float(1 - i))
+//                    let sharpness = CHHapticEventParameter(parameterID: .hapticSharpness, value: Float(1 - i))
+//                    let event = CHHapticEvent(eventType: .hapticTransient, parameters: [intensity, sharpness], relativeTime: 1 + i)
+//                    events.append(event)
+//                }
+//
+                
+                let pattern = try CHHapticPattern(events: events, parameters: [])
+                let player = try engine.makePlayer(with: pattern)
+                try player.start(atTime: 0)
+                
+           
             } catch {
                 AudioServicesPlayAlertSound(SystemSoundID(kSystemSoundID_Vibrate))
             }
