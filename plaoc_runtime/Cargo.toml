@@ -1,0 +1,21 @@
+[package]
+authors = ["BFS"]
+description = "BFS system runtime"
+edition = "2021"
+keywords = ["plaoc", "javascriptcore", "javascript"]
+license = "MIT"
+name = "plaoc_runtime"
+repository = "https://github.com/BioforestChain/plaoc"
+version = "0.1.0"
+
+[lib]
+crate-type = ["cdylib"]
+name = "rust_lib"
+
+[dependencies]
+anyhow = "1.0.62"
+#rusty_jsc
+rusty_jsc = { path = "./rusty_jsc" }
+rusty_jsc_macros = { path = "./rusty_jsc/macros" }
+rusty_jsc_sys = { path = "./rusty_jsc/sys" }
+#rusty_jsc end
