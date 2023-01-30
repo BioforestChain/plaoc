@@ -373,7 +373,7 @@ extension PlaocHandleModel {
     // 打开文件
     private func executiveFileOpener(param: Any, functionName: String) {
         let homePath = getDwebAppPath()
-        fileOpenManager.open(param: param, controller: self.controller, functionName: functionName, homePath: homePath)
+        //fileOpenManager.open(param: param, controller: self.controller, functionName: functionName, homePath: homePath)
     }
 }
 
