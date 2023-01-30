@@ -1,13 +1,12 @@
 // #![cfg(target_os = "android")]
-use crate::js_bridge::{
-    call_android_function,
-    call_js_function::{BUFFER_INSTANCES, BUFFER_INSTANCES_MAP},
-};
 #[cfg(target_os = "android")]
 use crate::module_loader::AssetsModuleLoader;
-use crate::my_deno_runtime::bootstrap_deno_fs_runtime;
 #[cfg(target_os = "android")]
 use crate::my_deno_runtime::bootstrap_deno_runtime;
+use crate::{
+    js_bridge::{call_android_function, call_js_function::BUFFER_INSTANCES},
+    my_deno_runtime::{bootstrap_deno_fs_runtime, JS_CONTEXT},
+};
 use android_logger::Config;
 use deno_core::ZeroCopyBuf;
 use jni::{
@@ -50,6 +49,7 @@ pub async extern "system" fn Java_info_bagen_rust_plaoc_DenoService_onlyReadRunt
         ndk_sys::AAssetManager_fromJava(env.get_native_interface(), _jasset_manager.cast())
     };
     let _entrance: String = env.get_string(terget).unwrap().into();
+
     #[cfg(target_os = "android")]
     let runtime = bootstrap_deno_runtime(
         Arc::new(AssetsModuleLoader::from_ptr(
@@ -84,11 +84,12 @@ pub async extern "system" fn Java_info_bagen_rust_plaoc_DenoService_denoRuntime(
     );
     let asset_path = String::from(env.get_string(path).unwrap());
     log::info!(" denoRuntime :启动BFS后端 !! => {}", asset_path);
+
     let runtime = bootstrap_deno_fs_runtime(asset_path.as_str()).await;
+
     match runtime {
         Ok(_worker) => {
             log::info!("DenoService_denoRuntime end");
-            // DenoRuntime::new(worker);
         }
         Err(e) => {
             log::info!("DenoService_denoRuntime error:{:?}", e);
@@ -104,8 +105,8 @@ pub async extern "system" fn Java_info_bagen_rust_plaoc_DenoService_backDataToRu
     byte_data: jbyteArray, //  /channel/354481793036294/chunk=
 ) {
     let buffer_array = env.convert_byte_array(byte_data).unwrap();
-    let data_string = std::str::from_utf8(&buffer_array).unwrap().to_string();
-    log::info!(" backDataToRust:{:?}", &data_string);
+    // let data_string = std::str::from_utf8(&buffer_array).unwrap().to_string();
+    // log::info!(" backDataToRust:{:?}", &data_string);
 
     let mut buffer_data = BUFFER_INSTANCES.lock().unwrap();
 
@@ -148,16 +149,41 @@ pub async extern "C" fn Java_info_bagen_rust_plaoc_DenoService_backSystemDataToR
     byte_data: jbyteArray, // 内存地址
 ) {
     let buffer_array = env.convert_byte_array(byte_data).unwrap();
-    // log::info!("rust#backSystemDataToRust:{:?}",buffer_array);
-    // let data_string = std::str::from_utf8(&buffer_array).unwrap();
-    // log::info!(" backSystemDataToRust:{:?}", data_string);
-    let head_view = get_head_view_id(&buffer_array);
-    log::info!("rust#backSystemDataToRust,head_view{:?}", head_view);
 
-    let mut buffer_map = BUFFER_INSTANCES_MAP.lock().unwrap();
-    // 存入map
-    let buffer = buffer_map.insert(head_view, ZeroCopyBuf::new_temp(buffer_array));
-    log::info!("rust#backSystemDataToRustxxbuffer:{:?}", buffer);
+    let head_view = get_head_view_id(&buffer_array);
+    let js_code = format!(
+        r#"
+        try {{
+            _getRustBuffer('{}',{:?});
+        }} catch(e) {{
+            console.log(e)
+        }}
+    "#,
+        head_view, buffer_array
+    );
+    unsafe {
+        log::info!(
+            "rust#backSystemDataToRust,js_code {:?},{}",
+            &js_code,
+            JS_CONTEXT.len()
+        );
+        let event = JS_CONTEXT[0].execute_script("", &js_code);
+
+        log::info!("rust#backSystemDataToRust,js_code 执行成功🍟");
+        match event {
+            Ok(_) => {
+                log::info!("rust#backSystemDataToRust,ok JS_CONTEXT 执行成功🍟");
+            }
+            Err(e) => {
+                log::info!("rust#backSystemDataToRust,error{:?}", e);
+            }
+        }
+    }
+    // let mut buffer_map = BUFFER_INSTANCES_MAP.lock().unwrap();
+    // // 存入map
+    // let buffer = buffer_map.insert(head_view, ZeroCopyBuf::new_temp(buffer_array));
+    // log::info!("rust#backSystemDataToRustxxbuffer:{:?}", buffer);
+
     // 此处需要等deno-js 那边不再轮询才能使用future
     // if let Ok(byte) = buffer {
     //     buffer_map.resolve(byte);

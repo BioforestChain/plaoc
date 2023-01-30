@@ -264,19 +264,19 @@ impl BufferTask {
             data: HashMap::new(),
         }
     }
-    pub fn insert(&mut self, head_view: String, buffer: ZeroCopyBuf) -> Result<ZeroCopyBuf, ()> {
-        self.data.insert(head_view.clone(), buffer);
-        let res = self.data.get(&head_view);
-        // log::info!(" BufferTaskxx 🥳 insert res:{:?}",res);
-        match res {
-            Some(byte) => {
-                return Ok(byte.clone());
-            }
-            None => {
-                return Err(());
-            }
-        }
-    }
+    // pub fn insert(&mut self, head_view: String, buffer: ZeroCopyBuf) -> Result<ZeroCopyBuf, ()> {
+    //     self.data.insert(head_view.clone(), buffer);
+    //     let res = self.data.get(&head_view);
+    //     // log::info!(" BufferTaskxx 🥳 insert res:{:?}",res);
+    //     match res {
+    //         Some(byte) => {
+    //             return Ok(byte.clone());
+    //         }
+    //         None => {
+    //             return Err(());
+    //         }
+    //     }
+    // }
     pub fn get(&mut self, head_view: String) -> ZeroCopyBuf {
         let data = self.data.get(&head_view);
         // thread::sleep(Duration::from_micros(500)); // 微秒
@@ -286,7 +286,7 @@ impl BufferTask {
                 // log::info!(" BufferTask 🥳 get Some {:?}",byte);
                 let buff = byte.clone();
                 self.data.remove(&head_view);
-                return buff
+                return buff;
             }
             None => {
                 // log::info!(" BufferTask 🥵 get None");

@@ -341,10 +341,8 @@ impl WebWorker {
     ) -> (Self, SendableWebWorkerHandle) {
         log::info!("bootstrap_from_options 1");
         let bootstrap_options = options.bootstrap.clone();
-        log::info!("bootstrap_from_options 2");
         let (mut worker, handle) =
             Self::from_options(name, permissions, main_module, worker_id, options);
-        log::info!("bootstrap_from_options 3");
         worker.bootstrap(&bootstrap_options);
         log::info!("bootstrap_from_options 4");
         (worker, handle)
@@ -685,9 +683,9 @@ pub fn run_web_worker(
                     worker.execute_main_module(id).await
                 }
                 Err(e) => {
-                    println!("execute_main_module:1->  {:?}",e);
+                    println!("execute_main_module:1->  {:?}", e);
                     Err(e)
-                },
+                }
             }
         };
 
