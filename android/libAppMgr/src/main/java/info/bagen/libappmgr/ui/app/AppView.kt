@@ -139,8 +139,8 @@ fun AppInfoView(appViewModel: AppViewModel, appViewState: AppViewState, onOpenAp
         downLoadViewModel = appViewState.maskViewState.downLoadViewModel,
         modifier = Modifier
           .size(50.dp)
-          //.clip(RoundedCornerShape(12.dp))
-          .clip(CircleShape)
+          .clip(RoundedCornerShape(6.dp))
+          //.clip(CircleShape)
           .align(Alignment.TopCenter)
           .background(Color.Black.copy(alpha = 0.6f))
           .padding(6.dp),

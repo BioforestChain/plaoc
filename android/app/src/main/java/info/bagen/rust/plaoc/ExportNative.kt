@@ -4,6 +4,8 @@ package info.bagen.rust.plaoc
 enum class ExportNative(val type: String) {
   OpenQrScanner("openQrScanner"), // 打开扫码-二维码
   BarcodeScanner("barcodeScanner"), // 打开扫码-条形码
+  ToggleTorch("toggleTorch"), // 打开/关闭手电筒
+  GetTorchState("getTorchState"), // 获取手电筒状态
   ExitApp("ExitApp"), // 退出app
   OpenDWebView("openDWebView"), // 打开DwebView
   InitMetaData("initMetaData"),
