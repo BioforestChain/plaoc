@@ -15,13 +15,10 @@ let minRegularInterval: TimeInterval = 5
 let appVersionMgr = AppVersionManager()
 
 class AppVersionManager: NSObject {
-    
-    
     override init() {
         super.init()
         //只需要读取一次，跟着版本走的
         readAllupdateIntervalMap()
-        
     }
     
     var updateIntervalMap = [String : Int]()
@@ -62,7 +59,7 @@ class AppVersionManager: NSObject {
         }
     }
     
-    
+    //读取轮询时间配置
     private func readAllupdateIntervalMap(){
         let configs = sharedRecommendAppManager.fetchAllRecommandAppLinkConfig()
         sharedRecommendAppManager.appDirs().forEach { appId in
@@ -82,6 +79,7 @@ class AppVersionManager: NSObject {
         updateIntervalMap["DDDDD"] = Int(20 / minRegularInterval) //4
     }
     
+    //获取app版本信息
     func requestAppVersion(by appId: String){
         guard let url = versionMap[appId] as String? else { return }
         
@@ -98,7 +96,7 @@ class AppVersionManager: NSObject {
     func cacheAppVersionToLocalFile(appId: String, config: [String:Any]){
         guard let serverVersion = config["version"] as? String else { return }
         
-        if !self.shouldCacheVersionInfo(appId: appId, to: "1.0.2"){
+        if !self.shouldCacheVersionInfo(appId: appId, to: serverVersion){
             return
         }
         
@@ -130,18 +128,23 @@ class AppVersionManager: NSObject {
         let sortedDirs = try? manager.contentsOfDirectory(atPath: configDir).sorted { $0 > $1 }
         if let dirs = sortedDirs, dirs.count > 5 {
             for i in 5...dirs.count-1{
-                try? manager.removeItem(atPath: configDir + "/" + dirs[i])
+                do {
+                    try manager.removeItem(atPath: configDir + "/" + dirs[i])
+                } catch {
+                    print(error.localizedDescription)
+                }
             }
         }
     }
 
-    
+    //判断是否需要缓存此次app版本信息
     func shouldCacheVersionInfo(appId: String, to serverVersion: String) -> Bool{
         guard let localVersionConfig = self.localRecordedAppConfig(appId: appId) else { return true }
         guard let localVersion = localVersionConfig["version"] as? String else { return true}
-        return isIncreasing(nowVersion: localVersion, newVersion: serverVersion)
+        return isVersionIncreasing(nowVersion: localVersion, newVersion: serverVersion)
     }
     
+    //app的版本信息缓存路径
     private func appVersionConfigDir(for appId: String) -> String {
         let type = sharedInnerAppFileMgr.currentAppType(appId: appId)
         var appDir = ""
@@ -155,7 +158,7 @@ class AppVersionManager: NSObject {
         return appDir + "/\(appId)/tmp/autoUpdate"
     }
     
-    //取本地最新的记录
+    //取本地最新的版本记录
     func localRecordedAppConfig(appId: String) -> [String:Any]? {
         let configDir = self.appVersionConfigDir(for: appId)
         
@@ -168,7 +171,8 @@ class AppVersionManager: NSObject {
         return ChangeTools.stringValueDic(cacheString)
     }
     
-    func isIncreasing(nowVersion:String, newVersion:String) -> Bool {
+    //是否有新版本
+    func isVersionIncreasing(nowVersion:String, newVersion:String) -> Bool {
         let nowArray = nowVersion.split(separator: ".")
         let newArray = newVersion.split(separator: ".")
         let count = nowArray.count > newArray.count ? newArray.count : nowArray.count
