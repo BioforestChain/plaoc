@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import HelloWorld from '../components/HelloWorld.vue'
 import System_api from '../components/system_api.vue';
+import Micro from "../components/micro.vue";
 import Dialogs from '../components/dialogs.vue';
 import { IonButton } from '@ionic/vue';
 import { useRouter } from 'vue-router';
@@ -32,6 +33,7 @@ defineProps<{ scannerData: string }>()
         <img src="../assets/waterbang.png" class="logo vue" alt="Vue logo" />
       </a>
     </div>
+    <Micro></Micro>
     <Dialogs></Dialogs>
     <System_api></System_api>
   </div>
