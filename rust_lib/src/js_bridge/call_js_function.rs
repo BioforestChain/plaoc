@@ -1,11 +1,9 @@
 // #![cfg(target_os = "android")]
 use super::promise::{BufferInstance, BufferTask};
 use crate::js_bridge::call_android_function;
-use android_logger::Config;
 use deno_core::error::{custom_error, AnyError};
 use deno_core::{op, ZeroCopyBuf};
 use lazy_static::*;
-use log::Level;
 use std::str;
 use std::sync::{Arc, Mutex};
 
